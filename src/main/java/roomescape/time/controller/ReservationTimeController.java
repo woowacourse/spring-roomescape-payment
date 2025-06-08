@@ -3,6 +3,7 @@ package roomescape.time.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.time.service.ReservationTimeService;
 
+@Slf4j
 @RequestMapping("/times")
 @RestController
 public class ReservationTimeController {
@@ -25,25 +27,24 @@ public class ReservationTimeController {
         this.reservationTimeService = reservationTimeService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReservationTimeResponse>> readAllReservationTimes() {
-        List<ReservationTimeResponse> responses = reservationTimeService.getAll();
-
-        return ResponseEntity.ok(responses);
-    }
-
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody final ReservationTimeRequest request) {
+        log.info("예약 시간 생성 요청: startAt={}", request.startAt());
         ReservationTimeResponse response = reservationTimeService.create(request);
-
         return ResponseEntity.created(URI.create("/times/" + response.id()))
                 .body(response);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ReservationTimeResponse>> readAllReservationTimes() {
+        List<ReservationTimeResponse> responses = reservationTimeService.getAll();
+        return ResponseEntity.ok(responses);
+    }
+
     @DeleteMapping("/{timeId}")
     public ResponseEntity<Void> delete(@PathVariable("timeId") final Long timeId) {
+        log.info("예약 시간 삭제 요청: timeId={}", timeId);
         reservationTimeService.delete(timeId);
-
         return ResponseEntity.noContent().build();
     }
 

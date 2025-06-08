@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -41,6 +42,7 @@ import roomescape.time.domain.ReservationTime;
 import roomescape.time.domain.ReservationTimeId;
 import roomescape.time.repository.ReservationTimeRepository;
 
+@Slf4j
 @Service
 public class ReservationService {
 
@@ -73,6 +75,7 @@ public class ReservationService {
         Reservation reservation = createReservation(request, request.loginMember());
         validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         Reservation savedReservation = reservationRepository.save(reservation);
+        log.info("예약 저장 완료: reservationId={}", savedReservation.getId());
 
         return ReservationResponse.from(savedReservation);
     }
@@ -87,6 +90,7 @@ public class ReservationService {
         Reservation reservation = createReservation(request, request.loginMember());
         validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         Reservation savedReservation = reservationRepository.save(reservation);
+        log.info("예약 저장 완료: reservationId={}", savedReservation.getId());
 
         paymentService.create(savedReservation.getId(), paymentRequest);
 
@@ -147,7 +151,7 @@ public class ReservationService {
 
         paymentService.delete(reservationId);
         reservationRepository.deleteById(reservationId);
-
+        log.info("예약 삭제 완료: reservationId={}", reservationId);
         approveFirstWaiting(reservation);
     }
 
@@ -164,6 +168,7 @@ public class ReservationService {
         LocalDateTime dateTime = LocalDateTime.of(date, time);
 
         if (now.isAfter(dateTime)) {
+            log.warn("지난 날짜, 시간에 예약 시도: now={}, requestDateTime={}", now, dateTime);
             throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
         }
     }
@@ -178,7 +183,11 @@ public class ReservationService {
             reservationRepository.save(new Reservation(
                     value.getMember(), value.getDate(), value.getTime(), value.getTheme()
             ));
+            log.info("대기 1순위 승인 완료: memberId={}, date={}, timeId={}, themeId={}",
+                    value.getMember().getId(), value.getDate(), value.getTime().getId(), value.getTheme().getId());
             waitingRepository.delete(value);
+            log.info("대기 1순위 삭제 완료: memberId={}, date={}, timeId={}, themeId={}",
+                    value.getMember().getId(), value.getDate(), value.getTime().getId(), value.getTheme().getId());
         });
     }
 
@@ -230,19 +239,28 @@ public class ReservationService {
     private Theme getTheme(final ReservationCreateRequest request) {
         Long themeId = request.themeId();
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new EntityNotFoundException("theme not found id =" + themeId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 테마 조회 시도: themeId={}", themeId);
+                    return new EntityNotFoundException("존재하지 않는 테마입니다");
+                });
     }
 
     private ReservationTime getReservationTime(final ReservationCreateRequest request) {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(new ReservationTimeId(timeId))
-                .orElseThrow(() -> new EntityNotFoundException("reservationsTime not found id =" + timeId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 시간 조회 시도: timeId={}", timeId);
+                    return new EntityNotFoundException("존재하지 않는 시간입니다");
+                });
     }
 
     private Member getMember(LoginMember loginMember) {
         MemberId memberId = new MemberId(loginMember.id());
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 회원 조회 시도: memberId={}", memberId);
+                    return new EntityNotFoundException("등록되지 않은 회원입니다.");
+                });
     }
 
     private Set<ReservationTime> getAlreadyBookedTimes(final LocalDate date, final Long themeId) {

@@ -1,18 +1,18 @@
 package roomescape.reservation.waiting.controller;
 
 import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import roomescape.auth.annotation.RequiredAdmin;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.waiting.service.WaitingService;
 
+@Slf4j
 @RequestMapping("/admin/waitings")
 @RestController
 public class AdminWaitingController {
@@ -27,15 +27,14 @@ public class AdminWaitingController {
     @GetMapping
     public ResponseEntity<List<WaitingResponse>> readAllWaiting() {
         List<WaitingResponse> responses = waitingService.getAll();
-
         return ResponseEntity.ok(responses);
     }
 
     @RequiredAdmin
     @DeleteMapping("/{waitingId}")
     public ResponseEntity<Void> deny(@PathVariable("waitingId") final Long waitingId) {
+        log.info("대기 삭제 요청: waitingId={}", waitingId);
         waitingService.deleteWaiting(waitingId);
-
         return ResponseEntity.noContent()
                 .build();
     }

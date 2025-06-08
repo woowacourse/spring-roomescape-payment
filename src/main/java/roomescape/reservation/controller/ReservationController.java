@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
+@Slf4j
 @RequestMapping("/reservations")
 @RestController
 public class ReservationController {
@@ -36,28 +38,14 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReservationResponse>> readAllReservations() {
-        List<ReservationResponse> response = reservationService.getAll();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/times/available")
-    public ResponseEntity<List<BookedReservationTimeResponse>> readAvailableReservationTimes(
-            @RequestParam("date") final LocalDate date,
-            @RequestParam("themeId") final Long themeId
-    ) {
-        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, themeId);
-
-        return ResponseEntity.ok(responses);
-    }
-
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody final ReservationPaymentRequest request,
             final LoginMember loginMember
     ) {
+        log.info("사용자 예약 생성 요청: memberId={}, date={}, timeId={}, themeId={}, amount={}",
+                loginMember.id(), request.date(), request.timeId(), request.themeId(), request.amount());
+
         ReservationCreateRequest createRequest = ReservationCreateRequest.from(
                 new ReservationRequest(
                         request.date(),
@@ -77,26 +65,40 @@ public class ReservationController {
                 .body(response);
     }
 
-    @DeleteMapping("/{reservationId}")
-    public ResponseEntity<Void> delete(@PathVariable("reservationId") final Long reservationId) {
-        reservationService.delete(reservationId);
-
-        return ResponseEntity.noContent().build();
+    @GetMapping
+    public ResponseEntity<List<ReservationResponse>> readAllReservations() {
+        List<ReservationResponse> response = reservationService.getAll();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/filtering")
-    public ResponseEntity<List<ReservationResponse>> findAllByFilter(
+    public ResponseEntity<List<ReservationResponse>> readFilteredReservations(
             @ModelAttribute @Valid final FilteringReservationRequest request
     ) {
         final List<ReservationResponse> reservationResponses =
                 reservationService.getFilteredReservations(request);
-
         return ResponseEntity.ok(reservationResponses);
     }
 
+    @GetMapping("/times/available")
+    public ResponseEntity<List<BookedReservationTimeResponse>> readAvailableReservationTimes(
+            @RequestParam("date") final LocalDate date,
+            @RequestParam("themeId") final Long themeId
+    ) {
+        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, themeId);
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/my")
-    public ResponseEntity<List<MyReservationsResponse>> getMyReservations(final @Valid LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationsResponse>> readMyReservations(final @Valid LoginMember loginMember) {
         List<MyReservationsResponse> response = reservationService.getAllMyReservations(loginMember);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<Void> delete(@PathVariable("reservationId") final Long reservationId) {
+        log.info("예약 삭제 요청: reservationId={}", reservationId);
+        reservationService.delete(reservationId);
+        return ResponseEntity.noContent().build();
     }
 }
