@@ -18,6 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             left join fetch m.reservations r
             left join fetch r.reservationTime
             left join fetch r.theme
+            left join fetch r.payment
             where m.id = :memberId
             """)
     Optional<Member> findFetchById(@Param("memberId") Long memberId);

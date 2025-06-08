@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.domain.ReservationWithRank;
 import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
@@ -20,6 +19,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 join fetch r.member
                 join fetch r.reservationTime
                 join fetch r.theme
+                left join fetch r.payment
                 where r.date = :date
                 and r.theme.id = :themeId
                 and (r.status = :reserved or r.status = :pending)
@@ -36,6 +36,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             join fetch r.member
             join fetch r.reservationTime
             join fetch r.theme
+            left join fetch r.payment
             where (:memberId is null or r.member.id  = :memberId)
             and (:themeId is null or r.theme.id = :themeId)
             and (:dateFrom is null or r.date >= :dateFrom)
@@ -52,6 +53,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             join fetch r.member
             join fetch r.reservationTime
             join fetch r.theme
+            left join fetch r.payment
             where r.status = :status
             """)
     List<Reservation> findAllFetchByStatus(@Param("status") ReservationStatus status);
@@ -82,21 +84,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                              @Param("pending") ReservationStatus pending);
 
     @Query(value = """
-            select new roomescape.domain.ReservationWithRank(r,
-                        (select count(rw)
-                         from Reservation rw
-                         where rw.theme = r.theme
-                         and rw.date = r.date
-                         and rw.reservationTime = r.reservationTime
-                         and rw.status = :status
-                         and rw.createAt <= r.createAt))
+            select r
             from Reservation r
             join fetch r.member
             join fetch r.reservationTime
             join fetch r.theme
-            join fetch r.payment
-            where r.member.id = :memberId
+            left join fetch r.payment
             """)
-    List<ReservationWithRank> findReservationWithRank(@Param("memberId") Long memberId,
-                                                      @Param("status") ReservationStatus status);
+    List<Reservation> findAllFetch();
 }
