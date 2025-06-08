@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -39,12 +40,21 @@ public class LogAspect {
     @Around("all()")
     public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
+        Signature methodName = joinPoint.getSignature();
         try {
             return joinPoint.proceed();
         } finally {
             long end = System.currentTimeMillis();
             long runMilTime = end - start;
-            log.info("{} | time = {}ms", joinPoint.getSignature(), runMilTime);
+            checkPerformanceProceed(methodName, runMilTime);
+            log.info("Method proceed complete: {} | time = {}ms", methodName, runMilTime);
+        }
+    }
+
+    private void checkPerformanceProceed(Signature methodName, long runMilTime) {
+        if (runMilTime > 1000) {
+            log.warn("Slow method execution detected - Method: {}, Time: {}ms",
+                    methodName, runMilTime);
         }
     }
 
@@ -62,7 +72,6 @@ public class LogAspect {
             params.put("controller", controllerName);
             params.put("method", methodName);
             params.put("params", getParams(request));
-            params.put("log_time", System.currentTimeMillis());
             params.put("request_uri", decodedURI);
             params.put("http_method", request.getMethod());
         } catch (Exception e) {
@@ -70,9 +79,12 @@ public class LogAspect {
         }
 
         log.info("[{}] {}", params.get("http_method"), params.get("request_uri"));
-        log.info("method: {}.{} | params: {}", params.get("controller"), params.get("method"), params.get("params"));
+        log.info("Method proceed: {}.{} | params: {}", params.get("controller"), params.get("method"),
+                params.get("params"));
 
-        return joinPoint.proceed();
+        Object response = joinPoint.proceed();
+        log.info("Method complete: {}.{} | response: {}", params.get("controller"), params.get("method"), response);
+        return response;
     }
 
     @Around("exceptionHandler()")
@@ -87,7 +99,8 @@ public class LogAspect {
         }
 
         if (exception != null) {
-            log.error("exception {} thrown message: {}", exception.getClass().getName(), exception.getMessage());
+            log.error("exception {} thrown message: {}",
+                    exception.getClass().getName(), exception.getMessage(), exception);
         }
 
         return joinPoint.proceed();

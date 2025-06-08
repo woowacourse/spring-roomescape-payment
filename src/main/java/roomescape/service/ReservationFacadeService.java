@@ -32,7 +32,7 @@ public class ReservationFacadeService {
         Reservation reservation = reservationService.addReservation(addReservationRequest, loginMemberRequest);
 
         ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest, reservation);
+        paymentService.processPayment(confirmPaymentRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }
@@ -44,7 +44,7 @@ public class ReservationFacadeService {
         Reservation reservation = reservationService.pendingToReserve(reservationId, loginMemberRequest);
 
         ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest, reservation);
+        paymentService.processPayment(confirmPaymentRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }
@@ -62,7 +62,7 @@ public class ReservationFacadeService {
         return reservationService.addWaitReservation(request, loginMemberRequest);
     }
 
-    public void deleteReservation(final Long id) {
+    public void deleteReservation(Long id) {
         reservationService.deleteReservation(id);
         paymentService.refundReservation(id);
     }

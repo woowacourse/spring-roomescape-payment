@@ -70,7 +70,7 @@ public class ReservationService {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
 
-        checkStatus(waitReservation);
+        checkWaitReservation(waitReservation);
 
         Optional<Reservation> cancelTargetOptional = reservationRepository.findByDateAndReservationTimeAndThemeAndStatus(
                 waitReservation.getDate(),
@@ -86,12 +86,12 @@ public class ReservationService {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
 
-        checkStatus(waitReservation);
+        checkWaitReservation(waitReservation);
 
         waitReservation.cancel();
     }
 
-    private void checkStatus(final Reservation waitReservation) {
+    private void checkWaitReservation(Reservation waitReservation) {
         if (waitReservation.getStatus() != ReservationStatus.WAIT) {
             throw new InvalidReservationException("대기 중인 예약이 아닙니다.");
         }
@@ -113,9 +113,7 @@ public class ReservationService {
             checkExistedReservation(date, timeId, themeId);
         }
 
-        Reservation reservation = member.reserve(date, reservationTime, theme, status);
-        reservationRepository.flush();
-        return reservation;
+        return member.reserve(date, reservationTime, theme, status);
     }
 
     private void checkExistedReservation(LocalDate date, long timeId, long themeId) {
@@ -156,7 +154,7 @@ public class ReservationService {
     public List<MyReservationResponse> findAllReservationOfMember(Long memberId) {
         Member member = memberRepository.findFetchById(memberId)
                 .orElseThrow(() -> new InvalidMemberException("존재하지 않는 멤버 ID입니다."));
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> reservations = reservationRepository.findAllFetch();
         List<ReservationWithRank> reservationWithRanks = member.calculateReservationRanks(reservations);
 
         return reservationWithRanks.stream()

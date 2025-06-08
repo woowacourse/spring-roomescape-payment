@@ -105,9 +105,9 @@ class ReservationIntegrateTest {
         );
 
         // when
-        when(paymentService.confirmPayment(any())).thenReturn(new ConfirmPaymentResponse(
-                "paymentKey", "orderId", 1000
-        ));
+        when(paymentService.processPayment(any(ConfirmPaymentRequest.class), any(Reservation.class)))
+                .thenReturn(new ConfirmPaymentResponse("paymentKey", "orderId", 1000));
+
         // then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

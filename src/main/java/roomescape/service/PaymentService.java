@@ -1,6 +1,7 @@
 package roomescape.service;
 
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import roomescape.domain.PaymentClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
@@ -12,6 +13,8 @@ import roomescape.repository.PaymentRepository;
 @Service
 public class PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
+
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
@@ -20,28 +23,20 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest) {
-        return paymentClient.confirmPayment(paymentRequest);
-    }
-
-    public void confirmPayment(ConfirmPaymentRequest paymentRequest, Reservation reservation) {
-        ConfirmPaymentResponse response = paymentClient.confirmPayment(paymentRequest);
-        Payment payment = new Payment(response.orderId(),
-                response.paymentKey(),
-                response.totalAmount(),
+    public ConfirmPaymentResponse processPayment(ConfirmPaymentRequest paymentRequest, Reservation reservation) {
+        Payment payment = new Payment(paymentRequest.orderId(),
+                paymentRequest.paymentKey(),
+                paymentRequest.amount(),
                 reservation);
         reservation.payForReservation(payment);
         paymentRepository.save(payment);
+        return paymentClient.confirmPayment(paymentRequest);
     }
 
     public void refundReservation(Long reservationId) {
-        Optional<Payment> paymentOptional = paymentRepository.findFetchByReservationId(reservationId);
-
-        if (paymentOptional.isEmpty()) {
-            return;
-        }
-
-        Payment payment = paymentOptional.get();
-        paymentClient.refund(payment);
+        paymentRepository.findFetchByReservationId(reservationId)
+                .ifPresentOrElse(paymentClient::refund,
+                        () -> log.warn("Attempting to refund with a non-existent payment by reservationId: {}",
+                                reservationId));
     }
 }
