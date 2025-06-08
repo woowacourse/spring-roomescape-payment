@@ -6,6 +6,6 @@ public interface PaymentEventProcessor {
 
     void saveNotPaidPayment(Reservation reservation);
 
-    void cancelPayment(Long reservationId);
+    void refundPayment(Long reservationId);
 
 }

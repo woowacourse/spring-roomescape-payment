@@ -29,7 +29,7 @@ public class TossPaymentEventProcessor implements PaymentEventProcessor {
     }
 
     @Override
-    public void cancelPayment(Long reservationId) {
+    public void refundPayment(Long reservationId) {
         paymentCancellationService.cancelPayment(reservationId);
     }
 }

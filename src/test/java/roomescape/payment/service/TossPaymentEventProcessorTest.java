@@ -87,7 +87,7 @@ class TossPaymentEventProcessorTest {
 
         // when
         Long reservationId = reservation.getId();
-        tossPaymentEventProcessor.cancelPayment(reservationId);
+        tossPaymentEventProcessor.refundPayment(reservationId);
 
         // then
         verify(paymentCancellationService).cancelPayment(reservationId);

@@ -38,7 +38,7 @@ public class PaymentEventHandler {
         Reservation reservation = getReservationById(event.reservationId());
 
         log.info("결제 취소 처리 시작 - reservationId={}", reservation.getId());
-        paymentEventProcessor.cancelPayment(reservation.getId());
+        paymentEventProcessor.refundPayment(reservation.getId());
         log.info("결제 취소 처리 완료 - reservationId={}", reservation.getId());
     }
 
