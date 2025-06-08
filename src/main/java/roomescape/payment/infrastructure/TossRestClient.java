@@ -33,10 +33,11 @@ public class TossRestClient {
     }
 
     public TossPaymentResponse cancel(final String paymentKey, final TossPaymentCancelRequest request) {
-        log.debug("cancel 중 🔥🔥🔥 paymentKey: {}", paymentKey);
+        log.info("cancel 요청 시작 - paymentKey={}", paymentKey);
         TossPaymentResponse cancelResponse = postWithErrorHandling("/v1/payments/{paymentKey}/cancel", request,
                 paymentKey);
         validateCancelSuccess(cancelResponse, paymentKey);
+        log.info("cancel 요청 완료 - paymentKey={}", paymentKey);
         return cancelResponse;
     }
 
@@ -49,6 +50,7 @@ public class TossRestClient {
     }
 
     private <T> TossPaymentResponse postWithErrorHandling(String uri, T requestBody, Object... uriVariables) {
+        log.info("토스 API 요청 시작 - requestBody={}, ", requestBody);
         try {
             return restClient.post()
                     .uri(uri, uriVariables)

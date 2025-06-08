@@ -72,13 +72,12 @@ public class PaymentCancellationService {
             payment.updateStatusTo(PaymentStatus.REFUND_FAILED);
             // 결제 상태 조회 후 결제 취소 API 호출 (필요 시 구현)
             throw e;
-        } catch (TossPaymentException e) {
+        } catch (Exception e) {
             log.warn("결제 환불 실패 - paymentKey={}, message={}", payment.getPaymentKey(), e.getMessage());
             payment.updateStatusTo(PaymentStatus.REFUND_FAILED);
             throw e;
         } finally {
             paymentRepository.save(payment);
         }
-
     }
 }
