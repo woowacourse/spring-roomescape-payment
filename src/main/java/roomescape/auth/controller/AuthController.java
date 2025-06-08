@@ -1,5 +1,7 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import roomescape.auth.service.dto.response.LoginResponse;
 import roomescape.common.AuthTokenCookieProvider;
 
 @RestController
+@Tag(name = "인증 컨트롤러", description = "인증에 관한 API 모음")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,16 +30,11 @@ public class AuthController {
         this.authTokenCookieProvider = authTokenCookieProvider;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid final LoginRequest request) {
-        LoginResponse loginResponse = authService.login(request);
-        ResponseCookie cookie = authTokenCookieProvider.generate(loginResponse.tokenValue());
-        return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .build();
-    }
-
     @GetMapping("/login/check")
+    @Operation(
+            summary = "로그인 확인",
+            description = "만약 로그인을 하지 않았다면 UNAUTHORIZED 응답을 반환합니다. 로그인을 했다면 멤버 이름을 포함한 OK 응답을 보냅니다."
+    )
     public ResponseEntity<CheckLoginResponse> checkLogin(final LoginMember member) {
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -45,7 +43,18 @@ public class AuthController {
         return ResponseEntity.ok(new CheckLoginResponse(member.name()));
     }
 
+    @PostMapping("/login")
+    @Operation(summary = "로그인", description = "입력받은 이메일과 패스워드로 로그인을 진행합니다.")
+    public ResponseEntity<Void> login(@RequestBody @Valid final LoginRequest request) {
+        LoginResponse loginResponse = authService.login(request);
+        ResponseCookie cookie = authTokenCookieProvider.generate(loginResponse.tokenValue());
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "멤버를 로그아웃한다.")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = authTokenCookieProvider.generateExpired();
         return ResponseEntity.status(HttpStatus.OK)

@@ -17,7 +17,9 @@ public record MyReservationsResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        String paymentKey,
+        Integer amount
 ) {
 
     public static MyReservationsResponse from(Reservation reservation) {
@@ -28,7 +30,9 @@ public record MyReservationsResponse(
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 reservationStatus.getDescription(),
-                null
+                null,
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
@@ -47,7 +51,9 @@ public record MyReservationsResponse(
                 waiting.getDate(),
                 waiting.getTime().getStartAt(),
                 ReservationStatus.WAITING.getDescription(),
-                waitingInfoDataResponse.rank().value()
+                waitingInfoDataResponse.rank().value(),
+                null,
+                null
         );
     }
 }
