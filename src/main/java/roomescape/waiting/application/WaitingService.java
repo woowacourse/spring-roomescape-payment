@@ -61,7 +61,7 @@ public class WaitingService {
 
         Waiting waiting = new Waiting(member, spec);
         Waiting saveWaiting = waitingRepository.save(waiting);
-        log.info("예약 등록 완료 waitingId={}", saveWaiting.getId());
+        log.info("예약 등록 완료 memberId={}, waitingId={}",memberId, saveWaiting.getId());
         return WaitingResponse.from(saveWaiting);
     }
 
@@ -102,7 +102,7 @@ public class WaitingService {
         Waiting waiting = waitingRepository.findById(id).orElseThrow(WaitingNotFoundException::new);
         validateIsOwner(memberId, waiting);
         deleteById(id);
-        log.info("예약 삭제 완료 id={}", id);
+        log.info("예약 삭제 완료 memberId={}, waitingId={}",memberId, id);
     }
 
     private void validateIsOwner(Long memberId, Waiting waiting) {
@@ -114,11 +114,11 @@ public class WaitingService {
     @Transactional
     public void deleteByAdmin(Long id) {
         deleteById(id);
+        log.info("어드민 예약 정보 삭제 완료: id={}", id);
     }
 
     private void deleteById(Long id) {
         waitingRepository.deleteById(id);
-        log.info("예약 정보 삭제 완료: id={}", id);
     }
 
     public List<WaitingResponse> findAll() {

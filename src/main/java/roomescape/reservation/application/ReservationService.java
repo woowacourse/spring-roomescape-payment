@@ -111,12 +111,13 @@ public class ReservationService {
         }
 
         paymentApprovalService.approvePayment(
-                new PaymentApprovalRequest(orderId.getValue(), amount.getValue(), request.paymentKey()));
+                new PaymentApprovalRequest(orderId.getValue(), amount.getValue(), request.paymentKey())
+        );
         Reservation reservation = create(memberId, request.date(), request.timeId(), request.themeId());
-        log.info("유저 예약 생성 및 저장 완료 reservationId={}", reservation.getId());
+        log.info("예약 생성 및 저장 완료 memberId={} reservationId={}",memberId, reservation.getId());
         PaymentKey paymentKey = new PaymentKey(request.paymentKey());
         Payment payment = paymentService.save(new Payment(paymentKey, orderId, amount, reservation.getId()));
-        log.info("결제 저장 완료: paymentId={}, paymentKey={}", payment.getId(), payment.getPaymentKey());
+        log.info("결제 저장 완료: memberId={}, paymentId={}, paymentKey={}",memberId, payment.getId(), payment.getPaymentKey());
         return ReservationResponse.from(reservation);
     }
 

@@ -59,6 +59,7 @@ public class ReservationController {
     public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getAll(
             @LoginMemberId Long memberId
     ) {
+        log.info("예약 목록 조회 요청 memberId={}", memberId);
         List<MyReservationResponse> response = reservationService.findAllByMemberId(memberId);
         ApiResponse<List<MyReservationResponse>> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.ok().body(apiResponse);

@@ -45,7 +45,10 @@ public class WaitingController {
             description = "ID에 해당하는 예약 대기를 삭제합니다."
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id, @LoginMemberId Long memberId) {
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable("id") Long id,
+            @LoginMemberId Long memberId
+    ) {
         log.info("예약대기 삭제 요청 memberId={}, waitingId={}", memberId, id);
         waitingService.deleteByUser(id, memberId);
         ApiResponse<Void> apiResponse = ApiResponse.createSuccessWithNoData();
