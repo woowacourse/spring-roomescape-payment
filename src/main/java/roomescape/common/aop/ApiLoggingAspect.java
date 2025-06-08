@@ -1,6 +1,7 @@
 package roomescape.common.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -24,15 +25,13 @@ public class ApiLoggingAspect {
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        Object[] args = joinPoint.getArgs();
-
         long startTime = System.currentTimeMillis();
 
         log.info("[요청] {} {}, controller: {}, args: {}, ip: {}",
             request.getMethod(),
             request.getRequestURI(),
             joinPoint.getSignature().getDeclaringTypeName(),
-            args,
+            Arrays.toString(joinPoint.getArgs()),
             request.getRemoteAddr());
 
         try {
