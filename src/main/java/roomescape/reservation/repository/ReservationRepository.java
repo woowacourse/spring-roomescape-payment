@@ -10,14 +10,17 @@ import roomescape.reservation.domain.Reservation;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("""
-            select r from Reservation r
-            join fetch r.registrationSlot bs
-            where (:themeId is null or bs.theme.id = :themeId)
-              and (:memberId is null or r.member.id = :memberId)
-              and (:localDateFrom is null or bs.date >= :localDateFrom)
-              and (:localDateTo is null or bs.date <= :localDateTo)
-              and r.reservationStatus = 'RESERVED'
-            """)
+    select r from Reservation r
+    join fetch r.registrationSlot bs
+    join fetch bs.time rt
+    join fetch bs.theme rth
+    join fetch r.member m
+    where (:themeId is null or bs.theme.id = :themeId)
+      and (:memberId is null or r.member.id = :memberId)
+      and (:localDateFrom is null or bs.date >= :localDateFrom)
+      and (:localDateTo is null or bs.date <= :localDateTo)
+      and r.reservationStatus = 'RESERVED'
+""")
     List<Reservation> findByCriteria(
             @Param("themeId") Long themeId,
             @Param("memberId") Long memberId,

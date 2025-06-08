@@ -1,11 +1,21 @@
 package roomescape.reservation.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.WaitingReservation;
 
 public interface WaitingReservationRepository extends JpaRepository<WaitingReservation, Long> {
+
+    @Query("""
+        select w from WaitingReservation w
+        join fetch w.registrationSlot bs
+        join fetch bs.time wt
+        join fetch bs.theme wth
+        join fetch w.member m
+    """)
+    List<WaitingReservation> findAllWithDetail();
 
     @Query("""
     SELECT EXISTS (

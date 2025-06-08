@@ -41,7 +41,7 @@ public class WaitingReservationService {
     private final ThemeRepository themeRepository;
 
     public List<ReservationResponse> getAll() {
-        final List<WaitingReservation> waitingReservations = waitingReservationRepository.findAll();
+        final List<WaitingReservation> waitingReservations = waitingReservationRepository.findAllWithDetail();
         return ReservationResponse.fromWaitings(waitingReservations);
     }
 
@@ -54,7 +54,7 @@ public class WaitingReservationService {
                 .member(member)
                 .registrationSlot(new RegistrationSlot(time, theme, command.date()))
                 .build();
-        waitingValidator.validateCanWaiting(waitingReservation);
+        waitingValidator.validateCanRegisterWaiting(waitingReservation);
         WaitingReservation saved = waitingReservationRepository.save(waitingReservation);
 
         log.info("대기 예약 등록 완료 - waitingId={}", saved.getId());
@@ -65,14 +65,15 @@ public class WaitingReservationService {
     public void approveWaitingReservation(final Long id) {
         final WaitingReservation waitingReservation = getWaitingById(id);
 
-        waitingValidator.validateCanWaitingApprove(waitingReservation);
+        waitingValidator.validateCanApproveWaiting(waitingReservation);
         Reservation approvedReservation = waitingReservation.approveToReservation();
         reservationRepository.save(approvedReservation);
-        eventPublisher.raise(new WaitingApprovedEvent(approvedReservation));
+
+        log.info("WaitingApprovedEvent 발행 - reservationId={}", approvedReservation.getId());
+        eventPublisher.raise(new WaitingApprovedEvent(approvedReservation.getId()));
 
         waitingReservationRepository.deleteById(waitingReservation.getId());
-        log.info("대기 승인 완료 - reservationId={}, waitingId={}",
-                approvedReservation.getId(), waitingReservation.getId());
+        log.info("대기 승인 완료 - reservationId={}, waitingId={}", approvedReservation.getId(), waitingReservation.getId());
     }
 
     @Transactional
