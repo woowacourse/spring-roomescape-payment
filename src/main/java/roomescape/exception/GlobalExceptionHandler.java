@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<Object> handlePaymentException(final PaymentException e) {
-        log.warn("결제 예외 발생 - 코드: {}, 메시지: {}", e.getStatus(), e.getMessage());
+        log.error("결제 예외 발생 - 코드: {}, 메시지: {}", e.getStatus(), e.getMessage());
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(e.getStatus(), "유효성 검증에 실패했습니다.");
 

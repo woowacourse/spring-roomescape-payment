@@ -61,7 +61,7 @@ public class TossPaymentClient implements PaymentClient {
             log.info("결제 승인 완료 - paymentKey: {}, orderId: {}", paymentInfo.getPaymentKey(), paymentInfo.getOrderId());
 
         } catch (ResourceAccessException e) {
-            log.warn("결제 API 연결 실패: {}", e.getMessage(), e);
+            log.error("결제 API 연결 실패: {}", e.getMessage(), e);
 
             Throwable rootCause = e.getCause();
             if (rootCause instanceof SocketTimeoutException) {
