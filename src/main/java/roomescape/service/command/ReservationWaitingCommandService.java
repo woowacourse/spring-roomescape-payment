@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,9 +90,14 @@ public class ReservationWaitingCommandService {
         if (alreadyBookedReservations.isEmpty()) {
             throw new ReservationWaitingForbiddenException("현재 예약이 존재하지 않습니다. 예약하기 기능을 이용해주세요.");
         }
-        if (alreadyBookedReservations.stream()
-                .anyMatch(reservation -> reservation.getMember().equals(member))) { //todo equals의 기준?
-            throw new ReservationWaitingForbiddenException("이미 예약한 이력이 있습니다. 유저 id : " + member.getId());
+        Optional<Reservation> duplicatedReservation = alreadyBookedReservations.stream()
+                .filter(reservation -> reservation.getMember().equals(member))
+                .findAny();
+        if (duplicatedReservation.isPresent()) { //todo equals의 기준?
+            throw new ReservationWaitingForbiddenException("이미 예약한 이력이 있습니다.",
+                    member.getId(),
+                    duplicatedReservation.get().getId()
+            );
         }
     }
 }
