@@ -30,7 +30,7 @@ public class MemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void signup(@RequestBody @Valid MemberRequest request) {
-        log.info("[회원가입] email: {}, password: {}, name: {}",
+        log.info("[회원가입 요청] email: {}, password: {}, name: {}",
                 request.email(),
                 request.password(),
                 request.name()

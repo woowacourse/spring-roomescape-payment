@@ -47,7 +47,7 @@ public class AuthController {
 
     @GetMapping("/login/check")
     public LoginCheckResponse checkLogin(@AuthenticationPrincipal LoginMember loginMember) {
-        log.info("[로그인 체크] memberId: {}", loginMember.getId());
+        log.info("[로그인 체크 요청] memberId: {}", loginMember.getId());
         return new LoginCheckResponse(loginMember);
     }
 }

@@ -68,7 +68,7 @@ public class ReservationController {
     @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable final Long reservationId) {
-        log.info("[(유저) 예약 삭제] reservationId: {}", reservationId);
+        log.info("[(유저) 예약 삭제 요청] reservationId: {}", reservationId);
         reservationService.deleteReservation(reservationId);
     }
 

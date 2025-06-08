@@ -28,7 +28,7 @@ public class ReservationTimeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTimeResponse saveTime(@Valid @RequestBody final ReservationTimeRequest request) {
-        log.info("[예약 시간 추가] startAt: {}", request.startAt());
+        log.info("[예약 시간 추가 요청] startAt: {}", request.startAt());
         return reservationTimeService.saveTime(request);
     }
 
@@ -40,7 +40,7 @@ public class ReservationTimeController {
     @DeleteMapping("/{timeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTime(@PathVariable final Long timeId) {
-        log.info("[예약 시간 삭제] timeId: {}", timeId);
+        log.info("[예약 시간 삭제 요청] timeId: {}", timeId);
         reservationTimeService.delete(timeId);
     }
 }

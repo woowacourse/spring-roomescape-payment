@@ -29,7 +29,7 @@ public class ThemeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ThemeResponse saveTheme(@Valid @RequestBody final ThemeRequest request) {
-        log.info("[테마 추가] 이름: {}, 설명: {}, 썸네일: {}",
+        log.info("[테마 추가 요청] 이름: {}, 설명: {}, 썸네일: {}",
                 request.name(),
                 request.description(),
                 request.thumbnail()
