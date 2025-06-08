@@ -53,6 +53,10 @@ public class WaitingCreateService {
 
     private void validatePast(final Schedule schedule) {
         if (schedule.isPast()) {
+            log.warn("[{}] EVENT: WAITING_CREATE_FAILED - PAST_SCHEDULE, date={}, time={}",
+                    MDC.get("requestId"),
+                    schedule.getDate(),
+                    schedule.getReservationTime().getStartAt());
             throw new PastScheduleException();
         }
     }
@@ -60,6 +64,10 @@ public class WaitingCreateService {
     private void validateExistsReservationAboutSchedule(final Schedule schedule) {
         boolean isReservationExist = reservationService.existsBySchedule(schedule);
         if (!isReservationExist) {
+            log.warn("[{}] EVENT: WAITING_CREATE_FAILED - RESERVATION_NOT_EXISTS, date={}, time={}",
+                    MDC.get("requestId"),
+                    schedule.getDate(),
+                    schedule.getReservationTime().getStartAt());
             throw new ReservationNotExistsScheduleException();
         }
     }

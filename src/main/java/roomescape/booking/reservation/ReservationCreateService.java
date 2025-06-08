@@ -47,7 +47,14 @@ public class ReservationCreateService {
 
     private void validateOrder(final ReservationRequest request, final Member member, final Schedule schedule) {
         final Order order = orderReader.getById(request.orderId());
-        order.validateOrderAndPaymentRequest(request.amount(), member, schedule);
+        try {
+            order.validateOrderAndPaymentRequest(request.amount(), member, schedule);
+        } catch (IllegalArgumentException e) {
+            log.warn("[{}] EVENT: RESERVATION_CREATE_FAILED_ORDER_NOT_MATCH, orderId={}",
+                    MDC.get("requestId"),
+                    order.getId());
+            throw e;
+        }
     }
 
     private Reservation saveReservation(final Schedule schedule, final Member member) {
@@ -72,12 +79,21 @@ public class ReservationCreateService {
 
     private void validatePast(final Schedule schedule) {
         if (schedule.isPast()) {
+            log.warn("[{}] EVENT: RESERVATION_CREATE_FAILED - PAST_SCHEDULE, date={}, time={}",
+                    MDC.get("requestId"),
+                    schedule.getDate(),
+                    schedule.getReservationTime().getStartAt());
             throw new ReservationPastDateException();
         }
     }
 
     private void validateDuplication(final Schedule schedule) {
         if (reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED)) {
+            log.warn("[{}] RESERVATION_CREATE_FAILED - DUPLICATED, date={}, time={}, themeName={}",
+                    MDC.get("requestId"),
+                    schedule.getDate(),
+                    schedule.getReservationTime().getStartAt(),
+                    schedule.getTheme().getName());
             throw new ReservationConflictException();
         }
     }

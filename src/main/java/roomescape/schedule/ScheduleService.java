@@ -29,11 +29,11 @@ public class ScheduleService {
     public ScheduleResponse create(ScheduleRequest request) {
         ReservationTime reservationTime = reservationTimeService.getById(request.reservationTimeId());
         Theme theme = themeService.getById(request.themeId());
-        validateDuplication(reservationTime, theme);
+        validateDuplication(reservationTime, theme, request.date());
 
         Schedule schedule = new Schedule(request.date(), reservationTime, theme);
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        log.info("[{}] SCHEDULE_CREATED, id={}. date={}, time={}, themeName={}",
+        log.info("[{}] EVENT: SCHEDULE_CREATED, id={}. date={}, time={}, themeName={}",
                 MDC.get("requestId"),
                 savedSchedule.getId(),
                 savedSchedule.getDate(),
@@ -48,8 +48,13 @@ public class ScheduleService {
                 .orElseThrow(ScheduleNotExistException::new);
     }
 
-    private void validateDuplication(final ReservationTime reservationTime, final Theme theme) {
-        if (scheduleRepository.existsByReservationTimeAndTheme(reservationTime, theme)) {
+    private void validateDuplication(final ReservationTime reservationTime, final Theme theme, final LocalDate date) {
+        if (scheduleRepository.existsByReservationTimeAndThemeAndDate(reservationTime, theme, date)) {
+            log.warn("[{}] EVENT: SCHEDULE_CREATE_FAILED - DUPLICATED, themeName={}, date={}, time={}",
+                    MDC.get("requestId"),
+                    theme.getName(),
+                    date,
+                    reservationTime.getStartAt());
             throw new ScheduleConflictException();
         }
     }

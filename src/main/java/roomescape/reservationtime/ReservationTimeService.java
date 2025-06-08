@@ -35,7 +35,7 @@ public class ReservationTimeService {
 
         final ReservationTime reservationTime = new ReservationTime(request.startAt());
         final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
-        log.info("[{}] RESERVATION_TIME_CREATED, id={}, startAt={}",
+        log.info("[{}] EVENT: RESERVATION_TIME_CREATED, id={}, startAt={}",
                 MDC.get("requestId"),
                 savedReservationTime.getId(),
                 savedReservationTime.getStartAt());
@@ -84,7 +84,7 @@ public class ReservationTimeService {
         }
 
         reservationTimeRepository.delete(reservationTime);
-        log.info("[{}] RESERVATION_TIME_DELETED, id={}, startAt={}",
+        log.info("[{}] EVENT: RESERVATION_TIME_DELETED, id={}, startAt={}",
                 MDC.get("requestId"),
                 reservationTime.getId(),
                 reservationTime.getStartAt());
@@ -92,6 +92,9 @@ public class ReservationTimeService {
 
     private void validateDuplication(final ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
+            log.warn("[{}] EVENT: RESERVATION_TIME_CREATE_FAILED - DUPLICATED, time={}",
+                    MDC.get("requestId"),
+                    request.startAt());
             throw new ReservationTimeConflictException();
         }
     }

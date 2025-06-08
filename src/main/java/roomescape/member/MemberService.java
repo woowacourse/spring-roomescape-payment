@@ -49,6 +49,7 @@ public class MemberService {
 
     private void validateDuplication(final MemberRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
+            log.warn("[{}] EVENT: MEMBER_SIGNED_UP_FAILED - DUPLICATED", MDC.get("requestId"));
             throw new MemberEmailConflictException();
         }
     }
