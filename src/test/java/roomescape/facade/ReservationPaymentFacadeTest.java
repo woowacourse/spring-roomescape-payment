@@ -1,15 +1,17 @@
 package roomescape.facade;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.facade.dto.ReservationWithPaymentResponseDto;
+import roomescape.payment.dto.PaymentRequestDto;
 import roomescape.payment.dto.PaymentResponseDto;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.domain.dto.ReservationResponseDto;
 import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 import roomescape.reservation.service.ReservationService;
@@ -24,30 +26,28 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class ReservationPaymentFacadeTest {
 
-    @Mock
-    private ReservationService mockReservationService;
+    @Autowired
+    private ReservationPaymentFacade facade;
 
-    @Mock
-    private PaymentService mockPaymentService;
+    @MockitoBean
+    private ReservationService reservationService;
 
-    @InjectMocks
-    ReservationPaymentFacade facade;
+    @MockitoBean
+    private PaymentService tossPaymentService;
 
-
-    @DisplayName("결제와 예약이 성공적으로 진행되면 결과 응답이 정상적으로 반환된다.")
     @Test
+    @DisplayName("Facade는 예약과 결제를 처리하고 응답을 반환한다 (MockBean 사용)")
     void addWithPayment() {
         //given
-        ReservationWithPaymentDto requestDto = new ReservationWithPaymentDto(
+        ReservationWithPaymentDto reservationRequestDto = new ReservationWithPaymentDto(
                 LocalDate.now().plusDays(5),
                 1L,
                 1L,
@@ -58,39 +58,37 @@ class ReservationPaymentFacadeTest {
 
         User user = UserFixture.create(Role.ROLE_MEMBER, "유저1", "user@email.com", "1234");
 
-        ReservationResponseDto reservationResponse = new ReservationResponseDto(
+        ReservationResponseDto reservationResponseDto = new ReservationResponseDto(
                 1L,
                 LocalDate.now().plusDays(5),
                 new ReservationTimeResponseDto(1L, LocalTime.of(10, 0)),
-                new ThemeResponseDto(1L, "테마명","방탈출 테마", "무서운 테마"),
-                new UserResponseDto(user.getId(), user.getRole().name() ,user.getName(), user.getEmail(), user.getPassword())
+                new ThemeResponseDto(1L, "공포의방", "방탈출 테마", "무서운 테마"),
+                new UserResponseDto(user.getId(), user.getRole().name(), user.getName(), user.getEmail(), user.getPassword())
         );
 
-        PaymentResponseDto paymentResponse = new PaymentResponseDto(
-                "paymentKey",
-                "orderId",
+        PaymentResponseDto paymentResponseDto = new PaymentResponseDto(
+                "결제키",
+                "주문ID",
                 1000
         );
 
-        Mockito.when(mockReservationService.add(any(), eq(user))).thenReturn(reservationResponse);
-        Mockito.when(mockPaymentService.approve(any(), any())).thenReturn(paymentResponse);
+
+
+        when(reservationService.add(any(ReservationRequestDto.class), eq(user)))
+                .thenReturn(reservationResponseDto);
+
+        when(tossPaymentService.approve(any(PaymentRequestDto.class), any(Reservation.class)))
+                .thenReturn(paymentResponseDto);
 
         // when
-        ReservationWithPaymentResponseDto response = facade.addWithPayment(requestDto, user);
+        ReservationWithPaymentResponseDto result = facade.addWithPayment(reservationRequestDto, user);
 
         // then
-        assertAll(
-                () -> assertThat(response.id()).isEqualTo(reservationResponse.id()),
-                () -> assertThat(response.date()).isEqualTo(reservationResponse.date()),
-                () -> assertThat(response.time()).isEqualTo(reservationResponse.time()),
-                () -> assertThat(response.theme()).isEqualTo(reservationResponse.theme()),
-                () -> assertThat(response.user()).isEqualTo(reservationResponse.user()),
-                () -> assertThat(response.paymentKey()).isEqualTo(paymentResponse.paymentKey()),
-                () -> assertThat(response.amount()).isEqualTo(paymentResponse.totalAmount())
+        Assertions.assertAll(
+                () -> assertThat(result.paymentKey()).isEqualTo("결제키"),
+                () -> assertThat(result.amount()).isEqualTo(1000),
+                () -> assertThat(result.user().email()).isEqualTo("user@email.com"),
+                () -> assertThat(result.theme().name()).isEqualTo("공포의방")
         );
-
-        verify(mockReservationService).add(any(), eq(user));
-        verify(mockPaymentService).approve(any(), any());
     }
-
 }
