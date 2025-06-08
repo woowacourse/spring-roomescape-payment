@@ -86,12 +86,14 @@ public class ReservationService {
         final Reservation reservation = reservationRepository.findById(id)
                 .orElse(null);
         if (reservation == null) {
-            log.warn("예약 삭제 시도 실패 - 존재하지 않음, id={}", id);
+            log.warn("예약 삭제 불가 - 존재하지 않음, reservationId={}", id);
             return;
         }
         reservation.delete();
+
+        log.info("예약 삭제 이벤트 발행 - reservationId={}", id);
         eventPublisher.raise(new ReservationDeleteEvent(id));
-        log.info("예약 삭제 완료 - id={}", id);
+        log.info("예약 삭제 완료 - reservationId={}", id);
     }
 
     private Reservation getReservationById(Long reservationId) {

@@ -6,7 +6,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
-                %clr(${APP_NAME:-}){green} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr(%logger{36}){cyan} - %msg%n%wEx
+                %clr(${APP_NAME:-}){green} %clr([%X{requestId}]){yellow} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr(%logger{36}){cyan} - %msg%n%wEx
             </pattern>
         </layout>
     </appender>

@@ -17,11 +17,11 @@ public class ControllerLoggingAspect {
     public Object logApiRequest(ProceedingJoinPoint joinPoint) throws Throwable {
         String method = joinPoint.getSignature().toShortString();
         Object[] args = joinPoint.getArgs();
-        log.info("➡️ [진입] {} with args={}", method, Arrays.toString(args));
+        log.info("[진입] {} with args={}", method, Arrays.toString(args));
 
         Object result = joinPoint.proceed();
 
-        log.info("⬅️ [응답] {} result={}", method, toNeedString(result));
+        log.info("[응답] {} result={}", method, toNeedString(result));
         return result;
     }
 
