@@ -163,9 +163,7 @@ start_application() {
     -Dserver.port=$PORT \
     -Xmx1024m \
     -Xms512m \
-    "$JAR_PATH" \
-    >"$APP_LOG" \
-    2>"$ERROR_LOG" &
+    "$JAR_PATH"
 
   # 프로세스 ID 저장
   echo $! >"$LOG_DIR/${APP_NAME}.pid"
