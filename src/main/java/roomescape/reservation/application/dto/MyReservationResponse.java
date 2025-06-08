@@ -48,7 +48,7 @@ public record MyReservationResponse(
                     String paymentKey = null;
                     BigDecimal amount = null;
                     if (payment != null) {
-                        paymentKey = payment.getPaymentKey().getKey();
+                        paymentKey = payment.getPaymentKey().getValue();
                         amount = payment.getAmount();
                     }
                     return new MyReservationResponse(
