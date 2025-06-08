@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.event.EventPublisher;
+import roomescape.exception.ForbiddenException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
@@ -94,6 +95,15 @@ public class ReservationService {
         log.info("예약 삭제 이벤트 발행 - reservationId={}", id);
         eventPublisher.raise(new ReservationDeleteEvent(id));
         log.info("예약 삭제 완료 - reservationId={}", id);
+    }
+
+    public void validateOwnership(Long reservationId, Long memberId) {
+        Reservation reservation = getReservationById(reservationId);
+        Member member = getMemberById(memberId);
+        if(member.isAdmin() || reservation.isOwnedBy(memberId)) {
+            return;
+        }
+        throw new ForbiddenException("해당 예약에 접근할 권한이 없습니다.");
     }
 
     private Reservation getReservationById(Long reservationId) {
