@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
+import roomescape.reservation.domain.Reservation;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,34 +43,50 @@ public class Payment {
     @Column(name = Fields.paymentType, nullable = false)
     private String paymentType;
 
-    private Payment(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
-        validate(paymentKey, amount, orderId, paymentType);
+    @OneToOne(optional = false)
+    private Reservation reservation;
+
+    private Payment(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType, final Reservation reservation) {
+        validate(paymentKey, amount, orderId, paymentType, reservation);
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
         this.paymentType = paymentType;
+        this.reservation = reservation;
     }
 
-    public Payment(final Long id, final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
+    public Payment(final Long id, final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType, final Reservation reservation) {
         validate(id);
-        validate(paymentKey, amount, orderId, paymentType);
+        validate(paymentKey, amount, orderId, paymentType, reservation);
         this.id = id;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
         this.paymentType = paymentType;
+        this.reservation = reservation;
     }
 
-    public static Payment of(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
-        return new Payment(paymentKey, amount, orderId, paymentType);
+    public static Payment of(final String paymentKey,
+                             final PaymentAmount amount,
+                             final String orderId,
+                             final String paymentType,
+                             final Reservation reservation
+    ) {
+        return new Payment(paymentKey, amount, orderId, paymentType, reservation);
     }
 
-    private static void validate(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
+    private static void validate(final String paymentKey,
+                                 final PaymentAmount amount,
+                                 final String orderId,
+                                 final String paymentType,
+                                 final Reservation reservation
+    ) {
         Validator.of(Payment.class)
                 .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
                 .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
                 .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label())
-                .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label());
+                .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
+                .validateNotNull(Fields.reservation, reservation, DomainTerm.RESERVATION.label());
     }
 
     private static void validate(final Long id) {
