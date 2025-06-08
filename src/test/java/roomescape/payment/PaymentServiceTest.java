@@ -19,6 +19,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Amount;
 import roomescape.payment.domain.OrderId;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentKey;
@@ -67,7 +68,7 @@ public class PaymentServiceTest {
         // 주문 orderId 설정
         String orderId = "orderId1234";
         // 가격 설정
-        BigDecimal amount = BigDecimal.valueOf(1000L);
+        Amount amount = new Amount(BigDecimal.valueOf(1000L));
         // given
         // 회원 생성 및 저장
         Member member = MemberFixture.createMember("에드", "ed@example.com", "password123");
@@ -100,7 +101,7 @@ public class PaymentServiceTest {
         assertThat(resultPayment).isNotNull();
         assertThat(resultPayment.getId()).isNotNull();
         assertThat(resultPayment.getPaymentKey().getValue()).isEqualTo(key);
-        assertThat(resultPayment.getAmount()).isEqualByComparingTo(amount);
+        assertThat(resultPayment.getAmount().getValue()).isEqualByComparingTo(amount.getValue());
         assertThat(resultPayment.getReservationId()).isEqualTo(paymentReservation.getId());
     }
 
@@ -126,9 +127,18 @@ public class PaymentServiceTest {
         Reservation reservation1 = reservationRepository.save(new Reservation(member, spec1));
         Reservation reservation2 = reservationRepository.save(new Reservation(member, spec2));
 
-        Payment payment1 = new Payment(new PaymentKey("payKey-1"), new OrderId("orderId-1"), BigDecimal.valueOf(1500), reservation1.getId());
-        Payment payment2 = new Payment(new PaymentKey("payKey-2"), new OrderId("orderId-2"), BigDecimal.valueOf(2000), reservation2.getId());
-
+        Payment payment1 = new Payment(
+                new PaymentKey("payKey-1"),
+                new OrderId("orderId-1"),
+                new Amount(BigDecimal.valueOf(1500)),
+                reservation1.getId()
+        );
+        Payment payment2 = new Payment(
+                new PaymentKey("payKey-2"),
+                new OrderId("orderId-2"),
+                new Amount(BigDecimal.valueOf(2000)),
+                reservation2.getId()
+        );
 
         paymentService.save(payment1);
         paymentService.save(payment2);

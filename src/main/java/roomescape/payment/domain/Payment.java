@@ -27,13 +27,13 @@ public class Payment {
     @Embedded
     OrderId orderId;
 
-    @Column(nullable = false)
-    BigDecimal amount;
+    @Embedded
+    Amount amount;
 
     @Column(nullable = false)
     Long reservationId;
 
-    public Payment(PaymentKey paymentKey, OrderId orderId, BigDecimal amount, Long reservationId) {
+    public Payment(PaymentKey paymentKey, OrderId orderId, Amount amount, Long reservationId) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;

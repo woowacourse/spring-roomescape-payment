@@ -17,6 +17,7 @@ import roomescape.member.exception.MemberNotFoundException;
 import roomescape.payment.application.PaymentApprovalService;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentApprovalRequest;
+import roomescape.payment.domain.Amount;
 import roomescape.payment.domain.OrderId;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentKey;
@@ -102,17 +103,19 @@ public class ReservationService {
             throw new PaymentSessionExpiredException();
         }
         OrderId orderId = new OrderId(request.orderId());
-        BigDecimal amount = request.amount();
-        if (originAmount.compareTo(amount) != 0) {
-            log.warn("결제 금액 불일치 발생! [orderId: {}] expected = {}, actual = {}", orderId, originAmount, amount);
+        Amount amount = new Amount(request.amount());
+        if (originAmount.compareTo(amount.getValue()) != 0) {
+            log.warn("결제 금액 불일치 발생! [orderId: {}] expected = {}, actual = {}", orderId, originAmount,
+                    amount.getValue());
             throw new InvalidPaymentAmountException();
         }
 
-        paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId.getValue(), amount, request.paymentKey()));
+        paymentApprovalService.approvePayment(
+                new PaymentApprovalRequest(orderId.getValue(), amount.getValue(), request.paymentKey()));
         Reservation reservation = create(memberId, request.date(), request.timeId(), request.themeId());
         log.info("유저 예약 생성 및 저장 완료 reservationId={}", reservation.getId());
         PaymentKey paymentKey = new PaymentKey(request.paymentKey());
-        Payment payment = paymentService.save(new Payment(paymentKey, orderId, request.amount(), reservation.getId()));
+        Payment payment = paymentService.save(new Payment(paymentKey, orderId, amount, reservation.getId()));
         log.info("결제 저장 완료: paymentId={}, paymentKey={}", payment.getId(), payment.getPaymentKey());
         return ReservationResponse.from(reservation);
     }

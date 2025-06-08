@@ -49,7 +49,7 @@ public record MyReservationResponse(
                     BigDecimal amount = null;
                     if (payment != null) {
                         paymentKey = payment.getPaymentKey().getValue();
-                        amount = payment.getAmount();
+                        amount = payment.getAmount().getValue();
                     }
                     return new MyReservationResponse(
                             reservation.getId(),
