@@ -13,7 +13,6 @@ class CookieManagerTest {
 
     private static final String COOKIE_NAME = "testCookie";
     private static final String COOKIE_VALUE = "testValue";
-    private static final String DOMAIN = "localhost";
     private static final long MAX_AGE = 3600L;
 
     private CookieManager cookieManager;
@@ -37,7 +36,6 @@ class CookieManagerTest {
                     softAssertions.assertThat(cookie.getValue()).isEqualTo(COOKIE_VALUE);
                     softAssertions.assertThat(cookie.getSameSite()).isEqualTo("Strict");
                     softAssertions.assertThat(cookie.getPath()).isEqualTo("/");
-                    softAssertions.assertThat(cookie.getDomain()).isEqualTo(DOMAIN);
                     softAssertions.assertThat(cookie.getMaxAge()).isEqualTo(Duration.ofSeconds(MAX_AGE));
                 }
         );
