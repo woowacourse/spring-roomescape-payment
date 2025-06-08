@@ -23,7 +23,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
 @Component
-@Profile("local")
+@Profile("production")
 @RequiredArgsConstructor
 public class SampleReservationInitializer implements CommandLineRunner {
 
@@ -61,7 +61,6 @@ public class SampleReservationInitializer implements CommandLineRunner {
         saveReservation(10L, baseDate.plusDays(4), 11L, 13L);
 
         LocalDate plusDate = LocalDate.now().plusDays(1);
-        saveReservation(2L, plusDate, 1L, 1L);
         saveWaiting(1L, plusDate, 1L, 1L);
         saveWaiting(3L, plusDate, 1L, 1L);
         saveWaiting(4L, plusDate, 1L, 1L);
