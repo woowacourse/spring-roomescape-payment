@@ -82,3 +82,66 @@
 - [x] 결제 기능은 외부의 결제 서비스를 사용하여 외부의 결제 API를 연동하세요.
 - [x] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링 하세요.
     - 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있어야 합니다.
+
+## ERD
+
+```mermaid
+
+erDiagram
+    member {
+        bigint id PK
+        varchar email
+        varchar name
+        varchar password
+        varchar role "ENUM('ADMIN', 'MEMBER')"
+    }
+
+    payment {
+        bigint id PK
+        varchar order_id
+        varchar payment_key
+        numeric amount
+        VARCHAR payment_status "ENUM('AWAIT','FAILED','PENDING','SUCCESS')"
+        bigint reservation_id FK
+    }
+
+    reservation {
+        bigint id PK
+        date date
+        bigint member_id FK
+        bigint time_id FK
+        bigint theme_id FK
+    }
+
+    reservation_time {
+        bigint id PK
+        time start_at
+    }
+
+    theme {
+        bigint id PK
+        varchar name
+        varchar description
+        varchar thumbnail
+        numeric price
+    }
+
+    waiting {
+        bigint id PK
+        date date
+        timestamp created_at
+        VARCHAR waiting_status "ENUM('ACCEPTED','CANCELLED','PENDING','REJECTED')"
+        bigint member_id FK
+        bigint time_id FK
+        bigint theme_id FK
+    }
+
+    member ||--o{ reservation: ""
+    member ||--o{ waiting: ""
+    reservation_time ||--o{ reservation: ""
+    reservation_time ||--o{ waiting: ""
+    theme ||--o{ reservation: ""
+    theme ||--o{ waiting: ""
+    reservation ||--|| payment: ""
+
+```
