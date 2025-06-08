@@ -53,6 +53,18 @@ public class FakeReservationWaitRepository implements ReservationWaitRepository 
     }
 
     @Override
+    public Optional<ReservationWait> findById(Long id) {
+        return reservationWaits.stream()
+                .filter(wait -> wait.getId().equals(id))
+                .findAny();
+    }
+
+    @Override
+    public void delete(ReservationWait waiting) {
+        deleteById(waiting.getId());
+    }
+
+    @Override
     public ReservationWait save(final ReservationWait reservationWait) {
         final ReservationWait saved = ReservationWait.withId(
                 index.getAndIncrement(),

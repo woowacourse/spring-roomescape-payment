@@ -61,7 +61,7 @@ public class ReservationService {
                 .stream()
                 .map(reservation -> ReservationWithStatusResponse.of(
                         reservation,
-                        paymentHistoryRepository.findByReservation(reservation).get())
+                        paymentHistoryRepository.findByReservation(reservation).orElse(null))
                 ).toList();
     }
 

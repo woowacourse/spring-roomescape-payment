@@ -30,8 +30,15 @@ public class ReservationWithStatusResponse {
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
                 CONFIRMED,
-                new PaymentHistoryWebResponse(paymentHistory)
+                makePaymentHistoryWebResponse(paymentHistory)
         );
+    }
+
+    private static PaymentHistoryWebResponse makePaymentHistoryWebResponse(PaymentHistory paymentHistory) {
+        if (paymentHistory == null) {
+            return new PaymentHistoryWebResponse("", 0);
+        }
+        return new PaymentHistoryWebResponse(paymentHistory.getOrderId(), paymentHistory.getAmount());
     }
 
     public static ReservationWithStatusResponse of(

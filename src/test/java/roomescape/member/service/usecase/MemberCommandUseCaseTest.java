@@ -13,6 +13,7 @@ import roomescape.member.domain.MemberEmail;
 import roomescape.member.domain.MemberName;
 import roomescape.member.domain.Password;
 import roomescape.member.domain.Role;
+import roomescape.member.log.MemberProbe;
 import roomescape.member.repository.FakeAccountRepository;
 import roomescape.member.repository.FakeMemberRepository;
 
@@ -24,7 +25,8 @@ class MemberCommandUseCaseTest {
     void setUp() {
         memberCommandUseCase = new MemberCommandUseCase(
                 new FakeMemberRepository(),
-                new FakeAccountRepository()
+                new FakeAccountRepository(),
+                new MemberProbe()
         );
     }
 
