@@ -16,7 +16,8 @@ public class RoomescapeService {
     @Transactional
     public Reservation reserveAndPay(final long userId, final CreateReservationRequest request) {
         var reservation = reservationService.reserve(userId, request.date(), request.timeId(), request.themeId());
-        paymentService.pay(request.paymentKey(), request.orderId(), request.amount(), reservation.id());
+        var payment = paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
+        reservation.updatePaymentId(payment.id());
         return reservation;
     }
 }

@@ -22,13 +22,18 @@ public class PaymentService {
     private final PaymentProvider paymentProvider;
     private final PaymentRepository paymentRepository;
 
-    public Payment register(String paymentKey, String orderId, long totalAmount, String status, long reservationId) {
-        var payment = new Payment(new PaymentKey(paymentKey), new OrderId(orderId), totalAmount, PaymentStatus.valueOf(status), reservationId);
+    public Payment register(String paymentKey, String orderId, long totalAmount, String status) {
+        var payment = new Payment(
+            new PaymentKey(paymentKey),
+            new OrderId(orderId),
+            totalAmount,
+            PaymentStatus.valueOf(status)
+        );
         return paymentRepository.save(payment);
     }
 
     @Transactional
-    public void pay(final String paymentKey, final String orderId, final long amount, final long reservationId) {
+    public Payment pay(final String paymentKey, final String orderId, final long amount) {
         var request = new PaymentRequest(paymentKey, orderId, amount);
 
         var paymentDetails = paymentProvider.confirm(request);
@@ -37,7 +42,7 @@ public class PaymentService {
         }
 
         var confirmation = paymentDetails.confirmation();
-        register(confirmation.paymentKey(), confirmation.orderId(), confirmation.totalAmount(), confirmation.status(), reservationId);
+        return register(confirmation.paymentKey(), confirmation.orderId(), confirmation.totalAmount(), confirmation.status());
     }
 
     private void throwPaymentException(final TransactionStatus status) {
