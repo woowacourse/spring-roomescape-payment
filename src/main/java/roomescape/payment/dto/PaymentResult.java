@@ -6,7 +6,6 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
-
 public record PaymentResult(String paymentKey,
                             int amount,
                             String orderId,

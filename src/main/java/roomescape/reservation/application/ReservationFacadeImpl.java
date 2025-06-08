@@ -8,6 +8,7 @@ import roomescape.common.exception.DuplicateException;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -90,19 +91,26 @@ public class ReservationFacadeImpl implements ReservationFacade {
     }
 
     @Override
-    @Transactional
     public ReservationResponse createWithPayment(final CreateReservationWithUserIdWebRequest reservationRequest,
                                                  final PaymentRequest paymentRequest) {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());
-
-        PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
-        if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
-            throw new IllegalArgumentException("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
-        }
-
+        PaymentResult paymentResult = confirmPaymentWithRollback(paymentRequest, reservation);
         return ReservationResponse.from(reservation, user);
+    }
+
+    private PaymentResult confirmPaymentWithRollback(final PaymentRequest paymentRequest, final Reservation reservation) {
+        try {
+            PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
+            if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
+                throw new PaymentInternalServerException("결제 승인 검증에 실패했습니다.");
+            }
+            return paymentResult;
+        } catch (Exception e) {
+            reservationCommandService.delete(reservation.getId());
+            throw e;
+        }
     }
 
     @Override

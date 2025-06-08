@@ -14,6 +14,7 @@ import roomescape.common.domain.Email;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
@@ -180,8 +181,8 @@ class ReservationFacadeIntegrationTest {
             // then
             assertThatThrownBy(() ->
                     reservationFacade.createWithPayment(reservationRequest, paymentRequest))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
+                    .isInstanceOf(PaymentInternalServerException.class)
+                    .hasMessage("결제 승인 API 호출 실패했습니다. 결제 승인 검증에 실패했습니다.");
 
             int finalReservationCount = countReservations();
             assertThat(finalReservationCount).isEqualTo(initialReservationCount);
