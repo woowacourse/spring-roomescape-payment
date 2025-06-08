@@ -13,7 +13,7 @@ public class PaymentDomainService {
 
     @Transactional
     public void approvePayment(final PaymentInfo paymentInfo) {
-        paymentClient.approvePayment(paymentInfo);
         paymentRepository.save(paymentInfo);
+        paymentClient.approvePayment(paymentInfo);
     }
 }
