@@ -40,7 +40,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory){
         HttpServletRequest nativeRequest = (HttpServletRequest) webRequest.getNativeRequest();
         Cookie[] cookies = nativeRequest.getCookies();
         String token = cookieHandler.extractCookie(cookies, "token");

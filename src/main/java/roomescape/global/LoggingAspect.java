@@ -7,6 +7,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -19,7 +20,10 @@ import java.util.Map;
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("execution(* roomescape.controller..*Controller.*(..))")
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Pointcut("within(roomescape.controller.api..*)")
     public void controllerMethods() {}
 
     @Around("controllerMethods()")
@@ -38,8 +42,6 @@ public class LoggingAspect {
         String fullUri = requestURI + (queryString == null ? "" : "?" + queryString);
         requestLogData.put("URI", fullUri);
         requestLogData.put("ARGS", joinPoint.getArgs());
-
-        ObjectMapper objectMapper = new ObjectMapper();
         log.info(objectMapper.writeValueAsString(requestLogData));
 
         try {
