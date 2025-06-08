@@ -5,18 +5,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import roomescape.auth.dto.LoginMember;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.reservation.controller.api.ReservationApi;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationPaymentRequest;
@@ -24,37 +21,32 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.reservation.service.ReservationService;
 
-@RequestMapping("/reservations")
+@RequiredArgsConstructor
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationApi {
 
     private final ReservationService reservationService;
 
-    public ReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
-
-    @GetMapping
+    @Override
     public ResponseEntity<List<ReservationResponse>> readAllReservations() {
         List<ReservationResponse> response = reservationService.getAll();
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/times/available")
+    @Override
     public ResponseEntity<List<BookedReservationTimeResponse>> readAvailableReservationTimes(
-            @RequestParam("date") final LocalDate date,
-            @RequestParam("themeId") final Long themeId
+            final LocalDate date,
+            final Long themeId
     ) {
         List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, themeId);
 
         return ResponseEntity.ok(responses);
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody final ReservationPaymentRequest request,
             final LoginMember loginMember
@@ -71,14 +63,14 @@ public class ReservationController {
                 .body(response);
     }
 
-    @DeleteMapping("/{reservationId}")
-    public ResponseEntity<Void> delete(@PathVariable("reservationId") final Long reservationId) {
+    @Override
+    public ResponseEntity<Void> delete(final Long reservationId) {
         reservationService.delete(reservationId);
 
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/filtering")
+    @Override
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteringReservationRequest request
     ) {
@@ -88,7 +80,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationResponses);
     }
 
-    @GetMapping("/my")
+    @Override
     public ResponseEntity<List<MyReservationsResponse>> getMyReservations(final @Valid LoginMember loginMember) {
         List<MyReservationsResponse> response = reservationService.getAllMyReservations(loginMember);
         return ResponseEntity.ok(response);
