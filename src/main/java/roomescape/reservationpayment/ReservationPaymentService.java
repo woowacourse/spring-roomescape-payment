@@ -28,12 +28,17 @@ public class ReservationPaymentService {
         try {
             tossPaymentAdapter.confirmPayment(command);
         } catch (Exception e) {
-            log.error("결제 승인 api 요청 실패", e);
+            log.warn("[{}] EVENT: PAYMENT_CONFIRM_FAILED, reservationId={}, paymentKey={}, orderId={}",
+                    MDC.get("requestId"),
+                    savedReservationPayment.getReservation().getId(),
+                    savedReservationPayment.getPaymentKey(),
+                    savedReservationPayment.getOrderId());
             throw e;
         }
-        log.info("[{}] EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}",
+        log.info("[{}] EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}, orderId={}",
                 MDC.get("requestId"),
                 savedReservationPayment.getReservation().getId(),
-                savedReservationPayment.getPaymentKey());
+                savedReservationPayment.getPaymentKey(),
+                savedReservationPayment.getOrderId());
     }
 }

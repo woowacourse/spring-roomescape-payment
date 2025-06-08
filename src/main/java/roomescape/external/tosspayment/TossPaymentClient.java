@@ -2,6 +2,7 @@ package roomescape.external.tosspayment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
@@ -25,6 +26,8 @@ public class TossPaymentClient {
 
     public void confirm(final PaymentConfirmRequest request) {
         try {
+            long startTime = System.currentTimeMillis();
+            log.info("[{}] EXTERNAL_API: 토스 결제 승인 api 요청", MDC.get("requestId"));
             ResponseEntity<TossPaymentConfirmResponse> response = restClient.post()
                     .uri(URL_PREFIX + "/confirm")
                     .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
@@ -33,15 +36,20 @@ public class TossPaymentClient {
                     .onStatus(tossPaymentConfirmErrorHandler)
                     .toEntity(TossPaymentConfirmResponse.class);
             if (response.getStatusCode() != HttpStatus.OK) {
+                log.warn("[{}] EXTERNAL_API_ERROR: TOSSPAYMENT_BUSINESS_FAILURE - 토스 응답 상태 코드: {}",
+                        MDC.get("requestId"),
+                        response.getStatusCode());
                 throw new PaymentException("결제 승인에 실패하였습니다.");
             }
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("[{}] EXTERNAL_API: 토스 결제 승인 api 요청 및 응답 성공, 응답까지 소요 시간: {} ms", MDC.get("requestId"), duration);
         } catch (PaymentException e) {
             throw e;
         } catch (ResourceAccessException e) {
-            log.warn("리소스 접근 에러 ", e);
+            log.warn("[{}] EXTERNAL_API_ERROR: TOSSPAYMENT_RESOURCE_ACCESS_FAILURE", MDC.get("requestId"), e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         } catch (Exception e) {
-            log.warn("예기치 못한 에러 ", e);
+            log.error("[{}] EXTERNAL_API_ERROR: UNEXPECTED_ERROR", MDC.get("requestId"), e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         }
     }
