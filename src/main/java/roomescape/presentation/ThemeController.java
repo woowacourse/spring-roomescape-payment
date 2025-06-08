@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,8 @@ import roomescape.service.ThemeService;
 @RequestMapping("/api/themes")
 public class ThemeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ThemeController.class);
+
     private final ThemeService themeService;
 
     public ThemeController(ThemeService themeService) {
@@ -32,6 +36,8 @@ public class ThemeController {
     @PostMapping
     public ResponseEntity<ThemeResponse> createNewTheme(@Valid @RequestBody ThemeRequest request) {
         ThemeResponse themeResponse = themeService.createTheme(request);
+
+        logger.info("테마 생성: 테마 id = {}, 테마 이름 = {}", themeResponse.id(), themeResponse.name());
         return ResponseEntity.created(URI.create("/api/themes/" + themeResponse.id())).body(themeResponse);
     }
 

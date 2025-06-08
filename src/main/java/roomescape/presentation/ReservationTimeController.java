@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,8 @@ import roomescape.service.ReservationTimeService;
 @RequestMapping(value = "/api/times")
 public class ReservationTimeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReservationTimeController.class);
+
     private final ReservationTimeService reservationTimeService;
 
     public ReservationTimeController(ReservationTimeService reservationTimeService) {
@@ -43,6 +47,8 @@ public class ReservationTimeController {
     public ResponseEntity<ReservationTimeResponse> createNewReservationTime(
             @Valid @RequestBody ReservationTimeRequest reservationTimeRequest) {
         ReservationTimeResponse reservationTime = reservationTimeService.createTime(reservationTimeRequest);
+
+        logger.info("예약 시간 생성: 예약시간 id = {}, 시작시간 = {}", reservationTime.id(), reservationTime.startAt());
         return ResponseEntity
                 .created(URI.create("/api/times/" + reservationTime.id()))
                 .body(reservationTime);

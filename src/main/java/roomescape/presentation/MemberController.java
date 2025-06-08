@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import roomescape.service.MemberService;
 @RestController
 @RequestMapping("/api/members")
 public class MemberController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     private final MemberService memberService;
 
@@ -34,6 +38,11 @@ public class MemberController {
     @Operation(summary = "회원 가입", description = "회원 가입을 수행합니다.")
     @PostMapping
     public ResponseEntity<MemberResponse> signUp(@RequestBody @Valid MemberRequest memberRequest) {
-        return ResponseEntity.ok(memberService.createMember(memberRequest));
+
+        MemberResponse createdMember = memberService.createMember(memberRequest);
+
+        logger.info("회원 가입 완료: username={}, id={}", createdMember.name(), createdMember.id()); // 가입 완료 로
+
+        return ResponseEntity.ok(createdMember);
     }
 }

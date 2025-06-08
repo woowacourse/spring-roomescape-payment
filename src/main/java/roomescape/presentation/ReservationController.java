@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,7 @@ import roomescape.service.ReservationService;
 @RestController
 @RequestMapping(value = "/api/reservations")
 public class ReservationController {
+    private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
     private final ReservationService reservationService;
     private final ReservationFacade reservationFacade;
@@ -45,7 +48,13 @@ public class ReservationController {
         ReservationForMemberResponse reservationResponse = reservationFacade.processReservationForMember(
                 memberId, request.timeId(), request.themeId(), request.date(), paymentRequest
         );
-
+        logger.info("회원 예약 생성: 회원ID = {}, 테마ID = {}, 날짜 = {}, 시간ID = {}, 금액 = {}",
+                memberId,
+                request.themeId(),
+                request.date(),
+                request.timeId(),
+                request.amount()
+        );
         return ResponseEntity
                 .created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

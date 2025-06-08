@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,6 +26,8 @@ import roomescape.service.WaitingService;
 @RequestMapping("/api/admin")
 public class AdminController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+
     private final ReservationService reservationService;
     private final WaitingService waitingService;
 
@@ -39,6 +43,13 @@ public class AdminController {
         ReservationResponse reservationResponse = reservationService.createReservation(
                 request.memberId(), request.timeId(), request.themeId(), request.date()
         );
+
+        logger.info("관리자 예약 생성: 테마ID = {}, 날짜 = {}, 시간ID = {}",
+                request.themeId(),
+                request.date(),
+                request.timeId()
+        );
+
         return ResponseEntity
                 .created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);

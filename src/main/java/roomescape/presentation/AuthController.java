@@ -3,6 +3,8 @@ package roomescape.presentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -21,6 +23,7 @@ import roomescape.service.AuthService;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
     private final int cookieMaxAge;
@@ -43,6 +46,7 @@ public class AuthController {
                 .maxAge(cookieMaxAge)
                 .path("/")
                 .build();
+        logger.info("유저 로그인: email={}", request.email());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
