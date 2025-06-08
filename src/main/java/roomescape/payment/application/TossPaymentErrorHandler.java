@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.common.exception.impl.DeserializationException;
-import roomescape.common.exception.impl.TossPaymentErrorException;
+import roomescape.common.exception.impl.ExternalApiException;
 import roomescape.payment.application.dto.TossErrorResponse;
 
 public class TossPaymentErrorHandler implements ResponseErrorHandler {
@@ -39,9 +39,9 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
 
         if (TossErrorCodesTreatedAsServerError.contains(error.code())) {
             logger.error("Toss API Unexpected error occurred: Code: {}, Message: {}", error.code(), error.message());
-            throw new TossPaymentErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 오류가 발생했습니다.");
+            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 오류가 발생했습니다.");
         }
-        throw new TossPaymentErrorException(status, error.message());
+        throw new ExternalApiException(status, error.message());
     }
 
     private TossErrorResponse parseErrorResponse(final InputStream bodyStream) {

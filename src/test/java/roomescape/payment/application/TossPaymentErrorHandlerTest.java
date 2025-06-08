@@ -18,7 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import roomescape.common.exception.impl.DeserializationException;
-import roomescape.common.exception.impl.TossPaymentErrorException;
+import roomescape.common.exception.impl.ExternalApiException;
 import roomescape.payment.application.dto.TossErrorResponse;
 
 class TossPaymentErrorHandlerTest {
@@ -38,9 +38,9 @@ class TossPaymentErrorHandlerTest {
 
         // when & then
         assertThatThrownBy(() -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST, response))
-            .isInstanceOf(TossPaymentErrorException.class)
+            .isInstanceOf(ExternalApiException.class)
             .satisfies(e -> {
-                TossPaymentErrorException ex = (TossPaymentErrorException) e;
+                ExternalApiException ex = (ExternalApiException) e;
                 assertAll(
                     () -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST),
                     () -> assertThat(ex.getMessage()).isEqualTo("결제가 유효하지 않습니다.")
@@ -61,9 +61,9 @@ class TossPaymentErrorHandlerTest {
 
         // when & then
         assertThatThrownBy(() -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST, response))
-            .isInstanceOf(TossPaymentErrorException.class)
+            .isInstanceOf(ExternalApiException.class)
             .satisfies(e -> {
-                TossPaymentErrorException ex = (TossPaymentErrorException) e;
+                ExternalApiException ex = (ExternalApiException) e;
                 assertAll(
                     () -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR),
                     () -> assertThat(ex.getMessage()).isEqualTo("서버 내부에 오류가 발생했습니다.")

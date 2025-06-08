@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
+import roomescape.common.exception.impl.ExternalApiException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
-import roomescape.common.exception.impl.TossPaymentErrorException;
 import roomescape.common.exception.impl.UnauthorizedException;
 
 @RestControllerAdvice
@@ -37,8 +37,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(TossPaymentErrorException.class)
-    public ResponseEntity<String> handle(final TossPaymentErrorException e) {
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<String> handle(final ExternalApiException e) {
         return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 
