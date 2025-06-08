@@ -16,6 +16,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApi(final ExternalApiException exception) {
+        return ResponseEntity.status(exception.getStatus()).body(ErrorResponse.from(exception));
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthentication(final AuthenticationException exception) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.from(exception));

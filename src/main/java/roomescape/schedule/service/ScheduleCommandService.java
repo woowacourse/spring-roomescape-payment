@@ -50,7 +50,7 @@ public class ScheduleCommandService {
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void createSchedule() {
-        DateRange nextTwoMonthsRange = DateRange.createNextTwoMonthsRange(clock);
+        DateRange nextTwoMonthsRange = DateRange.createNextMonthsRange(clock, 2);
         Set<LocalDate> scheduledDates = scheduleQueryService.existingScheduledDates(nextTwoMonthsRange);
         List<ReservationSchedule> newSchedules = generateNewSchedules(scheduledDates, nextTwoMonthsRange);
         reservationScheduleRepository.saveAll(newSchedules);

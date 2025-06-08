@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,9 +34,35 @@ public class Reservation {
     @JoinColumn(name = "schedule_id")
     private ReservationSchedule schedule;
 
+    @Embedded
+    private OrderId orderId;
+
+    @Embedded
+    private  Amount amount;
+
+    @Embedded
+    private PaymentKey paymentKey;
+
     protected Reservation() {
     }
 
+    public Reservation(
+            final Long id,
+            final Member member,
+            final ReservationSchedule schedule,
+            final OrderId orderId,
+            final Amount amount,
+            final PaymentKey paymentKey
+    ) {
+        this.id = id;
+        this.member = Objects.requireNonNull(member);
+        this.schedule = Objects.requireNonNull(schedule);
+        this.orderId = Objects.requireNonNull(orderId);
+        this.amount = Objects.requireNonNull(amount);
+        this.paymentKey = Objects.requireNonNull(paymentKey);
+    }
+
+    // TODO: 미사용 생성자 제거
     public Reservation(
             final Long id,
             final Member member,
@@ -72,5 +99,17 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public OrderId getOrderId() {
+        return orderId;
+    }
+
+    public Amount getAmount() {
+        return amount;
+    }
+
+    public PaymentKey getPaymentKey() {
+        return paymentKey;
     }
 }

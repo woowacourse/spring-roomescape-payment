@@ -50,7 +50,10 @@ class ReservationRestTest extends RestAssuredTestBase {
         Map<String, Object> request = Map.of(
                 "date", schedule.getDate().toString(),
                 "timeId", schedule.getReservationTime().getId(),
-                "themeId", schedule.getTheme().getId()
+                "themeId", schedule.getTheme().getId(),
+                "orderId", "testOrderId",
+                "amount", 1000,
+                "paymentKey", "testPaymentKey"
         );
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

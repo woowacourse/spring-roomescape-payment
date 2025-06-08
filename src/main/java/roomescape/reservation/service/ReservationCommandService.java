@@ -5,16 +5,23 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
+import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.external.toss.dto.PaymentConfirmRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.schedule.domain.ReservationSchedule;
 
 @Service
 public class ReservationCommandService {
     private final ReservationRepository reservationRepository;
+    private final PaymentApiClient paymentApiClient;
 
-    public ReservationCommandService(final ReservationRepository reservationRepository) {
+    public ReservationCommandService(
+            final ReservationRepository reservationRepository,
+            final PaymentApiClient paymentApiClient
+    ) {
         this.reservationRepository = reservationRepository;
+        this.paymentApiClient = paymentApiClient;
     }
 
     public void deleteReservationById(final Long id) {
@@ -28,4 +35,25 @@ public class ReservationCommandService {
         }
         return reservationRepository.save(new Reservation(null, member, schedule));
     }
+
+    @Transactional
+    public Reservation createReservationWithPayment(
+            final ReservationSchedule schedule,
+            final Member member,
+            final PaymentInfo paymentInfo
+    ) {
+        if (reservationRepository.findByScheduleId(schedule.getId()).isPresent()) {
+            throw new NoSuchElementException("이미 해당 일정에 예약이 존재합니다.");
+        }
+        PaymentInfo confirmPaymentInfo = paymentApiClient.paymentReservation(PaymentConfirmRequest.from(paymentInfo));
+        return reservationRepository.save(new Reservation(
+                null,
+                member,
+                schedule,
+                confirmPaymentInfo.orderId(),
+                confirmPaymentInfo.totalAmount(),
+                confirmPaymentInfo.paymentKey()
+        ));
+    }
+
 }
