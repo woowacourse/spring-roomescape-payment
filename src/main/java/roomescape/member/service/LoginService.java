@@ -3,6 +3,7 @@ package roomescape.member.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.LoginException;
+import roomescape.common.logging.LogExecution;
 import roomescape.common.util.DateTime;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.member.domain.Member;
@@ -12,7 +13,7 @@ import roomescape.member.dto.request.LoginRequest;
 import java.util.Optional;
 
 @Service
-
+@LogExecution
 public class LoginService {
 
     private final JwtTokenContainer jwtTokenContainer;

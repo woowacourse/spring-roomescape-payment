@@ -96,7 +96,7 @@ class ReservationServiceMockTest {
                 .thenReturn(true);
         // when & then
         ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 10, 6), 1L, 1L, "paymentKey", "orderId", 1000L);
-        assertThatThrownBy(() -> reservationService.createReservationWithoutPayment(reservationRequest, 1L))
+        assertThatThrownBy(() -> reservationService.createPendingReservation(reservationRequest, 1L))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

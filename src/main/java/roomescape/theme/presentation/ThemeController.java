@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.theme.adaptor.ThemeApiAdaptor;
+import roomescape.theme.docs.*;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.dto.response.ThemeResponse;
@@ -23,27 +25,37 @@ public class ThemeController {
     private static final String SLASH = "/";
 
     private final ThemeService themeService;
+    private final ThemeApiAdaptor themeApiAdaptor;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(ThemeService themeService, ThemeApiAdaptor themeApiAdaptor) {
         this.themeService = themeService;
+        this.themeApiAdaptor = themeApiAdaptor;
     }
 
     @GetMapping
-    public ResponseEntity<List<ThemeResponse>> getThemes() {
+    public ResponseEntity<List<ThemeResponseDocs>> getThemes() {
         List<ThemeResponse> responses = themeService.getThemes();
-        return ResponseEntity.ok().body(responses);
+        List<ThemeResponseDocs> responseDocs = responses.stream()
+                .map(themeApiAdaptor::toThemeResponseDocs)
+                .toList();
+        return ResponseEntity.ok().body(responseDocs);
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<PopularThemeResponse>> getPopularThemes() {
+    public ResponseEntity<List<PopularThemeResponseDocs>> getPopularThemes() {
         List<PopularThemeResponse> responses = themeService.getPopularThemes();
-        return ResponseEntity.ok().body(responses);
+        List<PopularThemeResponseDocs> responseDocs = responses.stream()
+                .map(themeApiAdaptor::toPopularThemeResponseDocs)
+                .toList();
+        return ResponseEntity.ok().body(responseDocs);
     }
 
     @PostMapping
-    public ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeRequest request) {
-        ThemeResponse theme = themeService.createTheme(request);
-        return ResponseEntity.created(URI.create(THEME_BASE_URL + SLASH + theme.id())).body(theme);
+    public ResponseEntity<ThemeResponseDocs> createTheme(@RequestBody final ThemeRequestDocs requestDocs) {
+        ThemeRequest request = themeApiAdaptor.toThemeRequest(requestDocs);
+        ThemeResponse response = themeService.createTheme(request);
+        ThemeResponseDocs responseDocs = themeApiAdaptor.toThemeResponseDocs(response);
+        return ResponseEntity.created(URI.create(THEME_BASE_URL + SLASH + response.id())).body(responseDocs);
     }
 
     @DeleteMapping("/{id}")

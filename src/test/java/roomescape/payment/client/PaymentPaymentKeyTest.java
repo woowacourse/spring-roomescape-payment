@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.ClientPaymentException;
+import roomescape.common.exception.PaymentException;
 import roomescape.payment.dto.request.TossPaymentConfirmRequest;
 
 import java.nio.charset.StandardCharsets;
@@ -65,7 +65,7 @@ public class PaymentPaymentKeyTest {
         );
 
         Assertions.assertThatThrownBy(() -> tossPaymentClient.confirmPayment(tossPaymentConfirmRequest))
-                .isInstanceOf(ClientPaymentException.class)
+                .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 실패 : 결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
     }
 }

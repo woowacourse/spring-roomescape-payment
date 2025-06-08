@@ -2,6 +2,11 @@ package roomescape.reservationTime.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import roomescape.reservationTime.adaptor.ReservationTimeApiAdaptor;
+import roomescape.reservationTime.docs.ReservationTimeRequestDocs;
+import roomescape.reservationTime.docs.ReservationTimeResponseDocs;
+import roomescape.reservationTime.docs.TimeConditionRequestDocs;
+import roomescape.reservationTime.docs.TimeConditionResponseDocs;
 import roomescape.reservationTime.dto.request.ReservationTimeRequest;
 import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
@@ -19,29 +24,42 @@ public class ReservationTimeController {
     private static final String SLASH = "/";
 
     private final ReservationTimeService reservationTimeService;
+    private final ReservationTimeApiAdaptor reservationTimeApiAdaptor;
 
-    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
+    public ReservationTimeController(final ReservationTimeService reservationTimeService, final ReservationTimeApiAdaptor reservationTimeApiAdaptor) {
         this.reservationTimeService = reservationTimeService;
+        this.reservationTimeApiAdaptor = reservationTimeApiAdaptor;
     }
 
     @PostMapping
-    public ResponseEntity<ReservationTimeResponse> createReservationTime(
-            @RequestBody final ReservationTimeRequest request) {
+    public ResponseEntity<ReservationTimeResponseDocs> createReservationTime(
+            @RequestBody final ReservationTimeRequestDocs requestDocs) {
+        ReservationTimeRequest request = reservationTimeApiAdaptor.toReservationTimeRequest(requestDocs);
         ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
+        ReservationTimeResponseDocs responseDocs = reservationTimeApiAdaptor.toReservationTimeResponseDocs(response);
+
         URI locationUri = URI.create(RESERVATION_TIME_BASE_URL + SLASH + response.id());
-        return ResponseEntity.created(locationUri).body(response);
+        return ResponseEntity.created(locationUri).body(responseDocs);
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
+    public ResponseEntity<List<ReservationTimeResponseDocs>> getReservationTimes() {
         List<ReservationTimeResponse> response = reservationTimeService.getReservationTimes();
-        return ResponseEntity.ok(response);
+        List<ReservationTimeResponseDocs> responseDocs = response.stream()
+                .map(reservationTimeApiAdaptor::toReservationTimeResponseDocs)
+                .toList();
+        return ResponseEntity.ok(responseDocs);
     }
 
     @GetMapping(consumes = {"application/json"})
-    public ResponseEntity<List<TimeConditionResponse>> getReservationTimes(final TimeConditionRequest request) {
+    public ResponseEntity<List<TimeConditionResponseDocs>> getReservationTimes(
+            final TimeConditionRequestDocs requestDocs) {
+        TimeConditionRequest request = reservationTimeApiAdaptor.toTimeConditionRequest(requestDocs);
         List<TimeConditionResponse> responses = reservationTimeService.getTimesWithCondition(request);
-        return ResponseEntity.ok().body(responses);
+        List<TimeConditionResponseDocs> responseDocs = responses.stream()
+                .map(reservationTimeApiAdaptor::toTimeConditionResponseDocs)
+                .toList();
+        return ResponseEntity.ok().body(responseDocs);
     }
 
     @DeleteMapping("/{id}")
