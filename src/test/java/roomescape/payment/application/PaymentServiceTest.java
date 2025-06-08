@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
-import roomescape.payment.application.dto.PrePaymentRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
@@ -33,7 +33,7 @@ class PaymentServiceTest {
     @Test
     void 결제한다() {
         // given
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "dummy",
                 "dummy",
                 BigDecimal.valueOf(1000)
@@ -46,7 +46,7 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when
-        final Payment payment = paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation);
+        final Payment payment = paymentService.pay(prePaymentValidRequest, paymentConfirmRequest, reservation);
 
         // then
         assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS);
@@ -55,7 +55,7 @@ class PaymentServiceTest {
     @Test
     void 결제_승인과정에서_예외가_발생하면_결제가_실패한다() {
         // given
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "dummy",
                 "dummy",
                 BigDecimal.valueOf(1000)
@@ -69,7 +69,7 @@ class PaymentServiceTest {
 
         // when & then
         when(paymentClient.requestPayment(any())).thenThrow(new PaymentException("결제 승인 에러"));
-        assertThatThrownBy(() -> paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation))
+        assertThatThrownBy(() -> paymentService.pay(prePaymentValidRequest, paymentConfirmRequest, reservation))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 승인 에러");
     }
@@ -77,7 +77,7 @@ class PaymentServiceTest {
     @Test
     void 결제_요청과_승인_사이의_orderId를_확인한다() {
         // given
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "dummy",
                 "dummy",
                 BigDecimal.valueOf(1000)
@@ -90,7 +90,7 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation))
+        assertThatThrownBy(() -> paymentService.pay(prePaymentValidRequest, paymentConfirmRequest, reservation))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("결제 주문번호가 일치하지 않습니다.");
     }
@@ -98,7 +98,7 @@ class PaymentServiceTest {
     @Test
     void 결제_요청과_승인_사이의_amount를_확인한다() {
         // given
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "dummy",
                 "dummy",
                 BigDecimal.valueOf(100000)
@@ -111,7 +111,7 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation))
+        assertThatThrownBy(() -> paymentService.pay(prePaymentValidRequest, paymentConfirmRequest, reservation))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("결제 금액이 일치하지 않습니다.");
     }
@@ -119,7 +119,7 @@ class PaymentServiceTest {
     @Test
     void 결제_요청을_대기한다() {
         // given
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "dummy",
                 "dummy",
                 BigDecimal.valueOf(1000)
@@ -127,7 +127,7 @@ class PaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when
-        final Payment payment = paymentService.await(prePaymentRequest, reservation);
+        final Payment payment = paymentService.await(prePaymentValidRequest, reservation);
 
         // then
         assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);

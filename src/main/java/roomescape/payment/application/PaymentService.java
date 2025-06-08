@@ -6,7 +6,7 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.DefaultPaymentRequest;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentRequest;
-import roomescape.payment.application.dto.PrePaymentRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
@@ -19,11 +19,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     public Payment pay(
-            final PrePaymentRequest prePaymentRequest,
+            final PrePaymentValidRequest prePaymentValidRequest,
             final PaymentConfirmRequest paymentConfirmRequest,
             final Reservation reservation
     ) {
-        validatePrePayment(paymentConfirmRequest, prePaymentRequest);
+        validatePrePayment(paymentConfirmRequest, prePaymentValidRequest);
 
         final PaymentRequest paymentRequest = new DefaultPaymentRequest(
                 paymentConfirmRequest.paymentKey(),
@@ -48,19 +48,19 @@ public class PaymentService {
         return payment;
     }
 
-    public Payment await(final PrePaymentRequest request, final Reservation reservation) {
+    public Payment await(final PrePaymentValidRequest request, final Reservation reservation) {
         final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
         return paymentRepository.save(payment);
     }
 
     private void validatePrePayment(
             final PaymentConfirmRequest paymentConfirmRequest,
-            final PrePaymentRequest prePaymentRequest
+            final PrePaymentValidRequest prePaymentValidRequest
     ) {
-        if (!prePaymentRequest.orderId().equals(paymentConfirmRequest.orderId())) {
+        if (!prePaymentValidRequest.orderId().equals(paymentConfirmRequest.orderId())) {
             throw new BadRequestException("결제 주문번호가 일치하지 않습니다.");
         }
-        if (!prePaymentRequest.amount().equals(paymentConfirmRequest.amount())) {
+        if (!prePaymentValidRequest.amount().equals(paymentConfirmRequest.amount())) {
             throw new BadRequestException("결제 금액이 일치하지 않습니다.");
         }
     }

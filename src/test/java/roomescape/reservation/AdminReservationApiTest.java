@@ -15,7 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
-import roomescape.payment.application.dto.PrePaymentRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -109,7 +109,7 @@ class AdminReservationApiTest {
                 .then().log().all()
                 .statusCode(204);
 
-        final PrePaymentRequest prePaymentRequest = new PrePaymentRequest(
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
                 "WEB_RSV_123456789",
                 "주문",
                 BigDecimal.valueOf(1000L)
@@ -118,7 +118,7 @@ class AdminReservationApiTest {
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
                 .contentType(ContentType.JSON)
-                .body(prePaymentRequest)
+                .body(prePaymentValidRequest)
                 .when().put("/admin/waitings/accept/1")
                 .then().log().all()
                 .statusCode(200);

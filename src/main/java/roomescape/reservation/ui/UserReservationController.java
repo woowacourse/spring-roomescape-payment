@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.login.application.dto.LoginCheckRequest;
-import roomescape.payment.application.dto.PrePaymentRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.reservation.application.ReservationCommandService;
 import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
@@ -57,7 +57,7 @@ public class UserReservationController {
         final ReservationResponse response = reservationCommandService.reserveWithPayment(
                 request,
                 loginCheckRequest.id(),
-                (PrePaymentRequest) session.getAttribute(PRE_PAYMENT)
+                (PrePaymentValidRequest) session.getAttribute(PRE_PAYMENT)
         );
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -72,7 +72,7 @@ public class UserReservationController {
         return new ResponseEntity<>(waitingResponse, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("waitings/{id}")
+    @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable("id") final Long id,
             final LoginCheckRequest request

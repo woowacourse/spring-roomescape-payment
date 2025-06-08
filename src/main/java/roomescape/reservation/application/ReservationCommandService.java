@@ -13,7 +13,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.application.dto.PrePaymentRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -46,11 +46,11 @@ public class ReservationCommandService {
     public ReservationResponse reserveWithPayment(
             final MemberReservationRequest request,
             final Long memberId,
-            final PrePaymentRequest prePaymentRequest
+            final PrePaymentValidRequest prePaymentValidRequest
     ) {
         Reservation reservation = reserve(request, memberId);
 
-        pay(request, prePaymentRequest, reservation);
+        pay(request, prePaymentValidRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }
@@ -71,11 +71,11 @@ public class ReservationCommandService {
     }
 
     private void pay(MemberReservationRequest request,
-                     PrePaymentRequest prePaymentRequest,
+                     PrePaymentValidRequest prePaymentValidRequest,
                      Reservation reservation) {
         try {
             paymentService.pay(
-                    prePaymentRequest,
+                    prePaymentValidRequest,
                     request.toPaymentConfirmRequest(),
                     reservation
             );
@@ -133,7 +133,7 @@ public class ReservationCommandService {
         reservationRepository.deleteById(id);
     }
 
-    public void acceptReservation(final Long id, final PrePaymentRequest request) {
+    public void acceptReservation(final Long id, final PrePaymentValidRequest request) {
         final Waiting waiting = getWaitingWithAssociations(id);
         validateIsBooked(waiting);
         waiting.accept();
