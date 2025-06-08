@@ -11,7 +11,6 @@ import roomescape.exception.auth.AuthenticationException;
 import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.payment.PaymentException;
 import roomescape.exception.resource.AlreadyExistException;
-import roomescape.exception.resource.InCorrectResultSizeException;
 import roomescape.exception.resource.ResourceNotFoundException;
 
 @RestControllerAdvice
@@ -23,15 +22,6 @@ public class GlobalExceptionHandler {
         final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(e.getStatus(), e.getMessage());
 
         return ResponseEntity.status(e.getStatus())
-                .body(problemDetail);
-    }
-
-    @ExceptionHandler(InCorrectResultSizeException.class)
-    public ResponseEntity<ProblemDetail> handleInCorrectResultSizeException(final InCorrectResultSizeException e) {
-        final HttpStatus responseStatus = HttpStatus.CONFLICT;
-        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
-
-        return ResponseEntity.status(responseStatus)
                 .body(problemDetail);
     }
 
