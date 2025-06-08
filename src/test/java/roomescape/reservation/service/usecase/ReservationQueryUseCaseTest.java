@@ -77,13 +77,15 @@ class ReservationQueryUseCaseTest {
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
-                theme);
+                theme,
+                null);
 
         final Reservation given2 = Reservation.withoutId(
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
-                theme);
+                theme,
+                null);
 
         final Reservation saved1 = reservationRepository.save(given1);
         final Reservation saved2 = reservationRepository.save(given2);
@@ -133,7 +135,8 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                null));
 
         // when
         final List<AvailableReservationTimeServiceResponse> timesWithAvailability = reservationQueryUseCase.getTimesWithAvailability(
@@ -183,7 +186,8 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                null));
 
         // when & then
         assertThat(reservationQueryUseCase.getByMemberId(member.getId()))
@@ -217,7 +221,8 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                null));
 
         // when & then
         assertThat(reservationQueryUseCase.search(member.getId(), theme.getId(), from, to))

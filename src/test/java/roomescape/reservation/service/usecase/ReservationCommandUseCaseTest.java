@@ -87,7 +87,8 @@ class ReservationCommandUseCaseTest {
                 member.getId(),
                 LocalDate.of(2025, 8, 5),
                 reservationTime.getId(),
-                theme.getId());
+                theme.getId(),
+                null);
 
         // when
         final Reservation reservation = reservationCommandUseCase.create(requestDto);
@@ -130,7 +131,8 @@ class ReservationCommandUseCaseTest {
                         member.getId(),
                         LocalDate.of(2025, 8, 10),
                         reservationTime.getId(),
-                        theme.getId()
+                        theme.getId(),
+                        null
                 ));
 
         // When & Then
@@ -139,7 +141,8 @@ class ReservationCommandUseCaseTest {
                         member.getId(),
                         LocalDate.of(2025, 8, 10),
                         reservationTime.getId(),
-                        theme.getId())))
+                        theme.getId(),
+                        null)))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage("추가하려는 예약이 이미 존재합니다.");
     }
@@ -169,7 +172,8 @@ class ReservationCommandUseCaseTest {
                         member,
                         ReservationDate.from(LocalDate.of(2025, 8, 10)),
                         reservationTime,
-                        theme));
+                        theme,
+                        null));
 
         // when
         reservationCommandUseCase.delete(reservation.getId());

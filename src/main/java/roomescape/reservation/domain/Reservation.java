@@ -68,20 +68,22 @@ public class Reservation {
             final Member member,
             final ReservationDate date,
             final ReservationTime time,
-            final Theme theme
+            final Theme theme,
+            final Payment payment
     ) {
-        return of(id, member, date, time, theme, null);
+        return of(id, member, date, time, theme, payment);
     }
 
     public static Reservation withoutId(
             final Member member,
             final ReservationDate date,
             final ReservationTime time,
-            final Theme theme
+            final Theme theme,
+            final Payment payment
     ) {
 
         validatePast(date, time);
-        return of(null, member, date, time, theme, null);
+        return of(null, member, date, time, theme, payment);
     }
 
     private static void validate(

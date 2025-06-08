@@ -72,7 +72,7 @@ public class MissionStepTest {
         adminToken = authService.login(new LoginRequest(adminEmail, adminPassword));
 
         when(paymentService.completePayment(any())).thenReturn(
-            Payment.withId(1L, "paymentKey", "orderId", 1000L, "2024-10-05", "2024-10-05"));
+            Payment.withId(1L, "paymentKey", 1000L));
     }
 
     @Test
@@ -183,6 +183,12 @@ public class MissionStepTest {
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
 
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
+            "공포", "설명", "엄지손톱");
+
+        jdbcTemplate.update("INSERT INTO payment (payment_key, amount) VALUES (?, ?)",
+            "test_payment_key", 1000L);
+
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");
         params.put("timeId", "1");
@@ -278,6 +284,9 @@ public class MissionStepTest {
 
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
+
+        jdbcTemplate.update("INSERT INTO payment (payment_key, amount) VALUES (?, ?)",
+            "test_payment_key", 1000L);
 
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");

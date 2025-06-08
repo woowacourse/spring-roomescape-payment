@@ -84,7 +84,9 @@ public class ReservationService {
                     createReservationWithMemberIdWebRequest.memberId(),
                     createReservationWithMemberIdWebRequest.date(),
                     createReservationWithMemberIdWebRequest.timeId(),
-                    createReservationWithMemberIdWebRequest.themeId())));
+                    createReservationWithMemberIdWebRequest.themeId(),
+                    null
+                )));
     }
 
     @Transactional
@@ -92,17 +94,18 @@ public class ReservationService {
         final CreateReservationWebRequest createReservationWebRequest,
         final MemberInfo memberInfo) {
 
+
+        Payment payment = paymentService.completePayment(
+            PaymentConverter.toPaymentDto(createReservationWebRequest));
+
         final Reservation reservation = reservationCommandUseCase.create(
             new CreateReservationServiceRequest(
                 memberInfo.id(),
                 createReservationWebRequest.date(),
                 createReservationWebRequest.timeId(),
-                createReservationWebRequest.themeId()));
-
-        Payment payment = paymentService.completePayment(
-            PaymentConverter.toPaymentDto(createReservationWebRequest));
-
-        reservation.confirmPayment(payment);
+                createReservationWebRequest.themeId(),
+                payment
+        ));
 
         return ReservationConverter.toDtoWithStatus(reservation);
     }
@@ -179,7 +182,8 @@ public class ReservationService {
                 waiting.getMember().getId(),
                 waiting.getDate().getValue(),
                 waiting.getTime().getId(),
-                waiting.getTheme().getId()
+                waiting.getTheme().getId(),
+                null
             )
         );
 

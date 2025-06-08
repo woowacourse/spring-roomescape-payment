@@ -25,13 +25,15 @@ public class ReservationConverter {
                                         final CreateReservationServiceRequest request,
                                         final Member member,
                                         final ReservationTime time,
-                                        final Theme theme
+                                        final Theme theme,
+                                        final Payment payment
     ) {
         return Reservation.withoutId(
                 member,
                 ReservationDate.from(request.date()),
                 time,
-                theme);
+                theme,
+                payment);
     }
 
     public static ReservationWebResponse toDto(final Reservation reservation) {

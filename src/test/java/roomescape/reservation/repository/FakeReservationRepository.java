@@ -73,7 +73,8 @@ public class FakeReservationRepository implements ReservationRepository {
                 reservation.getMember(),
                 reservation.getDate(),
                 reservation.getTime(),
-                reservation.getTheme()
+                reservation.getTheme(),
+                reservation.getPayment()
         );
 
         reservations.add(saved);

@@ -116,7 +116,8 @@ class ReservationTimeCommandUseCaseTest {
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1L)),
                 savedTime,
-                theme
+                theme,
+                null
         ));
 
         // when

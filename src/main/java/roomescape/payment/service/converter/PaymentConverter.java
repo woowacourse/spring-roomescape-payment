@@ -10,10 +10,7 @@ public class PaymentConverter {
     public static Payment toDomain(final PaymentClientResponse paymentClientResponse) {
         return Payment.withoutId(
             paymentClientResponse.paymentKey(),
-            paymentClientResponse.orderId(),
-            paymentClientResponse.totalAmount(),
-            paymentClientResponse.requestedAt(),
-            paymentClientResponse.approvedAt()
+            paymentClientResponse.totalAmount()
         );
     }
 
