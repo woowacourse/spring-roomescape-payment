@@ -3,11 +3,11 @@ package roomescape.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.global.dto.ErrorResponse;
@@ -37,7 +37,7 @@ public class LoginController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<Void> login(@RequestBody final LoginRequest request, final HttpSession session) {
+    public ResponseEntity<Void> login(@RequestBody @Valid final LoginRequest request, final HttpSession session) {
         Member member = memberService.login(request);
         session.setAttribute("LOGIN_MEMBER", new SessionMember(member.getId(), member.getName(), member.getRole()));
         return ResponseEntity.ok().build();
