@@ -81,6 +81,7 @@ public class TossConfirmationService {
         } catch (PaymentTimeoutException e) {
             log.warn("결제 승인 타임아웃 - paymentKey={}, orderId={}",
                     tossPaymentRequest.paymentKey(), tossPaymentRequest.orderId());
+            payment.updateStatusTo(PaymentStatus.FAILED);
             // 결제 상태 조회 후 결제 취소 API 호출 (필요 시 구현)
             throw e;
         } catch (TossPaymentException e) {
@@ -88,6 +89,8 @@ public class TossConfirmationService {
                     tossPaymentRequest.paymentKey(), e.getMessage());
             payment.updateStatusTo(PaymentStatus.FAILED);
             throw e;
+        } finally {
+            paymentRepository.save(payment);
         }
     }
 
