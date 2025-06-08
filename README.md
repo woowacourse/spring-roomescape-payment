@@ -17,7 +17,7 @@
   - 1번 째 예약 대기 때 예약이 취소되면 자동 승인됩니다
 
 # ☑️ERD
-![roomescape-erd](./imgages/roomescape-erd.png)
+![roomescape-erd](images/roomescape-erd.png)
 
 # 📌 View API
 
