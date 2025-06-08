@@ -23,7 +23,7 @@ public class TossPaymentService implements PaymentService {
     private final OrdersRepository ordersRepository;
     private final TossPaymentClient tossPaymentClient;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PaymentResponse createOrder(PaymentRequest paymentRequest) {
         Orders orders = new Orders(paymentRequest.paymentKey(), paymentRequest.orderId());
 

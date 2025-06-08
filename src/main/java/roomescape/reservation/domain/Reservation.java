@@ -40,7 +40,7 @@ public class Reservation {
     private Theme theme;
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-    @OneToOne
+    @OneToOne(optional = true)
     @JoinColumn(name = "order_id")
     private Orders orders;
 

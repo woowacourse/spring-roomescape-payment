@@ -23,7 +23,6 @@ public class ReservationPaymentEventListener {
     private final ReservationPaymentService reservationPaymentService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handlePaymentEvent(PaymentRequestedEvent event) {
         PaymentRequest paymentRequest = PaymentRequest.from(event.paymentInfoRequest());
         Long reservationId = event.reservationId();

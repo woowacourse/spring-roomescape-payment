@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.NotFoundException;
 import roomescape.payment.domain.Orders;
@@ -17,17 +18,16 @@ public class ReservationPaymentService {
     private final ReservationRepository reservationRepository;
     private final OrdersRepository ordersRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void paid(Long reservationId, String paymentKey) {
         Reservation reservation = reservationRepository.findByIdAndStatus(reservationId,
                 ReservationStatus.PENDING_PAYMENT).orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
-
         Orders orders = getOrders(paymentKey);
 
         reservation.paid(orders);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void failedPayment(Long id, String paymentKey) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
@@ -37,7 +37,6 @@ public class ReservationPaymentService {
     }
 
     private Orders getOrders(String paymentKey) {
-        return ordersRepository.findByPaymentKey(paymentKey)
-                .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다."));
+        return ordersRepository.findByPaymentKey(paymentKey).orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다."));
     }
 }
