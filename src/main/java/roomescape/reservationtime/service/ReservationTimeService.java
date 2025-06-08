@@ -36,6 +36,7 @@ public class ReservationTimeService {
 
     public void delete(final Long timeId) {
         if (reservationRepository.existsByTimeId(timeId)) {
+            log.warn("[예약 시간 삭제 실패] 예약 시간 사용 중 - timeId: {}", timeId);
             throw new ReservationException("해당 시간으로 예약된 건이 존재합니다.");
         }
         reservationTimeRepository.deleteById(timeId);

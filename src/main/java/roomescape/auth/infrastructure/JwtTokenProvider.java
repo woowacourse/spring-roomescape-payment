@@ -5,10 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -50,7 +47,7 @@ public class JwtTokenProvider implements TokenProvider {
         try {
             return buildToken(member, now);
         } catch (JwtException e) {
-            log.error("토큰 생성 실패 - 회원 ID: {}, error: {}", member.getId(), e.getMessage());
+            log.error("[토큰 생성] 토큰 생성 과정 실패 - memberId: {}, error: {}", member.getId(), e.getMessage());
             throw new TokenCreationException("로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
         }
     }
@@ -85,28 +82,12 @@ public class JwtTokenProvider implements TokenProvider {
     private Claims parseAllClaims(final String token) {
         try {
             return jwtParser.parseSignedClaims(token).getPayload();
-        } catch (JwtException e) {
-            log.error("JWT 토큰 처리 중 오류 발생. token: {}, error: {}", token, e.getMessage());
-            throw new UnauthorizedException(convertToErrorMessage(e));
-        } catch (IllegalArgumentException e) {
-            log.error("잘못된 토큰 형식. token: {}, error: {}", token, e.getMessage());
-            throw new UnauthorizedException("토큰이 제공되지 않았거나 잘못된 값입니다.");
+        } catch (ExpiredJwtException e) {
+            log.warn("[JWT 만료] 사용자 재로그인 필요");
+            throw new UnauthorizedException("인증이 만료되었습니다. 다시 로그인 해주세요.");
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("[JWT 검증 실패] 원인: {}", e.getClass().getSimpleName());
+            throw new UnauthorizedException("인증에 실패했습니다");
         }
-    }
-
-    private String convertToErrorMessage(final JwtException e) {
-        if (e instanceof ExpiredJwtException) {
-            return "토큰이 만료되었습니다.";
-        }
-        if (e instanceof UnsupportedJwtException) {
-            return "지원하지 않는 토큰 형식입니다.";
-        }
-        if (e instanceof MalformedJwtException) {
-            return "잘못된 토큰 형식입니다.";
-        }
-        if (e instanceof SignatureException) {
-            return "토큰 서명이 올바르지 않습니다.";
-        }
-        return "토큰 검증에 실패했습니다.";
     }
 }

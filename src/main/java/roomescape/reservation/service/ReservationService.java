@@ -80,6 +80,8 @@ public class ReservationService {
                                            Theme theme, LoginMember loginMember, Payment payment) {
         Member member = memberService.getMemberById(loginMember.getId());
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
+            log.warn("[예약 검증 실패] 사용자 중복 예약 시도 - memberId: {}, date: {}, time: {}, theme: {}",
+                    member.getId(), date, reservationTime.getStartAt(), theme.getName());
             throw new IllegalArgumentException("이미 예약한 사용자입니다.");
         }
         Long lastWaitingRank = reservationRepository.getLastWaitingRank(theme, date, reservationTime).orElse(0L);
@@ -107,6 +109,8 @@ public class ReservationService {
         Theme theme = themeRepository.getById(request.themeId());
         Member member = memberRepository.getById(request.memberId());
         if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
+            log.warn("[예약 검증 실패] 이미 예약된 시간대 - date: {}, time: {}, theme: {}",
+                    request.date(), reservationTime.getStartAt(), theme.getName());
             throw new ReservationException("해당 시간은 이미 예약되어있습니다.");
         }
         Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,

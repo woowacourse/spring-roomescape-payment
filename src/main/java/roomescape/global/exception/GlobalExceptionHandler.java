@@ -1,5 +1,6 @@
 package roomescape.global.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -7,19 +8,21 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import roomescape.auth.exception.TokenCreationException;
 import roomescape.auth.exception.UnauthorizedException;
 
-@RestControllerAdvice
 @Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PaymentClientException.class)
     public ResponseEntity<Object> handlePaymentClientException(final Exception e, final WebRequest request) {
         ProblemDetail body = super.createProblemDetail(e, HttpStatus.BAD_REQUEST, e.getMessage(), null,
                 null, request);
+
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -56,13 +59,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleTokenCreationException(final Exception e, final WebRequest request) {
         ProblemDetail body = super.createProblemDetail(e, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),
                 null, null, request);
-        log.error("JWT 토큰 생성 실패: " + e.getMessage(), e);
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @ExceptionHandler({Exception.class, RoomescapeException.class})
     public ResponseEntity<Object> handleInternalServerException(final Exception e, final WebRequest request) {
-        log.error(e.getMessage(), e);
+        HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+        log.error("[예상치 못한 오류] URI: {}, IP: {}, 예외 유형: {}, 메시지: {}",
+                servletRequest.getRequestURI(),
+                servletRequest.getRemoteAddr(),
+                e.getClass().getName(),
+                e.getMessage(),
+                e);
+
         ProblemDetail body = super.createProblemDetail(e, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.",
                 null, null, request);
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);

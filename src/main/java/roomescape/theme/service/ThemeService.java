@@ -51,6 +51,7 @@ public class ThemeService {
 
     public void delete(final Long themeId) {
         if (reservationRepository.existsByThemeId((themeId))) {
+            log.warn("[테마 삭제 실패] 테마 사용 중 - themeId: {}", themeId);
             throw new ReservationException("해당 테마로 예약된 건이 존재합니다.");
         }
         themeRepository.deleteById(themeId);

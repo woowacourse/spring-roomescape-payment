@@ -23,7 +23,8 @@ public class MemberService {
 
     public void save(final MemberRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다. email=" + request.email());
+            log.warn("[회원가입 실패] 중복 이메일 가입 - duplicateEmail: {}", request.email());
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
         }
         memberRepository.save(
                 Member.withDefaultRole(request.name(), request.email(), request.password()));
@@ -44,7 +45,7 @@ public class MemberService {
     public Member getMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.error("회원 ID 찾을 수 없음 - memberId = {}", memberId);
+                    log.warn("[회원 조회 실패] 존재하지 않는 회원 ID: {}", memberId);
                     return new MemberNotFoundException(INTERNAL_SERVER_ERROR.getMessage());
                 });
     }
@@ -52,7 +53,7 @@ public class MemberService {
     public Member getMemberByEmail(final String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.error("회원 이메일 찾을 수 없음 - email = {}", email);
+                    log.warn("[회원 조회 실패] 존재하지 않는 이메일: {}", email);
                     return new MemberNotFoundException(INTERNAL_SERVER_ERROR.getMessage());
                 });
     }

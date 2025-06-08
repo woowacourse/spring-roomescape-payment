@@ -3,6 +3,7 @@ package roomescape.auth.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,6 +12,7 @@ import roomescape.auth.application.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthCheckInterceptor implements HandlerInterceptor {
@@ -20,22 +22,43 @@ public class AuthCheckInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String uri = request.getRequestURI();
+        String clientIP = request.getRemoteAddr();
+
         if (request.getCookies() == null) {
+            log.warn("[인증 실패] 쿠키 정보 없음 - URI: {}, IP: {}", uri, clientIP);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
         }
 
-        LoginMember loginMember = authService.extractMemberByRequest(request);
-        if (loginMember.isNotAdmin()) {
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            return false;
-        }
+        try {
+            LoginMember loginMember = authService.extractMemberByRequest(request);
+            if (loginMember.isNotAdmin()) {
+                log.warn("[권한 부족] 관리자 권한 없음 - URI: {}, memberId: {}, role: {}, IP: {}",
+                        uri, loginMember.getId(), loginMember.getRole(), clientIP);
 
-        if (isNotAdminMember(loginMember)) {
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                return false;
+            }
+
+            if (isNotAdminMember(loginMember)) {
+                log.warn("[권한 검증 실패] 관리자 부가 검증 실패 - URI: {}, memberId: {}, IP: {}",
+                        uri, loginMember.getId(), clientIP);
+
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return false;
+            }
+
+            log.info("[관리자 인증 성공] - URI: {}, memberId: {}, role: {}",
+                    uri, loginMember.getId(), loginMember.getRole());
+            return true;
+        } catch (Exception e) {
+            log.error("[인증 처리 오류] URI: {}, IP: {}, error: {}",
+                    uri, clientIP, e.getMessage());
+
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
         }
-        return true;
     }
 
     private boolean isNotAdminMember(LoginMember loginMember) {
