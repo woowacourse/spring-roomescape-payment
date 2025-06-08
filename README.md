@@ -1,3 +1,7 @@
+### ERD 다이어그램
+
+![erd 다이어그램](/src/main/resources/static/image/erd.png)
+
 ### 요구 사항
 
 - [x] 정상적으로 동작하지 않는 기능
