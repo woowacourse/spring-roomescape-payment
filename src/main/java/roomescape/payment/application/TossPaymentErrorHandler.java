@@ -37,11 +37,11 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
         HttpStatus status = (HttpStatus) response.getStatusCode();
         TossErrorResponse error = parseErrorResponse(response.getBody());
 
-        if (TossErrorCodesTreatedAsServerError.contains(error.code())) {
-            logger.error("Toss API Unexpected error occurred: Code: {}, Message: {}", error.code(), error.message());
-            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 오류가 발생했습니다.");
+        if (TossErrorCodesTreatedAsClientError.contains(error.code())) {
+            throw new ExternalApiException(status, error.message());
         }
-        throw new ExternalApiException(status, error.message());
+        logger.error("Toss API Unexpected error occurred: Code: {}, Message: {}", error.code(), error.message());
+        throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 실패했습니다. 관리자 문의가 필요합니다.");
     }
 
     private TossErrorResponse parseErrorResponse(final InputStream bodyStream) {
@@ -52,14 +52,47 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
         }
     }
 
-    public enum TossErrorCodesTreatedAsServerError {
-        UNAUTHORIZED_KEY,
-        INCORRECT_BASIC_AUTH_FORMAT,
-        NOT_FOUND_TERMINAL_ID,
-        BELOW_MINIMUM_AMOUNT,
-        INVALID_AUTHORIZE_AUTH,
-        INVALID_UNREGISTERED_SUBMALL,
-        NOT_REGISTERED_BUSINESS;
+    public enum TossErrorCodesTreatedAsClientError {
+        ALREADY_PROCESSED_PAYMENT,
+        PROVIDER_ERROR,
+        EXCEED_MAX_CARD_INSTALLMENT_PLAN,
+        INVALID_REQUEST,
+        NOT_ALLOWED_POINT_USE,
+        INVALID_API_KEY,
+        INVALID_REJECT_CARD,
+        INVALID_CARD_EXPIRATION,
+        INVALID_STOPPED_CARD,
+        EXCEED_MAX_DAILY_PAYMENT_COUNT,
+        NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT,
+        INVALID_CARD_INSTALLMENT_PLAN,
+        NOT_SUPPORTED_MONTHLY_INSTALLMENT_PLAN,
+        EXCEED_MAX_PAYMENT_AMOUNT,
+        INVALID_CARD_LOST_OR_STOLEN,
+        RESTRICTED_TRANSFER_ACCOUNT,
+        INVALID_CARD_NUMBER,
+        EXCEED_MAX_ONE_DAY_WITHDRAW_AMOUNT,
+        EXCEED_MAX_ONE_TIME_WITHDRAW_AMOUNT,
+        CARD_PROCESSING_ERROR,
+        EXCEED_MAX_AMOUNT,
+        INVALID_ACCOUNT_INFO_RE_REGISTER,
+        NOT_AVAILABLE_PAYMENT,
+        UNAPPROVED_ORDER_ID,
+        EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT,
+        REJECT_ACCOUNT_PAYMENT,
+        REJECT_CARD_PAYMENT,
+        REJECT_CARD_COMPANY,
+        FORBIDDEN_REQUEST,
+        REJECT_TOSSPAY_INVALID_ACCOUNT,
+        EXCEED_MAX_AUTH_COUNT,
+        EXCEED_MAX_ONE_DAY_AMOUNT,
+        NOT_AVAILABLE_BANK,
+        INVALID_PASSWORD,
+        FDS_ERROR,
+        NOT_FOUND_PAYMENT,
+        NOT_FOUND_PAYMENT_SESSION,
+        FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING,
+        FAILED_INTERNAL_SYSTEM_PROCESSING,
+        UNKNOWN_PAYMENT_ERROR;
 
         private static final Set<String> CODE_SET = Stream.of(values())
             .map(Enum::name)
