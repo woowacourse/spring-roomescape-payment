@@ -3,6 +3,7 @@ package roomescape.member.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -31,6 +32,7 @@ public class MemberRestController {
     private final MemberService memberService;
 
     @PostMapping
+    @Operation(summary = "회원 추가")
     public ResponseEntity<MemberResponse.IdName> create(
             @RequestBody @Valid final SignUpRequest request
     ) {
@@ -42,6 +44,7 @@ public class MemberRestController {
 
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 삭제")
     public ResponseEntity<Void> delete(
             @PathVariable final Long id,
             final Member member
@@ -62,6 +65,7 @@ public class MemberRestController {
 
     @GetMapping
     @RequiresRole(authRoles = {ADMIN})
+    @Operation(summary = "모든 회원 목록 조회")
     public ResponseEntity<List<IdName>> findAll() {
         final List<IdName> responses = memberService.findAllNames();
 

@@ -2,6 +2,7 @@ package roomescape.reservation.ui;
 
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -31,6 +32,7 @@ public class AdminReservationRestController {
     private final AdminReservationService adminReservationService;
 
     @PostMapping
+    @Operation(summary = "관리자 권한의 예약 추가")
     public ResponseEntity<ReservationResponse> create(
             @RequestBody @Valid final CreateBookedReservationRequest request
     ) {
@@ -41,6 +43,7 @@ public class AdminReservationRestController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "관리자 권한의 예약 삭제")
     public ResponseEntity<Void> deleteAsAdmin(
             @PathVariable final Long id
     ) {
@@ -50,6 +53,7 @@ public class AdminReservationRestController {
     }
 
     @GetMapping
+    @Operation(summary = "관리자 권한의 모든 예약 목록 조회")
     public ResponseEntity<List<ReservationResponse>> findAllReservations() {
         final List<ReservationResponse> reservationResponses = adminReservationService.findAll();
 
@@ -57,6 +61,7 @@ public class AdminReservationRestController {
     }
 
     @GetMapping("/filtered")
+    @Operation(summary = "관리자 권한의 조건부 예약 목록 조회")
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteredReservationsRequest request
     ) {
@@ -66,6 +71,7 @@ public class AdminReservationRestController {
     }
 
     @GetMapping("/statuses")
+    @Operation(summary = "관리자 권한의 모든 예약 상태 목록 조회")
     @RequiresRole(authRoles = {ADMIN})
     public ResponseEntity<List<ReservationStatusResponse>> findAllReservationStatuses() {
         return ResponseEntity.ok()

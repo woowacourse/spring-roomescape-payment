@@ -2,6 +2,7 @@ package roomescape.reservation.ui;
 
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -28,6 +29,7 @@ public class ReservationTimeRestController {
 
     @PostMapping
     @RequiresRole(authRoles = {ADMIN})
+    @Operation(summary = "관리자 권한의 예약 시간 추가")
     public ResponseEntity<ReservationTimeResponse> create(
             @RequestBody @Valid final CreateReservationTimeRequest request
     ) {
@@ -39,6 +41,7 @@ public class ReservationTimeRestController {
 
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN})
+    @Operation(summary = "관리자 권한의 예약 시간 삭제")
     public ResponseEntity<Void> delete(
             @PathVariable final Long id
     ) {
@@ -48,6 +51,7 @@ public class ReservationTimeRestController {
     }
 
     @GetMapping
+    @Operation(summary = "모든 예약 시간 목록 조회")
     public ResponseEntity<List<ReservationTimeResponse>> findAll() {
         return ResponseEntity.ok(reservationTimeService.findAll());
     }
