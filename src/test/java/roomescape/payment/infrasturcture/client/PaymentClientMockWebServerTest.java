@@ -1,4 +1,4 @@
-package roomescape.payment.client;
+package roomescape.payment.infrasturcture.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;

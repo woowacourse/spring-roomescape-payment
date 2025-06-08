@@ -1,6 +1,8 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,8 +29,11 @@ public class Payment {
     @Column(name = Fields.paymentKey, nullable = false)
     private String paymentKey;
 
-    @Column(name = Fields.amount, nullable = false)
-    private int amount;
+    @Embedded
+    @AttributeOverride(
+            name = PaymentAmount.Fields.value,
+            column = @Column(name = Fields.amount, nullable = false))
+    private PaymentAmount amount;
 
     @Column(name = Fields.orderId, nullable = false)
     private String orderId;
@@ -36,7 +41,7 @@ public class Payment {
     @Column(name = Fields.paymentType, nullable = false)
     private String paymentType;
 
-    private Payment(final String paymentKey, final int amount, final String orderId, final String paymentType) {
+    private Payment(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
         validate(paymentKey, amount, orderId, paymentType);
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -44,7 +49,7 @@ public class Payment {
         this.paymentType = paymentType;
     }
 
-    public Payment(final Long id, final String paymentKey, final int amount, final String orderId, final String paymentType) {
+    public Payment(final Long id, final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
         validate(id);
         validate(paymentKey, amount, orderId, paymentType);
         this.id = id;
@@ -54,11 +59,11 @@ public class Payment {
         this.paymentType = paymentType;
     }
 
-    public static Payment of(final String paymentKey, final int amount, final String orderId, final String paymentType) {
+    public static Payment of(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
         return new Payment(paymentKey, amount, orderId, paymentType);
     }
 
-    private static void validate(final String paymentKey, final int amount, final String orderId, final String paymentType) {
+    private static void validate(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType) {
         Validator.of(Payment.class)
                 .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
                 .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
