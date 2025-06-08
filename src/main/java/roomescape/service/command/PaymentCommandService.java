@@ -1,6 +1,8 @@
 package roomescape.service.command;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.PaymentClient;
 import roomescape.client.dto.PaymentConfirmResultDto;
 import roomescape.domain.payment.Payment;
@@ -27,6 +29,7 @@ public class PaymentCommandService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional(propagation = Propagation.NEVER)
     public PaymentResponseDto confirmPayment(Long reservationId, PaymentConfirmDto confirmDto) {
         PaymentConfirmResultDto confirmResult = paymentClient.confirmPayment(confirmDto);
         Reservation reservation = reservationRepository.findById(reservationId)
