@@ -2,8 +2,6 @@ package roomescape.payment.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import roomescape.logging.aspect.Loggable;
@@ -11,6 +9,7 @@ import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.service.OrderService;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationPaymentService;
 
@@ -19,6 +18,7 @@ import roomescape.reservation.service.ReservationPaymentService;
 @RequiredArgsConstructor
 public class ReservationPaymentEventListener {
 
+    private final OrderService orderService;
     private final PaymentService paymentService;
     private final ReservationPaymentService reservationPaymentService;
 
@@ -26,7 +26,7 @@ public class ReservationPaymentEventListener {
     public void handlePaymentEvent(PaymentRequestedEvent event) {
         PaymentRequest paymentRequest = PaymentRequest.from(event.paymentInfoRequest());
         Long reservationId = event.reservationId();
-        PaymentResponse response = paymentService.createOrder(paymentRequest);
+        PaymentResponse response = orderService.createOrder(paymentRequest);
 
         try {
             callTossPaymentApi(paymentRequest);

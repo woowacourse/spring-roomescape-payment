@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.CleanUp;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentTemporaryException;
 import roomescape.payment.infra.toss.client.TossPaymentClient;
 import roomescape.payment.infra.toss.dto.TossPaymentRequest;
 import roomescape.payment.infra.toss.dto.TossPaymentResponse;
-import roomescape.payment.repository.OrdersRepository;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -29,9 +26,6 @@ class PaymentServiceTest {
 
     @Autowired
     private PaymentService paymentService;
-
-    @Autowired
-    private OrdersRepository ordersRepository;
 
     @Autowired
     private CleanUp cleanUp;
@@ -78,22 +72,5 @@ class PaymentServiceTest {
         assertThat(paymentService.confirmPayment(request)).isEqualTo(response.toPaymentResponse());
 
         verify(tossPaymentClient, times(2)).getPaymentConfirm(any(TossPaymentRequest.class));
-    }
-
-    @Test
-    void 결제_정보를_저장한다() {
-        // given
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000L);
-
-        // when
-        PaymentResponse result = paymentService.createOrder(paymentRequest);
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(result.orderId()).isEqualTo(paymentRequest.orderId());
-            softly.assertThat(result.paymentKey()).isEqualTo(paymentRequest.paymentKey());
-        });
-
-        assertThat(ordersRepository.findByPaymentKey(result.paymentKey())).isPresent();
     }
 }
