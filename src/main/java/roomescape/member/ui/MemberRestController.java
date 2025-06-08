@@ -4,6 +4,7 @@ import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -27,6 +28,7 @@ import roomescape.member.ui.dto.SignUpRequest;
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
+@Tag(name = "회원", description = "회원 관련 API")
 public class MemberRestController {
 
     private final MemberService memberService;

@@ -3,6 +3,7 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -27,6 +28,7 @@ import roomescape.reservation.ui.dto.response.ReservationStatusResponse;
 @RequestMapping("/admin/reservations")
 @RequiresRole(authRoles = {ADMIN})
 @RequiredArgsConstructor
+@Tag(name = "관리자 권한 예약 관리", description = "관리자 권한 예약 관리 API")
 public class AdminReservationRestController {
 
     private final AdminReservationService adminReservationService;

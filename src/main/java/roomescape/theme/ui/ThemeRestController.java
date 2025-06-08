@@ -5,6 +5,7 @@ import static roomescape.auth.domain.AuthRole.ADMIN;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -25,6 +26,7 @@ import roomescape.theme.ui.dto.ThemeResponse;
 @RestController
 @RequestMapping("/themes")
 @RequiredArgsConstructor
+@Tag(name = "테마", description = "테마 관련 API")
 public class ThemeRestController {
 
     private final ThemeService themeService;

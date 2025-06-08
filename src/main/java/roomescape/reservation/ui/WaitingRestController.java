@@ -4,6 +4,7 @@ import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -26,6 +27,7 @@ import roomescape.reservation.ui.dto.response.WaitingWithRankResponse;
 @RestController
 @RequestMapping("/waitings")
 @RequiredArgsConstructor
+@Tag(name = "예약 대기", description = "예약 대기 관련 API")
 public class WaitingRestController {
 
     private final WaitingService waitingService;

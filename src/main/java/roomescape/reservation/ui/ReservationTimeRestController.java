@@ -3,6 +3,7 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -23,6 +24,7 @@ import roomescape.reservation.ui.dto.response.ReservationTimeResponse;
 @RestController
 @RequestMapping("/times")
 @RequiredArgsConstructor
+@Tag(name = "예약 시간", description = "예약 시간 관련 API")
 public class ReservationTimeRestController {
 
     private final ReservationTimeService reservationTimeService;
