@@ -14,8 +14,7 @@ public class LoggingAspect {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Around("execution(* roomescape..*Controller.*(..)) || " +
-            "execution(* roomescape..*Service.*(..)) || " +
-            "execution(* roomescape..*Repository.*(..))")
+            "execution(* roomescape..*Service.*(..)) ")
     public Object traceLog(ProceedingJoinPoint joinPoint) throws Throwable {
         String method = joinPoint.getSignature().getName();
         log.info("[Start] {}", method);
