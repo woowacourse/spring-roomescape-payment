@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class SessionManager {
     public void saveToSession(HttpSession session, String key, Object value) {
         session.setAttribute(key, value);
-        log.info("세션 저장 성공");
+        log.info("세션 저장 성공 key={}, value={}", key, value);
     }
 
     public Object getFromSession(HttpSession session, String key) {

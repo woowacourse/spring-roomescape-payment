@@ -34,7 +34,7 @@ public class MemberService {
                 new Password(request.password(), passwordEncoder)
         );
         Member saveMember = memberRepository.save(member);
-        log.info("회원가입 성공: member={} , email={}", member.getName(), member.getEmail());
+        log.info("회원가입 성공: memberName={} , email={}", member.getName(), member.getEmail());
         return MemberResponse.from(saveMember);
     }
 
