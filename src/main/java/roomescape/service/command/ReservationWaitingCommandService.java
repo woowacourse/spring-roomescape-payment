@@ -37,9 +37,6 @@ public class ReservationWaitingCommandService {
     private final JpaMemberRepository memberRepository;
     private final Clock clock;
 
-    @Autowired
-    private EntityManager entityManager;//todo 왜있음?
-
     public ReservationWaitingCommandService(JpaReservationWaitingTicketRepository reservationWaitingTicketRepository,
                                             JpaReservationRepository reservationRepository,
                                             JpaReservationTimeRepository reservationTimeRepository,
@@ -93,7 +90,7 @@ public class ReservationWaitingCommandService {
         Optional<Reservation> duplicatedReservation = alreadyBookedReservations.stream()
                 .filter(reservation -> reservation.getMember().equals(member))
                 .findAny();
-        if (duplicatedReservation.isPresent()) { //todo equals의 기준?
+        if (duplicatedReservation.isPresent()) {
             throw new ReservationWaitingForbiddenException("이미 예약한 이력이 있습니다.",
                     member.getId(),
                     duplicatedReservation.get().getId()

@@ -34,6 +34,6 @@ public class PaymentCommandService {
         Payment payment = tossPaymentConfirmResponse.toPayment();
 
         paymentRepository.save(payment);
-        reservationPaymentRepository.save(new ReservationPayment(reservation, payment)); //TODO payment save와 전파될 수 없을까? -> 안될듯 ㅋ
+        reservationPaymentRepository.save(new ReservationPayment(reservation, payment));
     }
 }
