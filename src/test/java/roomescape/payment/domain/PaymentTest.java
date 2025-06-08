@@ -22,7 +22,6 @@ class PaymentTest {
     private static final String VALID_PAYMENT_KEY = "test_payment_key_123";
     private static final PaymentAmount VALID_AMOUNT = PaymentAmount.from(10000);
     private static final String VALID_ORDER_ID = "order_123456";
-    private static final String VALID_PAYMENT_TYPE = "CARD";
 
     @Test
     @DisplayName("Payment Key가 null이면 예외가 발생한다")
@@ -31,7 +30,7 @@ class PaymentTest {
         Reservation reservation = createReservation(1L);
         // when & then
         assertThatThrownBy(() -> Payment.of(
-                null, VALID_AMOUNT, VALID_ORDER_ID, VALID_PAYMENT_TYPE, reservation))
+                null, VALID_AMOUNT, VALID_ORDER_ID, reservation))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessageContaining("Validation failed [while checking null]: Payment.paymentKey");
     }
@@ -43,22 +42,10 @@ class PaymentTest {
         Reservation reservation = createReservation(1L);
         // when & then
         assertThatThrownBy(() -> Payment.of(
-                VALID_PAYMENT_KEY, VALID_AMOUNT, null, VALID_PAYMENT_TYPE, reservation))
+                VALID_PAYMENT_KEY, VALID_AMOUNT, null, reservation))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessageContaining("Validation failed [while checking null]: Payment.orderId");
         ;
-    }
-
-    @Test
-    @DisplayName("Payment Type가 null이면 예외가 발생한다")
-    void throwExceptionWhenPaymentTypeIsNull() {
-        // given
-        Reservation reservation = createReservation(1L);
-        // when & then
-        assertThatThrownBy(() -> Payment.of(
-                VALID_PAYMENT_KEY, VALID_AMOUNT, VALID_ORDER_ID, null, reservation))
-                .isInstanceOf(InvalidInputException.class)
-                .hasMessageContaining("Validation failed [while checking null]: Payment.paymentType");
     }
 
     @Test
@@ -68,7 +55,7 @@ class PaymentTest {
         Reservation reservation = createReservation(1L);
         // when & then
         assertThatThrownBy(() -> Payment.of(
-                VALID_PAYMENT_KEY, null, VALID_ORDER_ID, VALID_PAYMENT_TYPE, reservation))
+                VALID_PAYMENT_KEY, null, VALID_ORDER_ID, reservation))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessageContaining("Validation failed [while checking null]: Payment.amount");
     }
@@ -78,7 +65,7 @@ class PaymentTest {
     void throwExceptionWhenReservationIsNull() {
         // when & then
         assertThatThrownBy(() -> Payment.of(
-                VALID_PAYMENT_KEY, VALID_AMOUNT, VALID_ORDER_ID, VALID_PAYMENT_TYPE, null))
+                VALID_PAYMENT_KEY, VALID_AMOUNT, VALID_ORDER_ID, null))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessageContaining("Validation failed [while checking null]: Payment.reservation");
     }

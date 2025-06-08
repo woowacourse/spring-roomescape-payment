@@ -51,14 +51,14 @@ public class PaymentClientConfig {
 
     private ClientHttpRequestInterceptor loggingInterceptor() {
         return (request, body, execution) -> {
-            log.debug("Payment API 요청: {} {} | Body: {}",
+            log.info("Payment API 요청: {} {} | Body: {}",
                     request.getMethod(),
                     request.getURI(),
                     new String(body, StandardCharsets.UTF_8));
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            log.debug("Payment API 응답: {}", response.getStatusCode());
+            log.info("Payment API 응답: {}", response.getStatusCode());
 
             return response;
         };

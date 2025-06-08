@@ -28,27 +28,24 @@ public class TossPaymentClient implements PaymentClient {
 
     @Qualifier("tossPaymentRestClient")
     private final RestClient restClient;
-
+    private final String confirmPath;
     private final ObjectMapper mapper;
 
-    private final String confirmPath;
-
-    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient,
-                             ObjectMapper mapper,
-                             @Value("${toss.payment.path.confirm}") String confirmPath) {
+    public TossPaymentClient(@Qualifier("tossPaymentRestClient") final RestClient restClient,
+                             @Value("${toss.payment.path.confirm}") final String confirmPath,
+                             final ObjectMapper mapper) {
         this.restClient = restClient;
-        this.mapper = mapper;
         this.confirmPath = confirmPath;
+        this.mapper = mapper;
     }
 
     public PaymentResult confirmPayment(final PaymentRequest request) {
-        return executeWithExceptionHandling(() ->
-                restClient.post()
-                        .uri(confirmPath)
-                        .body(request)
-                        .retrieve()
-                        .onStatus(HttpStatusCode::isError, this::handleResponseError)
-                        .body(PaymentResult.class)
+        return executeWithExceptionHandling(() -> restClient.post()
+                .uri(confirmPath)
+                .body(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, this::handleResponseError)
+                .body(PaymentResult.class)
         );
     }
 

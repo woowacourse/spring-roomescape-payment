@@ -53,6 +53,10 @@ public class ReservationCommandService {
         throw new NotFoundException(DomainTerm.RESERVATION, id);
     }
 
+    public void deleteForRollback(final Long id) {
+        reservationRepository.deleteById(id);
+    }
+
     public void updateUserId(final Long id, final Long userId) {
         reservationRepository.updateUserId(id, userId);
     }

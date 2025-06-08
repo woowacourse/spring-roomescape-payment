@@ -169,12 +169,10 @@ class ReservationFacadeIntegrationTest {
         CreateReservationWithUserIdWebRequest request = createReservationRequest();
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
                 1000,
-                "orderId",
-                "DONE");
+                "orderId");
         PaymentResult paymentResult = new PaymentResult("paymentKey",
                 1000,
-                "orderId",
-                "DONE");
+                "orderId");
 
         given(paymentClient.confirmPayment(any())).willReturn(paymentResult);
 

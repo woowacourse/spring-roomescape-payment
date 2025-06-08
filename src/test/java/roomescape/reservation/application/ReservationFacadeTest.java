@@ -224,12 +224,10 @@ class ReservationFacadeTest {
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
                 0,
-                "orderId",
-                "DONE");
+                "orderId");
         PaymentResult response = new PaymentResult("paymentKey",
                 0,
-                "orderId",
-                "DONE");
+                "orderId");
 
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));

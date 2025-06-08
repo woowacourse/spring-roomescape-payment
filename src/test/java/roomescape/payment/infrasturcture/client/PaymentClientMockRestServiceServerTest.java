@@ -48,7 +48,7 @@ class PaymentClientMockRestServiceServerTest {
     void confirmPayment() throws Exception {
         // given
         PaymentRequest request = getRequest("paymentKey123");
-        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123", "DONE");
+        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123");
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -66,9 +66,8 @@ class PaymentClientMockRestServiceServerTest {
         // then
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(result.paymentKey()).isEqualTo("paymentKey123");
-        assertThat(result.amount()).isEqualTo(1000);
+        assertThat(result.totalAmount()).isEqualTo(1000);
         assertThat(result.orderId()).isEqualTo("orderId123");
-        assertThat(result.paymentType()).isEqualTo("DONE");
 
         mockServer.verify();
     }
@@ -99,6 +98,6 @@ class PaymentClientMockRestServiceServerTest {
     }
 
     private PaymentRequest getRequest(String paymentKey) {
-        return new PaymentRequest(paymentKey, 1000, "orderId123", "paymentType");
+        return new PaymentRequest(paymentKey, 1000, "orderId123");
     }
 }

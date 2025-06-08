@@ -99,25 +99,8 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());
-        final PaymentResult paymentResult = confirmPaymentWithRollback(paymentRequest, reservation);
-        final Payment payment = paymentResult.toEntity(reservation);
-
-        paymentRepository.save(payment);
-
+        final Payment payment = confirmPaymentWithRollback(paymentRequest, reservation);
         return ReservationResponse.from(reservation, user);
-    }
-
-    private PaymentResult confirmPaymentWithRollback(final PaymentRequest paymentRequest, final Reservation reservation) {
-        try {
-            PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
-            if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
-                throw new PaymentInternalServerException("결제 승인 검증에 실패했습니다.");
-            }
-            return paymentResult;
-        } catch (Exception e) {
-            reservationCommandService.delete(reservation.getId());
-            throw e;
-        }
     }
 
     @Override
@@ -125,7 +108,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());
-
         return ReservationResponse.from(reservation, user);
     }
 
@@ -182,6 +164,20 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final Reservation reservation = reservationCommandService.create(request.toServiceRequest());
         waitingReservationCommandService.delete(id);
         return ReservationResponse.from(reservation, user);
+    }
+
+    private Payment confirmPaymentWithRollback(final PaymentRequest paymentRequest, final Reservation reservation) {
+        try {
+            final PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
+            if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
+                throw new PaymentInternalServerException("결제 승인 검증에 실패했습니다.");
+            }
+            final Payment payment = paymentResult.toEntity(reservation);
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            reservationCommandService.deleteForRollback(reservation.getId());
+            throw e;
+        }
     }
 
     private void promotionWaiting(final Long id, final Long waitingId) {

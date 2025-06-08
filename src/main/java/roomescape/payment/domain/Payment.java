@@ -40,51 +40,43 @@ public class Payment {
     @Column(name = Fields.orderId, nullable = false)
     private String orderId;
 
-    @Column(name = Fields.paymentType, nullable = false)
-    private String paymentType;
-
     @OneToOne(optional = false)
     private Reservation reservation;
 
-    private Payment(final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType, final Reservation reservation) {
-        validate(paymentKey, amount, orderId, paymentType, reservation);
+    private Payment(final String paymentKey, final PaymentAmount amount, final String orderId, final Reservation reservation) {
+        validate(paymentKey, amount, orderId, reservation);
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
-        this.paymentType = paymentType;
         this.reservation = reservation;
     }
 
-    public Payment(final Long id, final String paymentKey, final PaymentAmount amount, final String orderId, final String paymentType, final Reservation reservation) {
+    public Payment(final Long id, final String paymentKey, final PaymentAmount amount, final String orderId, final Reservation reservation) {
         validate(id);
-        validate(paymentKey, amount, orderId, paymentType, reservation);
+        validate(paymentKey, amount, orderId, reservation);
         this.id = id;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.orderId = orderId;
-        this.paymentType = paymentType;
         this.reservation = reservation;
     }
 
     public static Payment of(final String paymentKey,
                              final PaymentAmount amount,
                              final String orderId,
-                             final String paymentType,
                              final Reservation reservation
     ) {
-        return new Payment(paymentKey, amount, orderId, paymentType, reservation);
+        return new Payment(paymentKey, amount, orderId, reservation);
     }
 
     private static void validate(final String paymentKey,
                                  final PaymentAmount amount,
                                  final String orderId,
-                                 final String paymentType,
                                  final Reservation reservation
     ) {
         Validator.of(Payment.class)
                 .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
                 .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
-                .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label())
                 .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
                 .validateNotNull(Fields.reservation, reservation, DomainTerm.RESERVATION.label());
     }
