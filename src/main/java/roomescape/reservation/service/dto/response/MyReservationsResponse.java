@@ -1,6 +1,7 @@
 package roomescape.reservation.service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.waiting.domain.Waiting;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@Schema(name = "MyReservationsResponse(나의 예약 목록 조회 응답 DTO)")
 public record MyReservationsResponse(
         Long id,
         String theme,

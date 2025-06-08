@@ -11,8 +11,8 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.payment.infraStructure.toss.TossPaymentClient;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.response.ConfirmPaymentResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

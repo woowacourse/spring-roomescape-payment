@@ -8,9 +8,9 @@ import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentClientException;
 import roomescape.common.exception.ServerConnectException;
 import roomescape.payment.infraStructure.PaymentGatewayClient;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
-import roomescape.payment.infraStructure.dto.PaymentFailure;
+import roomescape.payment.infraStructure.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.response.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.dto.response.PaymentFailure;
 
 import java.util.Base64;
 import java.util.List;

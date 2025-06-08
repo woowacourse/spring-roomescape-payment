@@ -1,7 +1,9 @@
-package roomescape.payment.infraStructure.dto;
+package roomescape.payment.infraStructure.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 
+@Schema(name = "ConfirmPaymentRequest(결제 요청 DTO)")
 public record ConfirmPaymentRequest(
         String paymentKey,
         String orderId,

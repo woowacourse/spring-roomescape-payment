@@ -1,12 +1,14 @@
 package roomescape.reservation.service.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.member.service.dto.response.MemberResponse;
-import roomescape.payment.infraStructure.dto.PaymentResponse;
+import roomescape.payment.infraStructure.dto.response.PaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.theme.service.dto.response.ThemeResponse;
 
 import java.time.LocalDate;
 
+@Schema(name = "MyReservationsResponse(나의 예약 조회 응답 DTO)")
 public record ReservationResponse(
         Long id,
         MemberResponse member,
