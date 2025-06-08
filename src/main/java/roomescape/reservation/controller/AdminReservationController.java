@@ -1,5 +1,8 @@
 package roomescape.reservation.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,16 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import roomescape.reservation.dto.AdminReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
-@RequestMapping("/admin/reservations")
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
@@ -25,12 +26,22 @@ public class AdminReservationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse saveReservation(@Valid @RequestBody final AdminReservationRequest request) {
+        log.info("[(관리자) 예약 추가] date: {}, timeId: {}, themeId: {}, memberId: {}",
+                request.date(),
+                request.timeId(),
+                request.themeId(),
+                request.memberId()
+        );
         return reservationService.saveAdminReservation(request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelReservation(@PathVariable("id") final Long id) {
-        reservationService.deleteReservation(id);
+    public void cancelReservation(@PathVariable final Long reservationId) {
+        log.info("[(관리자) 예약 취소] reservationId: {}", reservationId);
+        reservationService.deleteReservation(reservationId);
     }
 }
+
+
+

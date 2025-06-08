@@ -2,6 +2,7 @@ package roomescape.member.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponses;
 import roomescape.member.service.MemberService;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
@@ -28,6 +30,11 @@ public class MemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void signup(@RequestBody @Valid MemberRequest request) {
+        log.info("[회원가입] email: {}, password: {}, name: {}",
+                request.email(),
+                request.password(),
+                request.name()
+        );
         memberService.save(request);
     }
 }

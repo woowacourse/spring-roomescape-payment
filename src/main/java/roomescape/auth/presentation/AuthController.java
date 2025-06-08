@@ -3,6 +3,7 @@ package roomescape.auth.presentation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -17,6 +18,7 @@ import roomescape.auth.config.AuthenticationPrincipal;
 import roomescape.auth.presentation.dto.LoginCheckResponse;
 import roomescape.auth.presentation.dto.LoginRequest;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -26,6 +28,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse servletResponse) {
+        log.info("[로그인 요청] email: {}", request.email());
+
         String token = authService.createToken(request);
         authService.getMemberByLoginRequest(request);
 
@@ -43,6 +47,7 @@ public class AuthController {
 
     @GetMapping("/login/check")
     public LoginCheckResponse checkLogin(@AuthenticationPrincipal LoginMember loginMember) {
+        log.info("[로그인 체크] memberId: {}", loginMember.getId());
         return new LoginCheckResponse(loginMember);
     }
 }

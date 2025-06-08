@@ -3,6 +3,7 @@ package roomescape.theme.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/themes")
 @RequiredArgsConstructor
@@ -27,6 +29,12 @@ public class ThemeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ThemeResponse saveTheme(@Valid @RequestBody final ThemeRequest request) {
+        log.info("[테마 추가] 이름: {}, 설명: {}, 썸네일: {}",
+                request.name(),
+                request.description(),
+                request.thumbnail()
+        );
+
         return themeService.saveTheme(request);
     }
 
@@ -40,9 +48,10 @@ public class ThemeController {
         return themeService.findAllPopular();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{themeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final Long id) {
-        themeService.delete(id);
+    public void deleteTheme(@PathVariable final Long themeId) {
+        log.info("[테마 삭제] themeId: {}", themeId);
+        themeService.delete(themeId);
     }
 }

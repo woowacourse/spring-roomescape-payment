@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,10 +27,11 @@ import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
 
-@RestController
-@RequestMapping("/reservations")
-@RequiredArgsConstructor
+@Slf4j
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -54,13 +56,20 @@ public class ReservationController {
             @Valid @RequestBody final ReservationRequest request,
             @AuthenticationPrincipal final LoginMember loginMember
     ) {
+        log.info("[(유저) 예약 추가] date: {}, timeId: {}, themeId: {}, memberId: {}",
+                request.date(),
+                request.timeId(),
+                request.themeId(),
+                loginMember.getId()
+        );
         return reservationService.saveReservation(request, loginMember);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservation(@PathVariable final Long id) {
-        reservationService.deleteReservation(id);
+    public void deleteReservation(@PathVariable final Long reservationId) {
+        log.info("[(유저) 예약 삭제] reservationId: {}", reservationId);
+        reservationService.deleteReservation(reservationId);
     }
 
     @GetMapping("/mine")
