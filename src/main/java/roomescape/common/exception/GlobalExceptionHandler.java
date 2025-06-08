@@ -66,6 +66,5 @@ public class GlobalExceptionHandler {
         }
 
         log.warn("Client error ({}): {}", status.value(), message);
-
     }
 }
