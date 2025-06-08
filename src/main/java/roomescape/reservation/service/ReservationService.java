@@ -90,7 +90,7 @@ public class ReservationService {
             log.warn("예약 삭제 불가 - 존재하지 않음, reservationId={}", id);
             return;
         }
-        reservation.delete();
+        reservation.cancel();
 
         log.info("예약 삭제 이벤트 발행 - reservationId={}", id);
         eventPublisher.raise(new ReservationDeleteEvent(id));

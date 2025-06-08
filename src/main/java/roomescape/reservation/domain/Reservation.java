@@ -58,7 +58,7 @@ public class Reservation extends BaseTimeEntity {
         return new Reservation(null, member, registrationSlot, ReservationStatus.RESERVED);
     }
 
-    public void delete() {
+    public void cancel() {
         this.reservationStatus = ReservationStatus.CANCELED;
     }
 
