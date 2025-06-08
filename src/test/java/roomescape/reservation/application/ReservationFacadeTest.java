@@ -10,6 +10,7 @@ import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.infrastructure.client.TossPaymentClient;
 import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 import roomescape.payment.infrastructure.client.dto.PaymentResult;
@@ -72,6 +73,9 @@ class ReservationFacadeTest {
 
     @Mock
     private TossPaymentClient tossPaymentClient;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @Mock
     private UserQueryService userQueryService;
@@ -231,12 +235,15 @@ class ReservationFacadeTest {
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
         given(tossPaymentClient.confirmPayment(any())).willReturn(response);
+        given(paymentRepository.save(any())).willReturn(response.toEntity(reservation));
         //when
         ReservationResponse result = reservationFacade.createWithPayment(request, paymentRequest);
 
         //then
         assertThat(result).isNotNull();
         then(reservationCommandService).should(times(1)).create(any());
+        then(tossPaymentClient).should(times(1)).confirmPayment(any());
+        then(paymentRepository).should(times(1)).save(any());
     }
 
     @Test

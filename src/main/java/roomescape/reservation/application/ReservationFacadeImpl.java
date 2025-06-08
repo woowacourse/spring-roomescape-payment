@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 import roomescape.payment.infrastructure.client.dto.PaymentResult;
@@ -45,6 +47,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
     private final UserQueryService userQueryService;
 
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public List<ReservationResponse> getAll() {
@@ -96,7 +99,11 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());
-        PaymentResult paymentResult = confirmPaymentWithRollback(paymentRequest, reservation);
+        final PaymentResult paymentResult = confirmPaymentWithRollback(paymentRequest, reservation);
+        final Payment payment = paymentResult.toEntity(reservation);
+
+        paymentRepository.save(payment);
+
         return ReservationResponse.from(reservation, user);
     }
 
@@ -114,7 +121,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
     }
 
     @Override
-    public ReservationResponse create(CreateReservationWithUserIdWebRequest reservationRequest) {
+    public ReservationResponse create(final CreateReservationWithUserIdWebRequest reservationRequest) {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());

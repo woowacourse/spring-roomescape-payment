@@ -75,7 +75,7 @@ public class Validator {
     public Validator validatePositive(final String fieldName,
                                       final int target,
                                       final String fieldDescription) {
-        if (target <= 0) {
+        if (target < 0) {
             throw buildException(
                     ValidationType.POSITIVE_CHECK,
                     fieldName,

@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentAmount;
+import roomescape.reservation.domain.Reservation;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 public record PaymentResult(String paymentKey,
@@ -27,5 +30,9 @@ public record PaymentResult(String paymentKey,
                 .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
                 .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
                 .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label());
+    }
+
+    public Payment toEntity(final Reservation reservation) {
+        return Payment.of(paymentKey, PaymentAmount.from(amount), orderId, paymentType, reservation);
     }
 }
