@@ -39,13 +39,14 @@ public class ReservationPaymentFacade {
         ReservationWithPaymentResponse reservationWithPendingPayment = reservationService.createReservationWithPendingPayment(request, loginMember.id());
 
         ResponseEntity<TossPaymentResponse> response = tossPaymentClient.confirmPayment(confirmRequest);
-        log.warn("결제 확인 실패 - 예약 삭제 및 결제 취소 처리 시작 - reservationId: {}, paymentId: {}",
-                reservationWithPendingPayment.id(), reservationWithPendingPayment.paymentId());
-
         if (response.getStatusCode().is2xxSuccessful() || isPaymentConfirmValid(request, response.getBody())) {
             paymentService.confirm(reservationWithPendingPayment.paymentId());
+            log.info("예약 생성 완료 - reservationId: {}", reservationWithPendingPayment.id());
             return reservationWithPendingPayment;
         }
+
+        log.warn("결제 확인 실패 - 예약 삭제 및 결제 취소 처리 시작 - reservationId: {}, paymentId: {}",
+                reservationWithPendingPayment.id(), reservationWithPendingPayment.paymentId());
 
         reservationService.deleteReservationById(reservationWithPendingPayment.id());
         log.info("예약 삭제 완료 - reservationId: {}", reservationWithPendingPayment.id());
