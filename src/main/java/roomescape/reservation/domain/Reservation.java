@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import roomescape.global.common.TimeStamp;
@@ -58,6 +60,14 @@ public class Reservation extends TimeStamp {
         this.member = member;
         this.reservationInfo = reservationInfo;
         this.payment = null;
+    }
+
+    public void validateIsPast() {
+        final LocalDateTime reservationDateTime = LocalDateTime.of(getDate(), getReservationTime().getStartAt());
+
+        if (reservationDateTime.isBefore(LocalDateTime.now())) {
+            throw new DateTimeException("이미 지난 날짜에 대한 예약입니다.");
+        }
     }
 
     public Long getId() {

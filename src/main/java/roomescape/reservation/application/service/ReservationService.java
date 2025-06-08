@@ -1,8 +1,6 @@
 package roomescape.reservation.application.service;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -54,7 +52,7 @@ public class ReservationService {
     public ReservationResponse createUserReservationAndPayment(final ReservationRequest reservationRequest, final Long memberId) {
         Member member = findMemberById(memberId);
         Reservation unpaidReservation = makeUnpaidReservation(reservationRequest.getTimeId(), reservationRequest.getThemeId(), reservationRequest.getDate(), member);
-        validateIsPast(unpaidReservation.getDate(), unpaidReservation.getReservationTime());
+        unpaidReservation.validateIsPast();
 
         Payment payment = paymentService.processPaymentRequest(reservationRequest);
 
@@ -162,14 +160,6 @@ public class ReservationService {
     private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("테마 정보를 찾을 수 없습니다."));
-    }
-
-    private void validateIsPast(final LocalDate reservationDate, final ReservationTime reservationTime) {
-        final LocalDateTime reservationDateTime = LocalDateTime.of(reservationDate, reservationTime.getStartAt());
-
-        if (reservationDateTime.isBefore(LocalDateTime.now())) {
-            throw new DateTimeException("지난 일시에 대한 예약 생성은 불가능합니다.");
-        }
     }
 
     private void validateIsDuplicate(final LocalDate reservationDate, final ReservationTime reservationTime) {
