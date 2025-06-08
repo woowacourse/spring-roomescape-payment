@@ -19,6 +19,8 @@ import roomescape.theme.dto.response.ThemeResponse;
 @RequestMapping("/themes")
 public class ThemeController {
 
+    public static final String GET_ADMIN_THEME = "/admin/theme";
+
     private final ThemeService themeService;
 
     public ThemeController(final ThemeService themeService) {
@@ -39,8 +41,8 @@ public class ThemeController {
 
     @PostMapping
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeRequest request) {
-        ThemeResponse theme = themeService.createTheme(request);
-        return ResponseEntity.created(URI.create("/themes/" + theme.id())).body(theme);
+        ThemeResponse response = themeService.createTheme(request);
+        return ResponseEntity.created(URI.create(GET_ADMIN_THEME)).body(response);
     }
 
     @DeleteMapping("/{id}")

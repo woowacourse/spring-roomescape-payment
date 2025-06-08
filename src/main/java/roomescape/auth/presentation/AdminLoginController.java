@@ -16,7 +16,7 @@ import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.dto.response.LoginCheckResponse;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/login")
 public class AdminLoginController {
 
     private final LoginService loginService;
@@ -25,7 +25,7 @@ public class AdminLoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping("/login")
+    @PostMapping
     public ResponseEntity<Void> login(@RequestBody final LoginRequest request) {
         String token = loginService.createAdminToken(request);
 
@@ -39,7 +39,7 @@ public class AdminLoginController {
                 .build();
     }
 
-    @GetMapping("/login/check")
+    @GetMapping("/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(@LoginAdmin final LoginAdminInfo info) {
         Admin admin = loginService.findByAdminId(info.id());
         return ResponseEntity.ok().body(new LoginCheckResponse(admin.getName()));

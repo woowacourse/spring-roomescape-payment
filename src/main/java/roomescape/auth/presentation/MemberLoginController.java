@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMember;
 import roomescape.auth.application.LoginService;
@@ -15,6 +16,7 @@ import roomescape.auth.dto.response.LoginCheckResponse;
 import roomescape.member.domain.Member;
 
 @RestController
+@RequestMapping("/login")
 public class MemberLoginController {
 
     private final LoginService loginService;
@@ -23,7 +25,7 @@ public class MemberLoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping("/login")
+    @PostMapping
     public ResponseEntity<Void> login(@RequestBody final LoginRequest request) {
         String token = loginService.createMemberToken(request);
 
@@ -38,7 +40,7 @@ public class MemberLoginController {
                 .build();
     }
 
-    @GetMapping("/login/check")
+    @GetMapping("/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(@LoginMember final LoginMemberInfo info) {
         Member member = loginService.findByMemberId(info.id());
         return ResponseEntity.ok().body(new LoginCheckResponse(member.getName()));

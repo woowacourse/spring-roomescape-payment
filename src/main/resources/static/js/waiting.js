@@ -1,5 +1,7 @@
+const ADMIN_WAITING_API_ENDPOINT = '/admin/waitings';
+
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/admin/waitings') // 내 예약 목록 조회 API 호출
+    fetch(ADMIN_WAITING_API_ENDPOINT) // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -55,7 +57,7 @@ function deny(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/admin/waitings/${id}`;
+    const endpoint = `${ADMIN_WAITING_API_ENDPOINT}/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {
