@@ -32,12 +32,12 @@ public class BusinessLogicLogger {
         String methodName = extractMethodName(joinPoint);
         String businessType = determineBusinessType(className);
 
-        if (isController(className)) {
-            logRequestBody();
+        HttpServletRequest request = currentRequest();
+        if (isController(className) && request instanceof ContentCachingRequestWrapper) {
+            logRequestBody((ContentCachingRequestWrapper) request);
         }
 
-        logInvocation(className, methodName, businessType);
-
+        logInvocation(request, className, methodName, businessType);
         return joinPoint.proceed();
     }
 
@@ -66,25 +66,34 @@ public class BusinessLogicLogger {
         return "";
     }
 
-    private void logInvocation(String className, String methodName, String type) {
-        HttpServletRequest request = currentRequest();
-        String requestId = (String) request.getAttribute("requestId");
+    private void logInvocation(HttpServletRequest request,
+                               String className,
+                               String methodName,
+                               String type) {
+        String requestId = "N/A";
+        if (request != null) {
+            Object attr = request.getAttribute("requestId");
+            if (attr != null) {
+                requestId = attr.toString();
+            }
+        }
         log.info("RequestId = {} {} {}.{}()", requestId, type, className, methodName);
     }
 
-    private void logRequestBody() {
-        HttpServletRequest req = currentRequest();
-        ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) req;
+    private void logRequestBody(ContentCachingRequestWrapper wrapper) {
         String prettyJson = extractRequestBody(wrapper);
-        String requestId = (String) wrapper.getAttribute("requestId");
-
+        String requestId = "N/A";
+        Object attr = wrapper.getAttribute("requestId");
+        if (attr != null) {
+            requestId = attr.toString();
+        }
         log.info("RequestId = {} <<Request>> Body =\n{}", requestId, prettyJson);
     }
 
     private static HttpServletRequest currentRequest() {
-        return ((ServletRequestAttributes) RequestContextHolder
-                .currentRequestAttributes())
-                .getRequest();
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return (attrs != null) ? attrs.getRequest() : null;
     }
 
     private String extractRequestBody(ContentCachingRequestWrapper wrapper) {
