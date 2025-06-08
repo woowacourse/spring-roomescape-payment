@@ -1,4 +1,4 @@
-package roomescape.application.facade;
+package roomescape.application.reservation.command;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +36,10 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
-class ReservationTossPaymentFacadeTest {
+class ProcessReservationWithTossPaymentUseCaseTest {
 
     @Autowired
-    private ReservationTossPaymentFacade reservationTossPaymentFacade;
+    private ProcessReservationWithTossPaymentUseCase processReservationWithTossPaymentUseCase;
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -94,7 +94,7 @@ class ReservationTossPaymentFacadeTest {
         doNothing().when(tossPaymentClient).approve(command.toPaymentCommand());
 
         // when
-        final Long id = reservationTossPaymentFacade.reserveWithPayment(command);
+        final Long id = processReservationWithTossPaymentUseCase.execute(command);
 
         // then
         final Optional<Reservation> reservation = reservationRepository.findById(id);
@@ -138,7 +138,7 @@ class ReservationTossPaymentFacadeTest {
 
         // when
         // then
-        assertThatCode(() -> reservationTossPaymentFacade.reserveWithPayment(command))
+        assertThatCode(() -> processReservationWithTossPaymentUseCase.execute(command))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("toss payment server 예외");
 
@@ -182,7 +182,7 @@ class ReservationTossPaymentFacadeTest {
 
         // when
         // then
-        assertThatCode(() -> reservationTossPaymentFacade.reserveWithPayment(command))
+        assertThatCode(() -> processReservationWithTossPaymentUseCase.execute(command))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("요청 금액과 승인 금액이 일치하지 않습니다. 현재 결제 금액: 10001, 요청 금액: 10000");
     }
@@ -209,7 +209,7 @@ class ReservationTossPaymentFacadeTest {
 
         // when
         // then
-        assertThatCode(() -> reservationTossPaymentFacade.reserveWithPayment(command))
+        assertThatCode(() -> processReservationWithTossPaymentUseCase.execute(command))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("존재하지 않는 결제 정보입니다");
     }

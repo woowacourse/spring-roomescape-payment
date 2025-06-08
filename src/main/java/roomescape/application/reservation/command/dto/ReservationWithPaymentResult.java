@@ -1,4 +1,4 @@
-package roomescape.application.facade.dto;
+package roomescape.application.reservation.command.dto;
 
 public record ReservationWithPaymentResult(
         Long reservationId,

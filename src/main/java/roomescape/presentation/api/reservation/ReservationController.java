@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.facade.ReservationTossPaymentFacade;
+import roomescape.application.reservation.command.ProcessReservationWithTossPaymentUseCase;
 import roomescape.application.reservation.query.ReservationQueryService;
 import roomescape.application.reservation.query.dto.ReservationResult;
 import roomescape.presentation.api.reservation.request.CreateReservationWithPaymentRequest;
@@ -27,13 +27,13 @@ public class ReservationController {
     private static final String RESERVATIONS_URL = "/reservations/%d";
 
     private final ReservationQueryService reservationQueryService;
-    private final ReservationTossPaymentFacade reservationTossPaymentFacade;
+    private final ProcessReservationWithTossPaymentUseCase processReservationWithTossPaymentUseCase;
 
     @PostMapping
     public ResponseEntity<Void> createReservation(
             @AuthPrincipal final AuthInfo authInfo,
             @Valid @RequestBody final CreateReservationWithPaymentRequest request) {
-        final Long id = reservationTossPaymentFacade.reserveWithPayment(request.toCreateCommand(authInfo.memberId()));
+        final Long id = processReservationWithTossPaymentUseCase.execute(request.toCreateCommand(authInfo.memberId()));
         return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id)))
                 .build();
     }
