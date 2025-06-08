@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:database
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
