@@ -1,9 +1,12 @@
 package roomescape.presentation.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,7 +17,10 @@ import static roomescape.TestFixtures.anyTimeSlotWithNewId;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,6 +29,7 @@ import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 import roomescape.presentation.GlobalExceptionHandler;
 
+@ExtendWith(OutputCaptureExtension.class)
 class TimeSlotControllerTest {
 
     private final TimeSlotService timeSlotService = Mockito.mock(TimeSlotService.class);
@@ -71,21 +78,25 @@ class TimeSlotControllerTest {
 
     @Test
     @DisplayName("예약 시간 삭제 요청시, 주어진 아이디에 해당하는 예약 시간이 없다면 NOT FOUND를 응답한다.")
-    void deleteWhenNotFound() throws Exception {
+    void deleteWhenNotFound(CapturedOutput capturedOutput) throws Exception {
         Mockito.doThrow(new NotFoundException("time slot not found"))
             .when(timeSlotService).removeById(eq(999L));
 
         mockMvc.perform(delete("/times/999"))
             .andExpect(status().isNotFound());
+
+        assertThat(capturedOutput.getOut()).contains(NOT_FOUND.getReasonPhrase());
     }
 
     @Test
     @DisplayName("예약 시간 삭제 요청시, 주어진 아이디에 해당하는 예약 시간이 사용 중이라면 CONFLICT를 응답한다.")
-    void deleteWhenConflict() throws Exception {
+    void deleteWhenConflict(CapturedOutput capturedOutput) throws Exception {
         Mockito.doThrow(new InUseException("some reservation is referencing this time slot"))
             .when(timeSlotService).removeById(eq(999L));
 
         mockMvc.perform(delete("/times/999"))
             .andExpect(status().isConflict());
+
+        assertThat(capturedOutput.getOut()).contains(CONFLICT.getReasonPhrase());
     }
 }
