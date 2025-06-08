@@ -4,21 +4,32 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import fixture.MemberFixture;
 import fixture.PaymentFixture;
 import fixture.ReservationTimeFixture;
 import fixture.ThemeFixture;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.helper.TestHelper;
@@ -38,6 +49,7 @@ import roomescape.theme.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ExtendWith(RestDocumentationExtension.class) // JUnit 5용 REST Docs 확장 추가
 class ReservationAcceptanceTest {
 
     @LocalServerPort
@@ -63,9 +75,15 @@ class ReservationAcceptanceTest {
 
     private Payment payment;
 
+    private RequestSpecification documentationSpec;
+
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        this.documentationSpec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
 
         payment = PaymentFixture.createDefault();
         paymentRepository.save(payment);
@@ -100,12 +118,46 @@ class ReservationAcceptanceTest {
         );
 
         // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(reservationRequest)
+                .filter(document("reservations",
+                        requestFields( // 요청 필드 문서화
+                                fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
+                                fieldWithPath("timeId").description("예약 시간의 ID"),
+                                fieldWithPath("themeId").description("테마의 ID"),
+                                fieldWithPath("payment.paymentKey").description("결제 고유 키 (Toss Payments)"),
+                                fieldWithPath("payment.orderId").description("주문 ID (Toss Payments)"),
+                                fieldWithPath("payment.amount").description("결제 금액 (Toss Payments)"),
+                                fieldWithPath("payment.paymentType").description("결제 타입 (Toss Payments, 예: NORMAL)")
+                        ),
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("id").description("생성된 예약의 ID"),
+                                fieldWithPath("date").description("예약된 날짜"),
+                                fieldWithPath("startAt").description("예약 시작 시간 (HH:mm 형식)"),
+                                fieldWithPath("memberName").description("예약한 회원의 이름"),
+                                fieldWithPath("themeName").description("예약된 테마의 이름")
+                        )
+                ))
+                .when()
+                .post("/reservations")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("date", equalTo(tomorrow.toString()))
+                .body("startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("themeName", equalTo(theme.getName()));
+
+        /*
+        // TODO: 테스트 헬퍼 코드를 계속 사용할지 고민.
         TestHelper.postWithToken("/reservations", reservationRequest, token)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("date", equalTo(tomorrow.toString()))
                 .body("startAt", equalTo(reservationTime.getStartAt().toString()))
                 .body("themeName", equalTo(theme.getName()));
+         */
     }
 
     @Test

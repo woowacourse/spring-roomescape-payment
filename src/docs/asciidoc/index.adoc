@@ -1,0 +1,28 @@
+= Room Escape reservations API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+
+[[overview]]
+= 개요
+
+[[reservations]]
+=== 예약 생성
+
+사용자가 예약을 생성합니다.
+
+include::{snippets}/reservations/http-request.adoc[]
+
+include::{snippets}/reservations/http-response.adoc[]
+
+include::{snippets}/reservations/request-body.adoc[]
+
+include::{snippets}/reservations/request-fields.adoc[]
+
+include::{snippets}/reservations/response-body.adoc[]
+
+include::{snippets}/reservations/response-fields.adoc[]
