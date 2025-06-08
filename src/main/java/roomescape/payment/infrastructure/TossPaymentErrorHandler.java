@@ -1,6 +1,7 @@
 package roomescape.payment.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Slf4j
 public class TossPaymentErrorHandler implements ResponseErrorHandler {
     private static final List<String> INTERNAL_ERROR_CODES = Arrays.stream(TossPaymentInternalErrorCode.values())
             .map(TossPaymentInternalErrorCode::getCode)
@@ -39,9 +41,18 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
 
     private void handleErrorResponse(ConfirmPaymentResponse response) {
         PaymentFailure failure = response.failure();
+        logBasedOnFailure(failure);
+
         if (INTERNAL_ERROR_CODES.contains(failure.code())) {
             throw new InternalServerErrorException();
         }
         throw new BadRequestException(failure.message());
+    }
+
+    private void logBasedOnFailure(PaymentFailure failure) {
+        if (INTERNAL_ERROR_CODES.contains(failure.code())) {
+            log.error("toss payments API 500 error - code: {}, message: {}", failure.code(), failure.message());
+        }
+        log.warn("toss payments API 400 error - code: {}, message: {}", failure.code(), failure.message());
     }
 }
