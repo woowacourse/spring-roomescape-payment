@@ -75,6 +75,19 @@ public class Reservation {
                 status);
     }
 
+    public static Reservation of(
+            final ReservationSlot reservationSlot,
+            final Member member,
+            final Payment payment,
+            final ReservationStatus status
+    ) {
+        return new Reservation(
+                reservationSlot,
+                member,
+                payment,
+                status);
+    }
+
     public void updateMember(final Member member) {
         this.member = member;
     }
