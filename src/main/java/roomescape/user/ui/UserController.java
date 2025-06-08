@@ -1,5 +1,6 @@
 package roomescape.user.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ public class UserController {
     private final UserFacade userFacade;
 
     @GetMapping
+    @Operation(summary = "사용자 전체 조회")
     public ResponseEntity<List<UserResponse>> getAll() {
         return ResponseEntity.ok(userFacade.getAll());
     }

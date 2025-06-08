@@ -1,5 +1,6 @@
 package roomescape.reservation.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,12 +32,14 @@ public class WaitingReservationController {
     private final ReservationFacade reservationFacade;
 
     @GetMapping
+    @Operation(summary = "예약 대기 전체 조회")
     public ResponseEntity<List<WaitingReservationResponse>> getAll() {
         final List<WaitingReservationResponse> reservations = reservationFacade.getAllWaiting();
         return ResponseEntity.ok(reservations);
     }
 
     @PostMapping
+    @Operation(summary = "예약 대기 생성")
     public ResponseEntity<SimpleWaitingReservationResponse> create(
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session
@@ -50,12 +53,14 @@ public class WaitingReservationController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 대기 삭제")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         reservationFacade.deleteWaiting(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}")
+    @Operation(summary = "예약 대기 승격")
     public ResponseEntity<ReservationResponse> promotion(
             @PathVariable final Long id,
             @RequestBody final CreateReservationWebRequest request,
