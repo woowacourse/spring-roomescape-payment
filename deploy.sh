@@ -6,7 +6,6 @@ BRANCH="step2"
 DOCKER_COMPOSE_FILE="docker/docker-compose.yml"
 JAR_NAME="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 BUILD_DIR="build/libs"
-LOG_FILE="app.log"
 
 echo "==== 1. 최신 코드 가져오는 중... ===="
 git pull origin $BRANCH
