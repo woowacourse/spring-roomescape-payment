@@ -40,18 +40,35 @@ public class PaymentQueryService {
                 ));
     }
 
-    private PaymentResult getPaymentResult(final ReservationPayment reservationPayment, final Map<Long, TossPayment> tossPaymentById) {
-        return switch (reservationPayment.getPaymentType()) {
-            case TOSS -> {
-                final TossPayment tossPayment = tossPaymentById.get(reservationPayment.getPaymentId());
-                if (tossPayment == null)
-                    throw new PaymentException("존재하지 않는 결제입니다");
-                if (tossPayment.isApproved())
-                    yield new PaymentResult(PaymentType.TOSS, tossPayment.getPaymentKey(), tossPayment.getAmount());
-                yield new PaymentResult(PaymentType.TOSS, tossPayment.getStatusDescription(), tossPayment.getAmount());
-            }
-            case ADMIN -> new PaymentResult(PaymentType.ADMIN, reservationPayment.getPaymentId() + "번 관리자", 0L);
-        };
+    private PaymentResult getPaymentResult(
+            final ReservationPayment reservationPayment,
+            final Map<Long, TossPayment> tossPaymentById
+    ) {
+        if (reservationPayment.isTossPayment()) {
+            return getTossPaymentResult(reservationPayment, tossPaymentById);
+        }
+        if (reservationPayment.isAdminPayment()) {
+            return getAdminPaymentResult(reservationPayment);
+        }
+        throw new PaymentException("존재하지 않는 결제입니다");
+    }
+
+    private PaymentResult getTossPaymentResult(
+            final ReservationPayment reservationPayment,
+            final Map<Long, TossPayment> tossPaymentById
+    ) {
+        final TossPayment toss = tossPaymentById.get(reservationPayment.getPaymentId());
+        if (toss == null) {
+            throw new PaymentException("존재하지 않는 결제입니다");
+        }
+        if (toss.isApproved()) {
+            return new PaymentResult(PaymentType.TOSS, toss.getPaymentKey(), toss.getAmount());
+        }
+        return new PaymentResult(PaymentType.TOSS, toss.getStatusDescription(), toss.getAmount());
+    }
+
+    private PaymentResult getAdminPaymentResult(final ReservationPayment reservationPayment) {
+        return new PaymentResult(PaymentType.ADMIN, reservationPayment.getPaymentId() + "번 관리자", 0L);
     }
 }
 
