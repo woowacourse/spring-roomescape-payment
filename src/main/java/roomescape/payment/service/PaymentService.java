@@ -22,7 +22,6 @@ public class PaymentService {
         TossPaymentRequest request = new TossPaymentRequest(orderId, paymentKey, amount);
         TossPaymentResponse response = tossPaymentClient.requestPaymentApprove(request);
         Payment payment = new Payment(
-                reservation,
                 response.orderId(),
                 response.paymentKey(),
                 response.totalAmount(),

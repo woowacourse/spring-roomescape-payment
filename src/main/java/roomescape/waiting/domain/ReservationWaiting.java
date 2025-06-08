@@ -63,6 +63,14 @@ public class ReservationWaiting {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    public ReservationWaiting(Long id, Member member, LocalDate date, ReservationTime time, ReservationTheme theme) {
+        this.id = id;
+        this.member = member;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+    }
+
     public ReservationWaiting(final Member member, final LocalDate date, final ReservationTime time,
                               final ReservationTheme theme) {
         this.member = member;

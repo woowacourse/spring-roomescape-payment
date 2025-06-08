@@ -26,7 +26,6 @@ public class Payment {
     private Long id;
 
     @OneToOne(mappedBy = "payment")
-    @NotNull
     private Reservation reservation;
 
     @Column(name = "order_id")
@@ -45,8 +44,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentType type;
 
-    public Payment(Reservation reservation, String orderId, String paymentKey, Long amount, PaymentType type) {
-        this.reservation = reservation;
+    public Payment(String orderId, String paymentKey, Long amount, PaymentType type) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
