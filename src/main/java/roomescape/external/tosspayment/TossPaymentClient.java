@@ -9,7 +9,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.external.tosspayment.dto.PaymentConfirmRequest;
-import roomescape.external.tosspayment.dto.TossPaymentConfirmResponse;
 
 import java.util.Base64;
 
@@ -28,13 +27,13 @@ public class TossPaymentClient {
         try {
             long startTime = System.currentTimeMillis();
             log.info("[{}] EXTERNAL_API: 토스 결제 승인 api 요청", MDC.get("requestId"));
-            ResponseEntity<TossPaymentConfirmResponse> response = restClient.post()
+            ResponseEntity<Void> response = restClient.post()
                     .uri(URL_PREFIX + "/confirm")
                     .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
                     .body(request)
                     .retrieve()
                     .onStatus(tossPaymentConfirmErrorHandler)
-                    .toEntity(TossPaymentConfirmResponse.class);
+                    .toBodilessEntity();
             if (response.getStatusCode() != HttpStatus.OK) {
                 log.warn("[{}] EXTERNAL_API_ERROR: TOSSPAYMENT_BUSINESS_FAILURE - 토스 응답 상태 코드: {}",
                         MDC.get("requestId"),
