@@ -36,7 +36,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return (parameter.hasParameterAnnotation(CurrentMember.class) || parameter.hasParameterAnnotation(AdminOnly.class))
+        return parameter.hasParameterAnnotation(CurrentMember.class)
                 && parameter.getParameterType().equals(LoginInfo.class);
     }
 
@@ -48,12 +48,6 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         String token = cookieHandler.extractCookie(cookies, "token");
         Long id = jwtTokenProvider.extractId(token);
         Member loginMember = findExistingMemberById(id);
-
-        if (parameter.hasParameterAnnotation(AdminOnly.class)) {
-            if (!loginMember.getRole().isAdmin()) {
-                throw new AccessDeniedException(loginMember.getRole(), Role.ADMIN, loginMember.getId());
-            }
-        }
         return new LoginInfo(loginMember);
     }
 
