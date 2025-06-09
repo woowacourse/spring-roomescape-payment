@@ -15,8 +15,8 @@ import java.time.Duration;
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClientConfig {
 
-    public static final int REQUEST_CONNECT_TIMEOUT_MINUTE = 3;
-    public static final int REQUEST_READ_TIMEOUT_MINUTE = 5;
+    public static final int REQUEST_CONNECT_TIMEOUT_SECOND = 3;
+    public static final int REQUEST_READ_TIMEOUT_SECOND = 1;
     private final PaymentClientProperties paymentClientProperties;
 
     public PaymentClientConfig(final PaymentClientProperties paymentClientProperties) {
@@ -31,8 +31,8 @@ public class PaymentClientConfig {
 
     private SimpleClientHttpRequestFactory generateTimeoutRequestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofMinutes(REQUEST_CONNECT_TIMEOUT_MINUTE));
-        requestFactory.setReadTimeout(Duration.ofMinutes(REQUEST_READ_TIMEOUT_MINUTE));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(REQUEST_CONNECT_TIMEOUT_SECOND));
+        requestFactory.setReadTimeout(Duration.ofSeconds(REQUEST_READ_TIMEOUT_SECOND));
         return requestFactory;
     }
 
