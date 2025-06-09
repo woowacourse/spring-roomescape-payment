@@ -25,7 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
 
-    private static final Pattern JWT_PATTERN = Pattern.compile("Bearer\\s+.+");
+    private static final Pattern JWT_PATTERN = Pattern.compile("token=[^;\\s]*");
 
     @LocalServerPort
     protected int port;
@@ -52,7 +52,7 @@ public abstract class IntegrationTest {
                         .operationPreprocessors()
                         .withRequestDefaults(
                                 prettyPrint(),
-                                replacePattern(JWT_PATTERN, "Bearer {ACCESS_TOKEN}"),
+                                replacePattern(JWT_PATTERN, "token={ACCESS_TOKEN}"),
                                 modifyHeaders()
                                         .remove("Content-Length")
                         )

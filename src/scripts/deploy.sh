@@ -3,24 +3,24 @@
 set -e  # 에러 발생 시 스크립트 즉시 종료
 
 # 기본값 설정
-PROJECT_DIR="${PROJECT_DIR:-spring-roomescape-payment}"
 BRANCH_NAME="${BRANCH_NAME:-step2}"
 JAR_NAME="${JAR_NAME:-spring-roomescape-payment-0.0.1-SNAPSHOT.jar}"
 LOG_FILE="${LOG_FILE:-app.log}"
 
 echo "[배포 시작]"
 
-# 1. 프로젝트 디렉토리로 이동
-cd "$PROJECT_DIR"
-
-# 2. 브랜치 변경 및 최신 코드 받기
+# 1. 브랜치 변경 및 최신 코드 받기
 echo "[Git] 브랜치 전환: $BRANCH_NAME"
 git checkout "$BRANCH_NAME"
 git pull
 
-# 3. 빌드
+# 2. 빌드
 echo "[Gradle] 프로젝트 빌드"
 ./gradlew bootJar
+
+# 3. RestDocs 마스킹
+find build/generated-snippets -name "*.adoc" \
+  -exec sed -i '' 's/token=[^;[:space:]]*/token={ACCESS_TOKEN}/g' {} +
 
 # 4. 빌드된 jar 디렉토리로 이동
 cd build/libs

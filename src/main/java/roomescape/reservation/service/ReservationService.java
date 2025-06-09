@@ -104,24 +104,39 @@ public class ReservationService {
         if(member.isAdmin() || reservation.isOwnedBy(memberId)) {
             return;
         }
+        log.warn("해당 예약에 접근 권한이 없는 사용자 - reservationId={}, memberId={}, memberRole={}", reservationId, memberId, member.getRole());
         throw new ForbiddenException("해당 예약에 접근할 권한이 없습니다.");
     }
 
     private Reservation getReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다, id: " + reservationId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 예약 - reservationId={}", reservationId);
+                    return new NotFoundException("존재하지 않는 예약입니다, id: " + reservationId);
+                });
     }
 
     private Member getMemberById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버입니다."));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 회원 - memberId={}", id);
+                    return new NotFoundException("존재하지 않는 멤버입니다.");
+                });
     }
 
     private ReservationTime getReservationTimeById(final Long timeId) {
-        return reservationTimeRepository.findById(timeId).orElseThrow(() -> new NotFoundException("존재하지 않는 예약 시간입니다."));
+        return reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 예약 시간 - timeId={}", timeId);
+                    return new NotFoundException("존재하지 않는 예약 시간입니다.");
+                });
     }
 
     private Theme getThemeById(final Long themeId) {
-        return themeRepository.findById(themeId).orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 테마 - themeId={}", themeId);
+                    return new NotFoundException("존재하지 않는 테마입니다.");
+                });
     }
 }

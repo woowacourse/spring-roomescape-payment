@@ -87,5 +87,9 @@ tasks.register("copyRestDocs", Copy) {
 }
 
 build {
-    dependsOn ("copyRestDocs")
+    dependsOn copyRestDocs
+}
+
+bootJar {
+    dependsOn copyRestDocs
 }

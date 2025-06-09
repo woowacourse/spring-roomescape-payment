@@ -14,7 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ControllerLoggingAspect {
 
-    @Around("execution(* roomescape..*Controller.*(..)) && !execution(* roomescape.auth.controller.AuthController.*(..))")
+    @Around("execution(* roomescape..*Controller.*(..)) && " +
+            "!execution(* roomescape.auth.controller.AuthController.*(..)) && " +
+            "!execution(* roomescape.ui.ViewController.*(..))")
     public Object logApiRequest(ProceedingJoinPoint joinPoint) throws Throwable {
         String method = joinPoint.getSignature().toShortString();
         Object[] args = joinPoint.getArgs();
