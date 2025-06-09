@@ -59,6 +59,7 @@ public class ReservationService {
         if(loginMember.role() == MemberRole.ADMIN || checkReservation.isOwnedBy(loginMember.id())) {
             return;
         }
+        log.warn("예약 조회 권한 없음 - memberId={}, reservationId={}, role={}", loginMember.id(), checkReservation.getId(), loginMember.role());
         throw new ReservationException("자신의 예약만 조회할 수 있습니다.");
     }
 
