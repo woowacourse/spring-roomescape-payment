@@ -20,6 +20,14 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public GroupedOpenApi all() {
+        return GroupedOpenApi.builder()
+                .group("all")
+                .pathsToMatch("/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi auth() {
         return GroupedOpenApi.builder()
                 .group("인증 및 사용자")
