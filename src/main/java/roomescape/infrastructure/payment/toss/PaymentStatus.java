@@ -11,7 +11,7 @@ public enum PaymentStatus {
     EXPIRED;
 
     public static boolean isAcceptedStatus(String status) {
-        return status.equalsIgnoreCase(READY.name());
+        return status.equalsIgnoreCase(DONE.name());
     }
 
 }
