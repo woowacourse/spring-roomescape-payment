@@ -64,7 +64,6 @@ asciidoctor {
     outputDir = file("build/docs")
     baseDirFollowsSourceDir()
     dependsOn test
-    inputs.dir snippetsDir
 
     sources {
         include '**/*.adoc'
@@ -82,7 +81,6 @@ asciidoctor {
         delete outputDir
         delete file("src/main/resources/static/docs")
     }
-    attributes 'allow-uri-read': true
 }
 
 tasks.register('copyApiDocument', Copy) {
@@ -94,5 +92,3 @@ tasks.register('copyApiDocument', Copy) {
 build {
     dependsOn copyApiDocument
 }
-
-processResources.dependsOn copyApiDocument
