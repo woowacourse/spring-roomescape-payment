@@ -43,7 +43,7 @@ if [ -n "$PID" ]; then
 fi
 
 echo "🚀 새 애플리케이션 실행 중..."
-nohup java -jar "$JAR_NAME" &
+nohup java -Dspring.profiles.active=prod -jar "$JAR_NAME" &
 
 echo "✅ 배포 완료!"
 echo ""
