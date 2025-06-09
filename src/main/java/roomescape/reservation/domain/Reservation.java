@@ -12,6 +12,8 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
@@ -21,7 +23,6 @@ import roomescape.theme.domain.Theme;
 @Entity
 public class Reservation {
 
-    private final LocalDateTime createdAt = LocalDateTime.now();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +37,8 @@ public class Reservation {
     private PaymentStatus paymentStatus;
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
     private Payment payment;
+
+    private final LocalDateTime createdAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
 
     protected Reservation() {
 

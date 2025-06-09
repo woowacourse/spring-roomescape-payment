@@ -5,6 +5,8 @@ import static roomescape.reservation.domain.PaymentStatus.PENDING;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -115,7 +117,7 @@ public class ReservationService {
     }
 
     private void validatePastDateTime(final LocalDate date, final LocalTime time) {
-        final LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         final LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
         if (reservationDateTime.isBefore(now)) {
             throw new BadRequestException("현재보다 과거의 날짜로 예약 할 수 없습니다.");

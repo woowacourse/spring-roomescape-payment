@@ -2,6 +2,8 @@ package roomescape.reservation.application;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +27,8 @@ public class ReservationScheduler {
 
     @Scheduled(fixedRateString = "${scheduler.request.time}")
     public void checkReservationPaymentExpiredTime() {
-        LocalDateTime findTime = LocalDateTime.now().minus(validReservationTimePeriod);
+        LocalDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime findTime = now.minus(validReservationTimePeriod);
         List<Reservation> reservations = reservationService.findByCreateTimeAndPaymentStatus(
             findTime, PaymentStatus.PENDING);
         for (Reservation reservation : reservations) {
