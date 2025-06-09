@@ -95,7 +95,8 @@ public class ReservationService {
     }
 
     public List<MyReservationWaitingResponse> findMyReservations(Long id) {
-        List<ReservationWithPayment> reservations = reservationQueryRepository.findReservationsWithPaymentByMemberId(id);
+        List<ReservationWithPayment> reservations = reservationQueryRepository.findReservationsWithPaymentByMemberId(
+                id);
         return reservations.stream().map(MyReservationWaitingResponse::from).toList();
     }
 }
