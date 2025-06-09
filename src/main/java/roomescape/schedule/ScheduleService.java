@@ -48,11 +48,7 @@ public class ScheduleService {
 
     private void validateDuplication(final ReservationTime reservationTime, final Theme theme, final LocalDate date) {
         if (scheduleRepository.existsByReservationTimeAndThemeAndDate(reservationTime, theme, date)) {
-            log.warn("EVENT: SCHEDULE_CREATE_FAILED - DUPLICATED, themeName={}, date={}, time={}",
-                    theme.getName(),
-                    date,
-                    reservationTime.getStartAt());
-            throw new ScheduleConflictException();
+            throw new ScheduleConflictException(date, reservationTime.getStartAt(), theme.getName());
         }
     }
 }

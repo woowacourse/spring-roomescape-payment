@@ -9,7 +9,7 @@ import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.waiting.dto.WaitingRequest;
 import roomescape.booking.waiting.dto.WaitingResponse;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsScheduleException;
-import roomescape.exception.custom.reason.schedule.PastScheduleException;
+import roomescape.exception.custom.reason.waiting.WaitingPastScheduleException;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.schedule.Schedule;
@@ -52,20 +52,14 @@ public class WaitingCreateService {
 
     private void validatePast(final Schedule schedule) {
         if (schedule.isPast()) {
-            log.warn("EVENT: WAITING_CREATE_FAILED - PAST_SCHEDULE, date={}, time={}",
-                    schedule.getDate(),
-                    schedule.getReservationTime().getStartAt());
-            throw new PastScheduleException();
+            throw new WaitingPastScheduleException(schedule.getDate(), schedule.getReservationTime().getStartAt());
         }
     }
 
     private void validateExistsReservationAboutSchedule(final Schedule schedule) {
         boolean isReservationExist = reservationService.existsBySchedule(schedule);
         if (!isReservationExist) {
-            log.warn("EVENT: WAITING_CREATE_FAILED - RESERVATION_NOT_EXISTS, date={}, time={}",
-                    schedule.getDate(),
-                    schedule.getReservationTime().getStartAt());
-            throw new ReservationNotExistsScheduleException();
+            throw new ReservationNotExistsScheduleException(schedule.getDate(), schedule.getReservationTime().getStartAt());
         }
     }
 }

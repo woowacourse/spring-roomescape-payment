@@ -92,9 +92,7 @@ public class ReservationTimeService {
 
     private void validateDuplication(final ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            log.warn("EVENT: RESERVATION_TIME_CREATE_FAILED - DUPLICATED, time={}",
-                    request.startAt());
-            throw new ReservationTimeConflictException();
+            throw new ReservationTimeConflictException(request.startAt());
         }
     }
 }

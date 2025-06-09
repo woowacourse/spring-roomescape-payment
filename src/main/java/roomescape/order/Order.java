@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.exception.custom.reason.order.OrderNotMatchException;
 import roomescape.member.Member;
 import roomescape.schedule.Schedule;
 
@@ -43,13 +44,13 @@ public class Order {
 
     public void validateOrderAndPaymentRequest(final Long amount, final Member member, final Schedule schedule) {
         if (!isAmount(amount)) {
-            throw new IllegalArgumentException("주문 금액과 결제 금액이 일치하지 않아 결제를 할 수 없습니다.");
+            throw new OrderNotMatchException("주문 금액과 결제 금액이 일치하지 않아 결제를 할 수 없습니다.", id);
         }
         if (!isMember(member)) {
-            throw new IllegalArgumentException("주문 회원과 결제 회원이 일치하지 않아 결제를 할 수 없습니다.");
+            throw new OrderNotMatchException("주문 회원과 결제 회원이 일치하지 않아 결제를 할 수 없습니다.", id);
         }
         if (!isSchedule(schedule)) {
-            throw new IllegalArgumentException("주문 스케줄과 결제 스케줄이 일치하지 않아 결제를 할 수 없습니다.");
+            throw new OrderNotMatchException("주문 스케줄과 결제 스케줄이 일치하지 않아 결제를 할 수 없습니다.", id);
         }
     }
 

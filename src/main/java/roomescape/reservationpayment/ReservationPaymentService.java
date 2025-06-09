@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.TossPaymentConfirmCommandFactory;
+import roomescape.exception.custom.reason.reservationpayment.ReservationPaymentConfirmException;
 import roomescape.exception.custom.reason.reservationpayment.ReservationPaymentNotFoundException;
 import roomescape.external.tosspayment.TossPaymentAdapter;
 import roomescape.external.tosspayment.dto.TossPaymentConfirmCommand;
@@ -28,11 +29,7 @@ public class ReservationPaymentService {
         try {
             tossPaymentAdapter.confirmPayment(command);
         } catch (Exception e) {
-            log.warn("EVENT: PAYMENT_CONFIRM_FAILED, reservationId={}, paymentKey={}, orderId={}",
-                    savedReservationPayment.getReservation().getId(),
-                    savedReservationPayment.getPaymentKey(),
-                    savedReservationPayment.getOrderId());
-            throw e;
+            throw new ReservationPaymentConfirmException(e.getMessage(), savedReservationPayment.getReservation().getId(), savedReservationPayment.getPaymentKey(), savedReservationPayment.getOrderId());
         }
         log.info("EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}, orderId={}",
                 savedReservationPayment.getReservation().getId(),
