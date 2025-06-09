@@ -143,7 +143,7 @@ public class ReservationServiceTest {
 
             Reservation reservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
             // when
-            given(reservationRepository.findById(any()))
+            given(reservationRepository.findByIdForUpdate(any()))
                     .willReturn(Optional.of(reservation));
 
             // then
@@ -157,7 +157,7 @@ public class ReservationServiceTest {
             Reservation reservation = new Reservation(null, null, ReservationStatus.CONFIRMED);
 
             // when
-            given(reservationRepository.findById(any()))
+            given(reservationRepository.findByIdForUpdate(any()))
                     .willReturn(Optional.of(reservation));
 
             // then

@@ -74,9 +74,7 @@ public class ReservationTimeService {
 
     @Transactional
     public void deleteById(final Long id) {
-        final ReservationTime reservationTime = reservationTimeRepository.findById(id)
-                .orElseThrow(ReservationTimeNotFoundException::new);
-
+        final ReservationTime reservationTime = getByIdForUpdate(id);
         if (reservationService.existsByReservationTime(reservationTime)) {
             throw new ReservationTimeUsedException();
         }
@@ -85,6 +83,11 @@ public class ReservationTimeService {
         log.info("EVENT: RESERVATION_TIME_DELETED, id={}, startAt={}",
                 reservationTime.getId(),
                 reservationTime.getStartAt());
+    }
+
+    private ReservationTime getByIdForUpdate(final Long id) {
+        return reservationTimeRepository.findByIdForUpdate(id)
+                .orElseThrow(ReservationTimeNotFoundException::new);
     }
 
     private void validateDuplication(final ReservationTimeRequest request) {

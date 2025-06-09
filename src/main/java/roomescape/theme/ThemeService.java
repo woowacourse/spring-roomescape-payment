@@ -66,7 +66,7 @@ public class ThemeService {
 
     @Transactional
     public void deleteById(final Long id) {
-        final Theme theme = getById(id);
+        final Theme theme = getByIdForUpdate(id);
         if (reservationService.existsByTheme(theme)) {
             throw new ThemeUsedException();
         }
@@ -76,4 +76,10 @@ public class ThemeService {
                 theme.getId(),
                 theme.getName());
     }
+
+    private Theme getByIdForUpdate(final Long id) {
+        return themeRepository.findByIdForUpdate(id)
+                .orElseThrow(ThemeNotFoundException::new);
+    }
+
 }

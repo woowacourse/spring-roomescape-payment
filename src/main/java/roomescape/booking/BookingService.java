@@ -45,7 +45,7 @@ public class BookingService {
 
     @Transactional
     public void deleteReservationById(final Long id) {
-        Reservation oldReservation = reservationService.getById(id);
+        Reservation oldReservation = reservationService.getByIdForUpdate(id);
         reservationService.deleteById(id);
 
         Schedule schedule = oldReservation.getSchedule();

@@ -28,7 +28,7 @@ public class WaitingService {
 
     @Transactional
     public void deleteById(final Long id, LoginMember member) {
-        Waiting waiting = getById(id);
+        Waiting waiting = getByIdForUpdate(id);
         validateAuthorization(member, waiting);
         waitingRepository.delete(waiting);
         log.info("EVENT: WAITING_DELETED_BY_MEMBER, id={}, memberId={}, themeId={}, date={}, time={}",
@@ -41,7 +41,7 @@ public class WaitingService {
 
     @Transactional
     public void deleteByIdForAdmin(final Long id) {
-        Waiting waiting = getById(id);
+        Waiting waiting = getByIdForUpdate(id);
         waitingRepository.delete(waiting);
         log.info("EVENT: WAITING_DELETED_BY_ADMIN, id={}, memberId={}, themeId={}, date={}, time={}",
                 waiting.getId(),
@@ -89,8 +89,8 @@ public class WaitingService {
         }
     }
 
-    private Waiting getById(final Long id) {
-        return waitingRepository.findById(id)
+    private Waiting getByIdForUpdate(final Long id) {
+        return waitingRepository.findByIdForUpdate(id)
                 .orElseThrow(WaitingNotFoundException::new);
     }
 }

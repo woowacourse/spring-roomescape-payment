@@ -28,9 +28,9 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public Reservation getById(final Long id) {
-        return reservationRepository.findById(id)
+    @Transactional
+    public Reservation getByIdForUpdate(final Long id) {
+        return reservationRepository.findByIdForUpdate(id)
                 .orElseThrow(ReservationNotFoundException::new);
     }
 
@@ -71,7 +71,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteById(final Long id) {
-        Reservation reservation = getById(id);
+        Reservation reservation = getByIdForUpdate(id);
         validateReservationStatusForDeletion(reservation);
 
         reservationRepository.deleteById(id);

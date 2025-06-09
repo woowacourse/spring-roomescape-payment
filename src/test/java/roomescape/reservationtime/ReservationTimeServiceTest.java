@@ -210,7 +210,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById1() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.of(reservationTime));
             given(reservationService.existsByReservationTime(reservationTime))
                     .willReturn(false);
@@ -227,7 +227,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById2() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -241,7 +241,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById3() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.of(reservationTime));
             given(reservationService.existsByReservationTime(reservationTime))
                     .willReturn(true);

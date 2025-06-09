@@ -56,7 +56,7 @@ class BookingServiceTest {
         // given
         Waiting firstWaiting = waitingWithId(1L, new Waiting(schedule, member, LocalDateTime.now()));
         Reservation reservation = reservationWithId(1L, new Reservation(member, schedule));
-        given(reservationService.getById(1L)).willReturn(reservation);
+        given(reservationService.getByIdForUpdate(1L)).willReturn(reservation);
         given(waitingService.existsBySchedule(schedule)).willReturn(true);
         given(waitingService.findFirstWaitingOfSchedule(schedule)).willReturn(firstWaiting);
 
