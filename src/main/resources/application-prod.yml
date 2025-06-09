@@ -1,6 +1,6 @@
 spring:
   thymeleaf:
-    cache: false
+    cache: true
     prefix: classpath:/templates/
   jpa:
     show-sql: false

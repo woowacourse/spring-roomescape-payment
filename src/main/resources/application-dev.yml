@@ -25,3 +25,7 @@ spring:
   config:
     import: optional:classpath:application-secret.yml
 
+  logging:
+    level:
+      roomescape: DEBUG
+
