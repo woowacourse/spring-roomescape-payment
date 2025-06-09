@@ -32,11 +32,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(logInterceptor)
                 .order(1)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/h2-console", "/js/**", "/image/**", "/css/**");
+                .excludePathPatterns("/h2-console", "/js/**", "/image/**", "/css/**", "/docs/**");
 
         registry.addInterceptor(authorizationInterceptor)
                 .order(2)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/h2-console", "/js/**", "/image/**", "/css/**");
+                .excludePathPatterns("/h2-console", "/js/**", "/image/**", "/css/**", "/docs/**");
     }
 }

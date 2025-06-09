@@ -52,6 +52,7 @@ test {
 }
 
 asciidoctor {
+    baseDirFollowsSourceDir()
     inputs.dir snippetsDir
     configurations 'asciidoctorExt'
     dependsOn test
