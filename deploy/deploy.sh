@@ -28,6 +28,28 @@ NC='\033[0m' # No Color
 # 함수 정의
 # ========================================
 
+# Git 업데이트 함수
+update_git_branch() {
+  log_info "🔄 Git 브랜치를 최신 상태로 업데이트합니다 (origin/step2 기준)"
+
+  cd $PROJECT_PATH
+
+  # 안전을 위해 현재 브랜치 확인
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  log_info "현재 브랜치: $CURRENT_BRANCH"
+
+  git fetch origin
+  git checkout -B step2 origin/step2
+
+  if git rebase origin/step2; then
+    log_info "✅ Git rebase 성공 (origin/step2)"
+  else
+    log_error "❌ Git rebase 실패 - 충돌이 발생했을 수 있습니다."
+    log_warn "수동으로 충돌 해결 후 다시 실행해 주세요."
+    exit 1
+  fi
+}
+
 # 환경변수 로딩
 load_env_file() {
   ENV_FILE="$(dirname "$0")/.env"
@@ -258,6 +280,9 @@ main() {
   log_info "========================================="
   log_info "Spring Boot 애플리케이션 배포를 시작합니다"
   log_info "========================================="
+
+  # -1. Git 최신 상태 동기화
+  update_git_branch
 
   # 0. 환경변수
   load_env_file
