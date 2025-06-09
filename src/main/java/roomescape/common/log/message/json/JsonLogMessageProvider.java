@@ -16,7 +16,11 @@ import roomescape.common.log.message.RequestInfo;
 public class JsonLogMessageProvider implements LogMessageProvider {
 
     private static final String REQUEST_MESSAGE_FORMAT = "REQUEST%n%s";
+    private static final String DEFAULT_REQUEST_MESSAGE = "Failed to write request log";
+
     private static final String RESPONSE_MESSAGE_FORMAT = "RESPONSE%n%s";
+    private static final String DEFAULT_RESPONSE_MESSAGE = "Failed to write response log";
+
     private static final DefaultPrettyPrinter DEFAULT_PRETTY_PRINTER = createPrettyPrinter();
     private final ObjectMapper objectMapper;
 
@@ -42,7 +46,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
                             .writeValueAsString(requestLogEntry)
             );
         } catch (JsonProcessingException e) {
-            return "Failed to write request log";
+            return DEFAULT_REQUEST_MESSAGE;
         }
     }
 
@@ -61,7 +65,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLogEntry)
             );
         } catch (JsonProcessingException e) {
-            return "Failed to write response log";
+            return DEFAULT_RESPONSE_MESSAGE;
         }
     }
 }
