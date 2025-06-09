@@ -101,6 +101,10 @@ public class LogAspect {
 
     private String getCookies(final HttpServletRequest request) {
         final Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return "{}";
+        }
+
         final Map<String, Object> cookieMap = new LinkedHashMap<>();
         for (Cookie cookie : cookies) {
             cookieMap.put(cookie.getName(), cookie.getValue());
