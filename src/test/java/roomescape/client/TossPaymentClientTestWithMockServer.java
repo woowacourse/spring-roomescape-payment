@@ -48,7 +48,7 @@ class TossPaymentClientTestWithMockServer {
     void setUp() {
         mockServer = MockRestServiceServer.bindTo(builder).build();
         RestClient client = builder.build();
-        tossPaymentClient = new TossPaymentClient(client, SECRET_KEY);
+        tossPaymentClient = new TossPaymentClient(client);
     }
 
     @Test
