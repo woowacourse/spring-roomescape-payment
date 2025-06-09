@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.global.auth.JwtTokenProvider;
-import roomescape.global.config.interceptor.CheckAdminInterceptor;
+import roomescape.global.interceptor.CheckAdminInterceptor;
 import roomescape.global.config.resolver.LoginMemberArgumentResolver;
 
 @Configuration

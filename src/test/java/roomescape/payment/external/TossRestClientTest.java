@@ -13,7 +13,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequestDto;
 import roomescape.payment.dto.PaymentResponseDto;
-import roomescape.payment.exception.InvalidPaymentException;
+import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,7 +40,12 @@ class TossRestClientTest {
     void approvePayment() {
         server.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-                .andRespond(MockRestResponseCreators.withSuccess());
+                .andRespond(MockRestResponseCreators.withSuccess(
+                        """
+                                {"paymentKey": "paymentKey_test", "orderId": "orderId123","totalAmount": 10000}
+                                """,
+                        MediaType.APPLICATION_JSON
+                ));
 
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000);
 
@@ -96,7 +101,7 @@ class TossRestClientTest {
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000);
 
         assertThatThrownBy(() -> tossRestClient.confirmPayment(paymentRequestDto))
-                .isInstanceOf(InvalidPaymentException.class)
+                .isInstanceOf(PaymentException.class)
                 .hasMessage("존재하지 않는 결제 정보 입니다.");
     }
 }

@@ -72,8 +72,6 @@ class ReservationPaymentFacadeTest {
                 1000
         );
 
-
-
         when(reservationService.add(any(ReservationRequestDto.class), eq(user)))
                 .thenReturn(reservationResponseDto);
 

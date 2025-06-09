@@ -4,14 +4,14 @@ import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
-public class PaymentServerException extends RuntimeException {
+public class PaymentServerException extends PaymentException {
 
     private static final String DEFAULT_MESSAGE = "일시적으로 결제 서비스를 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.";
 
     private final HttpStatusCode statusCode;
 
     public PaymentServerException(String message, HttpStatusCode statusCode) {
-        super(message);
+        super(message, statusCode);
         this.statusCode = statusCode;
     }
 
