@@ -43,8 +43,7 @@ public class ReservationCommandService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReservationResponse resisterReservation(final ReservationRequest request, final LoginMember loginMember) {
-        final ReservationTime reservationTime = timeRepository.findById(request.timeId())
-                .orElseThrow(() -> new NotFoundException("found"));
+        final ReservationTime reservationTime = findReservationTimeById(request.timeId());
         final Theme theme = findThemeById(request.themeId());
         final Member member = findMemberById(loginMember.id());
         return saveReservationInternal(request.date(), reservationTime, theme, member);
