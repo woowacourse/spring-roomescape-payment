@@ -33,6 +33,6 @@ LOG_DIR=logs
 mkdir -p $LOG_DIR
 LOG_FILE=$LOG_DIR/app.log
 
-nohup java -jar $JAR_NAME --server.port=8080 --server.address=0.0.0.0 > $LOG_FILE 2>&1 &
+nohup java -jar $JAR_NAME --spring.profiles.active=prod --server.port=8080 --server.address=0.0.0.0 > $LOG_FILE 2>&1 &
 
 echo "> Application started with PID: $!"
