@@ -1,11 +1,7 @@
 package roomescape.payment.infrastructure;
 
-import java.net.SocketTimeoutException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
@@ -46,7 +42,7 @@ public class TossPaymentService implements PaymentService {
         paymentRepository.save(payment);
 
         try {
-            paymentClientWithRetry(paymentRequest);
+            paymentClient.requestPayment(paymentRequest);
             payment.success();
         } catch (PaymentException e) {
             payment.fail();
@@ -54,15 +50,6 @@ public class TossPaymentService implements PaymentService {
         }
 
         return payment;
-    }
-
-    @Retryable(
-            value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000)
-    )
-    public void paymentClientWithRetry(PaymentRequest request) {
-        paymentClient.requestPayment(request);
     }
 
     public Payment await(final Reservation reservation) {

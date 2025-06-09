@@ -3,9 +3,7 @@ package roomescape.payment.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -20,10 +18,8 @@ import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentDataRequest;
-import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
-import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.theme.domain.Theme;
 
@@ -138,25 +134,5 @@ class TossPaymentServiceTest {
 
         // then
         assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);
-    }
-
-    @Test
-    void 결제_요청이_실패하면_3번_재시도한다() {
-        // given
-        final PaymentRequest paymentRequest = new TossPaymentRequest(
-                BigDecimal.valueOf(1000),
-                "retryId",
-                "retryKey"
-        );
-        when(paymentClient.requestPayment(any())).thenThrow(
-                new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
-
-        // when & then
-        assertThatThrownBy(() -> paymentService.paymentClientWithRetry(paymentRequest))
-                .isInstanceOf(TossPaymentException.class)
-                .hasMessage("재시도 테스트 실패");
-
-        // 재시도 횟수 검증
-        verify(paymentClient, times(3)).requestPayment(any());
     }
 }
