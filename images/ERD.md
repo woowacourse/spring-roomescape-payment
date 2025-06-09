@@ -1,3 +1,0 @@
-# ERD
-
-![ERD](../ERD.png)
