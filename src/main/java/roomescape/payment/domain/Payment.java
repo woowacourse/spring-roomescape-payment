@@ -1,6 +1,7 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,14 +20,14 @@ public class Payment {
     @Column(name = "payment_id")
     private Long id;
 
-    @Column(name = "payment_key", nullable = false)
-    private String paymentKey;
+    @Embedded
+    private PaymentKey paymentKey;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
+    @Embedded
+    private OrderId orderId;
 
-    @Column(name = "amount", nullable = false)
-    private Long amount;
+    @Embedded
+    private Amount amount;
 
     @Column(name = "payment_type", nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -40,9 +41,9 @@ public class Payment {
     }
 
     public Payment(final String paymentKey, final String orderId, final Long amount, final PaymentType paymentType) {
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
-        this.amount = amount;
+        this.paymentKey = PaymentKey.from(paymentKey);
+        this.orderId = OrderId.from(orderId);
+        this.amount = Amount.from(amount);
         this.paymentType = paymentType;
     }
 
@@ -65,15 +66,15 @@ public class Payment {
     }
 
     public String getPaymentKey() {
-        return paymentKey;
+        return paymentKey.value();
     }
 
     public String getOrderId() {
-        return orderId;
+        return orderId.value();
     }
 
     public Long getAmount() {
-        return amount;
+        return amount.value();
     }
 
     public PaymentType getPaymentType() {
