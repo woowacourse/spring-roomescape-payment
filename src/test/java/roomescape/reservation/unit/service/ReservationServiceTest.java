@@ -311,7 +311,7 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(member));
         when(reservationRepository.findAllByMember(member))
                 .thenReturn(inDbReservations);
-        when(waitingService.getWaitingWithRanksByMemberId(anyLong()))
+        when(waitingService.findWaitingWithRanksByMember(any()))
                 .thenReturn(List.of());
 
         // when

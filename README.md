@@ -1,37 +1,75 @@
-# 방탈출 결제 / 배포
+# 방탈출 예약 시스템
 
-## 신규 기능
+## 기능
 
-- [x] 사용자가 날짜, 테마, 시간을 선택하고 `결제`를 해야 예약 가능하다.
-- [x] 결제 기능은 외부의 결제 서비스를 사용하여 `외부의 결제 API`를 연동한다.
-    - 토스 결제 API
-- [x] 결제 승인 API 호출에 실패 한 경우, 에러를 핸들링 한다.
-    - [x] 사용자에게 결제 실패 사유를 제공한다.
+## 💾 ERD
 
-## 예외 처리
+![erd.png](src/main/resources/static/image/erd.png)
 
-- [x] 클라이언트 에러
-  - 외부 api 에서 던지는 4xx 예외에 해당한다. 
-- [x] 서버 에러
-  - 외부 api 에서 던지는 5xx 예외에 해당한다.  
+## 📌 API 목록
 
-## API
+### 📋 [Swagger API 문서](http://13.209.80.122:8080/swagger-ui/index.html)
 
-### 결제 승인 API
-- request
-```
-POST /reservations HTTP/1.1
-content-type: application/json
-cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
-host: localhost:8080
+### 🔐 Auth 관련
+| Method | Endpoint         | 설명       |
+|--------|------------------|------------|
+| POST   | /auth/login      | 로그인     |
+| POST   | /auth/logout     | 로그아웃   |
+| GET    | /auth/check      | 로그인 상태 확인 |
 
-{
-  date: reservationData.date,
-  themeId: reservationData.themeId,
-  timeId: reservationData.timeId,
-  paymentKey: paymentData.paymentKey,
-  orderId: paymentData.orderId,
-  amount: paymentData.amount,
-  paymentType: paymentData.paymentType,
-}
-```
+### 👤 Member 관련
+| Method | Endpoint         | 설명         |
+|--------|------------------|--------------|
+| POST   | /members         | 회원 가입    |
+| GET    | /members         | 회원 목록 조회 |
+| DELETE | /members/{id}    | 회원 삭제    |
+
+### 📅 Reservation 관련
+| Method | Endpoint               | 설명               |
+|--------|------------------------|--------------------|
+| POST   | /reservations          | 예약 생성          |
+| GET    | /reservations          | 전체 예약 조회     |
+| GET    | /reservations/mine     | 내 예약 조회       |
+| DELETE | /reservations/{id}     | 예약 삭제          |
+| GET    | /reservations/filtered | 필터된 예약 조회   |
+
+### 🛠 Admin Reservation
+| Method | Endpoint               | 설명            |
+|--------|------------------------|-----------------|
+| POST   | /admin/reservations    | 관리자 예약 생성 |
+
+### ⏰ ReservationTime 관련
+| Method | Endpoint               | 설명                   |
+|--------|------------------------|------------------------|
+| POST   | /times                 | 예약 시간 추가         |
+| GET    | /times                 | 예약 시간 목록 조회    |
+| GET    | /times/available-times| 사용 가능한 시간 조회  |
+| DELETE | /times/{id}           | 예약 시간 삭제         |
+
+### 🎭 Theme 관련
+| Method | Endpoint         | 설명             |
+|--------|------------------|------------------|
+| POST   | /themes          | 테마 생성        |
+| GET    | /themes          | 테마 목록 조회   |
+| GET    | /themes/popular  | 인기 테마 조회   |
+| DELETE | /themes/{id}     | 테마 삭제        |
+
+### ⏳ Waiting 관련
+| Method | Endpoint               | 설명              |
+|--------|------------------------|-------------------|
+| POST   | /waitings              | 대기 등록         |
+| GET    | /waitings              | 대기 목록 조회     |
+| POST   | /waitings/accept/{id}  | 대기 수락         |
+| DELETE | /waitings/{id}         | 대기 삭제         |
+
+### 🖥 View (프론트엔드 페이지 라우팅)
+| Method | Endpoint              | 설명                     |
+|--------|-----------------------|--------------------------|
+| GET    | /login                | 로그인 페이지            |
+| GET    | /reservation          | 예약 페이지              |
+| GET    | /reservation-mine     | 내 예약 페이지           |
+| GET    | /admin                | 관리자 메인 페이지       |
+| GET    | /admin/reservation    | 관리자 예약 관리 페이지  |
+| GET    | /admin/time           | 관리자 시간 관리 페이지  |
+| GET    | /admin/theme          | 관리자 테마 관리 페이지  |
+| GET    | /admin/waiting        | 관리자 대기 관리 페이지  |
