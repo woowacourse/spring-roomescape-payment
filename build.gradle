@@ -45,9 +45,16 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.3'
 }
 
+def snippetsDir = file('build/generated-snippets')
+
 asciidoctor {
+    inputs.dir snippetsDir
     dependsOn test
     configurations 'asciidoctorExt'
+
+    attributes(
+            'snippets': snippetsDir
+    )
 }
 
 test {
@@ -62,7 +69,6 @@ bootJar {
 }
 
 tasks.register('copyApiDocument', Copy) {
-    dependsOn asciidoctor
     doFirst {
         delete file("src/main/resources/static/docs")
     }
@@ -71,5 +77,10 @@ tasks.register('copyApiDocument', Copy) {
 }
 
 build {
+    dependsOn asciidoctor
     dependsOn copyApiDocument
+}
+
+tasks.named('processResources') {
+    dependsOn(tasks.named('copyApiDocument'))
 }
