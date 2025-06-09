@@ -28,12 +28,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/js/",
             "/images/",
             "/favicon.ico",
-            "/docs/"
+            "/docs/",
+            "/actuator/health"
     );
 
     private static final List<String> WHITELIST = List.of(
             "/login",
-            "/logout",
             "/signup",
             "/h2-console"
     );

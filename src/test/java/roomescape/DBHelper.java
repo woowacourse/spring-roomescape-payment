@@ -33,9 +33,6 @@ public class DBHelper {
         if(reservation.getId() == null) {
             em.persist(reservation);
         }
-        if(reservation.getId() == null) {
-            em.persist(reservation);
-        }
         em.flush();
 
         return reservation;
@@ -50,9 +47,6 @@ public class DBHelper {
         }
         if(waiting.getTheme().getId() == null) {
             em.persist(waiting.getTheme());
-        }
-        if(waiting.getId() == null) {
-            em.persist(waiting);
         }
         if(waiting.getId() == null) {
             em.persist(waiting);

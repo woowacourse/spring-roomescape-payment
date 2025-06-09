@@ -34,3 +34,8 @@ logging:
   level:
     root: INFO
     org.hibernate.SQL: WARN
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
