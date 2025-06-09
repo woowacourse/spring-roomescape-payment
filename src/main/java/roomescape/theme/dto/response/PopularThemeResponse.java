@@ -1,4 +1,14 @@
 package roomescape.theme.dto.response;
 
-public record PopularThemeResponse(String name, String thumbnail, String description) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "인기 테마 응답")
+
+public record PopularThemeResponse(
+        @Schema(description = "테마 이름", example = "기본 테마")
+        String name,
+        @Schema(description = "테마 썸네일", example = "https://example.com/thumbnail.jpg")
+        String thumbnail,
+        @Schema(description = "테마 설명", example = "기본 테마입니다.")
+        String description) {
 }

@@ -8,7 +8,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
-import roomescape.member.docs.LoginMemberDocs;
+import roomescape.member.dto.request.LoginMember;
 
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -24,17 +24,17 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
         boolean hasAnnotation = parameter.hasParameterAnnotation(Login.class);
-        boolean hasLoginMemberType = LoginMemberDocs.class.isAssignableFrom(parameter.getParameterType());
+        boolean hasLoginMemberType = LoginMember.class.isAssignableFrom(parameter.getParameterType());
 
         return hasAnnotation && hasLoginMemberType;
     }
 
     @Override
-    public LoginMemberDocs resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                           final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
+    public LoginMember resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+                                       final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = tokenCookieManager.extractTokenFromCookie(request);
         Long memberId = tokenContainer.getMemberId(token);
-        return new LoginMemberDocs(memberId);
+        return new LoginMember(memberId);
     }
 }

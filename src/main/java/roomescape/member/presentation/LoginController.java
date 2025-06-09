@@ -8,10 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.util.TokenCookieManager;
-import roomescape.member.adaptor.MemberApiAdaptor;
-import roomescape.member.docs.LoginCheckResponseDocs;
-import roomescape.member.docs.LoginMemberDocs;
-import roomescape.member.docs.LoginRequestDocs;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.dto.request.LoginRequest;
 import roomescape.member.dto.response.LoginCheckResponse;
@@ -22,31 +18,24 @@ public class LoginController {
 
     private final TokenCookieManager tokenCookieManager;
     private final LoginService loginService;
-    private final MemberApiAdaptor memberApiAdaptor;
 
-    public LoginController(final TokenCookieManager tokenCookieManager, final LoginService loginService, final MemberApiAdaptor memberApiAdaptor) {
+    public LoginController(final TokenCookieManager tokenCookieManager, final LoginService loginService) {
         this.tokenCookieManager = tokenCookieManager;
         this.loginService = loginService;
-        this.memberApiAdaptor = memberApiAdaptor;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequestDocs requestDocs, HttpServletResponse response) {
-        LoginRequest request = memberApiAdaptor.toLoginRequest(requestDocs);
-
+    public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         String token = loginService.loginAndReturnToken(request);
         tokenCookieManager.addTokenCookie(response, token);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/login/check")
-    public ResponseEntity<LoginCheckResponseDocs> loginCheck(@Login LoginMemberDocs memberDocs) {
-        LoginMember loginMember = memberApiAdaptor.toLoginMember(memberDocs);
-
+    public ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember loginMember) {
         String memberName = loginService.findMemberName(loginMember.id());
         LoginCheckResponse loginCheckResponse = new LoginCheckResponse(memberName);
-        LoginCheckResponseDocs loginCheckResponseDocs = memberApiAdaptor.toLoginCheckResponseDocs(loginCheckResponse);
-        return ResponseEntity.ok().body(loginCheckResponseDocs);
+        return ResponseEntity.ok().body(loginCheckResponse);
     }
 
     @PostMapping("/logout")
