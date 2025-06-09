@@ -16,6 +16,9 @@ import roomescape.global.auth.annotation.AuthenticationPrincipal;
 import roomescape.global.auth.annotation.RoleRequired;
 import roomescape.global.auth.dto.LoginMember;
 import roomescape.member.entity.RoleType;
+import roomescape.reservation.dto.request.ReservationCreateRequest;
+import roomescape.reservation.dto.response.ReservationCreateResponse;
+import roomescape.reservation.service.ReservationService;
 import roomescape.waiting.dto.request.WaitingCreateRequest;
 import roomescape.waiting.dto.response.WaitingCreateResponse;
 import roomescape.waiting.dto.response.WaitingReadResponse;
@@ -27,6 +30,7 @@ import roomescape.waiting.service.WaitingService;
 public class WaitingController {
 
     private final WaitingService waitingService;
+    private final ReservationService reservationService;
 
     @PostMapping
     @RoleRequired(roleType = {RoleType.ADMIN, RoleType.USER})
@@ -61,5 +65,16 @@ public class WaitingController {
     ) {
         waitingService.deleteWaiting(id, loginMember);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/approve/{id}")
+    public ResponseEntity<ReservationCreateResponse> approveWaiting(
+            @PathVariable("id") long id,
+            @AuthenticationPrincipal LoginMember loginMember,
+            @RequestBody @Valid ReservationCreateRequest request
+    ) {
+        waitingService.approve(id);
+        ReservationCreateResponse response = reservationService.createReservation(loginMember.id(), request);
+        return ResponseEntity.ok().body(response);
     }
 }

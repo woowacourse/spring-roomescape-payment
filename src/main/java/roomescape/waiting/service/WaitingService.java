@@ -10,6 +10,7 @@ import roomescape.global.error.exception.ForbiddenException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
@@ -29,6 +30,7 @@ public class WaitingService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
     private final ReservationSlotRepository reservationSlotRepository;
+    private final PaymentService paymentService;
 
     public WaitingCreateResponse createWaiting(LoginMember loginMember, WaitingCreateRequest request) {
         ReservationSlot reservationSlot = reservationSlotRepository.findByDateAndTimeIdAndThemeId(
@@ -114,5 +116,13 @@ public class WaitingService {
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버 입니다."));
+    }
+
+    public void approve(long id) {
+        Waiting waiting = getWaitingById(id);
+        if (! waiting.isApprove()) {
+            throw new IllegalArgumentException("[ERROR] 현재 대기 번호 1번이 아닙니다. 대기 승인 후 다시 시도해 주세요.");
+        }
+        waitingRepository.delete(waiting);
     }
 }

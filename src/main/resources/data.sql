@@ -33,7 +33,11 @@ VALUES (1000, 1, '12345'),
        (1000, 2, '12345');
 
 INSERT INTO reservation(reservation_slot_id, member_id, payment_id)
+
 VALUES (1, 1, 1),
        (2, 1, 2),
        (3, 1, 3),
        (4, 2, 4);
+
+INSERT INTO waiting(member_id, reservation_slot_id, status)
+VALUES (1, 4, 'APPROVE');

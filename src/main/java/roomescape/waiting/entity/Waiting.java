@@ -1,5 +1,6 @@
 package roomescape.waiting.entity;
 
+import static roomescape.waiting.entity.ApprovalStatus.APPROVE;
 import static roomescape.waiting.entity.ApprovalStatus.REJECT;
 
 import jakarta.persistence.Entity;
@@ -45,5 +46,9 @@ public class Waiting {
 
     public boolean matchesMemberById(Long id) {
         return member.matchesId(id);
+    }
+
+    public boolean isApprove() {
+        return status == APPROVE;
     }
 }
