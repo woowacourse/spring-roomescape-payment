@@ -37,18 +37,15 @@ record RequestLogEntry(
     }
 
     private record HandlerArgument(
+            Class<?> clazz,
             String name,
             Object value
     ) {
         private static HandlerArgument fromArgumentEntry(final Entry<String, Object> argumentEntry) {
-            final String name = formatName(argumentEntry.getKey(), argumentEntry.getValue());
+            final String name = argumentEntry.getKey();
             final Object value = argumentEntry.getValue();
 
-            return new HandlerArgument(name, value);
-        }
-
-        private static String formatName(final String name, final Object value) {
-            return String.format("%s %s", value.getClass().getSimpleName(), name);
+            return new HandlerArgument(value.getClass(), name, value);
         }
     }
 }
