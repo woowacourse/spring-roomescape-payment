@@ -15,12 +15,12 @@
 
 - **본문**
     
-  |      필드       | 예시 값  |      설명      |
-  |:-------------:|:-----:|:------------:|
-  | reservationId |   1   | 결제하려는 예약의 ID |
-  |  paymentKey   | abcd  |   결제 식별 키    |
-  |    orderId    |  xyz  |   주문 식별 번호   |
-  |    amount     | 10000 |    결제할 금액    |
+  |      필드       |  자료형   |  예시 값  |      설명      |
+  |:-------------:|:------:|:------:|:------------:|
+  | reservationId | Number |   1    | 결제하려는 예약의 ID |
+  |  paymentKey   | String | "abcd" |   결제 식별 키    |
+  |    orderId    | String | "xyz"  |   주문 식별 번호   |
+  |    amount     | Number | 10000  |    결제할 금액    |
 
 ### Response
 
