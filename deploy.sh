@@ -40,7 +40,7 @@ else
 fi
 
 echo ">> 배포: $JAR_PATH"
-nohup java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar &
+nohup java -jar $JAR_PATH > application.log 2>&1 &
 
 sleep 3
 NEW_PID=$(pgrep -f $JAR_NAME)
