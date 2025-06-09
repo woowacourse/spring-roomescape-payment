@@ -20,6 +20,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         FROM Reservation r
         JOIN FETCH Payment p
         ON r.id = p.reservationId
+        WHERE r.member.id = :memberId
     """)
     List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId);
 
