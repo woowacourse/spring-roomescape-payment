@@ -1,7 +1,8 @@
 # 🚪방탈출 애플리케이션
 
-`RoomescapeApplication`에서 실행 가능합니다.
-
+- `RoomescapeApplication`에서 실행 가능합니다.
+- `3.35.53.56/8080` 에서도 확인 가능합니다.
+- `3.35.53.56/8080/swagger-ui/index.html#/`에서 API 명세를 확인할 수 있습니다.
 ### 관리자 페이지
 
 * http://localhost:8080/admin/time: 사용자가 예약할 수 있는 시간 관리 페이지
