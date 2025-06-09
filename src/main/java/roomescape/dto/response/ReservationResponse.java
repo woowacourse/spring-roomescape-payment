@@ -1,13 +1,24 @@
 package roomescape.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import roomescape.domain.Reservation;
 
+@Schema(description = "예약 응답 객체")
 public record ReservationResponse(
+        @Schema(description = "예약 ID", example = "1")
         Long id,
+
+        @Schema(description = "회원 이름", example = "John Doe")
         String memberName,
+
+        @Schema(description = "예약 날짜", example = "2023-12-01")
         LocalDate date,
+
+        @Schema(description = "예약 시간 정보")
         ReservationTimeResponse time,
+
+        @Schema(description = "테마 이름", example = "Escape the Dungeon")
         String themeName
 ) {
     public static ReservationResponse from(Reservation reservation) {
