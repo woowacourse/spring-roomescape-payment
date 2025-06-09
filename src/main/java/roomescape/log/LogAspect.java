@@ -4,7 +4,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -49,8 +48,13 @@ public class LogAspect {
 
     @Around("controller()")
     public Object logRequestInfo(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(
-                RequestContextHolder.getRequestAttributes())).getRequest();
+        final ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            log.debug("[REQUEST] No request context available");
+            return joinPoint.proceed();
+        }
+        final HttpServletRequest request = attributes.getRequest();
 
         try {
             final String method = request.getMethod();
@@ -68,7 +72,7 @@ public class LogAspect {
             logMap.put("role", getRole(request));
             logMap.put("cookies", getCookies(request));
 
-            log.info("[REQUEST] {{}}", formatLogMap(logMap));
+            log.info("[REQUEST] {}", formatLogMap(logMap));
         } catch (Exception e) {
             log.error("[ERROR] ", e);
         }
