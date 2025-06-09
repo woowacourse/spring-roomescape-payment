@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.LoginId;
+import roomescape.global.logging.LogContent;
 import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -36,8 +38,8 @@ public class ReservationController {
 
     @LogExecution(
             description = "예약 생성 (결제 포함)",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
     )
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservation(
@@ -48,8 +50,8 @@ public class ReservationController {
 
     @LogExecution(
             description = "예약 취소",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.WARN
+            content = {LogContent.REQUEST, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.WARN
     )
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> removeReservation(@PathVariable(name = "id") long id) {
@@ -59,8 +61,8 @@ public class ReservationController {
 
     @LogExecution(
             description = "관리자 예약 생성",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
     )
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationForAdmin(@RequestBody AdminReservationPaymentRequest request) {
@@ -70,8 +72,8 @@ public class ReservationController {
 
     @LogExecution(
             description = "관리자 예약 목록 조회 (필터)",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.DEBUG,
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG,
             maskSensitiveData = false
     )
     @GetMapping("/admin/reservations")
@@ -87,8 +89,8 @@ public class ReservationController {
 
     @LogExecution(
             description = "내 예약 목록 조회",
-            content = {LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.DEBUG
+            content = {LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG
     )
     @GetMapping("/members/reservations")
     public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(@LoginId final Long memberId) {

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.logging.LogContent;
 import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.theme.dto.ReservationThemeRequest;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.theme.service.ReservationThemeService;
@@ -37,8 +39,8 @@ public class ReservationThemeController {
 
     @LogExecution(
             description = "테마 생성",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO,
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO,
             maskSensitiveData = false
     )
     @PostMapping()
@@ -49,8 +51,8 @@ public class ReservationThemeController {
 
     @LogExecution(
             description = "테마 삭제",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.WARN,
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.WARN,
             maskSensitiveData = false
     )
     @DeleteMapping("/{id}")

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import roomescape.global.logging.LogContent;
 import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginRequest;
 import roomescape.member.service.AuthService;
@@ -27,8 +29,8 @@ public class LoginController {
 
     @LogExecution(
             description = "사용자 로그인",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO
+            content = {LogContent.REQUEST, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
     )
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody final LoginRequest loginRequest, final HttpSession session) {
@@ -41,8 +43,8 @@ public class LoginController {
 
     @LogExecution(
             description = "사용자 로그아웃",
-            content = {LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME},
-            level = LogExecution.LogLevel.INFO
+            content = {LogContent.USER_ACTION, LogContent.EXECUTION_TIME},
+            level = LogLevel.INFO
     )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpSession session) {

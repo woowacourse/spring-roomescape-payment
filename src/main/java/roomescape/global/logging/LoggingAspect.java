@@ -3,6 +3,10 @@ package roomescape.global.logging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -12,11 +16,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 @Aspect
 @Component
@@ -100,10 +99,10 @@ public class LoggingAspect {
             String logMessage = formatLogMessage(logData);
             
             switch (logExecution.level()) {
-                case DEBUG -> log.debug(logMessage);
-                case INFO -> log.info(logMessage);
-                case WARN -> log.warn(logMessage);
-                case ERROR -> log.error(logMessage);
+                case LogLevel.DEBUG -> log.debug(logMessage);
+                case LogLevel.INFO -> log.info(logMessage);
+                case LogLevel.WARN -> log.warn(logMessage);
+                case LogLevel.ERROR -> log.error(logMessage);
             }
         }
     }

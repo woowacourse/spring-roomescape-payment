@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.logging.LogContent;
 import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.time.dto.AvailableReservationTimeResponse;
 import roomescape.time.dto.ReservationTimeRequest;
 import roomescape.time.dto.ReservationTimeResponse;
@@ -36,8 +38,8 @@ public class ReservationTimeController {
 
     @LogExecution(
             description = "예약 가능한 시간 조회",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.DEBUG,
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG,
             maskSensitiveData = false
     )
     @GetMapping("/available-times")
@@ -50,8 +52,8 @@ public class ReservationTimeController {
 
     @LogExecution(
             description = "예약 시간 생성",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO,
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO,
             maskSensitiveData = false
     )
     @PostMapping()
@@ -62,8 +64,8 @@ public class ReservationTimeController {
 
     @LogExecution(
             description = "예약 시간 삭제",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.WARN,
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.WARN,
             maskSensitiveData = false
     )
     @DeleteMapping("/{id}")

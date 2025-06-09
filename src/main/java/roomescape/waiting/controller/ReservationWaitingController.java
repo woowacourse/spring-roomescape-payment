@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.LoginId;
+import roomescape.global.logging.LogContent;
 import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.waiting.dto.AdminReservationWaitingResponse;
 import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
@@ -26,8 +28,8 @@ public class ReservationWaitingController {
 
     @LogExecution(
             description = "예약 대기 등록",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO,
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO,
             maskSensitiveData = false
     )
     @PostMapping("/reservations-waiting")
@@ -39,8 +41,8 @@ public class ReservationWaitingController {
 
     @LogExecution(
             description = "예약 대기 취소",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.USER_ACTION, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.INFO,
+            content = {LogContent.REQUEST, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO,
             maskSensitiveData = false
     )
     @DeleteMapping("/reservations-waiting/{id}")
@@ -51,8 +53,8 @@ public class ReservationWaitingController {
 
     @LogExecution(
             description = "관리자 예약 대기 목록 조회",
-            content = {LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.DEBUG,
+            content = {LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG,
             maskSensitiveData = false
     )
     @GetMapping("/admin/reservations-waiting")
@@ -62,8 +64,8 @@ public class ReservationWaitingController {
 
     @LogExecution(
             description = "관리자 예약 대기 삭제",
-            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
-            level = LogExecution.LogLevel.WARN,
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.WARN,
             maskSensitiveData = false
     )
     @DeleteMapping("/admin/reservations-waiting/{id}")
