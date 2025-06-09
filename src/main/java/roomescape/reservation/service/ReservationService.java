@@ -142,12 +142,12 @@ public class ReservationService {
                 firstWaiting.getDate(),
                 firstWaiting.getTime(),
                 firstWaiting.getTheme(),
-                null // TODO:대기 예약은 결제 시스템이 없기 때문에 null로 둠
+                null // TODO:대기 예약은 결제 시스템이 없기 때문에 `null`로 둠
         );
         reservationRepository.save(newReservation);
 
         waitingRepository.delete(firstWaiting);
-        log.info("대기자 예약 처리 완료: newReservationId={}", newReservation.getId());
+        log.info("대기자 예약 처리 완료: memberId = {}, newReservationId = {}", newReservation.getMemberId(), newReservation.getId());
     }
 
     @Transactional(readOnly = true)
