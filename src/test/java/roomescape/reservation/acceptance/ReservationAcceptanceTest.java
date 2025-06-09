@@ -7,6 +7,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
@@ -101,7 +104,7 @@ class ReservationAcceptanceTest {
     }
 
     @Test
-    @DisplayName("예약 생성 - 성공")
+    @DisplayName("사용자 예약 생성 - 성공")
     void createReservation() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
@@ -123,7 +126,7 @@ class ReservationAcceptanceTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(reservationRequest)
-                .filter(document("reservations",
+                .filter(document("reservations-post-success",
                         requestFields( // 요청 필드 문서화
                                 fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
                                 fieldWithPath("timeId").description("예약 시간의 ID"),
@@ -148,20 +151,51 @@ class ReservationAcceptanceTest {
                 .body("date", equalTo(tomorrow.toString()))
                 .body("startAt", equalTo(reservationTime.getStartAt().toString()))
                 .body("themeName", equalTo(theme.getName()));
-
-        /*
-        // TODO: 테스트 헬퍼 코드를 계속 사용할지 고민.
-        TestHelper.postWithToken("/reservations", reservationRequest, token)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("date", equalTo(tomorrow.toString()))
-                .body("startAt", equalTo(reservationTime.getStartAt().toString()))
-                .body("themeName", equalTo(theme.getName()));
-         */
     }
 
     @Test
-    @DisplayName("예약 생성 - 중복 예약으로 실패")
+    @DisplayName("사용자 예약 생성 - 실패 - 로그인 정보 없음")
+    void createReservationWithoutLogin() {
+        // given
+        var reservationRequest = new ReservationCreateRequest(
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
+                new PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
+        );
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .body(reservationRequest)
+                .filter(document("reservations-post-fail-without-login",
+                        requestFields( // 요청 필드 문서화
+                                fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
+                                fieldWithPath("timeId").description("예약 시간의 ID"),
+                                fieldWithPath("themeId").description("테마의 ID"),
+                                fieldWithPath("payment.paymentKey").description("결제 고유 키 (Toss Payments)"),
+                                fieldWithPath("payment.orderId").description("주문 ID (Toss Payments)"),
+                                fieldWithPath("payment.amount").description("결제 금액 (Toss Payments)"),
+                                fieldWithPath("payment.paymentType").description("결제 타입 (Toss Payments, 예: NORMAL)")
+                        ),
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("message").description("에러 메시지")
+                        )
+                ))
+                .when()
+                .post("/reservations")
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    @DisplayName("사용자 예약 생성 - 실패 - 중복 예약 생성 요청")
     void createDuplicateReservation() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
@@ -179,128 +213,33 @@ class ReservationAcceptanceTest {
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
         // when & then
-        TestHelper.postWithToken("/reservations", reservationRequest, token)
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(reservationRequest)
+                .filter(document("reservations-post-fail-duplicate",
+                        requestFields( // 요청 필드 문서화
+                                fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
+                                fieldWithPath("timeId").description("예약 시간의 ID"),
+                                fieldWithPath("themeId").description("테마의 ID"),
+                                fieldWithPath("payment.paymentKey").description("결제 고유 키 (Toss Payments)"),
+                                fieldWithPath("payment.orderId").description("주문 ID (Toss Payments)"),
+                                fieldWithPath("payment.amount").description("결제 금액 (Toss Payments)"),
+                                fieldWithPath("payment.paymentType").description("결제 타입 (Toss Payments, 예: NORMAL)")
+                        ),
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("message").description("에러 메시지")
+                        )
+                ))
+                .when()
+                .post("/reservations")
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value());
     }
 
     @Test
-    @DisplayName("모든 예약 조회")
-    void getAllReservations() {
-        // given
-        String token = TestHelper.login(member.getEmail(), member.getPassword());
-        var reservationRequest = new ReservationCreateRequest(
-                tomorrow,
-                reservationTime.getId(),
-                theme.getId(),
-                new PaymentDetail(
-                        payment.getPaymentKey(),
-                        payment.getOrderId(),
-                        payment.getAmount(),
-                        payment.getPaymentType()
-                )
-        );
-        TestHelper.postWithToken("/reservations", reservationRequest, token);
-
-        // when & then
-        TestHelper.getWithToken("/admin/reservations", token)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("$", hasSize(1))
-                .body("[0].date", equalTo(tomorrow.toString()))
-                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
-                .body("[0].memberName", equalTo(member.getName()))
-                .body("[0].themeName", equalTo(theme.getName()));
-    }
-
-    @Test
-    @DisplayName("예약 삭제")
-    void deleteReservation() {
-        // given
-        String token = TestHelper.login(member.getEmail(), member.getPassword());
-        var reservationRequest = new ReservationCreateRequest(
-                tomorrow,
-                reservationTime.getId(),
-                theme.getId(),
-                new PaymentDetail(
-                        payment.getPaymentKey(),
-                        payment.getOrderId(),
-                        payment.getAmount(),
-                        payment.getPaymentType()
-                )
-        );
-        TestHelper.postWithToken("/reservations", reservationRequest, token);
-
-        // when & then
-        TestHelper.deleteWithToken("/admin/reservations/1", token)
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-
-        TestHelper.getWithToken("/admin/reservations", token)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("$", hasSize(0));
-    }
-
-    @Test
-    @DisplayName("예약 조회 - 필터링 성공")
-    void getFilteredReservations() {
-        // given
-        String token = TestHelper.login(member.getEmail(), member.getPassword());
-        var reservationRequest = new ReservationCreateRequest(
-                tomorrow,
-                reservationTime.getId(),
-                theme.getId(),
-                new PaymentDetail(
-                        payment.getPaymentKey(),
-                        payment.getOrderId(),
-                        payment.getAmount(),
-                        payment.getPaymentType()
-                )
-        );
-        TestHelper.postWithToken("/reservations", reservationRequest, token);
-        String url = String.format(
-                "/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
-                1L,
-                1L,
-                LocalDate.now(),
-                LocalDate.now().plusWeeks(1)
-        );
-
-        // when & then
-        TestHelper.getWithToken(url, token)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("$", hasSize(1))
-                .body("[0].date", equalTo(tomorrow.toString()))
-                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
-                .body("[0].memberName", equalTo(member.getName()))
-                .body("[0].themeName", equalTo(theme.getName()));
-    }
-
-    @Test
-    @DisplayName("예약 조회 - 필터링 (일반 유저 권한 부족) 실패")
-    void getFilteredReservationsWithNonAdmin() {
-        // given
-        Member userMember = MemberFixture.create(RoleType.USER);
-        memberRepository.save(userMember);
-        String token = TestHelper.login(userMember.getEmail(), userMember.getPassword());
-        String url = String.format(
-                "/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
-                1L,
-                1L,
-                LocalDate.now(),
-                LocalDate.now().plusDays(7)
-        );
-
-        // when & then
-        TestHelper.getWithToken(url, token)
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
-    }
-
-    @Test
-    @DisplayName("예약 조회 - 로그인 사용자 예약 조회")
+    @DisplayName("사용자 예약 조회 - 성공")
     void getReservationsByMember() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
@@ -318,7 +257,23 @@ class ReservationAcceptanceTest {
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
         // when & then
-        TestHelper.getWithToken("/reservations/mine", token)
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .filter(document("reservations-mine-get-success",
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].theme").description("테마 이름"),
+                                fieldWithPath("[].date").description("예약 날짜"),
+                                fieldWithPath("[].time").description("예약 시작 시간 (HH:mm 형식)"),
+                                fieldWithPath("[].status").description("예약 상태 (예: 예약, 2번째 예약대기 등)"),
+                                fieldWithPath("[].payment.paymentKey").description("결제 고유 키 (Toss Payments)"),
+                                fieldWithPath("[].payment.amount").description("결제 금액 (Toss Payments)")
+                        )
+                ))
+                .when()
+                .get("/reservations/mine")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$", hasSize(1))
@@ -329,10 +284,180 @@ class ReservationAcceptanceTest {
     }
 
     @Test
+    @DisplayName("관리자 모든 예약 조회 - 성공")
+    void getAllReservations() {
+        // given
+        String adminToken = TestHelper.login(member.getEmail(), member.getPassword());
+        var reservationRequest = new ReservationCreateRequest(
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
+                new PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
+        );
+        TestHelper.postWithToken("/reservations", reservationRequest, adminToken);
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .filter(document("admin-reservations-get-success",
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("[].id").description("생성된 예약의 ID"),
+                                fieldWithPath("[].date").description("예약된 날짜"),
+                                fieldWithPath("[].startAt").description("예약 시작 시간 (HH:mm 형식)"),
+                                fieldWithPath("[].memberName").description("예약한 회원의 이름"),
+                                fieldWithPath("[].themeName").description("예약된 테마의 이름")
+                        )
+                ))
+                .when()
+                .get("/admin/reservations")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("$", hasSize(1))
+                .body("[0].date", equalTo(tomorrow.toString()))
+                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("[0].memberName", equalTo(member.getName()))
+                .body("[0].themeName", equalTo(theme.getName()));
+    }
+
+    @Test
+    @DisplayName("관리자 예약 삭제 - 성공")
+    void deleteReservation() {
+        // given
+        String adminToken = TestHelper.login(member.getEmail(), member.getPassword());
+        var reservationRequest = new ReservationCreateRequest(
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
+                new PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
+        );
+        TestHelper.postWithToken("/reservations", reservationRequest, adminToken);
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .filter(document("admin-reservations-delete-success",
+                        pathParameters(
+                                parameterWithName("id").description("삭제할 예약 ID")
+                        )
+                ))
+                .when()
+                .delete("/admin/reservations/{id}", 1L)
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // 예약 삭제 후 조회 검사
+        TestHelper.getWithToken("/admin/reservations", adminToken)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("$", hasSize(0));
+    }
+
+    @Test
+    @DisplayName("관리자 예약 조회 - 성공 - 필터링 조회")
+    void getFilteredReservations() {
+        // given
+        String adminToken = TestHelper.login(member.getEmail(), member.getPassword());
+        var reservationRequest = new ReservationCreateRequest(
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
+                new PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
+        );
+        TestHelper.postWithToken("/reservations", reservationRequest, adminToken);
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .filter(document("admin-reservations-filtered-get-success",
+                        queryParameters(
+                                parameterWithName("themeId").description("테마 ID"),
+                                parameterWithName("memberId").description("회원 ID"),
+                                parameterWithName("dateFrom").description("조회 시작 날짜 (YYYY-MM-DD 형식)"),
+                                parameterWithName("dateTo").description("조회 종료 날짜 (YYYY-MM-DD 형식)")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].date").description("예약 날짜"),
+                                fieldWithPath("[].startAt").description("예약 시작 시간 (HH:mm 형식)"),
+                                fieldWithPath("[].memberName").description("회원 이름"),
+                                fieldWithPath("[].themeName").description("테마 이름")
+                        )
+                ))
+                .when()
+                .param("themeId", 1L)
+                .param("memberId", 1L)
+                .param("dateFrom", LocalDate.now().toString())
+                .param("dateTo", LocalDate.now().plusWeeks(1).toString())
+                .get("/admin/reservations/filtered")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("$", hasSize(1))
+                .body("[0].date", equalTo(tomorrow.toString()))
+                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("[0].memberName", equalTo(member.getName()))
+                .body("[0].themeName", equalTo(theme.getName()));
+    }
+
+    @Test
+    @DisplayName("관리자 예약 조회 - 실패 - 필터링 조회 - 일반 유저 권한 부족")
+    void getFilteredReservationsWithNonAdmin() {
+        // given
+        Member userMember = MemberFixture.create(RoleType.USER);
+        memberRepository.save(userMember);
+        String userToken = TestHelper.login(userMember.getEmail(), userMember.getPassword());
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", userToken)
+                .filter(document("admin-reservations-filtered-get-fail-no-permission",
+                        queryParameters(
+                                parameterWithName("themeId").description("테마 ID"),
+                                parameterWithName("memberId").description("회원 ID"),
+                                parameterWithName("dateFrom").description("조회 시작 날짜 (YYYY-MM-DD 형식)"),
+                                parameterWithName("dateTo").description("조회 종료 날짜 (YYYY-MM-DD 형식)")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("에러 메시지")
+                        )
+                ))
+                .when()
+                .param("themeId", 1L)
+                .param("memberId", 1L)
+                .param("dateFrom", LocalDate.now().toString())
+                .param("dateTo", LocalDate.now().plusWeeks(1).toString())
+                .get("/admin/reservations/filtered")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
     @DisplayName("관리자 예약 생성 - 성공")
     void createReservationByAdmin() {
         // given
-        String token = TestHelper.login(member.getEmail(), member.getPassword());
+        String adminToken = TestHelper.login(member.getEmail(), member.getPassword());
         Member userMember = MemberFixture.create(RoleType.USER);
         memberRepository.save(userMember);
 
@@ -344,7 +469,28 @@ class ReservationAcceptanceTest {
         );
 
         // when & then
-        TestHelper.postWithToken("/admin/reservations", adminCreateRequest, token)
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", adminToken)
+                .body(adminCreateRequest)
+                .filter(document("admin-reservations-post-success",
+                        requestFields( // 요청 필드 문서화
+                                fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
+                                fieldWithPath("themeId").description("테마의 ID"),
+                                fieldWithPath("timeId").description("예약 시간의 ID"),
+                                fieldWithPath("memberId").description("예약할 회원의 ID")
+                        ),
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("id").description("생성된 예약의 ID"),
+                                fieldWithPath("date").description("예약된 날짜"),
+                                fieldWithPath("startAt").description("예약 시작 시간 (HH:mm 형식)"),
+                                fieldWithPath("memberName").description("예약한 회원의 이름"),
+                                fieldWithPath("themeName").description("예약된 테마의 이름")
+                        )
+                ))
+                .when()
+                .post("/admin/reservations")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .body("date", equalTo(tomorrow.toString()))
@@ -353,12 +499,12 @@ class ReservationAcceptanceTest {
     }
 
     @Test
-    @DisplayName("관리자 예약 생성 - 일반 유저 권한 부족 실패")
+    @DisplayName("관리자 예약 생성 - 실패 - 권한 부족")
     void createReservationByNonAdmin() {
         // given
         Member userMember = MemberFixture.create(RoleType.USER);
         memberRepository.save(userMember);
-        String token = TestHelper.login(userMember.getEmail(), userMember.getPassword());
+        String userToken = TestHelper.login(userMember.getEmail(), userMember.getPassword());
 
         var adminCreateRequest = new ReservationAdminCreateRequest(
                 tomorrow,
@@ -368,7 +514,24 @@ class ReservationAcceptanceTest {
         );
 
         // when & then
-        TestHelper.postWithToken("/admin/reservations", adminCreateRequest, token)
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", userToken)
+                .body(adminCreateRequest)
+                .filter(document("admin-reservations-post-fail-no-permission",
+                        requestFields( // 요청 필드 문서화
+                                fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD 형식)"),
+                                fieldWithPath("themeId").description("테마의 ID"),
+                                fieldWithPath("timeId").description("예약 시간의 ID"),
+                                fieldWithPath("memberId").description("예약할 회원의 ID")
+                        ),
+                        responseFields( // 응답 필드 문서화
+                                fieldWithPath("message").description("에러 메시지")
+                        )
+                ))
+                .when()
+                .post("/admin/reservations")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }

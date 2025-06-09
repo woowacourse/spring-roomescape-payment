@@ -10,19 +10,120 @@
 [[overview]]
 = 개요
 
+이 문서는 Room Escape 예약 API에 대한 문서입니다.
+이 API는 사용자가 방탈출 예약을 생성하고 관리할 수 있도록 합니다.
+또한 관리자는 모든 예약을 조회하고 삭제할 수 있습니다.
+
 [[reservations]]
-=== 예약 생성
+== 방탈출 예약
 
-사용자가 예약을 생성합니다.
+[[reservations-post-success]]
+=== 사용자 예약 생성 - 성공
 
-include::{snippets}/reservations/http-request.adoc[]
+로그인 한 사용자가 예약을 생성합니다.
 
-include::{snippets}/reservations/http-response.adoc[]
+include::{snippets}/reservations-post-success/http-request.adoc[]
+include::{snippets}/reservations-post-success/request-fields.adoc[]
 
-include::{snippets}/reservations/request-body.adoc[]
+include::{snippets}/reservations-post-success/http-response.adoc[]
+include::{snippets}/reservations-post-success/response-fields.adoc[]
 
-include::{snippets}/reservations/request-fields.adoc[]
+[[reservations-post-fail-without-login]]
+=== 사용자 예약 생성 - 실패 - 로그인 정보 없음
 
-include::{snippets}/reservations/response-body.adoc[]
+로그인 하지 않고 예약 생성 요청하면 실패합니다.
 
-include::{snippets}/reservations/response-fields.adoc[]
+include::{snippets}/reservations-post-fail-without-login/http-request.adoc[]
+include::{snippets}/reservations-post-fail-without-login/request-fields.adoc[]
+
+include::{snippets}/reservations-post-fail-without-login/http-response.adoc[]
+include::{snippets}/reservations-post-fail-without-login/response-fields.adoc[]
+
+[[reservations-post-fail-duplicate]]
+=== 사용자 에약 생성 - 실패 - 중복  예약 생성 요청
+
+이미 예약된 방탈출에 중복 예약 요청하면 실패합니다.
+
+include::{snippets}/reservations-post-fail-duplicate/http-request.adoc[]
+include::{snippets}/reservations-post-fail-duplicate/request-fields.adoc[]
+
+include::{snippets}/reservations-post-fail-duplicate/http-response.adoc[]
+include::{snippets}/reservations-post-fail-duplicate/response-fields.adoc[]
+
+[[reservations-mine-get-success]]
+=== 사용자 예약 조회 - 성공
+
+로그인 한 사용자가 자신의 예약을 조회합니다.
+
+include::{snippets}/reservations-mine-get-success/http-request.adoc[]
+include::{snippets}/reservations-mine-get-success/request-fields.adoc[]
+
+include::{snippets}/reservations-mine-get-success/http-response.adoc[]
+include::{snippets}/reservations-mine-get-success/response-fields.adoc[]
+
+[[admin-reservations-get-success]]
+=== 관리자 모든 예약 조회 - 성공
+
+로그인 한 관리자가 모든 예약을 조회합니다.
+
+include::{snippets}/admin-reservations-get-success/http-request.adoc[]
+include::{snippets}/admin-reservations-get-success/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-get-success/http-response.adoc[]
+include::{snippets}/admin-reservations-get-success/response-fields.adoc[]
+
+[[admin-reservations-filtered-get-fail-no-permission]]
+=== 관리자 예약 조회 - 실패 - 필터링 조회 - 일반 유저 권한 부족
+
+로그인 한 사용자가 관리자의 예약 조회를 필터링해서 조회하려고 하면 실패합니다.
+
+include::{snippets}/admin-reservations-filtered-get-fail-no-permission/http-request.adoc[]
+include::{snippets}/admin-reservations-filtered-get-fail-no-permission/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-filtered-get-fail-no-permission/http-response.adoc[]
+include::{snippets}/admin-reservations-filtered-get-fail-no-permission/response-fields.adoc[]
+
+[[admin-reservations-delete-success]]
+=== 관리자 예약 삭제 - 성공
+
+로그인 한 관리자가 예약 id를 사용해 예약을 삭제합니다.
+
+include::{snippets}/admin-reservations-delete-success/http-request.adoc[]
+include::{snippets}/admin-reservations-delete-success/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-delete-success/http-response.adoc[]
+include::{snippets}/admin-reservations-delete-success/response-fields.adoc[]
+
+[[admin-reservations-filtered-get-success]]
+=== 관리자 예약 조회 - 성공 - 필터링 조회
+
+로그인 한 관리자가 예약을 필터링해서 조회합니다.
+
+include::{snippets}/admin-reservations-filtered-get-success/http-request.adoc[]
+include::{snippets}/admin-reservations-filtered-get-success/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-filtered-get-success/http-response.adoc[]
+include::{snippets}/admin-reservations-filtered-get-success/response-fields.adoc[]
+
+[[admin-reservations-post-success]]
+=== 관리자 예약 생성 - 성공
+
+로그인 한 관리자가 예약을 생성합니다.
+
+include::{snippets}/admin-reservations-post-success/http-request.adoc[]
+include::{snippets}/admin-reservations-post-success/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-post-success/http-response.adoc[]
+include::{snippets}/admin-reservations-post-success/response-fields.adoc[]
+
+[[admin-reservations-post-fail-no-permission]]
+
+=== 관리자 예약 생성 - 실패 - 권한 없음
+
+관리자 권한이 없는 사용자가 예약 생성 요청하면 실패합니다.
+
+include::{snippets}/admin-reservations-post-fail-no-permission/http-request.adoc[]
+include::{snippets}/admin-reservations-post-fail-no-permission/request-fields.adoc[]
+
+include::{snippets}/admin-reservations-post-fail-no-permission/http-response.adoc[]
+include::{snippets}/admin-reservations-post-fail-no-permission/response-fields.adoc[]
