@@ -16,9 +16,11 @@ echo "[배포 시작]"
 cd "$PROJECT_ROOT"
 
 # 1. Git 브랜치 전환 및 최신 코드
-echo "[Git] 브랜치 전환: $BRANCH_NAME"
+echo "[Git] 브랜치 전환 및 업데이트: $BRANCH_NAME"
+git fetch origin
 git checkout "$BRANCH_NAME"
-git pull
+git reset --hard "origin/$BRANCH_NAME"
+git clean -fd
 
 # 2. Gradle 빌드
 echo "[Gradle] bootJar 실행"
