@@ -25,23 +25,6 @@ public class ReservationTest {
     private final Theme theme = TestFixtures.anyThemeWithNewId();
 
     @Test
-    @DisplayName("주어진 예약과 같은 방탈출 일정인 지 비교할 수 있다.")
-    void sameScheduleWith() {
-        var schedule = RoomescapeSchedule.of(date, timeSlot, theme);
-        var reservation1 = new Reservation(1L, user1, schedule, ReservationStatus.CONFIRMED);
-        var reservation2 = new Reservation(2L, user2, schedule, ReservationStatus.CONFIRMED);
-
-        assertThat(reservation1.sameScheduleWith(reservation2)).isTrue();
-    }
-
-    @Test
-    @DisplayName("예약이 확정 상태인 지 확인한다.")
-    void isConfirmed() {
-        var reservation = reservationOf(ReservationStatus.CONFIRMED);
-        assertThat(reservation.isConfirmed()).isTrue();
-    }
-
-    @Test
     @DisplayName("예약이 대기 상태인 지 확인한다.")
     void isWaiting() {
         var reservation = reservationOf(ReservationStatus.WAITING);

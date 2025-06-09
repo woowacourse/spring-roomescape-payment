@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWithOrder;
 import roomescape.domain.user.User;
 
@@ -48,7 +49,7 @@ class UserServiceTest extends ServiceTest {
     private Reservation reserveWithUser(final User user) {
         var savedTimeSlot = repositoryHelper.saveAnyTimeSlot();
         var savedTheme = repositoryHelper.saveAnyTheme();
-        var reservation = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), savedTimeSlot, savedTheme));
+        var reservation = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), savedTimeSlot, savedTheme), ReservationStatus.CONFIRMED);
         return repositoryHelper.saveReservation(reservation);
     }
 }

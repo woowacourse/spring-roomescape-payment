@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.exception.InUseException;
 
@@ -65,7 +66,7 @@ class TimeSlotServiceTest extends ServiceTest {
         var theme = repositoryHelper.saveAnyTheme();
         var timeSlot = service.register(LocalTime.of(10, 0));
 
-        var reservationForTimeSlot = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), timeSlot, theme));
+        var reservationForTimeSlot = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED);
         repositoryHelper.saveReservation(reservationForTimeSlot);
         return timeSlot;
     }
