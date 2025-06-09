@@ -7,7 +7,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import roomescape.logging.aspect.Loggable;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.service.OrderService;
 import roomescape.payment.service.PaymentService;
@@ -31,8 +30,9 @@ public class ReservationPaymentEventListener {
         try {
             callTossPaymentApi(paymentRequest);
             reservationPaymentService.paid(reservationId, response.paymentKey());
-        } catch (PaymentServerException | PaymentProcessException e) {
+        } catch (Exception e) {
             reservationPaymentService.failedPayment(reservationId, response.paymentKey());
+            throw e;
         }
     }
 
