@@ -163,7 +163,7 @@ class WaitingReservationServiceTest {
             assertThatThrownBy(() -> service.registerWaitingReservation(
                     new CreateRegistrationCommand(member.getId(), pastDate, time.getId(), theme.getId())
             )).isInstanceOf(ReservationException.class)
-                    .hasMessageContaining("지난 날짜와 시간에 대한 대기는 불가능합니다.");
+                    .hasMessageContaining("지난 날짜에 대한 대기입니다.");
         }
     }
 
