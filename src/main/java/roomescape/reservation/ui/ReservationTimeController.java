@@ -40,7 +40,7 @@ public class ReservationTimeController {
         return new ResponseEntity<>(reservationTimeService.add(requestDto), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "예약 시간 수정 API", description = "기존 예약 시간을 수정합니다. 요청 본문에 수정된 예약 시간 정보를 포함해야 합니다.")
+    @Operation(summary = "예약 시간 삭제 API", description = "예약 시간을 ID로 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id) {
         reservationTimeService.deleteById(id);

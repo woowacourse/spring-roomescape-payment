@@ -40,7 +40,7 @@ public class ThemeController {
         return new ResponseEntity<>(themeService.add(requestDto), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "테마 수정 API", description = "기존 테마를 수정합니다. 요청 본문에 수정된 테마 정보를 포함해야 합니다.")
+    @Operation(summary = "테마 삭제 API", description = "테마를 ID로 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id) {
         themeService.deleteById(id);
