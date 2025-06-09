@@ -10,8 +10,17 @@ spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+logging:
+  level:
+    root: info
+    roomescape.global.LoggingInterceptor: info
+  file:
+    name: logs/app.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"

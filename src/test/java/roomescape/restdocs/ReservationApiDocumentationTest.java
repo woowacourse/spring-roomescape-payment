@@ -27,11 +27,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.fixture.TestFixture;
+import roomescape.global.LoggingFilter;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.controller.ReservationController;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -41,14 +44,14 @@ import roomescape.time.controller.ReservationTimeController;
 import roomescape.time.dto.AvailableReservationTimeResponse;
 import roomescape.time.service.ReservationTimeService;
 import roomescape.waiting.controller.ReservationWaitingController;
-import roomescape.waiting.domain.ReservationWaiting;
 import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
 import roomescape.waiting.service.ReservationWaitingService;
 
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureRestDocs
-@WebMvcTest({ReservationController.class, ReservationTimeController.class, ReservationWaitingController.class})
+@WebMvcTest(controllers = {ReservationController.class, ReservationTimeController.class, ReservationWaitingController.class},
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = LoggingFilter.class))
 class ReservationApiDocumentationTest {
 
     @Autowired

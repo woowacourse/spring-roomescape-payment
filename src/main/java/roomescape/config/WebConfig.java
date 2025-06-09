@@ -1,7 +1,7 @@
 package roomescape.config;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,17 +10,11 @@ import roomescape.global.AuthInterceptor;
 import roomescape.global.LoginMemberArgumentResolver;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
     private final LoginMemberArgumentResolver loginMemberArgumentResolver;
-
-    @Autowired
-    public WebConfig(final AuthInterceptor authInterceptor,
-                     final LoginMemberArgumentResolver loginMemberArgumentResolver) {
-        this.authInterceptor = authInterceptor;
-        this.loginMemberArgumentResolver = loginMemberArgumentResolver;
-    }
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {

@@ -450,7 +450,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_예약_생성">예약 생성</a></li>
 <li><a href="#_예약_시간_조회">예약 시간 조회</a></li>
-<li><a href="#_예약_대기">예약 대기</a></li>
+<li><a href="#_예약_대기_생성">예약 대기 생성</a></li>
 </ul>
 </li>
 </ul>
@@ -472,7 +472,7 @@ Content-Length: 171
 Host: localhost:8080
 
 {
-  "date" : "2025-06-09",
+  "date" : "2025-06-10",
   "themeId" : 1,
   "timeId" : 1,
   "paymentKey" : "testPaymentKey",
@@ -545,7 +545,7 @@ Content-Length: 267
 {
   "id" : 1,
   "name" : "테스트 유저",
-  "date" : "2025-06-09",
+  "date" : "2025-06-10",
   "time" : {
     "id" : 1,
     "startAt" : "10:00"
@@ -620,6 +620,7 @@ Content-Length: 267
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -628,7 +629,7 @@ Content-Length: 267
 <h4 id="_http_요청_2"><a class="link" href="#_http_요청_2">HTTP 요청</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times/available-times?date=2025-06-09&amp;themeId=1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times/available-times?date=2025-06-10&amp;themeId=1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Host: localhost:8080</code></pre>
 </div>
@@ -710,10 +711,11 @@ Content-Length: 184
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_예약_대기"><a class="link" href="#_예약_대기">예약 대기</a></h3>
+<h3 id="_예약_대기_생성"><a class="link" href="#_예약_대기_생성">예약 대기 생성</a></h3>
 <div class="sect3">
 <h4 id="_http_요청_3"><a class="link" href="#_http_요청_3">HTTP 요청</a></h4>
 <div class="listingblock">
@@ -724,7 +726,7 @@ Content-Length: 60
 Host: localhost:8080
 
 {
-  "date" : "2025-06-09",
+  "date" : "2025-06-10",
   "themeId" : 1,
   "timeId" : 1
 }</code></pre>
@@ -772,7 +774,7 @@ Content-Length: 236
 
 {
   "id" : 1,
-  "date" : "2025-06-09",
+  "date" : "2025-06-10",
   "time" : {
     "id" : 1,
     "startAt" : "10:00"
@@ -850,7 +852,7 @@ Content-Length: 236
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2025-06-08 17:21:06 +0900
+Last updated 2025-06-08 17:25:24 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

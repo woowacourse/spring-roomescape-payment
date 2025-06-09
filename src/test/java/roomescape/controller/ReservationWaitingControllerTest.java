@@ -12,17 +12,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.global.AuthInterceptor;
+import roomescape.global.LoggingFilter;
 import roomescape.waiting.controller.ReservationWaitingController;
 import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
 import roomescape.waiting.service.ReservationWaitingService;
 
-@WebMvcTest(value = ReservationWaitingController.class)
+@WebMvcTest(controllers = ReservationWaitingController.class,
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = LoggingFilter.class))
 class ReservationWaitingControllerTest {
 
     @Autowired

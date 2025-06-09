@@ -14,11 +14,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.global.AuthInterceptor;
+import roomescape.global.LoggingFilter;
 import roomescape.reservation.controller.ReservationController;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -26,7 +29,8 @@ import roomescape.reservation.service.ReservationService;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.time.dto.ReservationTimeResponse;
 
-@WebMvcTest(ReservationController.class)
+@WebMvcTest(controllers = ReservationController.class,
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = LoggingFilter.class))
 public class ReservationControllerTestWithMock {
 
     @Autowired
