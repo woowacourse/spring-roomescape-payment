@@ -10,25 +10,32 @@ LOG_DIR="/var/log/deploy"
 LOG_FILE="$LOG_DIR/deploy.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
+# 색상 정의
+NC="\033[0m"
+RED="\033[0;31m"
+YELLOW="\033[0;33m"
+GREEN="\033[0;32m"
+CYAN="\033[0;36m"
+
 # 로그 디렉토리 생성
 sudo mkdir -p $LOG_DIR
 sudo chown $USER:$USER $LOG_DIR
 
 # 로그 함수들
 log_debug() {
-    echo "[$TIMESTAMP] [DEBUG] $1" | tee -a $LOG_FILE
+    echo -e "${CYAN}[$TIMESTAMP] [DEBUG] $1${NC}" | tee -a $LOG_FILE
 }
 
 log_info() {
-    echo "[$TIMESTAMP] [INFO] $1" | tee -a $LOG_FILE
+    echo -e "${GREEN}[$TIMESTAMP] [INFO] $1${NC}" | tee -a $LOG_FILE
 }
 
 log_warn() {
-    echo "[$TIMESTAMP] [WARN] $1" | tee -a $LOG_FILE
+    echo -e "${YELLOW}[$TIMESTAMP] [WARN] $1${NC}" | tee -a $LOG_FILE
 }
 
 log_error() {
-    echo "[$TIMESTAMP] [ERROR] $1" | tee -a $LOG_FILE
+    echo -e "${RED}[$TIMESTAMP] [ERROR] $1${NC}" | tee -a $LOG_FILE
 }
 
 # 에러 트래킹 함수
