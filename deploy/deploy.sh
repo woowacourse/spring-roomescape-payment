@@ -3,6 +3,7 @@
 APP_NAME="spring-roomescape"
 JAR_NAME="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 PROJECT_PATH="$HOME/spring-roomescape-payment"
+PROFILE=${1:-prod}
 PORT=8080
 
 # 로그 색상 코드
@@ -90,6 +91,7 @@ APP_LOG_FILE="$LOG_DIR/app_${APP_NAME}_$(date +%Y%m%d).log"
 ERR_LOG_FILE="$LOG_DIR/err_${APP_NAME}_$(date +%Y%m%d).log"
 
 nohup java \
+    -Dspring.profiles.active=$PROFILE \
     -Dserver.port=$PORT \
     -Xmx1024m \
     -Xms512m \
