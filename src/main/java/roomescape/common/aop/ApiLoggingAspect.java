@@ -51,7 +51,7 @@ public class ApiLoggingAspect {
             long endTime = System.currentTimeMillis();
             long executionTime = endTime - startTime;
 
-            log.error("[예외] {} {}, executionTime: {}ms, message: {}",
+            log.info("[응답 - 예외] {} {}, executionTime: {}ms, message: {}",
                 request.getMethod(),
                 request.getRequestURI(),
                 executionTime,
