@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
             }
             cause = cause.getCause();
         }
-        log.warn("timeout 에러 발생 - {}", e.getMessage());
+        log.error("timeout 에러 발생 - {}", e.getMessage());
         return ResponseEntity.internalServerError().body(new ErrorResponse("알 수 없는 에러가 발생했습니다."));
     }
 
