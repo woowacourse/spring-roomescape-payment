@@ -3,6 +3,11 @@ package roomescape.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -12,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -76,6 +82,9 @@ class LoginControllerTestWithMock extends ControllerTest {
                             requestFields(
                                     fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
                                     fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                            ),
+                            responseHeaders(
+                                    headerWithName("Set-Cookie").description("세션 쿠키가 설정됩니다").optional()
                             )
                     ));
         }
@@ -94,9 +103,14 @@ class LoginControllerTestWithMock extends ControllerTest {
 
             // when & then
             mockMvc.perform(post("/logout")
-                            .session(session))
+                            .session(session)
+                            .cookie(new Cookie("JSESSIONID", session.getId())))
                     .andExpect(status().isOk())
-                    .andDo(restDocs.document());
+                    .andDo(restDocs.document(
+                            requestCookies(
+                                    cookieWithName("JSESSIONID").description("회원 ID 값")
+                            )
+                    ));
         }
     }
 
@@ -116,10 +130,14 @@ class LoginControllerTestWithMock extends ControllerTest {
 
             // when & then
             mockMvc.perform(get("/login/check")
-                            .session(session))
+                            .session(session)
+                            .cookie(new Cookie("JSESSIONID", session.getId())))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value("테스터"))
                     .andDo(restDocs.document(
+                            requestCookies(
+                                    cookieWithName("JSESSIONID").description("회원 ID 값")
+                            ),
                             responseFields(
                                     fieldWithPath("name").type(JsonFieldType.STRING).description("로그인된 회원 이름")
                             )
