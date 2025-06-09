@@ -5,6 +5,6 @@ import roomescape.payment.domain.Orders;
 public class OrdersFixture {
 
     public static Orders create() {
-        return new Orders("paymentKey", "orderId");
+        return Orders.pending("paymentKey", "orderId");
     }
 }

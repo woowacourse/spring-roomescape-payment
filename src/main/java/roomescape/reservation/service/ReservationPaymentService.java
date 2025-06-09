@@ -22,20 +22,22 @@ public class ReservationPaymentService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void paid(Long reservationId, String paymentKey) {
         Reservation reservation = reservationRepository.findByIdAndStatus(reservationId,
-                ReservationStatus.PENDING_PAYMENT).orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
+                ReservationStatus.PENDING).orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
         Orders orders = getOrders(paymentKey);
 
+        orders.success();
         reservation.paid(orders);
     }
 
     @Loggable
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void failedPayment(Long id, String paymentKey) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
+    public void failedPayment(Long reservationId, String paymentKey) {
+        Reservation reservation = reservationRepository.findByIdAndStatus(reservationId,
+                ReservationStatus.PENDING).orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
         Orders orders = getOrders(paymentKey);
 
-        reservation.failPayment(orders);
+        orders.failed();
+        reservation.updateOrders(orders);
     }
 
     private Orders getOrders(String paymentKey) {

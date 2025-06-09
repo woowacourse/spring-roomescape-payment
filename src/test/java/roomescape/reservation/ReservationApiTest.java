@@ -29,8 +29,8 @@ import roomescape.config.AuthServiceTestConfig;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
+import roomescape.payment.domain.OrderStatus;
 import roomescape.payment.infra.toss.client.TossPaymentClient;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.infra.toss.dto.TossPaymentResponse;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
 import roomescape.reservation.controller.request.PaymentInfoRequest;
@@ -114,7 +114,7 @@ class ReservationApiTest {
         verify(tossPaymentClient, times(1)).getPaymentConfirm(any());
 
         await().atMost(1, TimeUnit.SECONDS)
-                .untilAsserted(() ->{
+                .untilAsserted(() -> {
                     Reservation reservation = reservationRepository.findById(1L).get();
                     assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.RESERVED);
                 });
@@ -158,9 +158,9 @@ class ReservationApiTest {
                 .statusCode(201);
 
         await().atMost(1, TimeUnit.SECONDS)
-                .untilAsserted(() ->{
+                .untilAsserted(() -> {
                     Reservation reservation = reservationRepository.findById(1L).get();
-                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                    assertThat(reservation.getOrders().getStatus()).isEqualTo(OrderStatus.FAILED);
                 });
     }
 

@@ -23,7 +23,7 @@ public class ReservationTest {
     void 대기상태에서_결제_대기_상태로_전환된다() {
         Reservation reservation = Reservation.waiting(member, reservationDateTime, theme);
 
-        assertThatCode(reservation::changePaymentPending)
+        assertThatCode(reservation::changePending)
                 .doesNotThrowAnyException();
     }
 
@@ -31,7 +31,7 @@ public class ReservationTest {
     void 대기상태가_아니면_결제_대기_상태로_전환시_예외가_발생한다() {
         Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
-        assertThatThrownBy(reservation::changePaymentPending)
+        assertThatThrownBy(reservation::changePending)
                 .isInstanceOf(InvalidStatusTransitionException.class);
     }
 

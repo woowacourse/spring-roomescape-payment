@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.CleanUp;
 import roomescape.fixture.db.ReservationDbFixture;
+import roomescape.payment.domain.OrderStatus;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.infra.toss.client.TossPaymentClient;
 import roomescape.payment.infra.toss.dto.TossPaymentResponse;
@@ -88,7 +89,7 @@ class ReservationPaymentEventListenerTest {
     }
 
     @Test
-    void 결제_실패_시에는_PAYMENT_FAILED로_변경된다() {
+    void 결제_실패_시에는_주문_상태가_FAILED로_변경된다() {
         // Arrange
         Reservation pending = reservationDbFixture.pending();
         String failPaymentKey = "failPaymentKey";
@@ -107,9 +108,9 @@ class ReservationPaymentEventListenerTest {
         await().atMost(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     Reservation reservation = reservationRepository.findById(pending.getId()).get();
-                    assertThat(reservation.getStatus())
-                            .as("결제 실패 시 예약 상태가 PAYMENT_FAILED로 변경되어야 합니다.")
-                            .isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                    assertThat(reservation.getOrders().getStatus())
+                            .as("결제 실패 시 주문 상태가 FAILED로 변경되어야 합니다.")
+                            .isEqualTo(OrderStatus.FAILED);
                     assertThat(reservation.getOrders().getPaymentKey())
                             .as("결제 실패 시 결제 키가 저장되어야 합니다.")
                             .isEqualTo(failPaymentKey);

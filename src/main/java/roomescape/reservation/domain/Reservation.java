@@ -60,7 +60,7 @@ public class Reservation {
                 .reserver(reserver)
                 .reservationDateTime(reservationDateTime)
                 .theme(theme)
-                .status(ReservationStatus.PENDING_PAYMENT)
+                .status(ReservationStatus.PENDING)
                 .build();
     }
 
@@ -90,12 +90,12 @@ public class Reservation {
         return reserver.isOwner(userId);
     }
 
-    public void changePaymentPending() {
+    public void changePending() {
         if (status != ReservationStatus.WAITING) {
             throw new InvalidStatusTransitionException("대기 상태에서만 결제 대기로 변경할 수 있습니다.");
         }
 
-        status = ReservationStatus.PENDING_PAYMENT;
+        status = ReservationStatus.PENDING;
     }
 
     public void cancelReservation() {
@@ -119,7 +119,7 @@ public class Reservation {
             throw new IllegalArgumentException("주문 정보가 필요합니다.");
         }
 
-        if (status != ReservationStatus.PENDING_PAYMENT) {
+        if (status != ReservationStatus.PENDING) {
             throw new InvalidStatusTransitionException("결제 대기 상태가 아닙니다.");
         }
 
@@ -127,12 +127,15 @@ public class Reservation {
         this.orders = orders;
     }
 
-    public void failPayment(Orders orders) {
-        if (status != ReservationStatus.PENDING_PAYMENT) {
+    public void updateOrders(Orders orders) {
+        if (orders == null) {
+            throw new IllegalArgumentException("주문 정보가 필요합니다.");
+        }
+
+        if (status != ReservationStatus.PENDING) {
             throw new InvalidStatusTransitionException("결제 대기 상태가 아닙니다.");
         }
 
-        status = ReservationStatus.PAYMENT_FAILED;
         this.orders = orders;
     }
 

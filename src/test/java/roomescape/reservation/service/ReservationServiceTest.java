@@ -27,6 +27,7 @@ import roomescape.fixture.entity.ReservationDateFixture;
 import roomescape.global.exception.InvalidArgumentException;
 import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.OrderStatus;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.infra.toss.client.TossPaymentClient;
 import roomescape.payment.infra.toss.dto.TossPaymentResponse;
@@ -444,7 +445,8 @@ class ReservationServiceTest {
         await().atMost(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     Reservation reservation = reservationRepository.findById(result.id()).get();
-                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PENDING);
+                    assertThat(reservation.getOrders().getStatus()).isEqualTo(OrderStatus.FAILED);
                 });
     }
 

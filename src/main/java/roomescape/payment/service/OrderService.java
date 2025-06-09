@@ -17,7 +17,7 @@ public class OrderService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PaymentResponse createOrder(PaymentRequest paymentRequest) {
-        Orders orders = new Orders(paymentRequest.paymentKey(), paymentRequest.orderId());
+        Orders orders = Orders.pending(paymentRequest.paymentKey(), paymentRequest.orderId());
 
         Orders save = ordersRepository.save(orders);
 
