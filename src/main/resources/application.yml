@@ -31,3 +31,15 @@ logging:
     root=INFO:
   file:
     name: logs/application.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  h2:
+    console:
+      enabled: false
+  sql:
+    init:
+      mode: never
