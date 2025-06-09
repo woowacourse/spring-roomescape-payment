@@ -19,14 +19,14 @@ public class WaitingFacadeService {
         return ReservationResponse.of(waiting);
     }
 
-    public List<ReservationResponse> findWaitings(){
+    public List<ReservationResponse> findWaitings() {
         List<Waiting> waitings = waitingService.findWaitings();
         return waitings.stream()
                 .map(ReservationResponse::of)
                 .toList();
     }
 
-    public void deleteWaiting(final Long id){
+    public void deleteWaiting(final Long id) {
         waitingService.delete(id);
     }
 }
