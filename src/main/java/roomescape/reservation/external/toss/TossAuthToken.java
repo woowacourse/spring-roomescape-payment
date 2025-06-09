@@ -5,11 +5,11 @@ import java.util.Base64;
 
 public record TossAuthToken(String secretKey) {
 
-    public String encodeSecretKey() {
-        return Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+    public String generateToken() {
+        return String.format("basic %s", encodeSecretKeyWithColon());
     }
 
-    public String generateToken() {
-        return String.format("basic %s", encodeSecretKey());
+    private String encodeSecretKeyWithColon() {
+        return Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }
 }
