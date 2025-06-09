@@ -13,6 +13,7 @@ import roomescape.lock.service.LockService;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationLockKey;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
@@ -87,8 +88,10 @@ public class ReservationCommandService {
             final Theme theme,
             final Member member
     ) {
+
+        final ReservationLockKey reservationLockKey = new ReservationLockKey(date, reservationTime.getId(), theme.getId());
         try {
-            lockService.acquireLock(generateLockKey(date, reservationTime, theme));
+            lockService.acquireLock(reservationLockKey.generate());
         } catch (DataIntegrityViolationException e) {
             throw new ReservationException("이미 다른분이 예약했습니다.");
         }
@@ -97,15 +100,6 @@ public class ReservationCommandService {
         validateAlreadyBooked(date, reservationTime, theme);
         final Reservation reservation = reservationRepository.save(Reservation.booked(slot, member));
         return new ReservationResponse(reservation);
-    }
-
-    private String generateLockKey(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
-        return String.format(
-                "reservation_%s_%d_%d",
-                date.toString(),
-                reservationTime.getId(),
-                theme.getId()
-        );
     }
 
     private RoomEscapeInformation findSlot(final LocalDate date,

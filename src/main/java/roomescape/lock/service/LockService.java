@@ -15,7 +15,7 @@ public class LockService {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void acquireLock(final String lockKey) {
-        lockRepository.save(new LockEntity(lockKey));
+        lockRepository.save(LockEntity.from(lockKey));
         lockRepository.findByKeyWithPessimisticWrite(lockKey);
     }
 }
