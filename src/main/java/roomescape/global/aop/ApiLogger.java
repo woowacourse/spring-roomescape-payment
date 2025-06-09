@@ -28,7 +28,15 @@ public class ApiLogger {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
-            log.error("{} {} {}", method, uri, e.getMessage());
+            String className = joinPoint.getSignature().getDeclaringTypeName();
+            String methodName = joinPoint.getSignature().getName();
+
+            StackTraceElement topStackTrace = e.getStackTrace()[0];
+            int lineNumber = topStackTrace.getLineNumber();
+
+            log.error("{} {} - {}.{}():{} - {}: {}",
+                    method, uri, className, methodName, lineNumber, e.getClass().getName(), e.getMessage());
+
             throw e;
         } finally {
             long endTime = System.currentTimeMillis();
