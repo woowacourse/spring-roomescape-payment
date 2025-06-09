@@ -1,6 +1,6 @@
 package roomescape.common.log;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,9 +14,12 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import roomescape.common.log.context.RequestIdProvider;
+import roomescape.common.log.context.RequestContext;
+import roomescape.common.log.context.RequestContextProvider;
+import roomescape.common.log.entry.ErrorLogEntry;
+import roomescape.common.log.entry.RequestLogEntry;
+import roomescape.common.log.entry.ResponseLogEntry;
 import roomescape.common.log.message.LogMessageProvider;
-import roomescape.common.log.message.RequestInfo;
 
 @Slf4j
 @Aspect
@@ -26,8 +29,7 @@ public class LoggingAspect {
 
     private static final String HANDLER_NAME_FORMAT = "%s#%s";
 
-    private final RequestIdProvider requestIdProvider;
-    private final HttpServletRequest httpServletRequest;
+    private final RequestContextProvider requestContextProvider;
     private final LogMessageProvider logMessageProvider;
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
@@ -64,44 +66,38 @@ public class LoggingAspect {
 
     @Before("allMapping()")
     public void requestLog(final JoinPoint joinPoint) {
-        String message = logMessageProvider.getRequestLog(
-                getRequestInfo(joinPoint),
+
+        final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArgumentMap(
+                requestContextProvider.get(),
+                getHandlerName(joinPoint),
                 getHandlerArguments(joinPoint)
         );
-
-        log.info(message);
+        log.info(logMessageProvider.getRequestLog(requestLogEntry));
     }
 
-    @Before(value = "exceptionHandlerCut()")
-    public void exceptionHandlerLog(final JoinPoint joinPoint) {
-        Object arg0 = joinPoint.getArgs()[0];
-        String message = logMessageProvider.getErrorLog(
-                getRequestInfo(joinPoint),
-                (Throwable) arg0
-        );
+    @AfterReturning(value = "exceptionHandlerCut()", returning = "response")
+    public void exceptionHandlerLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
+        final RequestContext requestContext = requestContextProvider.get();
+        final ErrorLogEntry errorLogEntry = Arrays.stream(joinPoint.getArgs())
+                .filter(Throwable.class::isInstance)
+                .map(Throwable.class::cast)
+                .map(arg -> ErrorLogEntry.withThrowable(requestContext, arg, response))
+                .findFirst()
+                .orElse(ErrorLogEntry.withoutThrowable(requestContext, response));
 
-        log.info(message);
+        log.info(logMessageProvider.getErrorLog(errorLogEntry));
     }
 
     @AfterReturning(value = "controllerPointCut()", returning = "response")
-    public void responseLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
-        String message = logMessageProvider.getResponseLog(
-                getRequestInfo(joinPoint),
+    public void responseLog(final ResponseEntity<?> response) {
+        final ResponseLogEntry responseLogEntry = new ResponseLogEntry(
+                requestContextProvider.get(),
                 response
         );
-
-        log.info(message);
+        log.info(logMessageProvider.getResponseLog(responseLogEntry));
     }
 
-    private RequestInfo getRequestInfo(final JoinPoint joinPoint) {
-        return RequestInfo.get(
-                requestIdProvider.getId().toString(),
-                httpServletRequest,
-                formatHandlerName(joinPoint)
-        );
-    }
-
-    private String formatHandlerName(final JoinPoint joinPoint) {
+    private String getHandlerName(final JoinPoint joinPoint) {
         return String.format(
                 HANDLER_NAME_FORMAT,
                 joinPoint.getTarget().getClass().getSimpleName(),

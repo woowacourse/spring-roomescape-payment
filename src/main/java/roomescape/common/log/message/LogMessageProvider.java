@@ -1,23 +1,15 @@
 package roomescape.common.log.message;
 
 
-import java.util.Map;
-import org.springframework.http.ResponseEntity;
+import roomescape.common.log.entry.ErrorLogEntry;
+import roomescape.common.log.entry.RequestLogEntry;
+import roomescape.common.log.entry.ResponseLogEntry;
 
 public interface LogMessageProvider {
 
-    String getRequestLog(
-            final RequestInfo requestInfo,
-            final Map<String, Object> handlerArguments
-    );
+    String getRequestLog(final RequestLogEntry requestLogEntry);
 
-    String getResponseLog(
-            final RequestInfo requestInfo,
-            final ResponseEntity<?> response
-    );
+    String getResponseLog(final ResponseLogEntry responseLogEntry);
 
-    String getErrorLog(
-            final RequestInfo requestInfo,
-            final Throwable throwable
-    );
+    String getErrorLog(final ErrorLogEntry errorLogEntry);
 }

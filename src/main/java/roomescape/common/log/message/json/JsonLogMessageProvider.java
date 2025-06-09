@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import roomescape.common.log.context.RequestContextProvider;
+import roomescape.common.log.entry.ErrorLogEntry;
+import roomescape.common.log.entry.RequestLogEntry;
+import roomescape.common.log.entry.ResponseLogEntry;
 import roomescape.common.log.message.LogMessageProvider;
-import roomescape.common.log.message.RequestInfo;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +26,8 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     private static final String DEFAULT_ERROR_MESSAGE = "Failed to write error log";
 
     private static final DefaultPrettyPrinter DEFAULT_PRETTY_PRINTER = createPrettyPrinter();
+
+    private final RequestContextProvider requestContextProvider;
     private final ObjectMapper objectMapper;
 
     private static DefaultPrettyPrinter createPrettyPrinter() {
@@ -34,14 +37,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getRequestLog(
-            final RequestInfo requestInfo,
-            final Map<String, Object> handlerArguments
-    ) {
-        final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArgumentMap(
-                requestInfo,
-                handlerArguments
-        );
+    public String getRequestLog(RequestLogEntry requestLogEntry) {
         return formatLogMessage(
                 REQUEST_MESSAGE_FORMAT,
                 requestLogEntry,
@@ -50,14 +46,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getResponseLog(
-            final RequestInfo requestInfo,
-            final ResponseEntity<?> response
-    ) {
-        final ResponseLogEntry responseLogEntry = new ResponseLogEntry(
-                requestInfo,
-                response
-        );
+    public String getResponseLog(ResponseLogEntry responseLogEntry) {
         return formatLogMessage(
                 RESPONSE_MESSAGE_FORMAT,
                 responseLogEntry,
@@ -66,8 +55,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getErrorLog(RequestInfo requestInfo, Throwable throwable) {
-        final ErrorLogEntry errorLogEntry = ErrorLogEntry.of(requestInfo, throwable);
+    public String getErrorLog(ErrorLogEntry errorLogEntry) {
         return formatLogMessage(
                 ERROR_MESSAGE_FORMAT,
                 errorLogEntry,

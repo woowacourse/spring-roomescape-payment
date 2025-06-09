@@ -1,4 +1,4 @@
-package roomescape.common.log.message.json;
+package roomescape.common.log.entry;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-import roomescape.common.log.message.RequestInfo;
+import roomescape.common.log.context.RequestContext;
 
-record RequestLogEntry(
-        RequestInfo requestInfo,
+public record RequestLogEntry(
+        RequestContext requestContext,
+        String handlerName,
         List<HandlerArgument> handlerArguments
 ) {
 
@@ -18,12 +19,14 @@ record RequestLogEntry(
             HttpServletResponse.class::isAssignableFrom
     );
 
-    static RequestLogEntry createWithHandlerArgumentMap(
-            final RequestInfo requestInfo,
+    public static RequestLogEntry createWithHandlerArgumentMap(
+            final RequestContext requestContext,
+            final String handlerName,
             final Map<String, Object> handlerArguments
     ) {
         return new RequestLogEntry(
-                requestInfo,
+                requestContext,
+                handlerName,
                 handlerArguments.entrySet().stream()
                         .filter(entry -> isJsonSerializable(entry.getValue()))
                         .map(HandlerArgument::fromArgumentEntry)
