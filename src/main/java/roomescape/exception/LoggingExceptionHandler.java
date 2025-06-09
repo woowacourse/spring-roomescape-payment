@@ -24,7 +24,7 @@ public class LoggingExceptionHandler {
 
     @ExceptionHandler(OrderNotMatchException.class)
     public ResponseEntity<ErrorResponse> handleOrderNotMatchException(OrderNotMatchException e) {
-        log.warn("EVENT: RESERVATION_CREATE_FAILED_ORDER_NOT_MATCH, orderId={}", e.getOrderId());
+        log.error("EVENT: RESERVATION_CREATE_FAILED_ORDER_NOT_MATCH, orderId={}", e.getOrderId());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
     }

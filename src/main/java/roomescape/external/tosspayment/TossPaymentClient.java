@@ -43,7 +43,7 @@ public class TossPaymentClient {
         } catch (PaymentException e) {
             throw e;
         } catch (ResourceAccessException e) {
-            log.warn("EXTERNAL_API_ERROR: TOSSPAYMENT_RESOURCE_ACCESS_FAILURE", e);
+            log.error("EXTERNAL_API_ERROR: TOSSPAYMENT_RESOURCE_ACCESS_FAILURE", e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         } catch (Exception e) {
             log.error("EXTERNAL_API_ERROR: UNEXPECTED_ERROR", e);
