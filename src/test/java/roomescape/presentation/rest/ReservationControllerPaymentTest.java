@@ -13,19 +13,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.PaymentService;
+import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.PaymentFailedException;
 import roomescape.presentation.GlobalExceptionHandler;
 import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 
-public class PaymentControllerTest {
+public class ReservationControllerPaymentTest {
 
     private final long userId = 99L;
 
+    private final ReservationService reservationService = Mockito.mock(ReservationService.class);
     private final PaymentService paymentService = Mockito.mock(PaymentService.class);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new PaymentController(paymentService))
+        .standaloneSetup(new ReservationController(reservationService, paymentService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();
@@ -35,11 +37,10 @@ public class PaymentControllerTest {
     void confirmReservation() throws Exception {
         Mockito.doNothing().when(paymentService).confirm(anyLong(), anyString(), anyString(), anyInt());
 
-        mockMvc.perform(post("/payments/confirm")
+        mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                        "reservationId": "1",
                         "paymentKey": "a",
                         "orderId": "1",
                         "amount": 1000
@@ -54,11 +55,10 @@ public class PaymentControllerTest {
         Mockito.doThrow(PaymentFailedException.byClient("결제 실패"))
             .when(paymentService).confirm(anyLong(), anyString(), anyString(), anyInt());
 
-        mockMvc.perform(post("/payments/confirm")
+        mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                        "reservationId": "1",
                         "paymentKey": "a",
                         "orderId": "1",
                         "amount": 1000
@@ -73,11 +73,10 @@ public class PaymentControllerTest {
         Mockito.doThrow(PaymentFailedException.byServer())
             .when(paymentService).confirm(anyLong(), anyString(), anyString(), anyInt());
 
-        mockMvc.perform(post("/payments/confirm")
+        mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                        "reservationId": "1",
                         "paymentKey": "a",
                         "orderId": "1",
                         "amount": 1000
@@ -92,11 +91,10 @@ public class PaymentControllerTest {
         Mockito.doThrow(PaymentFailedException.byExternalServer())
             .when(paymentService).confirm(anyLong(), anyString(), anyString(), anyInt());
 
-        mockMvc.perform(post("/payments/confirm")
+        mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                        "reservationId": "1",
                         "paymentKey": "a",
                         "orderId": "1",
                         "amount": 1000

@@ -219,14 +219,13 @@ function onReservationButtonClick(event, paymentWidget) {
 async function fetchReservationPayment(paymentData, reservationId) {
 
   const reservationPaymentRequest = {
-    reservationId: reservationId,
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
     paymentType: paymentData.paymentType,
   }
 
-  fetch("/payments/confirm", {
+  fetch("/reservations/" + reservationId + "/payment", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
