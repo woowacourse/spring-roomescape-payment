@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%level] [%logger] [request_id=%X{request_id}] - %msg%n" />
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>${LOG_PATTERN}</pattern>
-      </encoder>
-  </appender>
-
-  <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>logs/my-application.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>//home/ubuntu/app/my-application-%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
-    </rollingPolicy>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
     <encoder>
       <pattern>${LOG_PATTERN}</pattern>
     </encoder>
   </appender>
 
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ROLLING_FILE">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+    <file>logs/my-application.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>//home/ubuntu/app/my-application-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <property name="LOG_PATTERN"
+    value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%level] [%logger] [request_id=%X{request_id}] - %msg%n"/>
+
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
-    <appender-ref ref="ROLLING_FILE" />
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="ROLLING_FILE"/>
   </root>
 </configuration>

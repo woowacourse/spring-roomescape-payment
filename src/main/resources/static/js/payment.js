@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   paymentWidget.renderPaymentMethods(
       "#payment-method",
-      { value: paymentAmount },
-      { variantKey: "DEFAULT" }
+      {value: paymentAmount},
+      {variantKey: "DEFAULT"}
   );
 
   const reserveButton = document.getElementById("payment-button");
@@ -58,7 +58,7 @@ async function fetchReservationPayment(paymentData, reservationId) {
   try {
     const response = await fetch(reservationURL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {"Content-Type": "application/json"},
       body: JSON.stringify(reservationPaymentRequest),
     });
 

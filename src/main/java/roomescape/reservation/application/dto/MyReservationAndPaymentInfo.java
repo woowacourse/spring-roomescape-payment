@@ -16,7 +16,8 @@ public record MyReservationAndPaymentInfo(
     Long amount
 ) {
 
-    public static MyReservationAndPaymentInfo from(MyReservation reservation, PaymentInfo paymentInfo) {
+    public static MyReservationAndPaymentInfo from(MyReservation reservation,
+        PaymentInfo paymentInfo) {
         if (paymentInfo == null) {
             return new MyReservationAndPaymentInfo(
                 reservation.id(),

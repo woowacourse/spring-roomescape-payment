@@ -27,5 +27,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByMemberId(Long memberId);
 
-    List<Reservation> findByCreatedAtBeforeAndPaymentStatus(LocalDateTime createdAtBefore, PaymentStatus paymentStatus);
+    List<Reservation> findByCreatedAtBeforeAndPaymentStatus(LocalDateTime createdAtBefore,
+        PaymentStatus paymentStatus);
 }

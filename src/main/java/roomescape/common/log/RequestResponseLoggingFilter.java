@@ -22,6 +22,22 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
+    /**
+     * 정적 페이지입니다.
+     */
+    private static final List<String> EXCLUDE_URI = Arrays.asList(
+        "/",
+        "/admin/reservation",
+        "/admin/time",
+        "/admin/theme",
+        "/admin/waiting",
+        "/reservation",
+        "/reservation-mine",
+        "/payment",
+        "/login",
+        "/signup"
+    );
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain chain) throws ServletException, IOException {
@@ -47,24 +63,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         MDC.remove(requestId);
     }
 
-    /**
-     * 정적 페이지입니다.
-     */
-    private static final List<String> EXCLUDE_URI = Arrays.asList(
-        "/",
-        "/admin/reservation",
-        "/admin/time",
-        "/admin/theme",
-        "/admin/waiting",
-        "/reservation",
-        "/reservation-mine",
-        "/payment",
-        "/login",
-        "/signup"
-    );
-
-
-    private boolean isNotLoggingUri(String uri)  {
+    private boolean isNotLoggingUri(String uri) {
         return EXCLUDE_URI.contains(uri) || isStaticResource(uri);
     }
 

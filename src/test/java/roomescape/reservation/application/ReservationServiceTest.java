@@ -126,7 +126,8 @@ class ReservationServiceTest {
             memberReservationRequest, 1L);
 
         // 기존 member2의 예약 내역
-        List<MyReservationAndPaymentInfo> beforeMemberReservations = reservationService.findByMemberId(2L);
+        List<MyReservationAndPaymentInfo> beforeMemberReservations = reservationService.findByMemberId(
+            2L);
         assertThat(beforeMemberReservations).hasSize(2);
 
         WaitingIdResponse waitingIdResponse = waitingService.addWaiting(memberReservationRequest,

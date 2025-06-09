@@ -2,25 +2,30 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>방탈출 예약 페이지</title>
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="stylesheet" href="/css/reservation.css">
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/toss-style.css">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        rel="stylesheet">
+  <link href="/css/reservation.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+  <link href="/css/toss-style.css" rel="stylesheet">
   <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="/">
-    <img src="https://avatars.githubusercontent.com/u/141792611?s=200&v=4" alt="LOGO" style="height: 40px;">
+    <img alt="LOGO" src="https://avatars.githubusercontent.com/u/141792611?s=200&v=4"
+         style="height: 40px;">
   </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+          class="navbar-toggler"
+          data-target="#navbarSupportedContent" data-toggle="collapse"
+          type="button">
     <span class="navbar-toggler-icon"></span>
   </button>
 </nav>
@@ -28,10 +33,10 @@
 <!-- 결제창 ui -->
 <div class="wrapper w-100">
   <div class="max-w-540 w-100">
-    <div id="payment-method" class="w-100"></div>
-    <div id="agreement" class="w-100"></div>
+    <div class="w-100" id="payment-method"></div>
+    <div class="w-100" id="agreement"></div>
     <div class="btn-wrapper w-100">
-      <button id="payment-button" class="btn primary w-100">결제하기</button>
+      <button class="btn primary w-100" id="payment-button">결제하기</button>
     </div>
   </div>
 </div>

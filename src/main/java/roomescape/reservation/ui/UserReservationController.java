@@ -40,8 +40,10 @@ public class UserReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationAndPaymentInfo>> findMyReservations(final LoginCheckRequest request) {
-        List<MyReservationAndPaymentInfo> response = reservationService.findByMemberId(request.id());
+    public ResponseEntity<List<MyReservationAndPaymentInfo>> findMyReservations(
+        final LoginCheckRequest request) {
+        List<MyReservationAndPaymentInfo> response = reservationService.findByMemberId(
+            request.id());
         return ResponseEntity.ok(response);
     }
 

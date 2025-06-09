@@ -26,10 +26,13 @@ public class ReservationSchedulerTest {
 
     @DisplayName("결제 대기상태에서 대기 시간을 초과하면 삭제가 되어야 한다.")
     @Test
-    void payment_pending_and_over_waiting_time_then_delete_reservation() throws InterruptedException {
+    void payment_pending_and_over_waiting_time_then_delete_reservation()
+        throws InterruptedException {
         // given
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(LocalDate.now().plusDays(1), 1L, 1L);
-        ReservationResponse reservationResponse = reservationService.addMemberReservation(memberReservationRequest, 1L);
+        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+            LocalDate.now().plusDays(1), 1L, 1L);
+        ReservationResponse reservationResponse = reservationService.addMemberReservation(
+            memberReservationRequest, 1L);
         assertThat(reservationRepository.findById(reservationResponse.id())).isNotEmpty();
 
         // when

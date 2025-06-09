@@ -21,28 +21,21 @@ import roomescape.theme.domain.Theme;
 @Entity
 public class Reservation {
 
+    private final LocalDateTime createdAt = LocalDateTime.now();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private LocalDate date;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private ReservationTime time;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
-
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
     private Payment payment;
-
-    private final LocalDateTime createdAt = LocalDateTime.now();
 
     protected Reservation() {
 

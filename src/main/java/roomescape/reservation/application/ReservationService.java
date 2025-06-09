@@ -61,8 +61,10 @@ public class ReservationService {
             .toList();
     }
 
-    public List<Reservation> findByCreateTimeAndPaymentStatus(LocalDateTime createdAtBefore, PaymentStatus paymentStatus) {
-        return reservationRepository.findByCreatedAtBeforeAndPaymentStatus(createdAtBefore, paymentStatus);
+    public List<Reservation> findByCreateTimeAndPaymentStatus(LocalDateTime createdAtBefore,
+        PaymentStatus paymentStatus) {
+        return reservationRepository.findByCreatedAtBeforeAndPaymentStatus(createdAtBefore,
+            paymentStatus);
     }
 
     @Transactional
@@ -97,7 +99,8 @@ public class ReservationService {
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());
 
-        final Reservation reservation = new Reservation(date, reservationTime, theme, member, PENDING);
+        final Reservation reservation = new Reservation(date, reservationTime, theme, member,
+            PENDING);
         return reservationRepository.save(reservation);
     }
 

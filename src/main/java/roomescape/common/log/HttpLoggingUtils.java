@@ -6,13 +6,13 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 public class HttpLoggingUtils {
 
-    private HttpLoggingUtils() {}
+    private HttpLoggingUtils() {
+    }
 
     public static String getRequestBody(ContentCachingRequestWrapper request) {
         try {
             return new String(request.getContentAsByteArray(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            // 예외 처리
             return "Failed to read request body";
         }
     }

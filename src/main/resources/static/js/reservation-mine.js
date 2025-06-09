@@ -32,8 +32,8 @@ function renderCombined(reservations, waitings) {
       date: r.date,
       time: r.time,
       status: r.status,
-      paymentKey : r.paymentKey,
-      amount : r.amount
+      paymentKey: r.paymentKey,
+      amount: r.amount
     })),
     ...waitings.map(w => ({
       id: w.id,
@@ -55,7 +55,6 @@ function renderCombined(reservations, waitings) {
     row.insertCell(3).textContent = item.status;
     row.insertCell(4).textContent = item.paymentKey;
     row.insertCell(5).textContent = item.amount;
-
 
     const cancelCell = row.insertCell(4);
     if (item.status.includes('예약대기')) {
