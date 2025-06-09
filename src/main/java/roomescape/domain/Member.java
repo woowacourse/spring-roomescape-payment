@@ -12,12 +12,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Member {
+
+    private static final String MARKED_PASSWORD_CHAR = "*";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,7 +65,7 @@ public class Member {
                 ", name='" + name + '\'' +
                 ", role=" + role +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + MARKED_PASSWORD_CHAR.repeat(password.length()) + '\'' +
                 '}';
     }
 }
