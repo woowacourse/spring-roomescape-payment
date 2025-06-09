@@ -1,7 +1,6 @@
 package roomescape.global;
 
 import java.util.NoSuchElementException;
-import javax.naming.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,10 +24,5 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RoomEscapeException.class)
     public ResponseEntity<ErrorResponse> handleRoomEscapeException(final RoomEscapeException e) {
         return ResponseEntity.status(e.getHttpStatus()).body(ErrorResponse.from(e));
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public String handleAuthenticationException(final AuthenticationException e) {
-        return "login";
     }
 }
