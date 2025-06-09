@@ -33,6 +33,7 @@ class AuthenticationInfoArgumentResolverTest {
     @DisplayName("인증 정보를 바인딩할 때 쿠키에 유효한 토큰이 있으면 바인딩된다.")
     void bindUserWhenRequestWithValidToken() throws Exception {
         var cookie = AuthenticationTokenCookie.forResponse("validToken");
+        Mockito.when(tokenHandler.isValidToken("validToken")).thenReturn(true);
         Mockito.when(tokenHandler.extractAuthenticationInfo("validToken")).thenReturn(new AuthenticationInfo(1L, UserRole.USER));
 
         mockMvc.perform(get("/authenticationInfoTest").cookie(cookie))
@@ -52,6 +53,7 @@ class AuthenticationInfoArgumentResolverTest {
     @DisplayName("유저를 바인딩할 때 쿠키에 유효하지 않은 토큰이 있으면 예외가 발생한다.")
     void bindUserWhenRequestWithInvalidToken() {
         var invalidToken = "invalidToken";
+        Mockito.when(tokenHandler.isValidToken(invalidToken)).thenReturn(true);
         Mockito.when(tokenHandler.extractAuthenticationInfo(invalidToken)).thenThrow(new AuthorizationException("invalid token"));
 
         assertThatThrownBy(() ->
