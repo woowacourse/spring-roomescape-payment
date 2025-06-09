@@ -29,7 +29,7 @@ public class TossApiClient {
         try {
             return tossRestClient.post()
                     .uri("/payments/confirm")
-                    .body(objectMapper.convertValue(tossPaymentRequest, Map.class))
+                    .body(tossPaymentRequest)
                     .retrieve()
                     .body(TossPaymentResponse.class);
         }

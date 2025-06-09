@@ -25,7 +25,6 @@ public class RestClientConfig {
                 .baseUrl(tossUri)
                 .defaultRequest(requestBuilder -> requestBuilder
                         .header(HttpHeaders.AUTHORIZATION, authToken.generateToken())
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 )
                 .build();
     }
