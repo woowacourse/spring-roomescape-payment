@@ -5,7 +5,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
@@ -40,7 +39,6 @@ public class Reservation {
     private Theme theme;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_key")
     private Payment payment;
 
     public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time,
