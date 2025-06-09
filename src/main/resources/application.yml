@@ -29,3 +29,5 @@ payment:
 logging:
   level:
     root=INFO:
+  file:
+    name: logs/application.log
