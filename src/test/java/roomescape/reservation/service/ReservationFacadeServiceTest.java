@@ -3,6 +3,8 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,6 +23,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
@@ -224,5 +228,57 @@ class ReservationFacadeServiceTest {
         );
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void executeReservation_shouldCreateReservationWithPayment() {
+        PaymentResponse mockResponse = new PaymentResponse(
+                "test_payment_key",
+                "test_order_id",
+                "CARD",
+                50000,
+                "DONE",
+                "2025-05-28T20:48:23+09:00"
+        );
+        when(tossApiClient.authPayment(any())).thenReturn(mockResponse);
+
+        ReservationResponse response = reservationFacadeService.executeReservation(
+                new ReservationCreateRequest(
+                        new ReservationRequest(futureDate, time.getId(), theme.getId()),
+                        new PaymentRequest(
+                                "test_payment_key",
+                                "test_order_id",
+                                50000,
+                                "CARD"
+                        )),
+                member.getId()
+        );
+
+        assertAll(
+                () -> assertThat(response.member().name()).isEqualTo("Mint"),
+                () -> assertThat(response.date()).isEqualTo(futureDate),
+                () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(9, 0)),
+                () -> assertThat(response.reservedStatus()).isEqualTo(ReservationStatus.RESERVED.getName())
+        );
+    }
+
+    @Test
+    void executeReservation_shouldThrowException_whenPaymentFails() {
+        when(tossApiClient.authPayment(any())).thenThrow(
+                new TossPaymentClientException("카드 사용이 거절되었습니다. 카드사 문의가 필요합니다.")
+        );
+
+        assertThatThrownBy(() -> reservationFacadeService.executeReservation(
+                new ReservationCreateRequest(
+                        new ReservationRequest(futureDate, time.getId(), theme.getId()),
+                        new PaymentRequest(
+                                "test_payment_key",
+                                "test_order_id",
+                                50000,
+                                "CARD"
+                        )),
+                member.getId()))
+                .isInstanceOf(TossPaymentClientException.class)
+                .hasMessageContaining("카드 사용이 거절되었습니다. 카드사 문의가 필요합니다.");
     }
 }

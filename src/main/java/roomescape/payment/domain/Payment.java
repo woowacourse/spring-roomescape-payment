@@ -97,6 +97,10 @@ public class Payment {
         return requestedAt;
     }
 
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
     public Payment() {
     }
 }
