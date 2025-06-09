@@ -21,7 +21,7 @@ public interface ReservationTimeRepository extends ListCrudRepository<Reservatio
                          WHERE rs2.time.id = rt.id
                          AND rs2.date = :date
                          AND rs2.theme.id = :themeId
-                         AND r.reservationStatus != 'FAILED'
+                         AND r.reservationStatus.value != 'FAILED'
                      )
                  )
                  FROM ReservationTime AS rt

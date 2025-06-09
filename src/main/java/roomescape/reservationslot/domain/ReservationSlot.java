@@ -75,7 +75,7 @@ public class ReservationSlot {
     public Optional<Member> findHighestPriorityMember() {
         return reservations.stream()
                 .filter(reservation -> !reservation.isFailed())
-                .sorted(Comparator.comparing(Reservation::getCreatedAt))
+                .sorted(Comparator.comparing(reservation -> reservation.getCreatedAt().value()))
                 .map(Reservation::getMember)
                 .findFirst();
     }
