@@ -18,7 +18,6 @@ import roomescape.service.ReservationService;
 
 @RestController
 @RequestMapping("/admin/reservations")
-@Slf4j
 public class AdminReservationController {
 
     private final ReservationService reservationService;
