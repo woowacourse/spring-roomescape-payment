@@ -17,6 +17,7 @@ public class TossPaymentProperties {
     }
 
     public String getEncodedSecretKey() {
-        return Base64.getEncoder().encodeToString(widgetSecretKey.getBytes());
+        String preparedWidgetSecretKey = widgetSecretKey + ":";
+        return Base64.getEncoder().encodeToString(preparedWidgetSecretKey.getBytes());
     }
 }
