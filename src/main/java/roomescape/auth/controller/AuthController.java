@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginCheckResponse;
+import roomescape.auth.dto.LoginMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.infrastructure.util.CookieManager;
 import roomescape.auth.service.AuthService;
@@ -31,23 +32,19 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse response) {
-        log.debug("로그인 시작");
-
         final String token = authService.createToken(request);
-        log.debug("토큰 생성 완료");
-
         final ResponseCookie cookie = cookieManager.generateLoginCookie(token);
-        log.debug("쿠키 생성 완료");
-
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("로그인 성공");
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(final HttpServletResponse response) {
+    public void logout(final HttpServletResponse response,
+                       LoginMember loginMember) {
         final ResponseCookie cookie = cookieManager.generateLogoutCookie();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        log.info("로그아웃 - memberId={}", loginMember.id());
     }
 
     @GetMapping("/login/check")

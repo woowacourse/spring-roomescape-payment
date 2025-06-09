@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>방탈출 예약 결제 페이지</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="/css/reservation.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/toss-style.css" rel="stylesheet">
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+</head>
+<body>
+
+<!-- 결제창 ui -->
+<div class="wrapper w-100">
+    <div class="max-w-540 w-100">
+        <div class="w-100" id="payment-method"></div>
+        <div class="w-100" id="agreement"></div>
+        <div class="btn-wrapper w-100">
+            <button class="btn primary w-100"
+                    id="payment-button"
+                    th:attr="data-reservation-id=${reservationId}">
+                결제하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/user-scripts.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/js/user-payment.js"></script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 package roomescape.auth.dto;
 
 import lombok.NonNull;
+import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 
 public record LoginMember(
@@ -12,5 +13,9 @@ public record LoginMember(
 
     public boolean isAdmin() {
         return role.isAdmin();
+    }
+
+    public static LoginMember from(Member member) {
+        return new LoginMember(member.getId(), member.getName(), member.getEmail(), member.getRole());
     }
 }

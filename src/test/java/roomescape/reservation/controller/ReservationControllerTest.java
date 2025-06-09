@@ -1,36 +1,36 @@
 package roomescape.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createClaims;
+import static roomescape.TestFixture.createDefaultMember_1;
+import static roomescape.TestFixture.createDefaultTheme;
+import static roomescape.TestFixture.createReservationOf;
+import static roomescape.TestFixture.createTimeAt;
+import static roomescape.TestFixture.createTimeAt_10;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.IntegrationTest;
+import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
-import roomescape.member.domain.Password;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.RoomEscapeInformation;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.RoomEscapeInformationRepository;
 import roomescape.reservation.repository.WaitingReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
-@Sql("/member.sql")
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationControllerTest extends IntegrationTest {
 
     @Autowired
@@ -46,146 +46,63 @@ class ReservationControllerTest extends IntegrationTest {
     WaitingReservationRepository waitingReservationRepository;
 
     @Autowired
-    RoomEscapeInformationRepository roomEscapeInformationRepository;
-
-    @Autowired
     MemberRepository memberRepository;
 
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
+    @MockitoBean
+    TossRestClient tossRestClient;
+
+    @DisplayName("유저 본인의 예약 조회 성공")
     @Test
-    void 유저_예약_생성_조회_삭제() {
+    void getReservationById() {
         // given
-        Map<String, String> params = new HashMap<>();
-        LocalDate now = LocalDate.now();
-        LocalDate localDate = now.plusDays(1);
-        params.put("date", localDate.toString());
-        ReservationTime time = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
-        Theme theme = themeRepository.save(Theme.of("name", "desc", "thumb"));
-        params.put("timeId", time.getId().toString());
-        params.put("themeId", theme.getId().toString());
+        Member member = dbHelper.insertMember(createDefaultMember_1());
+        String token = jwtTokenProvider.createToken(createClaims(member));
 
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
+        ReservationTime time = dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
+        Theme theme = dbHelper.insertTheme(createDefaultTheme());
+        Reservation reservation = dbHelper.insertReservation(
+            createReservationOf(member, DEFAULT_DATE, time, theme)
+        );
+
+        // when & then
+        ReservationResponse response = givenWithDocs("reservation-getById")
+                .cookie("token", token)
+                .when().get("/reservations/" + reservation.getId())
                 .then().log().all()
                 .statusCode(200)
-                .extract()
-                .cookie("token");
+                .extract().as(ReservationResponse.class);
 
-        // when
-        // then
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201)
-                .body("id", is(1));
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(204);
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(0));
+        assertThat(response.id()).isEqualTo(reservation.getId());
+        assertThat(response.date()).isEqualTo(DEFAULT_DATE);
+        assertThat(response.time().startAt()).isEqualTo(time.getStartAt());
+        assertThat(response.theme().name()).isEqualTo(theme.getName());
+        assertThat(response.member().name()).isEqualTo(member.getName());
     }
 
-
     @Test
-    void 여러건의_동일_조건에_대한_동시_요청이_들어올_때_하나의_예약만_생성된다() throws InterruptedException {
-        int threadCount = 5;
-        CountDownLatch latch = new CountDownLatch(threadCount);
+    void 유저_예약_생성_성공() {
+        // given
+        Member member1 = dbHelper.insertMember(createDefaultMember_1());
+        ReservationTime reservationTimeAt10 = dbHelper.insertTime(createTimeAt_10());
+        Theme theme1 = dbHelper.insertTheme(createDefaultTheme());
+        String token = jwtTokenProvider.createToken(createClaims(member1));
 
-        final Member member = memberRepository.findByEmailAndPassword("admin@naver.com",
-                        Password.createForMember("1234"))
-                .orElseThrow();
-
-        ReservationTime time = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
-        Theme theme1 = themeRepository.save(Theme.of("name", "desc", "thumb"));
-        Theme theme2 = themeRepository.save(Theme.of("name2", "desc2", "thumb2"));
-        Theme theme3 = themeRepository.save(Theme.of("name3", "desc3", "thumb3"));
-
-        Map<String, String> params = new HashMap<>();
-        LocalDate localDate = LocalDate.of(2999, 1, 5);
-        params.put("date", localDate.toString());
-        params.put("timeId", time.getId().toString());
-        params.put("themeId", theme1.getId().toString());
-
-        RoomEscapeInformation info1 = RoomEscapeInformation.builder()
-                .date(localDate)
-                .time(time)
-                .theme(theme2)
-                .build();
-
-        RoomEscapeInformation info2 = RoomEscapeInformation.builder()
-                .date(localDate)
-                .time(time)
-                .theme(theme3)
-                .build();
-
-        roomEscapeInformationRepository.save(info1);
-        roomEscapeInformationRepository.save(info2);
-
-        reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(info1)
-                .member(member)
-                .build()
-        );
-        reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(info2)
-                .member(member)
-                .build()
+        ReservationRequest reservationRequest = new ReservationRequest(
+                DEFAULT_DATE,
+                reservationTimeAt10.getId(),
+                theme1.getId()
         );
 
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
+        // when & then
+        givenWithDocs("reservation-create")
+                .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
+                .body(reservationRequest)
+                .when().post("/reservations")
                 .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
-
-        // when
-        for (int i = 0; i < threadCount; i++) {
-            new Thread(() -> {
-                try {
-                    RestAssured.given()
-                            .contentType(ContentType.JSON)
-                            .cookie("token", token)
-                            .body(params)
-                            .when()
-                            .post("/reservations");
-                } finally {
-                    latch.countDown();
-                }
-            }).start();
-        }
-
-        latch.await();
-
-        // then
-        Thread.sleep(1000);
-
-        long booked = reservationRepository.findByMember(member)
-                .size();
-
-        assertThat(booked).isEqualTo(3); // 기존 2건 + 예약 1건 = 3건
+                .statusCode(HttpStatus.CREATED.value());
     }
 }

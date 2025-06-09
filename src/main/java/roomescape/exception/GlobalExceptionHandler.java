@@ -28,7 +28,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<Object> handleUnauthorizedException(final UnauthorizedException e,
                                                               final WebRequest request) {
-        log.error(e.getMessage(), e);
         return buildResponseEntity(e, HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 
@@ -40,13 +39,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(TokenCreationException.class)
     public ResponseEntity<Object> handleTokenCreationException(final TokenCreationException e,
                                                                final WebRequest request) {
-        log.error(e.getMessage(), e);
         return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "토큰 생성 중 오류가 발생했습니다.", request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleInternalServerException(final Exception e, final WebRequest request) {
-        log.error(e.getMessage(), e);
         return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.", request);
     }
 
@@ -57,6 +54,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             final WebRequest request
     ) {
         final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+
+        // 공통 로그 출력
+        if (status.is5xxServerError()) {
+            log.error("[{}] {}: {}", status.value(), path, message, e);
+        } else {
+            log.warn("[{}] {}: {}", status.value(), path, message);
+        }
+
         final ProblemDetail body = super.createProblemDetail(e, status, message, path, null, request);
         return super.handleExceptionInternal(e, body, new HttpHeaders(), status, request);
     }

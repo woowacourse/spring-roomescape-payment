@@ -23,6 +23,8 @@ public class DatabaseCleaner {
         jdbcTemplate.execute("ALTER TABLE theme ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.execute("TRUNCATE TABLE member");
         jdbcTemplate.execute("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("TRUNCATE TABLE payment");
+        jdbcTemplate.execute("ALTER TABLE payment ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 }

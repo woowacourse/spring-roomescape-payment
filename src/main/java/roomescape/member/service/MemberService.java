@@ -2,6 +2,7 @@ package roomescape.member.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
@@ -13,6 +14,7 @@ import roomescape.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -20,6 +22,7 @@ public class MemberService {
     @Transactional
     public void signup(final MemberRequest memberRequest) {
         if (memberRepository.existsByEmail(memberRequest.email())) {
+            log.warn("회원가입 실패 - 중복 이메일: email={}", memberRequest.email());
             throw new IllegalArgumentException("이미 가입된 이메일입니다. email=" + memberRequest.email());
         }
         memberRepository.save(
@@ -30,6 +33,7 @@ public class MemberService {
                         .role(MemberRole.MEMBER)
                         .build()
         );
+        log.info("회원가입 성공: email={}", memberRequest.email());
     }
 
     public List<MemberResponse> findAllMember() {

@@ -1,0 +1,13 @@
+== 결제(Payment)
+
+=== 예약 생성 및 결제 승인 API
+==== request
+include::{snippets}/confirm-payment/http-request.adoc[]
+==== response
+include::{snippets}/confirm-payment/http-response.adoc[]
+
+=== 결제 전 예약에 대한 결제 시작 API
+==== request
+include::{snippets}/proceed-payment/http-request.adoc[]
+==== response
+include::{snippets}/proceed-payment/http-response.adoc[]

@@ -17,9 +17,9 @@ public interface ReservationTimeRepository extends JpaRepository<ReservationTime
               )
             from ReservationTime rt
             left join Reservation r
-              on rt.id = r.roomEscapeInformation.time.id
-              and r.roomEscapeInformation.date = :date
-              and r.roomEscapeInformation.theme.id = :themeId
+              on rt.id = r.registrationSlot.time.id
+              and r.registrationSlot.date = :date
+              and r.registrationSlot.theme.id = :themeId
             order by rt.startAt
             """)
     List<AvailableReservationTimeResponse> findAllAvailable(

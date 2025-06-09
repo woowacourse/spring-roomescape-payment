@@ -2,39 +2,34 @@ package roomescape.reservationtime.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.constant.TestData.RESERVATION_TIME_COUNT;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createDefaultMember_1;
+import static roomescape.TestFixture.createDefaultTheme;
+import static roomescape.TestFixture.createReservationOf;
+import static roomescape.TestFixture.createTimeAt;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.context.annotation.Import;
+import roomescape.DBHelper;
 import roomescape.exception.ReservationException;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
-import roomescape.member.domain.Password;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.domain.RoomEscapeInformation;
-import roomescape.reservation.repository.RoomEscapeInformationRepository;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
 @DataJpaTest
-@Sql("/data.sql")
+@Import({ReservationTimeService.class, DBHelper.class})
 class ReservationTimeServiceTest {
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private RoomEscapeInformationRepository roomEscapeInformationRepository;
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -42,25 +37,11 @@ class ReservationTimeServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private ReservationTimeService service;
-    private Theme theme;
-    private Member member;
+    @Autowired
+    ReservationTimeService reservationTimeService;
 
-    @BeforeEach
-    void setUp() {
-        service = new ReservationTimeService(reservationTimeRepository, roomEscapeInformationRepository);
-
-        theme = Theme.of("테마1", "설명1", "썸네일1");
-        themeRepository.save(theme);
-
-        member = Member.builder()
-                .name("사용자1")
-                .email("user1@example.com")
-                .password(Password.createForMember("pass123"))
-                .role(MemberRole.MEMBER)
-                .build();
-        memberRepository.save(member);
-    }
+    @Autowired
+    DBHelper dbHelper;
 
     @Test
     void 예약_시간이_정상적으로_저장된다() {
@@ -69,7 +50,7 @@ class ReservationTimeServiceTest {
         ReservationTimeRequest request = new ReservationTimeRequest(newTime);
 
         // when
-        ReservationTimeResponse response = service.saveTime(request);
+        ReservationTimeResponse response = reservationTimeService.saveTime(request);
 
         // then
         assertThat(response.id()).isNotNull();
@@ -79,20 +60,19 @@ class ReservationTimeServiceTest {
     @Test
     void 모든_예약_시간을_조회한다() {
         // given
-        LocalTime time1 = LocalTime.of(10, 0);
-        LocalTime time2 = LocalTime.of(11, 30);
-        reservationTimeRepository.saveAll(List.of(
-                ReservationTime.from(time1),
-                ReservationTime.from(time2)
-        ));
+        dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
+        dbHelper.insertTime(createTimeAt(LocalTime.of(11, 0)));
 
         // when
-        List<ReservationTimeResponse> responses = service.findAll();
+        List<ReservationTimeResponse> responses = reservationTimeService.findAll();
 
         // then
-        assertThat(responses).hasSize(RESERVATION_TIME_COUNT + 2)
+        assertThat(responses).hasSize(2)
                 .extracting(ReservationTimeResponse::startAt)
-                .contains(time1, time2);
+                .contains(
+                        LocalTime.of(10, 0),
+                        LocalTime.of(11, 0)
+                );
     }
 
     @Test
@@ -102,7 +82,7 @@ class ReservationTimeServiceTest {
         ReservationTime savedTime = reservationTimeRepository.save(time);
 
         // when
-        service.delete(savedTime.getId());
+        reservationTimeService.delete(savedTime.getId());
 
         // then
         assertThat(reservationTimeRepository.findById(savedTime.getId())).isEmpty();
@@ -111,18 +91,18 @@ class ReservationTimeServiceTest {
     @Test
     void 예약이_있는_시간은_삭제할_수_없다() {
         // given
-        ReservationTime time = ReservationTime.from(LocalTime.of(15, 0));
-        ReservationTime savedTime = reservationTimeRepository.save(time);
+        ReservationTime time = dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
 
-        RoomEscapeInformation info = RoomEscapeInformation.builder()
-                .date(LocalDate.of(2999, 12, 31))
-                .time(savedTime)
-                .theme(theme)
-                .build();
-        roomEscapeInformationRepository.save(info);
+        Reservation reservation = createReservationOf(
+                createDefaultMember_1(),
+                DEFAULT_DATE,
+                time,
+                createDefaultTheme()
+        );
+        dbHelper.insertReservation(reservation);
 
         // when & then
-        assertThatThrownBy(() -> service.delete(savedTime.getId()))
+        assertThatThrownBy(() -> reservationTimeService.delete(time.getId()))
                 .isInstanceOf(ReservationException.class)
                 .hasMessage("해당 시간으로 예약된 건이 존재합니다.");
     }

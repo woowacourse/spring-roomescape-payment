@@ -15,7 +15,6 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
-import roomescape.member.domain.Password;
 import roomescape.member.repository.MemberRepository;
 
 @Service
@@ -29,9 +28,18 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     public String createToken(final LoginRequest loginRequest) {
-        final Member member = memberRepository.findByEmailAndPassword(loginRequest.email(),
-                        Password.createForMember(loginRequest.password()))
-                .orElseThrow(() -> new UnauthorizedException("이메일 또는 패스워드가 올바르지 않습니다."));
+        Member member = memberRepository.findByEmail(loginRequest.email())
+                .orElseThrow(() -> {
+                    log.warn("로그인 실패 - 존재하지 않는 email의 사용자. email={}", loginRequest.email());
+                    return new UnauthorizedException("이메일 또는 패스워드가 올바르지 않습니다.");
+                });
+
+        if(!member.matchesPassword(loginRequest.password())) {
+            log.warn("로그인 실패 - 잘못된 비밀번호. memberId={}", member.getId());
+            throw new UnauthorizedException("이메일 또는 패스워드가 올바르지 않습니다.");
+        }
+
+        log.info("로그인 성공 - memberId={}", member.getId());
         return jwtTokenProvider.createToken(createClaims(member));
     }
 
@@ -44,7 +52,10 @@ public class AuthService {
     public LoginCheckResponse checkLogin(final String token) {
         final Long memberId = parseMemberId(token);
         final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new UnauthorizedException("유효하지 않은 회원입니다. id: " + memberId));
+                .orElseThrow(() -> {
+                    log.warn("checkLogin 실패 - 존재하지 않는 사용자. memberId={}", memberId);
+                    return new UnauthorizedException("유효하지 않은 회원입니다. id: " + memberId);
+                });
         return new LoginCheckResponse(member);
     }
 
@@ -59,6 +70,7 @@ public class AuthService {
     public void checkAdmin(final HttpServletRequest request) {
         final LoginMember loginMember = extractMemberByRequest(request);
         if (!loginMember.isAdmin()) {
+            log.warn("권한 없음 - 관리자 아님: memberId={}", loginMember.id());
             throw new ForbiddenException("관리자 권한이 필요합니다.");
         }
     }
@@ -67,7 +79,7 @@ public class AuthService {
         try {
             return findMemberByMemberId(extractMemberId(request));
         } catch (IllegalArgumentException | NotFoundException e) {
-            log.debug(e.getMessage());
+            log.warn("인증 실패 - memberId 추출 또는 회원 조회 실패. 원인={}", e.getMessage());
             throw new UnauthorizedException("인증에 실패했습니다.");
         }
     }
@@ -77,7 +89,10 @@ public class AuthService {
         return Optional.ofNullable(raw)
                 .filter(Long.class::isInstance)
                 .map(Long.class::cast)
-                .orElseThrow(() -> new IllegalArgumentException("memberId 형식이 올바르지 않습니다. memberId =" + raw));
+                .orElseThrow(() -> {
+                    log.warn("HttpServletRequest에서 memberId 추출 실패 - memberId={}", raw);
+                    return new IllegalArgumentException("memberId 형식이 올바르지 않습니다. memberId =" + raw);
+                });
     }
 
     private LoginMember findMemberByMemberId(final Long memberId) {

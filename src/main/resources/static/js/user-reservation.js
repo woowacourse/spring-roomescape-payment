@@ -97,7 +97,7 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-    fetch(`/reservations/times?date=${date}&themeId=${themeId}`, {
+    fetch(`/times/available?date=${date}&themeId=${themeId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -201,6 +201,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 내 서버 URL에 맞게 reservationURL 변경
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
+
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,

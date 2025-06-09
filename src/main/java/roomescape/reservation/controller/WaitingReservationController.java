@@ -16,6 +16,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.dto.WaitingReservationRequest;
 import roomescape.reservation.dto.WaitingReservationResponse;
 import roomescape.reservation.service.WaitingReservationService;
+import roomescape.reservation.service.dto.CreateRegistrationCommand;
 
 @Validated
 @RestController
@@ -28,14 +29,17 @@ public class WaitingReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public WaitingReservationResponse saveWaitingReservation(@Valid @RequestBody final WaitingReservationRequest request,
-                                           final LoginMember member) {
-        return waitingReservationService.registerWaitingReservation(request, member);
+    public WaitingReservationResponse saveWaitingReservation(
+            @Valid @RequestBody final WaitingReservationRequest request,
+            final LoginMember member) {
+        return waitingReservationService.registerWaitingReservation(
+                new CreateRegistrationCommand(member.id(), request.date(), request.timeId(), request.themeId())
+        );
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@NotNull @PathVariable final Long id) {
-        waitingReservationService.deleteById(id);
+    public void delete(@NotNull @PathVariable final Long id, LoginMember loginMember) {
+        waitingReservationService.cancelWaitingByIdForMember(id, loginMember);
     }
 }

@@ -1,0 +1,16 @@
+package roomescape.reservation.repository.dto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public interface MemberRegistrationProjection {
+    Long getId();
+    String getReservationStatus();
+    String getThemeName();
+    LocalDate getDate();
+    LocalTime getTime();
+    int getRank();
+    String getPaymentKey();
+    Long getAmount();
+    String getPaymentStatus();
+}

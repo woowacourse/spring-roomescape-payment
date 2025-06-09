@@ -2,37 +2,39 @@ package roomescape.theme.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createDefaultMember_1;
+import static roomescape.TestFixture.createDefaultTheme;
+import static roomescape.TestFixture.createReservationOf;
+import static roomescape.TestFixture.createTimeAt_10;
 
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.context.annotation.Import;
+import roomescape.DBHelper;
+import roomescape.TestFixture;
 import roomescape.exception.ReservationException;
-import roomescape.reservation.repository.RoomEscapeInformationRepository;
+import roomescape.reservation.domain.Reservation;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
 
 @DataJpaTest
-@Sql("/data.sql")
+@Import({ThemeService.class, DBHelper.class})
 class ThemeServiceTest {
-
-    @Autowired
-    private RoomEscapeInformationRepository roomEscapeInformationRepository;
 
     @Autowired
     private ThemeRepository themeRepository;
 
-    private ThemeService service;
+    @Autowired
+    private ThemeService themeService;
 
-    @BeforeEach
-    void setUp() {
-        service = new ThemeService(themeRepository, roomEscapeInformationRepository);
-    }
+    @Autowired
+    DBHelper dbHelper;
 
     @Test
     void 테마가_저장된다() {
@@ -40,7 +42,7 @@ class ThemeServiceTest {
         ThemeRequest request = new ThemeRequest("이름3", "설명3", "썸네일3");
 
         // when
-        ThemeResponse response = service.saveTheme(request);
+        ThemeResponse response = themeService.saveTheme(request);
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -52,37 +54,48 @@ class ThemeServiceTest {
 
     @Test
     void 모든_테마를_조회한다() {
+        // given
+        dbHelper.insertTheme(TestFixture.createThemeByName("테마1"));
+        dbHelper.insertTheme(TestFixture.createThemeByName("테마2"));
+
         // when
-        List<ThemeResponse> all = service.findAll();
+        List<ThemeResponse> all = themeService.findAll();
 
         // then
-        assertThat(all).hasSize(2);
+        assertThat(all)
+                .hasSize(2)
+                .extracting(ThemeResponse::name)
+                .containsExactly("테마1", "테마2");
     }
 
     @Test
     void 테마가_삭제된다() {
         // given
-        final Theme theme = Theme.of("테마3", "설명3", "썸네일3");
-        final Theme savedTheme = themeRepository.save(theme);
-        assertThat(savedTheme.getId()).isEqualTo(3L);
+        Theme theme = dbHelper.insertTheme(createDefaultTheme());
+        assertThat(themeRepository.findAll()).hasSize(1);
 
         // when
-        service.delete(savedTheme.getId());
+        themeService.delete(theme.getId());
 
         // then
-        List<ThemeResponse> afterDelete = service.findAll();
-        assertThat(afterDelete)
-                .hasSize(2)
-                .extracting(ThemeResponse::id)
-                .doesNotContain(3L);
+        assertThat(themeRepository.findAll()).hasSize(0);
     }
 
     @Test
     void 예약이_존재하는_테마를_삭제하지_못_한다() {
         // given
-        // when
-        // then
-        assertThatThrownBy(() -> service.delete(1L))
+        Theme theme = dbHelper.insertTheme(createDefaultTheme());
+
+        Reservation reservation = createReservationOf(
+                createDefaultMember_1(),
+                DEFAULT_DATE,
+                createTimeAt_10(),
+                theme
+        );
+        dbHelper.insertReservation(reservation);
+
+        // when & then
+        assertThatThrownBy(() -> themeService.delete(theme.getId()))
                 .isInstanceOf(ReservationException.class)
                 .hasMessage("해당 테마로 예약된 건이 존재합니다.");
     }

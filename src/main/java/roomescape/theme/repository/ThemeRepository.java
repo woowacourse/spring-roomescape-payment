@@ -11,11 +11,12 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
 
     @Query("""
             SELECT t FROM Theme t
-            JOIN Reservation r ON r.roomEscapeInformation.theme.id = t.id
-            WHERE r.roomEscapeInformation.date BETWEEN :startDate AND :endDate
+            LEFT JOIN Reservation r ON r.registrationSlot.theme.id = t.id
+                AND r.registrationSlot.date BETWEEN :startDate AND :endDate
             GROUP BY t
             ORDER BY COUNT(r) DESC
             LIMIT 10
             """)
+    //TODO: LIMIT도 파라미터로 받기
     List<Theme> findAllPopular(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }
