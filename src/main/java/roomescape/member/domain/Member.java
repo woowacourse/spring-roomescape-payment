@@ -27,7 +27,7 @@ public class Member {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "password", nullable = false))
     private Password password;
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(value = EnumType.STRING) @Column(name = "role", nullable = false)
     private Role role;
 
     protected Member() {}

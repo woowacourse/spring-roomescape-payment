@@ -12,16 +12,11 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
 
----
-
 logging:
   level:
     root: info
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
-
----
 
 spring:
   config:
@@ -53,6 +48,7 @@ security:
     token:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
+
 
 payment:
   toss:
