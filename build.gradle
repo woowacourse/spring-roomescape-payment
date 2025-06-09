@@ -45,13 +45,16 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.3'
 }
 
-def snippetsDir = file("build/generated-snippets")
+def snippetsDir = file('build/generated-snippets')
 
 asciidoctor {
-    dependsOn test
-    configurations 'asciidoctorExt'
     inputs.dir snippetsDir
-    attributes 'snippets': snippetsDir
+    dependsOn test // 테스트가 실행되고 스니펫이 생성된 후 문서가 빌드되도록 합니다.
+    configurations 'asciidoctorExt'
+
+    attributes(
+            'snippets': snippetsDir
+    )
 }
 
 test {
@@ -60,20 +63,7 @@ test {
 
 bootJar {
     dependsOn asciidoctor
-    from ("build/generated-snippets/html5") {
-        into 'static/docs'
+    from("build/generated-snippets/html5") {
+        into 'static/docs' // 최종 JAR 파일 내의 위치입니다.
     }
-}
-
-tasks.register('copyApiDocument', Copy) {
-    dependsOn asciidoctor
-    doFirst {
-        delete file("src/main/resources/static/docs")
-    }
-    from "build/docs/asciidoc"
-    into file("src/main/resources/static/docs")
-}
-
-build {
-    dependsOn copyApiDocument
 }
