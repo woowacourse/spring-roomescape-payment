@@ -16,16 +16,20 @@ public class TossPaymentErrorHandler extends DefaultResponseErrorHandler {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void handleError(final ClientHttpResponse response) throws IOException {
-        if (response.getStatusCode().isError()) {
-            final String body = new String(getResponseBody(response), StandardCharsets.UTF_8);
-            final TossPaymentError tossPaymentError = mapper.readValue(body, TossPaymentError.class);
+    public void handleError(final ClientHttpResponse response) {
+        try {
+            if (response.getStatusCode().isError()) {
+                final String body = new String(getResponseBody(response), StandardCharsets.UTF_8);
+                final TossPaymentError tossPaymentError = mapper.readValue(body, TossPaymentError.class);
 
-            boolean exists = FilteredPaymentErrorCode.exists(tossPaymentError.code());
-            if (exists) {
-                throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", INTERNAL_SERVER_ERROR.name());
+                boolean exists = FilteredPaymentErrorCode.exists(tossPaymentError.code());
+                if (exists) {
+                    throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", INTERNAL_SERVER_ERROR.name());
+                }
+                throw new PaymentException(response.getStatusCode(), tossPaymentError.message(), tossPaymentError.code());
             }
-            throw new PaymentException(response.getStatusCode(), tossPaymentError.message(), tossPaymentError.code());
+        } catch (IOException e) {
+            throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", e);
         }
     }
 
