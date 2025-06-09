@@ -1,4 +1,4 @@
-package roomescape.payment.infrasturcture.client;
+package roomescape.payment.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentInternalServerException;
-import roomescape.payment.infrastructure.client.TossPaymentClient;
 import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 import roomescape.payment.infrastructure.client.dto.PaymentResult;
 

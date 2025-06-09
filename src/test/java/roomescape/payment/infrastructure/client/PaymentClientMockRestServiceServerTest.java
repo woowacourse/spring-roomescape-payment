@@ -1,4 +1,4 @@
-package roomescape.payment.infrasturcture.client;
+package roomescape.payment.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -13,9 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.config.TestPaymentConfiguration;
 import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 import roomescape.payment.infrastructure.client.dto.PaymentResult;
-import roomescape.payment.infrasturcture.client.config.TestPaymentConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

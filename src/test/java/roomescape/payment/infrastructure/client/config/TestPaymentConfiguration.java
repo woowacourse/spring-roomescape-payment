@@ -1,4 +1,4 @@
-package roomescape.payment.infrasturcture.client.config;
+package roomescape.payment.infrastructure.client.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
