@@ -31,56 +31,10 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ProblemDetail> notFoundExceptionHandler(NotFoundException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setTitle("데이터가 존재하지 않습니다.");
-        problemDetail.setDetail(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ProblemDetail> badRequestExceptionHandler(BadRequestException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("올바르지 않은 입력입니다.");
-        problemDetail.setDetail(exception.getMessage());
-        return ResponseEntity.badRequest().body(problemDetail);
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ProblemDetail> unauthorizedExceptionHandler(UnauthorizedException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problemDetail.setTitle("인증을 먼저 진행해주세요.");
-        problemDetail.setDetail(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetail);
-    }
-
-    @ExceptionHandler(LoginFailException.class)
-    public ResponseEntity<ProblemDetail> loginFailExceptionHandler(LoginFailException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("로그인에 실패했습니다.");
-        problemDetail.setDetail("로그인 정보를 다시 확인해주세요.");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ProblemDetail> forbiddenExceptionHandler(ForbiddenException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
-        problemDetail.setTitle("권한이 없습니다.");
-        problemDetail.setDetail(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ProblemDetail> methodArgumentNotValidExceptionHandler(
             MethodArgumentNotValidException exception
     ) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
         List<String> messages = fieldErrors.stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -95,7 +49,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handlerMethodValidationExceptionHandler(
             HandlerMethodValidationException exception
     ) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
         List<String> errorMessage = exception.getAllErrors().stream()
                 .map(MessageSourceResolvable::getDefaultMessage)
                 .toList();
@@ -109,11 +62,65 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> httpMessageNotReadableExceptionHandler(
             HttpMessageNotReadableException exception
     ) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("올바르지 않은 입력입니다.");
         problemDetail.setDetail("요청 메세지의 형식을 다시 확인해주세요.");
         return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ProblemDetail> illegalArgumentExceptionHandler(IllegalArgumentException exception) {
+        log.info("[INFO][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("올바르지 않은 입력입니다.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ProblemDetail> notFoundExceptionHandler(NotFoundException exception) {
+        log.info("[INFO][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("데이터가 존재하지 않습니다.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ProblemDetail> badRequestExceptionHandler(BadRequestException exception) {
+        log.info("[INFO][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("올바르지 않은 입력입니다.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(LoginFailException.class)
+    public ResponseEntity<ProblemDetail> loginFailExceptionHandler(LoginFailException exception) {
+        log.info("[INFO][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("로그인에 실패했습니다.");
+        problemDetail.setDetail("로그인 정보를 다시 확인해주세요.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+    }
+
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ProblemDetail> unauthorizedExceptionHandler(UnauthorizedException exception) {
+        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        problemDetail.setTitle("인증을 먼저 진행해주세요.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetail);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ProblemDetail> forbiddenExceptionHandler(ForbiddenException exception) {
+        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        problemDetail.setTitle("권한이 없습니다.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
     }
 
     @ExceptionHandler(PaymentException.class)
@@ -123,15 +130,6 @@ public class GlobalExceptionHandler {
         log.warn("[WARN][{}]", LocalDateTime.now(), exception);
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("결제 승인에 실패했습니다");
-        problemDetail.setDetail(exception.getMessage());
-        return ResponseEntity.badRequest().body(problemDetail);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ProblemDetail> illegalArgumentExceptionHandler(IllegalArgumentException exception) {
-        log.warn("[WARN][{}]", LocalDateTime.now(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("올바르지 않은 입력입니다.");
         problemDetail.setDetail(exception.getMessage());
         return ResponseEntity.badRequest().body(problemDetail);
     }
