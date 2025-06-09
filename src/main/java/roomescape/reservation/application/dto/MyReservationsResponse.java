@@ -51,6 +51,6 @@ public record MyReservationsResponse(long id,
                 .validateNotNull(Fields.theme, themeResponse, DomainTerm.THEME.label())
                 .validateNotNull(Fields.sequence, sequence, DomainTerm.RESERVATION_WAITING_ORDER.label())
                 .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
-                .validatePositive(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label());
+                .validateNonNegative(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label());
     }
 }

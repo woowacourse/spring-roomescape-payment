@@ -31,7 +31,7 @@ public class PaymentAmount {
 
     private static void validate(final int value) {
         Validator.of(PaymentAmount.class)
-                .validatePositive(Fields.value, value, DomainTerm.PAYMENT_AMOUNT.label());
+                .validateNonNegative(Fields.value, value, DomainTerm.PAYMENT_AMOUNT.label());
     }
 
 }

@@ -14,7 +14,7 @@ public record MyReservation(long id,
                             int amount
 ) {
 
-    private static final String PAYMENT_WAITING = "결제 대기";
+    private static final String PAYMENT_WAITING = "PAYMENT_WAITING";
 
     public MyReservation(
             long id,

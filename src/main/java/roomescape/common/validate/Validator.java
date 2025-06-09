@@ -72,12 +72,12 @@ public class Validator {
                 fieldDescription);
     }
 
-    public Validator validatePositive(final String fieldName,
-                                      final int target,
-                                      final String fieldDescription) {
+    public Validator validateNonNegative(final String fieldName,
+                                         final int target,
+                                         final String fieldDescription) {
         if (target < 0) {
             throw buildException(
-                    ValidationType.POSITIVE_CHECK,
+                    ValidationType.NON_NEGATIVE_CHECK,
                     fieldName,
                     fieldDescription);
         }
@@ -102,7 +102,7 @@ public class Validator {
         BLANK_CHECK("while checking blank"),
         URI_CHECK("while checking URI"),
         EMAIL_CHECK("while checking email"),
-        POSITIVE_CHECK("while checking positive value");
+        NON_NEGATIVE_CHECK("while checking non-negative value");
 
         private final String description;
     }

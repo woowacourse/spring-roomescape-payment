@@ -27,7 +27,7 @@ public record PaymentResult(String paymentKey,
         Validator.of(PaymentResult.class)
                 .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
                 .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
-                .validateNotNull(Fields.totalAmount, amount, DomainTerm.PAYMENT_AMOUNT.label());
+                .validateNonNegative(Fields.totalAmount, amount, DomainTerm.PAYMENT_AMOUNT.label());
     }
 
     public Payment toEntity(final Reservation reservation) {

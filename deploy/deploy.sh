@@ -2,7 +2,7 @@
 
 APP_NAME="spring-roomescape"
 JAR_NAME="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
-PROJECT_PATH="$HOME\spring-roomescape-payment"
+PROJECT_PATH="$HOME/spring-roomescape-payment"
 PROFILE=${1:-prod}
 PORT=8080
 
@@ -112,7 +112,8 @@ check_application_status() {
     log_info "헬스 체크 시작..."
 
     for i in {1..10}; do
-      if curl -s "http://localhost:$PORT/actuator/health" | grep -q '"status":"UP"'; then
+      HEALTH_STATUS=$(curl -s "http://localhost:$PORT/actuator/health" | jq -r '.status' 2>/dev/null || echo "")
+      if [ "$HEALTH_STATUS" = "UP" ]; then
         log_info "✅ 애플리케이션 정상 작동"
         return 0
       fi

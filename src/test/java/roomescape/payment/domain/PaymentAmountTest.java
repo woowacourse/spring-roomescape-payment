@@ -10,11 +10,11 @@ class PaymentAmountTest {
 
     @Test
     @DisplayName("결제 금액이 음수이면 예외가 발생한다")
-    void validatePositivePaymentAmount() {
+    void validateNonNegativePaymentAmount() {
         // when
         // then
         assertThatThrownBy(() -> PaymentAmount.from(-1))
                 .isInstanceOf(InvalidInputException.class)
-                .hasMessage("Validation failed [while checking positive value]: PaymentAmount.value");
+                .hasMessage("Validation failed [while checking non-negative value]: PaymentAmount.value");
     }
 }
