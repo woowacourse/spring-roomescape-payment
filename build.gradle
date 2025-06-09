@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '4.0.2'
     id 'java'
 }
 
@@ -16,23 +17,66 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    asciidoctorExt
+}
+
 dependencies {
+    // Spring Boot starters
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    // DB
     runtimeOnly 'com.h2database:h2'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // REST Docs
+    add("asciidoctorExt", "org.springframework.restdocs:spring-restdocs-asciidoctor")
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 test {
+    outputs.dir snippetsDir
     useJUnitPlatform()
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    sources {
+        include 'index.adoc'
+    }
+    baseDirFollowsSourceFile()
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+tasks.register('createDocument', Copy) {
+    doFirst {
+        delete file("src/main/resources/static/docs")
+    }
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn tasks.named('createDocument')
+    from("build/docs/asciidoc") {
+        into 'static/docs'
+    }
 }

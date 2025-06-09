@@ -9,6 +9,7 @@ import roomescape.timeslot.dto.response.TimeSlotResponse;
 
 public record ReservationResponse(Long id, LocalDate date, TimeSlotResponse time, ThemeResponse theme,
                                   MemberResponse member) {
+
     public static ReservationResponse from(final Reservation reservation) {
         return new ReservationResponse(
                 reservation.getId(),

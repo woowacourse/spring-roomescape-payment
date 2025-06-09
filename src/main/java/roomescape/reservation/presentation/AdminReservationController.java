@@ -41,9 +41,9 @@ public class AdminReservationController {
         ReservationResponse response = reservationService.createReservationWithoutPayment(
                 new ReservationRequest(request.date(), request.timeId(), request.themeId()), request.memberId()
         );
-
         return ResponseEntity.created(URI.create("/admin/reservation")).body(response);
     }
+
     @GetMapping("/waitings")
     public ResponseEntity<List<ReservationResponse>> getWaitings(@LoginAdmin final LoginAdminInfo adminInfo) {
         return ResponseEntity.ok(reservationService.findAllWaitings());

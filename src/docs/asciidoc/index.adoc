@@ -1,0 +1,82 @@
+= Room Escape API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== Introduction
+
+This document describes the Room Escape API.
+
+== Time Slot API
+
+=== 예약 시간 목록 조회
+operation::time-slot/find-all[snippets='http-request,http-response,response-fields']
+
+=== 예약 시간 추가
+operation::time-slot/create[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 시간 삭제
+operation::time-slot/delete[snippets='http-request,path-parameters,http-response']
+
+== Theme API
+
+=== 테마 목록 조회
+operation::theme/find-all[snippets='http-request,http-response,response-fields']
+
+=== 테마 생성
+operation::theme/create[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 테마 삭제
+operation::theme/delete[snippets='http-request,path-parameters,http-response']
+
+// === 인기 테마 조회
+// operation::theme/popular-themes[snippets='http-request,http-response,response-fields']
+//
+// == Member Reservation API
+//
+// === 예약 생성
+// operation::member-reservation/create-reservation[snippets='http-request,request-fields,http-response,response-fields']
+//
+// === 대기 생성
+// operation::member-reservation/create-waiting[snippets='http-request,request-fields,http-response,response-fields']
+//
+// === 나의 예약/대기 목록 조회
+// operation::member-reservation/my-reservations[snippets='http-request,http-response,response-fields']
+//
+// == Admin Reservation API
+//
+// === 예약 생성
+// operation::admin-reservation/create[snippets='http-request,request-fields,http-response,response-fields']
+//
+// === 예약 조건 검색
+// operation::admin-reservation/search[snippets='http-request,http-response,response-fields']
+//
+// === 예약 대기 목록 조회
+// operation::admin-reservation/waitings[snippets='http-request,http-response,response-fields']
+//
+// == Reservation API
+//
+// === 예약 목록 전체 조회
+// operation::reservation/find-all[snippets='http-request,http-response,response-fields']
+//
+// === 예약 삭제
+// operation::reservation/delete[snippets='http-request,path-parameters,http-response']
+
+== Admin Login API
+
+=== 관리자 로그인
+operation::admin-login/login[snippets='http-request,request-fields,http-response,response-body']
+
+=== 로그인 상태 확인
+operation::admin-login/check[snippets='http-request,http-response,response-fields']
+
+== Member Login API
+
+=== 회원 로그인
+operation::member-login/login[snippets='http-request,request-fields,http-response,response-body']
+
+=== 로그인 상태 확인
+operation::member-login/check[snippets='http-request,http-response,response-fields']

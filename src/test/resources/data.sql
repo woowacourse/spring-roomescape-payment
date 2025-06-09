@@ -15,13 +15,3 @@ INSERT INTO member (name, email, password) VALUES
 
 INSERT INTO admin (name, email, password) VALUES
     ('어드민', 'admin@email.com', 'password');
-
-INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES
-    ('2025-04-28', 1, 1, 1, 'RESERVED'),
-    ('2025-04-28', 2, 1, 1, 'RESERVED'),
-    ('2025-04-26', 1, 3, 2, 'RESERVED'),
-    ('2025-04-18', 1, 2, 3, 'RESERVED');
-
-INSERT INTO waiting (reservation_id, member_id) VALUES
-    (1, 2),
-    (1, 3);
