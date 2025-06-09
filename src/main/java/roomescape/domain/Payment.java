@@ -16,9 +16,7 @@ public class Payment {
 
     private int amount;
 
-    private String orderId;
-
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     public Payment(PaymentRequest request, Reservation reservation) {
