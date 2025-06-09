@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -29,11 +30,10 @@ public class TossPaymentGateway implements PaymentGateway {
     private final ObjectMapper objectMapper;
 
     public TossPaymentGateway(@Value("${toss.payment.secret-key}") final String secretKey,
-                              final RestClient.Builder builder,
+                              @Qualifier("tossRestClient") final RestClient restClient,
                               final ObjectMapper objectMapper) {
         this.secretKey = secretKey;
-        this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
-                .build();
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 

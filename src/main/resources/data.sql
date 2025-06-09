@@ -38,7 +38,7 @@ values (NEXT VALUE FOR MEMBER_ID_SEQUENCE, '포스티', 'posty@woowa.com', '1234
 insert into member (id, name, email, password, role)
 values (NEXT VALUE FOR MEMBER_ID_SEQUENCE, '하루', 'haru@woowa.com', '12341234', 'MEMBER');
 insert into member (id, name, email, password, role)
-values (NEXT VALUE FOR MEMBER_ID_SEQUENCE, '로키', 'roky@woowa.com', '12341234', 'ADMIN');
+values (NEXT VALUE FOR MEMBER_ID_SEQUENCE, '조앤', 'Joanne@woowa.com', '12341234', 'ADMIN');
 
 -- 포스티 예약 목록
 insert into reservation (id, date, time_id, theme_id, member_id, status)
@@ -82,7 +82,7 @@ values (NEXT VALUE FOR WAITING_ID_SEQUENCE, CURRENT_DATE - 2, 2, 2, 1, DATEADD('
 insert into waiting (id, date, time_id, theme_id, member_id, created_at)
 values (NEXT VALUE FOR WAITING_ID_SEQUENCE, CURRENT_DATE - 2, 3, 3, 1, DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 
--- 로키 예약 대기 목록
+-- 관리자 예약 대기 목록
 insert into waiting (id, date, time_id, theme_id, member_id, created_at)
 values (NEXT VALUE FOR WAITING_ID_SEQUENCE, CURRENT_DATE - 2, 1, 1, 3, DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 

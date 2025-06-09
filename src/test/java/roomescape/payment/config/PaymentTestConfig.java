@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.payment.config;
 
 import java.util.List;
 import org.springframework.boot.test.context.TestConfiguration;
