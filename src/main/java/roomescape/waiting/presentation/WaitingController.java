@@ -39,7 +39,7 @@ public class WaitingController {
     @GetMapping("/waitings")
     @Operation(summary = "예약 대기 조회 API")
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
-        List<WaitingResponse> waitings = waitingService.getAllWaitings();
+        List<WaitingResponse> waitings = waitingService.getAllWaiting();
         return ResponseEntity.ok(waitings);
     }
 

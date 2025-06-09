@@ -79,7 +79,7 @@ public class WaitingService {
         );
 
         if (currentWaitingCounts >= MAX_WAITING_COUNT) {
-            log.warn("대기 생성 불가 - 최대 대기 인원 초과 date: {}, themeId: {}, timeId: {}, count: {}", request.date(), request.themeId(), request.timeId(), currentWaitingCounts);
+            log.warn("대기 생성 불가 - 최대 대기 인원 초과 date: {}, themeId: {}, timeId: {}, currentWaitingCount: {}", request.date(), request.themeId(), request.timeId(), currentWaitingCounts);
             throw new IllegalStateException("최대 대기 인원(10명)을 초과했습니다.");
         }
         Waiting waiting = Waiting.createWithoutId(
@@ -106,7 +106,7 @@ public class WaitingService {
     }
 
     @Transactional(readOnly = true)
-    public List<WaitingResponse> getAllWaitings() {
+    public List<WaitingResponse> getAllWaiting() {
         return waitingRepository.findAll().stream()
                 .map(WaitingResponse::from)
                 .toList();
