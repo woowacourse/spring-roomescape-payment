@@ -10,10 +10,15 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.Theme;
+import roomescape.domain.reservation.repository.ReservationTimeRepository;
+import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.infrastructure.security.JwtProvider;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -31,6 +36,12 @@ class ReservationControllerTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private ThemeRepository themeRepository;
+
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
     private Clock clock;
 
     private Member savedMember;
@@ -44,10 +55,13 @@ class ReservationControllerTest {
     @Test
     void 예약결제_토스서버오류() {
         // given
+        themeRepository.save(new Theme("테마", "테마 설명", "thumbnail.com"));
+        reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
+
         final String requestBody = """
                     {
                         "date": "%s",
-                        "timeId": 2,
+                        "timeId": 1,
                         "themeId": 1,
                         "paymentKey": "pk_test_123456789",
                         "orderId": "ORDER-123456",

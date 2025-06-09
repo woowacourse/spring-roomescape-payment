@@ -1,31 +1,37 @@
 package roomescape.application.reservation.command;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.payment.CreatePaymentUseCase;
-import roomescape.application.payment.toss.TossPaymentService;
-import roomescape.application.reservation.command.dto.CreateReservationWithTossPaymentCommand;
+import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.ReservationWithPaymentResult;
+import roomescape.domain.payment.AdminPayment;
 import roomescape.domain.payment.PaymentType;
+import roomescape.domain.payment.repository.AdminPaymentRepository;
 import roomescape.domain.reservation.ReservationPayment;
 import roomescape.domain.reservation.repository.ReservationPaymentRepository;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
-public class RegisterReservationWithTossPaymentUseCase {
+public class RegisterReservationByAdminUseCase {
 
     private final CreateReservationService createReservationService;
     private final CreatePaymentUseCase createPaymentUseCase;
-    private final TossPaymentService tossPaymentService;
+    private final AdminPaymentRepository adminPaymentRepository;
     private final ReservationPaymentRepository reservationPaymentRepository;
 
     @Transactional
-    public ReservationWithPaymentResult execute(final CreateReservationWithTossPaymentCommand command) {
-        final Long reservationId = createReservationService.reserve(command.toCreateWithoutPaymentCommand());
-        final Long paymentId = createPaymentUseCase.execute(PaymentType.TOSS);
+    public ReservationWithPaymentResult execute(final CreateReservationCommand command, final Long adminId) {
+        final Long reservationId = createReservationService.reserve(command);
+        final Long paymentId = createPaymentUseCase.execute(PaymentType.ADMIN);
         reservationPaymentRepository.save(new ReservationPayment(reservationId, paymentId));
-        final Long tossPaymentId = tossPaymentService.save(command.toPaymentCommand(paymentId));
-        return new ReservationWithPaymentResult(reservationId, paymentId, tossPaymentId);
+
+        // TODO 서비스로 분리
+        final Long adminPaymentId = adminPaymentRepository.save(new AdminPayment(paymentId, adminId)).getId();
+
+        return new ReservationWithPaymentResult(reservationId, paymentId, adminPaymentId);
     }
 }

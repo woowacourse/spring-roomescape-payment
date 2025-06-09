@@ -3,6 +3,7 @@ package roomescape.application.payment.toss.dto;
 import roomescape.domain.payment.TossPayment;
 
 public record TossPaymentCommand(
+        Long paymentId,
         String paymentKey,
         String orderId,
         Long amount
@@ -13,6 +14,6 @@ public record TossPaymentCommand(
     }
 
     public TossPayment toDomain() {
-        return TossPayment.init(paymentKey, orderId, amount);
+        return TossPayment.init(paymentId, paymentKey, orderId, amount);
     }
 }

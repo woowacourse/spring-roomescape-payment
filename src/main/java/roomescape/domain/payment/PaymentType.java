@@ -1,4 +1,4 @@
-package roomescape.domain.reservation;
+package roomescape.domain.payment;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -4,15 +4,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.payment.OrderAmountVerificationCache;
 import roomescape.application.payment.toss.TossPaymentClient;
-import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
+import roomescape.application.reservation.command.dto.CreateReservationWithTossPaymentCommand;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.payment.TossPayment;
+import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.payment.repository.TossPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationPayment;
@@ -32,10 +36,12 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
+@Transactional
 class ProcessReservationWithTossPaymentUseCaseTest {
 
     @Autowired
@@ -68,9 +74,14 @@ class ProcessReservationWithTossPaymentUseCaseTest {
     @Autowired
     private Clock clock;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Test
     void 예약과_결제는_API_호출_전_PENDING으로_저장되고_승인_API_성공시_APPROVED로_갱신된다() {
         // given
+        reservationRepository.deleteAll();
+
         final Member member = memberRepository.save(
                 new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
         final Theme theme = themeRepository.save(
@@ -81,7 +92,7 @@ class ProcessReservationWithTossPaymentUseCaseTest {
         final long amount = 10_000L;
 
         orderAmountVerificationCache.register(orderId, amount);
-        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final CreateReservationWithTossPaymentCommand command = new CreateReservationWithTossPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -91,22 +102,29 @@ class ProcessReservationWithTossPaymentUseCaseTest {
                 amount,
                 "NORMAL"
         );
-        doNothing().when(tossPaymentClient).approve(command.toPaymentCommand());
+        doNothing().when(tossPaymentClient).approve(command.toPaymentCommand(any()));
 
         // when
         final Long id = processReservationWithTossPaymentUseCase.execute(command);
 
-        // then
-        final Optional<Reservation> reservation = reservationRepository.findById(id);
-        assertThat(reservation).isPresent();
-        final Long reservationId = reservation.get().getId();
-        assertThat(reservationId).isEqualTo(id);
+        final List<Reservation> all = reservationRepository.findAll();
+        assertThat(all).hasSize(1);
+        final Reservation reservation = all.getFirst();
+        final Long reservationId = reservation.getId();
         final Optional<ReservationPayment> reservationPayment =
                 reservationPaymentRepository.findByReservationId(reservationId);
         assertThat(reservationPayment).isPresent();
         final Long paymentId = reservationPayment.get().getPaymentId();
-        final Optional<TossPayment> tossPayment = tossPaymentRepository.findById(paymentId);
-        assertThat(tossPayment.get().getPaymentStatus()).isEqualTo(PaymentStatus.APPROVED);
+
+        final Optional<Payment> payment = paymentRepository.findById(paymentId);
+        assertThat(payment).isPresent();
+        assertThat(payment.get().getPaymentType()).isEqualTo(PaymentType.TOSS);
+
+        final List<TossPayment> result = tossPaymentRepository.findAllByPaymentIdIn(List.of(paymentId));
+        assertThat(result).hasSize(1);
+        final TossPayment tossPayment = result.getFirst();
+
+        assertThat(tossPayment.getPaymentStatus()).isEqualTo(PaymentStatus.APPROVED);
     }
 
     @Test
@@ -124,7 +142,7 @@ class ProcessReservationWithTossPaymentUseCaseTest {
         final long amount = 10_000L;
         orderAmountVerificationCache.register(orderId, amount);
 
-        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final CreateReservationWithTossPaymentCommand command = new CreateReservationWithTossPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -134,7 +152,7 @@ class ProcessReservationWithTossPaymentUseCaseTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.toPaymentCommand());
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.toPaymentCommand(any()));
 
         // when
         // then
@@ -150,8 +168,16 @@ class ProcessReservationWithTossPaymentUseCaseTest {
                 reservationPaymentRepository.findByReservationId(reservationId);
         assertThat(reservationPayment).isPresent();
         final Long paymentId = reservationPayment.get().getPaymentId();
-        final Optional<TossPayment> tossPayment = tossPaymentRepository.findById(paymentId);
-        assertThat(tossPayment.get().getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
+
+        final Optional<Payment> payment = paymentRepository.findById(paymentId);
+        assertThat(payment).isPresent();
+        assertThat(payment.get().getPaymentType()).isEqualTo(PaymentType.TOSS);
+
+        final List<TossPayment> result = tossPaymentRepository.findAllByPaymentIdIn(List.of(paymentId));
+        assertThat(result).hasSize(1);
+        final TossPayment tossPayment = result.getFirst();
+
+        assertThat(tossPayment.getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 
     @Test
@@ -169,7 +195,7 @@ class ProcessReservationWithTossPaymentUseCaseTest {
 
         orderAmountVerificationCache.register(orderId, invalidAmount);
 
-        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final CreateReservationWithTossPaymentCommand command = new CreateReservationWithTossPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -196,7 +222,7 @@ class ProcessReservationWithTossPaymentUseCaseTest {
         final String orderId = "orderId";
         final long amount = 10_000L;
 
-        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final CreateReservationWithTossPaymentCommand command = new CreateReservationWithTossPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),

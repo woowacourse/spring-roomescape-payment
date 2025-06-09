@@ -1,7 +1,7 @@
 package roomescape.application.reservation.query.dto;
 
 import roomescape.application.payment.PaymentResult;
-import roomescape.domain.reservation.PaymentType;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.ReservationStatus;
 
 import java.time.LocalDate;

@@ -16,9 +16,13 @@ import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.AdminPayment;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.TossPayment;
+import roomescape.domain.payment.repository.AdminPaymentRepository;
+import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.payment.repository.TossPaymentRepository;
-import roomescape.domain.reservation.PaymentType;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationPayment;
 import roomescape.domain.reservation.ReservationStatus;
@@ -67,6 +71,12 @@ class ReservationQueryServiceTest {
 
     @Autowired
     private ReservationQueryService reservationQueryService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private AdminPaymentRepository adminPaymentRepository;
 
     @Test
     void 전체_예약을_조회할_수_있다() {
@@ -154,6 +164,7 @@ class ReservationQueryServiceTest {
         final ReservationTime time2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(14, 0)));
         final ReservationTime time3 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(15, 0)));
         final ReservationTime time4 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(16, 0)));
+
         final Reservation reservation1 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(clock), time1, theme));
         final Reservation reservation2 = reservationRepository.save(
@@ -163,40 +174,47 @@ class ReservationQueryServiceTest {
         final Reservation reservation4 = reservationRepository.save(
                 new Reservation(member, LocalDate.now(clock), time4, theme));
 
-        final TossPayment tossPayment1 = TossPayment.init("paymentKey1", "orderId1", 10000L);
+        final Payment payment1 = paymentRepository.save(new Payment(PaymentType.TOSS));
+        final Payment payment2 = paymentRepository.save(new Payment(PaymentType.TOSS));
+        final Payment payment3 = paymentRepository.save(new Payment(PaymentType.TOSS));
+        final Payment payment4 = paymentRepository.save(new Payment(PaymentType.ADMIN));
+
+        final TossPayment tossPayment1 = TossPayment.init(payment1.getId(),"paymentKey1", "orderId1", 10000L);
         tossPayment1.approve();
         tossPaymentRepository.save(tossPayment1);
 
-        final TossPayment tossPayment2 = TossPayment.init("paymentKey2", "orderId2", 10000L);
+        final TossPayment tossPayment2 = TossPayment.init(payment2.getId(), "paymentKey2", "orderId2", 10000L);
         // 기본값은 PENDING이다
         tossPaymentRepository.save(tossPayment2);
 
-        final TossPayment tossPayment3 = TossPayment.init("paymentKey2", "orderId2", 10000L);
+        final TossPayment tossPayment3 = TossPayment.init(payment3.getId(), "paymentKey3", "orderId2", 10000L);
         tossPayment3.fail();
         tossPaymentRepository.save(tossPayment3);
+
+        final Long pkOfSomeAdmin = memberRepository.save(
+                new Member("사장님", new Email("test@email.com"), "pw", MemberRole.ADMIN)).getId();
+        final AdminPayment adminPayment = new AdminPayment(payment4.getId(), pkOfSomeAdmin);
+        adminPaymentRepository.save(adminPayment);
 
         final ReservationPayment reservationPayment1 = reservationPaymentRepository.save(
                 new ReservationPayment(
                         reservation1.getId(),
-                        PaymentType.TOSS,
-                        tossPayment1.getId()));
+                        tossPayment1.getPaymentId()));
+
         final ReservationPayment reservationPayment2 = reservationPaymentRepository.save(
                 new ReservationPayment(
                         reservation2.getId(),
-                        PaymentType.TOSS,
-                        tossPayment2.getId()));
+                        tossPayment2.getPaymentId()));
+
         final ReservationPayment reservationPayment3 = reservationPaymentRepository.save(
                 new ReservationPayment(
                         reservation3.getId(),
-                        PaymentType.TOSS,
-                        tossPayment3.getId()));
+                        tossPayment3.getPaymentId()));
 
-        final Long pkOfSomeAdmin = 10L;
         final ReservationPayment reservationPayment4 = reservationPaymentRepository.save(
                 new ReservationPayment(
                         reservation4.getId(),
-                        PaymentType.ADMIN,
-                        pkOfSomeAdmin));
+                        adminPayment.getPaymentId()));
 
         // when
         final List<ReservationWithStatusAndPaymentResult> results = reservationQueryService.getReservationsWithStatusAndPayment(
