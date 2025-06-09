@@ -3,6 +3,7 @@ package roomescape.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.PaymentClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
@@ -11,6 +12,7 @@ import roomescape.entity.Reservation;
 import roomescape.repository.PaymentRepository;
 
 @Service
+@Transactional
 public class PaymentService {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
