@@ -93,7 +93,7 @@ public class ReservationCreateService {
     }
 
     private Reservation saveReservationForAdmin(final Schedule schedule, final Member member) {
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
         Reservation reservation = reservationRepository.save(notSavedReservation);
         log.info("EVENT: RESERVATION_CREATED_BY_ADMIN, id={}, memberId={}, themeName={}, date={}, time={}",
                 reservation.getId(),
