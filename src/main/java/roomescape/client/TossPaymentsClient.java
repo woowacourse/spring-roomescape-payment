@@ -33,7 +33,7 @@ public class TossPaymentsClient implements PaymentClient {
                 .onStatus(HttpStatusCode::isError, (req, res) -> handlerTossPaymentsException(res))
                 .body(PaymentsConfirmResponse.class);
         log.info("Toss 결제 승인 API 호출 성공 - orderId: {}, amount: {}", request.orderId(),
-                request.amount()); // TODO: paymentKey는 민감 정보인가
+                request.amount());
         return response;
     }
 

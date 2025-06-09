@@ -34,7 +34,7 @@ public class MemberService {
         }
         final Password password = new Password(member.password());
         final Member savedMember = memberRepository.save(Member.register(name, email, password));
-        log.info("회원 가입 완료 - memberId: {}, email: {}", savedMember.getId(), savedMember.getEmail().getValue()); // TODO : 얘도 민감 정보임?
+        log.info("회원 가입 완료 - memberId: {}, email: {}", savedMember.getId(), savedMember.getEmail().getValue());
         return new MemberResponse(savedMember);
     }
 
