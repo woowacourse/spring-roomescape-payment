@@ -1,6 +1,7 @@
 package roomescape.mvc.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,10 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Authority;
 import roomescape.annotation.RequiredAccessToken;
-import roomescape.annotation.docs.DocsAuthorizationExceptionResponse;
-import roomescape.annotation.docs.DocsDeletableDataNotFoundExceptionResponse;
-import roomescape.annotation.docs.DocsDuplicatedDateCreationResponse;
-import roomescape.annotation.docs.DocsSuccessResponse;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.payment.domain.Payment;
@@ -63,8 +60,14 @@ public class ReservationController {
     }
 
     @Operation(summary = "Find All Reservation", description = "모든 예약 조회")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindAllReservationResponse.class)))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+    })
     @GetMapping
     @Authority(Role.ADMIN)
     public List<FindAllReservationResponse> findAllReservations() {
@@ -72,8 +75,14 @@ public class ReservationController {
     }
 
     @Operation(summary = "Find All Reservation By Filter", description = "필터를 통해 예약 조회")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindReservationsByFilter.class)))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+    })
     @GetMapping(params = {"memberId", "themeId", "from", "to"})
     @Authority(Role.ADMIN)
     public List<FindReservationsByFilter> findReservationsByFilter(
@@ -86,9 +95,13 @@ public class ReservationController {
     }
 
     @Operation(summary = "Find Member's All Reservation States", description = "회원의 예약 상태를 모두 조회")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = ReservationStatusResponse.class))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "과거 에약을 생성하는 경우",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "결제 승인에 실패하는 경우",
@@ -103,11 +116,18 @@ public class ReservationController {
     }
 
     @Operation(summary = "Add Reservation By Admin", description = "관리자의 예약 추가")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
-    @DocsDuplicatedDateCreationResponse
-    @ApiResponse(responseCode = "400", description = "과거 에약을 생성하는 경우",
-            content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = AddReservationByAdmin.class))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "중복된 데이터를 추가하는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "과거 에약을 생성하는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PostMapping
     @Authority(Role.ADMIN)
     public ResponseEntity<AddReservationByAdmin> addReservationByAdmin(
@@ -122,10 +142,15 @@ public class ReservationController {
     }
 
     @Operation(summary = "Add Reservation By Member", description = "회원의 예약 추가")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
-    @DocsDuplicatedDateCreationResponse
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = AddReservationByMember.class))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "중복된 데이터를 추가하는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "과거 예약을 생성하는 경우",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "결제 승인에 실패하는 경우",
@@ -150,9 +175,15 @@ public class ReservationController {
     }
 
     @Operation(summary = "DELETE RESERVATION BY ID", description = "ID를 기준으로 예약 삭제")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
-    @DocsDeletableDataNotFoundExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "404", description = "삭제할 데이터가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @DeleteMapping("/{reservationId}")
     @Authority(Role.ADMIN)
     public ResponseEntity<Void> deleteReservationById(

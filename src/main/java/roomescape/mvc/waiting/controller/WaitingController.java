@@ -1,6 +1,7 @@
 package roomescape.mvc.waiting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,10 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Authority;
 import roomescape.annotation.RequiredAccessToken;
-import roomescape.annotation.docs.DocsAuthorizationExceptionResponse;
-import roomescape.annotation.docs.DocsDeletableDataNotFoundExceptionResponse;
-import roomescape.annotation.docs.DocsDuplicatedDateCreationResponse;
-import roomescape.annotation.docs.DocsSuccessResponse;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.payment.domain.Payment;
@@ -56,8 +53,14 @@ public class WaitingController {
     }
 
     @Operation(summary = "Find All Waiting", description = "모든 예약 대기 조회")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindAllWaitingResponse.class)))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+    })
     @GetMapping
     @Authority(Role.ADMIN)
     public List<FindAllWaitingResponse> findAllWaiting() {
@@ -65,10 +68,15 @@ public class WaitingController {
     }
 
     @Operation(summary = "Add Waiting", description = "예약 대기 추가")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
-    @DocsDuplicatedDateCreationResponse
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = AddWaitingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "중복된 데이터를 추가하는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "결제 승인에 실패하는 경우",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "대기를 추가할 예약이 존재하지 않는 경우",
@@ -91,9 +99,15 @@ public class WaitingController {
     }
 
     @Operation(summary = "Delete Waiting By Id", description = "예약 대기 삭제")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
-    @DocsDeletableDataNotFoundExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "404", description = "삭제할 데이터가 존재하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @DeleteMapping("/{id}")
     @Authority(Role.GENERAL)
     public ResponseEntity<Void> deleteWaitingById(

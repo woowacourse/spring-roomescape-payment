@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Duration;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.annotation.Authority;
 import roomescape.annotation.RequiredAccessToken;
-import roomescape.annotation.docs.DocsAuthorizationExceptionResponse;
-import roomescape.annotation.docs.DocsSuccessResponse;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.auth.request.LoginRequest;
 import roomescape.mvc.auth.response.AccessTokenResponse;
@@ -37,9 +36,15 @@ public class AuthController {
     }
 
     @Operation(summary = "Login", description = "로그인 수행")
-    @DocsSuccessResponse
-    @ApiResponse(responseCode = "400", description = "로그인 정보가 올바르지 않은 경우",
-            content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "로그인 정보가 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest loginRequest
@@ -58,8 +63,16 @@ public class AuthController {
     }
 
     @Operation(summary = "Check Login", description = "로그인 여부 체크")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(schema = @Schema(implementation = CheckLoginResponse.class))),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "로그인 정보가 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @GetMapping("/login/check")
     @Authority(Role.GENERAL)
     public CheckLoginResponse checkLogin(
@@ -69,8 +82,13 @@ public class AuthController {
     }
 
     @Operation(summary = "Logout", description = "로그인 아웃")
-    @DocsSuccessResponse
-    @DocsAuthorizationExceptionResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "access 토큰이 올바르지 않은 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 맞지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+    })
     @PostMapping("/logout")
     @Authority(Role.GENERAL)
     public ResponseEntity<Void> logout() {
