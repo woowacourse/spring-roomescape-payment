@@ -62,6 +62,10 @@ include::{snippets}/login-test/login-success/http-response.adoc[]
 
 include::{snippets}/logout-test/logout-success/http-request.adoc[]
 
+==== Cookie
+
+include::{snippets}/logout-test/logout-success/request-cookies.adoc[]
+
 ==== Response
 
 include::{snippets}/logout-test/logout-success/http-response.adoc[]
@@ -75,6 +79,10 @@ include::{snippets}/logout-test/logout-success/http-response.adoc[]
 ==== Request
 
 include::{snippets}/login-check-test/login-check-success/http-request.adoc[]
+
+==== Cookie
+
+include::{snippets}/login-check-test/login-check-success/request-cookies.adoc[]
 
 ==== Response
 
