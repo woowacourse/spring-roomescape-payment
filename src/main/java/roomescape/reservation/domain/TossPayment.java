@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "toss_payment")
@@ -40,10 +41,10 @@ public class TossPayment {
             final PaymentKey paymentKey,
             final Reservation reservation
     ) {
-        this.orderId = orderId;
-        this.amount = amount;
-        this.paymentKey = paymentKey;
-        this.reservation = reservation;
+        this.orderId = Objects.requireNonNull(orderId);
+        this.amount = Objects.requireNonNull(amount);
+        this.paymentKey = Objects.requireNonNull(paymentKey);
+        this.reservation = Objects.requireNonNull(reservation);
     }
 
     public Long getId() {
