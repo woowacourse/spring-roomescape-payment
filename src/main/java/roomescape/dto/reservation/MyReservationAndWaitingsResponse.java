@@ -21,7 +21,7 @@ public record MyReservationAndWaitingsResponse(
 
     public static MyReservationAndWaitingsResponse of(Reservation reservation, Payment payment) {
         if (payment == null) {
-            MyReservationAndWaitingsResponse.from(reservation);
+            return MyReservationAndWaitingsResponse.from(reservation);
         }
         return new MyReservationAndWaitingsResponse(reservation.getId(), reservation.getTheme().getName(),
                 reservation.getDate(), reservation.getTime().getStartAt(), "예약", payment.getPaymentKey(),
