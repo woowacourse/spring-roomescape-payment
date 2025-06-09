@@ -65,6 +65,7 @@ public class Reservation {
             @NonNull final LocalDateTime currentDateTime,
             final Payment payment
     ) {
+        validateFutureOrPresent(currentDateTime, date, time);
         this.id = id;
         this.date = date;
         this.time = time;
@@ -72,7 +73,6 @@ public class Reservation {
         this.member = member;
         this.reservationStatus = reservationStatus;
         this.payment = payment;
-        validateFutureOrPresent(currentDateTime);
     }
 
     public static Reservation of(
@@ -134,7 +134,7 @@ public class Reservation {
                 .build();
     }
 
-    private void validateFutureOrPresent(LocalDateTime currentDateTime) {
+    private void validateFutureOrPresent(LocalDateTime currentDateTime, LocalDate date, ReservationTime time) {
         final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
             throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");

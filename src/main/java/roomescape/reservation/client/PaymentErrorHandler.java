@@ -28,15 +28,15 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         String responseBody = new String(response.getBody().readAllBytes());
         if (responseBody.isBlank()) {
-            log.error("응답 데이터가 비어 있습니다");
+            log.warn("응답 데이터가 비어 있습니다");
             throw new PaymentClientException(RETRY_NOTICE_ERROR_MESSAGE);
         }
         try {
             Response errorResponse = mapper.readValue(responseBody, Response.class);
-            log.error("Toss Payments API 에러: {}", errorResponse.message());
+            log.warn("Toss Payments API 에러: {}", errorResponse.code());
             throw new PaymentClientException(RETRY_THEN_CONTACT_MESSAGE);
         } catch (JsonProcessingException e) {
-            log.error("Json 파싱 에러: {}", responseBody, e);
+            log.warn("Json 파싱 에러: {}", responseBody, e);
             throw new IllegalStateException(RETRY_NOTICE_ERROR_MESSAGE);
         }
     }

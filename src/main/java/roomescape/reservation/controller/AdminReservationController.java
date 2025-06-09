@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import roomescape.reservation.dto.AdminReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "admin-reservation-controller", description = "관리자 권한이 있어야 호출할 수 있는 API 그룹입니다.")
 @RequestMapping("/admin/reservations")
 @RestController
 @RequiredArgsConstructor
