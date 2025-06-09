@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class LoggingAspect {
         String queryString = request.getQueryString();
         String fullUri = requestURI + (queryString == null ? "" : "?" + queryString);
         requestLogInfos.put("Uri", fullUri);
-        requestLogInfos.put("Args", joinPoint.getArgs());
+        requestLogInfos.put("Args", Arrays.toString(joinPoint.getArgs()));
 
         if (log.isInfoEnabled()) {
             log.info(objectMapper.writeValueAsString(requestLogInfos));
@@ -54,14 +55,18 @@ public class LoggingAspect {
 
     @AfterReturning(pointcut = "controllerMethods()", returning = "result")
     public void afterLog(JoinPoint joinPoint, Object result) throws JsonProcessingException {
-        Map<String, Object> responseLogInfos = new LinkedHashMap<>();
-        responseLogInfos.put("Log Type", "Response");
-        responseLogInfos.put("Method", joinPoint.getSignature().getName());
-        long elapsed = System.currentTimeMillis() - startTime.get();
-        responseLogInfos.put("Time", elapsed + "ms");
-        responseLogInfos.put("Result", result);
-        if (log.isInfoEnabled()) {
-            log.info(objectMapper.writeValueAsString(responseLogInfos));
+        try {
+            Map<String, Object> responseLogInfos = new LinkedHashMap<>();
+            responseLogInfos.put("Log Type", "Response");
+            responseLogInfos.put("Method", joinPoint.getSignature().getName());
+            long elapsed = System.currentTimeMillis() - startTime.get();
+            responseLogInfos.put("Time", elapsed + "ms");
+            responseLogInfos.put("Result", result);
+            if (log.isInfoEnabled()) {
+                log.info(objectMapper.writeValueAsString(responseLogInfos));
+            }
+        } finally {
+            startTime.remove();
         }
     }
 }
