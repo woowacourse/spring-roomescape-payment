@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.NotFoundException;
+import roomescape.logging.aspect.Loggable;
 import roomescape.payment.domain.Orders;
 import roomescape.payment.repository.OrdersRepository;
 import roomescape.reservation.domain.Reservation;
@@ -27,6 +28,7 @@ public class ReservationPaymentService {
         reservation.paid(orders);
     }
 
+    @Loggable
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void failedPayment(Long id, String paymentKey) {
         Reservation reservation = reservationRepository.findById(id)

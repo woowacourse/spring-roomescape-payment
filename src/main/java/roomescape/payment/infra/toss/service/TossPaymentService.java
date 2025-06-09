@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
+import roomescape.logging.aspect.Loggable;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentTemporaryException;
@@ -20,6 +21,7 @@ public class TossPaymentService implements PaymentService {
 
     private final TossPaymentClient tossPaymentClient;
 
+    @Loggable
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @Retryable(retryFor = {PaymentTemporaryException.class, ResourceAccessException.class},
             maxAttempts = 2, backoff = @Backoff(delay = 500))
@@ -30,6 +32,7 @@ public class TossPaymentService implements PaymentService {
                 .toPaymentResponse();
     }
 
+    @Loggable
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @Retryable(retryFor = {PaymentTemporaryException.class, ResourceAccessException.class},
             maxAttempts = 2, backoff = @Backoff(delay = 500))

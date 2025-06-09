@@ -9,6 +9,7 @@ import roomescape.auth.web.controller.request.LoginRequest;
 import roomescape.auth.web.controller.response.MemberNameResponse;
 import roomescape.auth.web.exception.NotAuthorizationException;
 import roomescape.global.exception.NotFoundException;
+import roomescape.logging.aspect.Loggable;
 import roomescape.logging.utils.MaskingUtil;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
@@ -45,6 +46,7 @@ public class AuthService {
         }
     }
 
+    @Loggable
     public boolean isAdmin(String token) {
         Role role = tokenProvider.getRole(token);
         return role.isAdmin();

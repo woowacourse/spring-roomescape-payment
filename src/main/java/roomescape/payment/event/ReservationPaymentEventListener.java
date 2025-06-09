@@ -12,7 +12,6 @@ import roomescape.payment.service.OrderService;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationPaymentService;
 
-@Loggable
 @Component
 @RequiredArgsConstructor
 public class ReservationPaymentEventListener {
@@ -21,6 +20,7 @@ public class ReservationPaymentEventListener {
     private final PaymentService paymentService;
     private final ReservationPaymentService reservationPaymentService;
 
+    @Loggable
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePaymentEvent(PaymentRequestedEvent event) {
         PaymentRequest paymentRequest = PaymentRequest.from(event.paymentInfoRequest());

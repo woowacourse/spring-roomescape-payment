@@ -14,19 +14,12 @@ public class LoggingAspect {
 
     private static final int WARNING_THRESHOLD = 1000;
 
-    @Pointcut("execution(* roomescape..controller..*(..)) || " +
-            "execution(* roomescape..service..*(..)) || " +
-            "execution(* roomescape..repository..*(..)) "
-            + "&& !within(roomescape..auth..*)")
-    public void loggingPointcut() {
-    }
-
     @Pointcut("@annotation(roomescape.logging.aspect.Loggable)")
     public void logAnnotation() {
 
     }
 
-    @Around("loggingPointcut() || logAnnotation()")
+    @Around("logAnnotation()")
     public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         String methodName = joinPoint.getSignature().toShortString();

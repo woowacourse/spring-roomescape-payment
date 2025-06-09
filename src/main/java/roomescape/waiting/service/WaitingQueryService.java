@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.NotFoundException;
+import roomescape.logging.aspect.Loggable;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -29,6 +30,7 @@ public class WaitingQueryService {
                 .map(WaitingInfoResponse::from);
     }
 
+    @Loggable
     public List<MyReservationResponse> getMyWaitings(Long memberId) {
         List<Reservation> myWaitings = reservationRepository.findByMemberIdAndStatus(memberId, WAITING);
 
