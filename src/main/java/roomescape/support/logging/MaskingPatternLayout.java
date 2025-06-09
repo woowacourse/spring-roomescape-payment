@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 public class MaskingPatternLayout extends PatternLayout {
 
@@ -35,15 +34,57 @@ public class MaskingPatternLayout extends PatternLayout {
         if (multilinePattern == null) {
             return message;
         }
+
         StringBuilder sb = new StringBuilder(message);
         Matcher matcher = multilinePattern.matcher(sb);
+
         while (matcher.find()) {
-            IntStream.rangeClosed(1, matcher.groupCount()).forEach(group -> {
-                if (matcher.group(group) != null) {
-                    IntStream.range(matcher.start(group), matcher.end(group)).forEach(i -> sb.setCharAt(i, '*'));
+            for (int group = 1; group <= matcher.groupCount(); group++) {
+                if (matcher.group(group) == null) {
+                    continue;
                 }
-            });
+                handleMaskingGroup(matcher, group, sb);
+            }
         }
+
         return sb.toString();
+    }
+
+    private void handleMaskingGroup(Matcher matcher, int group, StringBuilder sb) {
+        String matchedValue = matcher.group(group);
+        String fullMatch = matcher.group();
+        int groupStart = matcher.start(group);
+        int groupEnd = matcher.end(group);
+
+        if (fullMatch.startsWith("email")) {
+            maskEmail(matchedValue, sb, groupStart, groupEnd);
+        } else {
+            maskMessage(groupStart, groupEnd, sb);
+        }
+    }
+
+    private void maskEmail(String matchedValue, StringBuilder sb, int groupStart, int groupEnd) {
+        String maskedEmail = maskEmail(matchedValue);
+        replaceRange(sb, groupStart, groupEnd, maskedEmail);
+    }
+
+    private static void maskMessage(int groupStart, int groupEnd, StringBuilder sb) {
+        for (int i = groupStart; i < groupEnd; i++) {
+            sb.setCharAt(i, '*');
+        }
+    }
+
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf("@");
+        if (atIndex > 1) {
+            return email.charAt(0)
+                    + "*".repeat(atIndex - 1)
+                    + email.substring(atIndex);
+        }
+        return "***";
+    }
+
+    private void replaceRange(StringBuilder sb, int start, int end, String replacement) {
+        sb.replace(start, end, replacement);
     }
 }
