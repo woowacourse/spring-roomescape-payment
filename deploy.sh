@@ -4,7 +4,7 @@ set -e
 
 APP_NAME="spring-roomescape-payment"
 JAR_NAME="$APP_NAME-0.0.1-SNAPSHOT.jar"
-PROJECT_DIR="$HOME/cd/$APP_NAME"
+PROJECT_DIR="$HOME/$APP_NAME"
 JAR_DIR="$PROJECT_DIR/build/libs"
 BRANCH_NAME="step2"
 
