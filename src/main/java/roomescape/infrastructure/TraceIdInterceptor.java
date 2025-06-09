@@ -12,6 +12,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
 
     private static final String TRACE_ID = "traceId";
     private static final String MEMBER_ID_ATTRIBUTE = "memberId";
+    private static final String REQUEST_URL = "url";
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
@@ -26,7 +27,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
         }
         MDC.put(MEMBER_ID_ATTRIBUTE, memberId);
 
-        MDC.put("api", request.getRequestURI());
+        MDC.put(REQUEST_URL, request.getRequestURI());
         return true;
     }
 
@@ -34,5 +35,7 @@ public class TraceIdInterceptor implements HandlerInterceptor {
     public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
                                 final Object handler, final Exception ex) {
         MDC.remove(TRACE_ID);
+        MDC.remove(MEMBER_ID_ATTRIBUTE);
+        MDC.remove(REQUEST_URL);
     }
 }
