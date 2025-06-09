@@ -1,5 +1,6 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,8 +18,10 @@ public class Payment {
     @GeneratedValue
     private Long id;
 
+    @Column(name = "payment_key", nullable = false)
     private String paymentKey;
 
+    @Column(name = "order_id", nullable = false)
     private String orderId;
 
     private Integer amount;
