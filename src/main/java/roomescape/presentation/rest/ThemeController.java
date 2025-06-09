@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.ThemeService;
-import roomescape.domain.auth.AuthenticationInfo;
-import roomescape.exception.AuthorizationException;
+import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateThemeRequest;
 import roomescape.presentation.response.ThemeResponse;
 
@@ -29,15 +28,10 @@ public class ThemeController {
 
     private final ThemeService service;
 
+    @AdminOnly
     @PostMapping
     @ResponseStatus(CREATED)
-    public ThemeResponse register(
-        final AuthenticationInfo authenticationInfo,
-        @RequestBody @Valid final CreateThemeRequest request
-    ) {
-        if (authenticationInfo.isNotAdmin()) {
-            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
-        }
+    public ThemeResponse register(@RequestBody @Valid final CreateThemeRequest request) {
         var theme = service.register(request.name(), request.description(), request.thumbnail());
         return ThemeResponse.from(theme);
     }
@@ -58,15 +52,10 @@ public class ThemeController {
         return ThemeResponse.from(themes);
     }
 
+    @AdminOnly
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void delete(
-        final AuthenticationInfo authenticationInfo,
-        @PathVariable("id") final long id
-    ) {
-        if (authenticationInfo.isNotAdmin()) {
-            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
-        }
+    public void delete(@PathVariable("id") final long id) {
         service.removeById(id);
     }
 }

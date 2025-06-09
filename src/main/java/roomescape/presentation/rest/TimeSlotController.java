@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.TimeSlotService;
-import roomescape.domain.auth.AuthenticationInfo;
-import roomescape.exception.AuthorizationException;
+import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateTimeSlotRequest;
 import roomescape.presentation.response.AvailableTimeSlotResponse;
 import roomescape.presentation.response.TimeSlotResponse;
@@ -30,15 +29,10 @@ public class TimeSlotController {
 
     private final TimeSlotService service;
 
+    @AdminOnly
     @PostMapping
     @ResponseStatus(CREATED)
-    public TimeSlotResponse register(
-        final AuthenticationInfo authenticationInfo,
-        @RequestBody @Valid final CreateTimeSlotRequest request
-    ) {
-        if (authenticationInfo.isNotAdmin()) {
-            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
-        }
+    public TimeSlotResponse register(@RequestBody @Valid final CreateTimeSlotRequest request) {
         var timeSlot = service.register(request.startAt());
         return TimeSlotResponse.from(timeSlot);
     }
@@ -58,15 +52,10 @@ public class TimeSlotController {
         return AvailableTimeSlotResponse.from(availableTimeSlots);
     }
 
+    @AdminOnly
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void delete(
-        final AuthenticationInfo authenticationInfo,
-        @PathVariable("id") final long id
-    ) {
-        if (authenticationInfo.isNotAdmin()) {
-            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
-        }
+    public void delete(@PathVariable("id") final long id) {
         service.removeById(id);
     }
 }
