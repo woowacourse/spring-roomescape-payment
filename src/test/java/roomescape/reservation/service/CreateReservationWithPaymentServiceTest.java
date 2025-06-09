@@ -21,7 +21,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.CustomException;
 import roomescape.common.exception.InternalServerErrorException;
-import roomescape.config.PaymentRestClientConfig;
+import roomescape.payment.config.PaymentRestClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.payment.domain.Payment;

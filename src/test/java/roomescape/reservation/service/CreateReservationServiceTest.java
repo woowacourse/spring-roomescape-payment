@@ -15,7 +15,7 @@ import roomescape.common.exception.ConflictException;
 import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.config.PaymentRestClientConfig;
+import roomescape.payment.config.PaymentRestClientConfig;
 import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.payment.infrastructure.TossPaymentErrorHandler;
 import roomescape.reservation.domain.ReservationTime;

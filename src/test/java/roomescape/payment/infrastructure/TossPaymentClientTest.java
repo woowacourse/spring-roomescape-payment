@@ -15,7 +15,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.InternalServerErrorException;
-import roomescape.config.PaymentRestClientConfig;
+import roomescape.payment.config.PaymentRestClientConfig;
 import roomescape.payment.infrastructure.dto.PaymentFailure;
 import roomescape.payment.infrastructure.dto.request.ConfirmPaymentRequest;
 import roomescape.payment.infrastructure.dto.response.ConfirmPaymentResponse;
