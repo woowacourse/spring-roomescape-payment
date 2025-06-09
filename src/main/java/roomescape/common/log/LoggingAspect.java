@@ -15,7 +15,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import roomescape.common.log.context.RequestContext;
-import roomescape.common.log.context.RequestContextProvider;
 import roomescape.common.log.entry.ErrorLogEntry;
 import roomescape.common.log.entry.RequestLogEntry;
 import roomescape.common.log.entry.ResponseLogEntry;
@@ -29,7 +28,6 @@ public class LoggingAspect {
 
     private static final String HANDLER_NAME_FORMAT = "%s#%s";
 
-    private final RequestContextProvider requestContextProvider;
     private final LogMessageProvider logMessageProvider;
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
@@ -66,9 +64,8 @@ public class LoggingAspect {
 
     @Before("allMapping()")
     public void requestLog(final JoinPoint joinPoint) {
-
         final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArgumentMap(
-                requestContextProvider.get(),
+                getRequestContext(),
                 getHandlerName(joinPoint),
                 getHandlerArguments(joinPoint)
         );
@@ -77,13 +74,12 @@ public class LoggingAspect {
 
     @AfterReturning(value = "exceptionHandlerCut()", returning = "response")
     public void exceptionHandlerLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
-        final RequestContext requestContext = requestContextProvider.get();
         final ErrorLogEntry errorLogEntry = Arrays.stream(joinPoint.getArgs())
                 .filter(Throwable.class::isInstance)
                 .map(Throwable.class::cast)
-                .map(arg -> ErrorLogEntry.withThrowable(requestContext, arg, response))
+                .map(arg -> ErrorLogEntry.withThrowable(getRequestContext(), arg, response))
                 .findFirst()
-                .orElse(ErrorLogEntry.withoutThrowable(requestContext, response));
+                .orElse(ErrorLogEntry.withoutThrowable(getRequestContext(), response));
 
         log.info(logMessageProvider.getErrorLog(errorLogEntry));
     }
@@ -91,7 +87,7 @@ public class LoggingAspect {
     @AfterReturning(value = "controllerPointCut()", returning = "response")
     public void responseLog(final ResponseEntity<?> response) {
         final ResponseLogEntry responseLogEntry = new ResponseLogEntry(
-                requestContextProvider.get(),
+                getRequestContext(),
                 response
         );
         log.info(logMessageProvider.getResponseLog(responseLogEntry));
@@ -113,5 +109,9 @@ public class LoggingAspect {
         return IntStream.range(0, parameterNames.length)
                 .boxed()
                 .collect(Collectors.toMap(i -> parameterNames[i], i -> parameterValues[i]));
+    }
+
+    private RequestContext getRequestContext() {
+        return RequestContext.fromCurrentRequest();
     }
 }

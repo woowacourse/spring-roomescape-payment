@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import roomescape.common.log.context.RequestContextProvider;
 import roomescape.common.log.entry.ErrorLogEntry;
 import roomescape.common.log.entry.RequestLogEntry;
 import roomescape.common.log.entry.ResponseLogEntry;
@@ -27,7 +26,6 @@ public class JsonLogMessageProvider implements LogMessageProvider {
 
     private static final DefaultPrettyPrinter DEFAULT_PRETTY_PRINTER = createPrettyPrinter();
 
-    private final RequestContextProvider requestContextProvider;
     private final ObjectMapper objectMapper;
 
     private static DefaultPrettyPrinter createPrettyPrinter() {
