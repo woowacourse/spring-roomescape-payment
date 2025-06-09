@@ -18,6 +18,16 @@ import roomescape.member.controller.dto.SignupRequest;
 public interface AuthController {
 
     @Operation(summary = "로그인")
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = LoginRequest.class),
+                    examples = {
+                            @ExampleObject(name = "sample",
+                                    value = "{\"email\":\"user1@email.com\",\"password\":\"qwe123\"}")
+                    }
+            )
+    )
     ResponseEntity<Void> login(@RequestBody(required = true) LoginRequest loginRequest);
 
     @Operation(summary = "로그아웃", security = @SecurityRequirement(name = "loginAuth"))

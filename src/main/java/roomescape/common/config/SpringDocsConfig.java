@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         info = @Info(title = "방탈출 API", version = "v1",
                 description = "우아한테크코스 7기 레벨2 방탈출 예약 관리 시스템",
                 contact = @Contact(name = "레오", email = "rlawnsdud920@gmail.com")),
-        servers = @Server(url = "http://localhost:8080/")
+        servers = @Server(url = "http://3.35.134.88:8080/")
 )
 @SecurityScheme(
         name = "cookieAuth",
