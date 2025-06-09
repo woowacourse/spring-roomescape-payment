@@ -17,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -34,8 +33,8 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ReservationPaymentServiceTest {
 
     private static MockWebServer mockWebServer;

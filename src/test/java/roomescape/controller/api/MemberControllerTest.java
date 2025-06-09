@@ -18,15 +18,6 @@ import roomescape.dto.auth.SignUpRequest;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class MemberControllerTest {
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().get("/members")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
-    }
-
     @Nested
     class MemberRegistration {
 
