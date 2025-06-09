@@ -41,10 +41,10 @@ public class TossPayment {
             final PaymentKey paymentKey,
             final Reservation reservation
     ) {
-        this.orderId = Objects.requireNonNull(orderId);
-        this.amount = Objects.requireNonNull(amount);
-        this.paymentKey = Objects.requireNonNull(paymentKey);
-        this.reservation = Objects.requireNonNull(reservation);
+        this.orderId = Objects.requireNonNull(orderId, "orderId는 null일 수 없습니다.");
+        this.amount = Objects.requireNonNull(amount, "amount는 null일 수 없습니다.");
+        this.paymentKey = Objects.requireNonNull(paymentKey, "paymentKey는 null일 수 없습니다.");
+        this.reservation = Objects.requireNonNull(reservation, "reservation은 null일 수 없습니다.");
     }
 
     public Long getId() {

@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.BadRequestException;
 
 @Embeddable
+@Slf4j
 public record ThemeThumbnail(
         @Column(nullable = false)
         @Size(max = ThemeThumbnail.MAX_THUMBNAIL_LENGTH)
@@ -17,6 +19,7 @@ public record ThemeThumbnail(
     public ThemeThumbnail(final String thumbnail) {
         this.thumbnail = Objects.requireNonNull(thumbnail, "thumbnail은 null일 수 없습니다.");
         if (thumbnail.length() > MAX_THUMBNAIL_LENGTH) {
+            log.warn("[VALIDATION-FAIL] 테마 썸네일 길이 초과");
             throw new BadRequestException("thumbnail은 " + MAX_THUMBNAIL_LENGTH + "자 이내여야 합니다.");
         }
     }

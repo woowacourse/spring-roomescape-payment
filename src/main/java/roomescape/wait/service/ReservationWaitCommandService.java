@@ -1,5 +1,6 @@
 package roomescape.wait.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.AccessDeniedException;
@@ -15,6 +16,7 @@ import roomescape.wait.repository.ReservationWaitRepository;
 
 @Service
 @Transactional
+@Slf4j
 public class ReservationWaitCommandService {
     private final ReservationWaitRepository reservationWaitRepository;
     private final ReservationQueryService reservationQueryService;
@@ -36,6 +38,8 @@ public class ReservationWaitCommandService {
             final Member member
     ) {
         if (!reservationQueryService.existsReservation(schedule)) {
+            log.warn("[WAIT-CREATE] 예약 없음 - 예약 대기 불가. scheduleId: {}, memberId: {}",
+                    schedule.getId(), member.getId());
             throw new BadRequestException("해당 일정에 예약이 없어서 예약 대기가 불가능합니다.");
         }
         return reservationWaitRepository.save(new ReservationWait(null, member, schedule));
@@ -45,6 +49,8 @@ public class ReservationWaitCommandService {
     public Reservation approveReservationWait(final ReservationWait wait) {
         ReservationSchedule schedule = wait.getSchedule();
         if (reservationQueryService.existsReservation(schedule)) {
+            log.warn("[WAIT-APPROVE] 예약 존재 - 예약 대기 승인 실패. waitId: {}, scheduleId: {}, memberId: {}",
+                    wait.getId(), schedule.getId(), wait.getMember().getId());
             throw new BadRequestException("예약 대기를 승인하려면 해당 예약 일정에 예약이 없어야 합니다.");
         }
         Reservation savedReservation = reservationCommandService.createReservation(schedule, wait.getMember());
@@ -57,6 +63,8 @@ public class ReservationWaitCommandService {
             Member member
     ) {
         if (member.getRole() != MemberRole.ADMIN && !wait.getMember().equals(member)) {
+            log.warn("[WAIT-DELETE] 권한 없음 - 예약 대기 삭제 실패. waitId: {}, 요청자: {}, 소유자: {}, 요청자 role: {}",
+                    wait.getId(), member.getId(), wait.getMember().getId(), member.getRole());
             throw new AccessDeniedException("예약 대기는 관리자 또는 본인만 취소 가능합니다.");
         }
         reservationWaitRepository.deleteById(wait.getId());

@@ -2,8 +2,10 @@ package roomescape.member.domain;
 
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.AccessDeniedException;
 
+@Slf4j
 public enum MemberRole {
     ADMIN(List.of("ADMIN")),
     MEMBER(List.of("MEMBER")),
@@ -19,7 +21,10 @@ public enum MemberRole {
         return Arrays.stream(values())
                 .filter(role -> role.types.contains(roleName))
                 .findFirst()
-                .orElseThrow(() -> new AccessDeniedException("존재하지 않는 권한입니다."));
+                .orElseThrow(() -> {
+                    log.warn("[ROLE-MAP] 존재하지 않는 권한 요청: {}", roleName);
+                    return new AccessDeniedException("존재하지 않는 권한입니다.");
+                });
     }
 
     public String getPrimaryType() {

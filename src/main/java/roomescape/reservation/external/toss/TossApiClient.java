@@ -3,6 +3,7 @@ package roomescape.reservation.external.toss;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import roomescape.global.exception.ErrorCode;
 import roomescape.global.exception.ExternalApiException;
 
 @Component
+@Slf4j
 public class TossApiClient {
 
     private final ObjectMapper objectMapper;
@@ -32,6 +34,9 @@ public class TossApiClient {
                     .body(TossPaymentResponse.class);
         }
         catch (RestClientResponseException e) {
+            log.warn("[TOSS-ERROR] 외부 API 응답 오류 - 상태코드: {}, 응답내용: {}",
+                    e.getStatusCode(), e.getResponseBodyAsString(), e);
+
             TossErrorResponse tossErrorResponse = parseErrorResponse(e.getResponseBodyAsString());
 
             throw new ExternalApiException(new ErrorCode(
@@ -45,7 +50,7 @@ public class TossApiClient {
         try {
             return objectMapper.readValue(errorMessage, TossErrorResponse.class);
         }
-        catch (JsonProcessingException ex) {
+        catch (JsonProcessingException e) {
             throw new ExternalApiException(new ErrorCode(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "INVALID_EXTERNAL_API_FORMAT",
