@@ -15,4 +15,9 @@ public interface LogMessageProvider {
             final RequestInfo requestInfo,
             final ResponseEntity<?> response
     );
+
+    String getErrorLog(
+            final RequestInfo requestInfo,
+            final Throwable throwable
+    );
 }

@@ -72,7 +72,18 @@ public class LoggingAspect {
         log.info(message);
     }
 
-    @AfterReturning(value = "controllerPointCut() || exceptionHandlerCut()", returning = "response")
+    @Before(value = "exceptionHandlerCut()")
+    public void exceptionHandlerLog(final JoinPoint joinPoint) {
+        Object arg0 = joinPoint.getArgs()[0];
+        String message = logMessageProvider.getErrorLog(
+                getRequestInfo(joinPoint),
+                (Throwable) arg0
+        );
+
+        log.info(message);
+    }
+
+    @AfterReturning(value = "controllerPointCut()", returning = "response")
     public void responseLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
         String message = logMessageProvider.getResponseLog(
                 getRequestInfo(joinPoint),

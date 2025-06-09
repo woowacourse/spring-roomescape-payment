@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({ReservationException.class, ThemeException.class, MemberException.class,
-        PastDateException.class, WaitingException.class})
+            PastDateException.class, WaitingException.class})
     public ResponseEntity<String> handleDomainExceptions(final Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
@@ -43,5 +43,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TossPaymentException.class)
     public ResponseEntity<String> handleTossPaymentException(final TossPaymentException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(final Exception e) {
+        // Log the exception (optional)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
     }
 }

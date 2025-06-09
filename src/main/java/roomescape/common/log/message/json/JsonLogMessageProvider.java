@@ -21,6 +21,9 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     private static final String RESPONSE_MESSAGE_FORMAT = "RESPONSE%n%s";
     private static final String DEFAULT_RESPONSE_MESSAGE = "Failed to write response log";
 
+    private static final String ERROR_MESSAGE_FORMAT = "ERROR%n%s";
+    private static final String DEFAULT_ERROR_MESSAGE = "Failed to write error log";
+
     private static final DefaultPrettyPrinter DEFAULT_PRETTY_PRINTER = createPrettyPrinter();
     private final ObjectMapper objectMapper;
 
@@ -39,15 +42,11 @@ public class JsonLogMessageProvider implements LogMessageProvider {
                 requestInfo,
                 handlerArguments
         );
-        try {
-            return String.format(
-                    REQUEST_MESSAGE_FORMAT,
-                    objectMapper.writer(DEFAULT_PRETTY_PRINTER)
-                            .writeValueAsString(requestLogEntry)
-            );
-        } catch (JsonProcessingException e) {
-            return DEFAULT_REQUEST_MESSAGE;
-        }
+        return formatLogMessage(
+                REQUEST_MESSAGE_FORMAT,
+                requestLogEntry,
+                DEFAULT_REQUEST_MESSAGE
+        );
     }
 
     @Override
@@ -59,13 +58,31 @@ public class JsonLogMessageProvider implements LogMessageProvider {
                 requestInfo,
                 response
         );
+        return formatLogMessage(
+                RESPONSE_MESSAGE_FORMAT,
+                responseLogEntry,
+                DEFAULT_RESPONSE_MESSAGE
+        );
+    }
+
+    @Override
+    public String getErrorLog(RequestInfo requestInfo, Throwable throwable) {
+        final ErrorLogEntry errorLogEntry = ErrorLogEntry.of(requestInfo, throwable);
+        return formatLogMessage(
+                ERROR_MESSAGE_FORMAT,
+                errorLogEntry,
+                DEFAULT_ERROR_MESSAGE
+        );
+    }
+
+    private String formatLogMessage(String format, Object logEntry, String defaultMessage) {
         try {
             return String.format(
-                    RESPONSE_MESSAGE_FORMAT,
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseLogEntry)
+                    format,
+                    objectMapper.writer(DEFAULT_PRETTY_PRINTER).writeValueAsString(logEntry)
             );
         } catch (JsonProcessingException e) {
-            return DEFAULT_RESPONSE_MESSAGE;
+            return defaultMessage;
         }
     }
 }
