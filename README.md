@@ -4,14 +4,14 @@
 
 애플리케이션 실행 후 아래의 링크로 접속할 수 있습니다.
 
-- 관리자 페이지: [3.35.51.181:8080/admin](http://localhost:8080/admin)
+- 관리자 페이지: [3.35.51.181:8080/admin](http://3.35.51.181:8080/admin)
     ```plaintext
       테스트 관리자 계정
       email: danny@example.com
       password: 0000
     ```
 
-- 사용자 페이지: [3.35.51.181:8080/](http://localhost:8080/)
+- 사용자 페이지: [3.35.51.181:8080/](http://3.35.51.181:8080/)
     ```plaintext
   테스트 사용자 계정
   email: sooyang@example.com
@@ -25,6 +25,7 @@
 ![img.png](docs/API_DOCS.png)
 
 ## ERD
+
 ![erd250607_01.png](docs/erd250607_01.png)
 
 ## 배포 관련
