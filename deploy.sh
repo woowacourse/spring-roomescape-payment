@@ -1,8 +1,8 @@
 #!/bin/bash
 
-EC2_HOST="ubuntu@ec2-3-36-57-197.ap-northeast-2.compute.amazonaws.com"
+EC2_HOST="ubuntu@ec2-43-201-62-219.ap-northeast-2.compute.amazonaws.com"
 PEM_KEY_PATH="/Users/spqje/key-jenson.pem"
-TARGET_DIR="~/home/ubuntu/app"
+TARGET_DIR="/home/ubuntu/app"
 JAR_NAME="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 TARGET_JAR_PATH="$TARGET_DIR/$JAR_NAME"
 
