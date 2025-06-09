@@ -24,7 +24,7 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
     List<Reservation> findAllByDateAndThemeId(ReservationDate date, Long themeId);
 
     @Query("""
-            SELECT new roomescape.reservation.infrastructure.vo.ThemeBookingCount(t, COUNT(r))
+            SELECT new roomescape.reservation.domain.vo.ThemeBookingCount(t, COUNT(r))
             FROM Reservation r
             JOIN r.theme t
             WHERE r.date BETWEEN :startDate AND :endDate
@@ -41,7 +41,7 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
     void updateUserId(@Param("id") Long id, @Param("userId") Long userId);
 
     @Query("""
-            SELECT new roomescape.reservation.infrastructure.vo.MyReservation(
+            SELECT new roomescape.reservation.domain.vo.MyReservation(
                 r.id,
                 r.date.value,
                 rt,

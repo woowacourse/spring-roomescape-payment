@@ -27,11 +27,11 @@ public interface JpaWaitingReservationRepository extends JpaRepository<WaitingRe
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-            UPDATE WaitingReservation w 
-            SET w.waitingOrder = w.waitingOrder - 1 
-            WHERE w.time.id = :timeId 
-              AND w.theme.id = :themeId 
-              AND w.date = :date 
+            UPDATE WaitingReservation w
+            SET w.waitingOrder = w.waitingOrder - 1
+            WHERE w.time.id = :timeId
+              AND w.theme.id = :themeId
+              AND w.date = :date
               AND w.waitingOrder > :waitingOrder
             """)
     int decrementWaitingOrderAfter(@Param("timeId") Long timeId,
@@ -43,7 +43,7 @@ public interface JpaWaitingReservationRepository extends JpaRepository<WaitingRe
     Optional<Long> findUserIdById(@Param("id") Long id);
 
     @Query("""
-                        SELECT new roomescape.reservation.infrastructure.vo.MyReservation(
+                        SELECT new roomescape.reservation.domain.vo.MyReservation(
                             wr.id,
                             wr.date.value,
                             wrt,

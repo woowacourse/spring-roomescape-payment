@@ -22,15 +22,15 @@ import java.util.Objects;
 @Slf4j
 public class LogAspect {
 
-    @Pointcut("execution(* roomescape..*(..))")
-    public void all() {
+    @Pointcut("execution(* roomescape..application..*(..))")
+    public void applicationServices() {
     }
 
     @Pointcut("execution(* roomescape..ui..*(..))")
     public void controller() {
     }
 
-    @Around("all()")
+    @Around("applicationServices()")
     public Object logExecutionTime(final ProceedingJoinPoint joinPoint) throws Throwable {
         final long start = System.currentTimeMillis();
         try {
@@ -82,7 +82,7 @@ public class LogAspect {
         final Map<String, Object> cookieMap = new LinkedHashMap<>();
         for (Cookie cookie : cookies) {
             if ("ACCESS_TOKEN".equals(cookie.getName())) {
-                cookieMap.put(cookie.getName(), cookie.getValue());
+                cookieMap.put(cookie.getName(), maskSensitiveData(cookie.getValue()));
             }
         }
 
@@ -95,5 +95,10 @@ public class LogAspect {
                 sb.append("  ").append(key).append(" = ").append(value).append("\n")
         );
         return sb.toString();
+    }
+
+    private String maskSensitiveData(String value) {
+        return value.length() > 8 ?
+                value.substring(4, 8) + "****" : "****";
     }
 }
