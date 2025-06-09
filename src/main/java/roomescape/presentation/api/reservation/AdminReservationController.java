@@ -1,5 +1,7 @@
 package roomescape.presentation.api.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "관리자 예약 API")
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
@@ -36,6 +39,10 @@ public class AdminReservationController {
     private final DeleteReservationService deleteReservationService;
     private final ReservationQueryService reservationQueryService;
 
+    @Operation(
+            summary = "관리자 예약 생성",
+            description = "관리자가 예약을 생성합니다. 요청 본문에 필요한 예약 정보를 포함해야 합니다."
+    )
     @PostMapping
     public ResponseEntity<Void> createReservation(
             @AuthPrincipal final AuthInfo authInfo,
@@ -47,12 +54,20 @@ public class AdminReservationController {
                 .build();
     }
 
+    @Operation(
+            summary = "관리자 예약 삭제",
+            description = "관리자가 예약을 삭제합니다. 예약 ID를 경로 변수로 전달해야 합니다."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long reservationId) {
         deleteReservationService.cancelById(reservationId);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "관리자 예약 조회",
+            description = "관리자가 예약 목록을 조회합니다. 선택적으로 테마 ID, 회원 ID, 날짜 범위를 필터링할 수 있습니다."
+    )
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findAll(
             @RequestParam(value = "themeId", required = false) final Long themeId,

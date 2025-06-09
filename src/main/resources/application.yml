@@ -25,3 +25,10 @@ security:
 
 toss-payment:
   secret-key: ${TOSS_PAYMENT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+  packages-to-scan: roomescape.presentation.api

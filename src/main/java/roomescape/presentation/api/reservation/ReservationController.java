@@ -1,5 +1,7 @@
 package roomescape.presentation.api.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "사용자 예약 API")
 @RequestMapping("/reservations")
 public class ReservationController {
 
@@ -29,6 +32,10 @@ public class ReservationController {
     private final ReservationQueryService reservationQueryService;
     private final ProcessReservationWithTossPaymentUseCase processReservationWithTossPaymentUseCase;
 
+    @Operation(
+            summary = "예약 생성",
+            description = "사용자가 예약을 생성합니다. 요청 본문에 필요한 예약 정보를 포함해야 합니다."
+    )
     @PostMapping
     public ResponseEntity<Void> createReservation(
             @AuthPrincipal final AuthInfo authInfo,
@@ -38,6 +45,10 @@ public class ReservationController {
                 .build();
     }
 
+    @Operation(
+            summary = "예약 조회",
+            description = "사용자가 자신의 예약을 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findReservations() {
         final List<ReservationResult> reservationResults = reservationQueryService.findAll();
