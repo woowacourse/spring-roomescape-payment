@@ -6,6 +6,7 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.booking.dto.PromotingReservationRequest;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
@@ -120,5 +121,21 @@ public class ReservationCreateService {
                 reservation.getSchedule().getDate(),
                 reservation.getSchedule().getReservationTime().getStartAt());
         return reservation;
+    }
+
+    @Transactional
+    public void promote(final PromotingReservationRequest request) {
+        final Reservation reservation = new Reservation(
+                request.member(),
+                request.schedule(),
+                ReservationStatus.PROMOTED
+        );
+
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        log.info("EVENT: PROMOTED_TO_RESERVATION, memberId={}, themeName={}, date={}, time={}",
+                savedReservation.getMember().getId(),
+                savedReservation.getSchedule().getTheme().getName(),
+                savedReservation.getSchedule().getDate(),
+                savedReservation.getSchedule().getReservationTime().getStartAt());
     }
 }

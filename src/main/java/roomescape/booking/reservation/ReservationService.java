@@ -2,7 +2,6 @@ package roomescape.booking.reservation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
@@ -21,11 +20,6 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-
-    @Transactional
-    public void create(final Reservation reservation) {
-        reservationRepository.save(reservation);
-    }
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> getAll() {

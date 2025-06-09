@@ -2,14 +2,14 @@ package roomescape.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
+import roomescape.booking.dto.PromotingReservationRequest;
 import roomescape.booking.reservation.Reservation;
+import roomescape.booking.reservation.ReservationCreateService;
 import roomescape.booking.reservation.ReservationService;
-import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.reservationpayment.ReservationPayment;
@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 public class BookingService {
 
     private final ReservationService reservationService;
+    private final ReservationCreateService reservationCreateService;
     private final WaitingService waitingService;
     private final ReservationPaymentService reservationPaymentService;
 
@@ -58,13 +59,7 @@ public class BookingService {
 
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
-        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED);
-        log.info("[{}] EVENT: WAITING_PROMOTED_TO_RESERVATION, memberId={}, themeName={}, date={}, time={}",
-                MDC.get("requestId"),
-                reservation.getMember().getId(),
-                reservation.getSchedule().getTheme().getName(),
-                reservation.getSchedule().getDate(),
-                reservation.getSchedule().getReservationTime().getStartAt());
-        reservationService.create(reservation);
+        PromotingReservationRequest request = PromotingReservationRequest.from(firstWaiting);
+        reservationCreateService.promote(request);
     }
 }

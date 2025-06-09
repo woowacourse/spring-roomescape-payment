@@ -7,9 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.booking.dto.PromotingReservationRequest;
 import roomescape.booking.reservation.Reservation;
+import roomescape.booking.reservation.ReservationCreateService;
 import roomescape.booking.reservation.ReservationService;
-import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.member.Member;
@@ -31,6 +32,8 @@ class BookingServiceTest {
 
     @Mock
     private ReservationService reservationService;
+    @Mock
+    private ReservationCreateService reservationCreateService;
     @Mock
     private WaitingService waitingService;
     @InjectMocks
@@ -61,7 +64,6 @@ class BookingServiceTest {
         bookingService.deleteReservationById(1L);
 
         // then
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
+        then(reservationCreateService).should().promote(PromotingReservationRequest.from(firstWaiting));
     }
 }
