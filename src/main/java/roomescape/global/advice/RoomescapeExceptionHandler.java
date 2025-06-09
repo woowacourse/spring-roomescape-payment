@@ -56,12 +56,4 @@ public class RoomescapeExceptionHandler {
         return ResponseEntity.status(CONFLICT)
                 .body(ApiResponse.fail(IN_ALREADY_EXCEPTION));
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(HttpServletRequest request,
-                                                             Exception e) {
-        log.error("{} | {}", request.getAttribute("traceId"), e.getStackTrace());
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.fail(UNKNOWN_EXCEPTION));
-    }
 }
