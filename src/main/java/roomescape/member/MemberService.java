@@ -2,7 +2,6 @@ package roomescape.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.member.MemberEmailConflictException;
@@ -25,7 +24,7 @@ public class MemberService {
 
         final Member notSavedMember = new Member(request.email(), request.password(), request.name(), MemberRole.MEMBER);
         Member member = memberRepository.save(notSavedMember);
-        log.info("[{}] EVENT: MEMBER_SIGNED_UP, id={}", MDC.get("requestId"), member.getId());
+        log.info("EVENT: MEMBER_SIGNED_UP, id={}", member.getId());
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +48,7 @@ public class MemberService {
 
     private void validateDuplication(final MemberRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
-            log.warn("[{}] EVENT: MEMBER_SIGNED_UP_FAILED - DUPLICATED", MDC.get("requestId"));
+            log.warn("EVENT: MEMBER_SIGNED_UP_FAILED - DUPLICATED");
             throw new MemberEmailConflictException();
         }
     }

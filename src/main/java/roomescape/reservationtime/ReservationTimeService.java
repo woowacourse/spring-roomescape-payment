@@ -2,7 +2,6 @@ package roomescape.reservationtime;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.ReservationService;
@@ -35,8 +34,7 @@ public class ReservationTimeService {
 
         final ReservationTime reservationTime = new ReservationTime(request.startAt());
         final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
-        log.info("[{}] EVENT: RESERVATION_TIME_CREATED, id={}, startAt={}",
-                MDC.get("requestId"),
+        log.info("EVENT: RESERVATION_TIME_CREATED, id={}, startAt={}",
                 savedReservationTime.getId(),
                 savedReservationTime.getStartAt());
         return ReservationTimeResponse.from(savedReservationTime);
@@ -84,16 +82,14 @@ public class ReservationTimeService {
         }
 
         reservationTimeRepository.delete(reservationTime);
-        log.info("[{}] EVENT: RESERVATION_TIME_DELETED, id={}, startAt={}",
-                MDC.get("requestId"),
+        log.info("EVENT: RESERVATION_TIME_DELETED, id={}, startAt={}",
                 reservationTime.getId(),
                 reservationTime.getStartAt());
     }
 
     private void validateDuplication(final ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            log.warn("[{}] EVENT: RESERVATION_TIME_CREATE_FAILED - DUPLICATED, time={}",
-                    MDC.get("requestId"),
+            log.warn("EVENT: RESERVATION_TIME_CREATE_FAILED - DUPLICATED, time={}",
                     request.startAt());
             throw new ReservationTimeConflictException();
         }

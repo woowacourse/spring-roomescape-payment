@@ -2,7 +2,6 @@ package roomescape.booking.waiting;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -32,8 +31,7 @@ public class WaitingService {
         Waiting waiting = getById(id);
         validateAuthorization(member, waiting);
         waitingRepository.delete(waiting);
-        log.info("[{}] EVENT: WAITING_DELETED_BY_MEMBER, id={}, memberId={}, themeId={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: WAITING_DELETED_BY_MEMBER, id={}, memberId={}, themeId={}, date={}, time={}",
                 waiting.getId(),
                 waiting.getMember().getId(),
                 waiting.getSchedule().getId(),
@@ -45,8 +43,7 @@ public class WaitingService {
     public void deleteByIdForAdmin(final Long id) {
         Waiting waiting = getById(id);
         waitingRepository.delete(waiting);
-        log.info("[{}] EVENT: WAITING_DELETED_BY_ADMIN, id={}, memberId={}, themeId={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: WAITING_DELETED_BY_ADMIN, id={}, memberId={}, themeId={}, date={}, time={}",
                 waiting.getId(),
                 waiting.getMember().getId(),
                 waiting.getSchedule().getId(),
@@ -67,8 +64,7 @@ public class WaitingService {
     @Transactional
     public void delete(final Waiting waiting) {
         waitingRepository.delete(waiting);
-        log.info("[{}] EVENT: WAITING_DELETED, id={}, memberId={}, themeId={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: WAITING_DELETED, id={}, memberId={}, themeId={}, date={}, time={}",
                 waiting.getId(),
                 waiting.getMember().getId(),
                 waiting.getSchedule().getId(),

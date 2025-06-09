@@ -76,8 +76,7 @@ public class ReservationService {
 
         reservationRepository.deleteById(id);
 
-        log.info("[{}] EVENT: RESERVATION_DELETED, id={}, memberId={}, themeName={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: RESERVATION_DELETED, id={}, memberId={}, themeName={}, date={}, time={}",
                 id,
                 reservation.getMember().getId(),
                 reservation.getSchedule().getTheme().getName(),
@@ -87,8 +86,7 @@ public class ReservationService {
 
     private void validateReservationStatusForDeletion(final Reservation reservation) {
         if (reservation.getReservationStatus() == ReservationStatus.CONFIRMED) {
-            log.warn("[{}] EVENT: RESERVATION_DELETED_FAILED - CONFIRMED_RESERVATION",
-                    MDC.get("requestId"));
+            log.warn("EVENT: RESERVATION_DELETED_FAILED - CONFIRMED_RESERVATION");
             throw new IllegalArgumentException("예약이 이미 확정되어 취소할 수 없습니다.");
         }
     }

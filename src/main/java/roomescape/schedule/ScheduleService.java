@@ -2,7 +2,6 @@ package roomescape.schedule;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.schedule.ScheduleConflictException;
@@ -33,8 +32,7 @@ public class ScheduleService {
 
         Schedule schedule = new Schedule(request.date(), reservationTime, theme);
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        log.info("[{}] EVENT: SCHEDULE_CREATED, id={}. date={}, time={}, themeName={}",
-                MDC.get("requestId"),
+        log.info("EVENT: SCHEDULE_CREATED, id={}. date={}, time={}, themeName={}",
                 savedSchedule.getId(),
                 savedSchedule.getDate(),
                 savedSchedule.getReservationTime().getStartAt(),
@@ -50,8 +48,7 @@ public class ScheduleService {
 
     private void validateDuplication(final ReservationTime reservationTime, final Theme theme, final LocalDate date) {
         if (scheduleRepository.existsByReservationTimeAndThemeAndDate(reservationTime, theme, date)) {
-            log.warn("[{}] EVENT: SCHEDULE_CREATE_FAILED - DUPLICATED, themeName={}, date={}, time={}",
-                    MDC.get("requestId"),
+            log.warn("EVENT: SCHEDULE_CREATE_FAILED - DUPLICATED, themeName={}, date={}, time={}",
                     theme.getName(),
                     date,
                     reservationTime.getStartAt());

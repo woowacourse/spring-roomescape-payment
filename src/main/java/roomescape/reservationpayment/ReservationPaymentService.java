@@ -2,7 +2,6 @@ package roomescape.reservationpayment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.TossPaymentConfirmCommandFactory;
@@ -29,15 +28,13 @@ public class ReservationPaymentService {
         try {
             tossPaymentAdapter.confirmPayment(command);
         } catch (Exception e) {
-            log.warn("[{}] EVENT: PAYMENT_CONFIRM_FAILED, reservationId={}, paymentKey={}, orderId={}",
-                    MDC.get("requestId"),
+            log.warn("EVENT: PAYMENT_CONFIRM_FAILED, reservationId={}, paymentKey={}, orderId={}",
                     savedReservationPayment.getReservation().getId(),
                     savedReservationPayment.getPaymentKey(),
                     savedReservationPayment.getOrderId());
             throw e;
         }
-        log.info("[{}] EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}, orderId={}",
-                MDC.get("requestId"),
+        log.info("EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}, orderId={}",
                 savedReservationPayment.getReservation().getId(),
                 savedReservationPayment.getPaymentKey(),
                 savedReservationPayment.getOrderId());

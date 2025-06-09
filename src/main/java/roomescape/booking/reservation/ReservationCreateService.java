@@ -2,7 +2,6 @@ package roomescape.booking.reservation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -51,8 +50,7 @@ public class ReservationCreateService {
         try {
             order.validateOrderAndPaymentRequest(request.amount(), member, schedule);
         } catch (IllegalArgumentException e) {
-            log.warn("[{}] EVENT: RESERVATION_CREATE_FAILED_ORDER_NOT_MATCH, orderId={}",
-                    MDC.get("requestId"),
+            log.warn("EVENT: RESERVATION_CREATE_FAILED_ORDER_NOT_MATCH, orderId={}",
                     order.getId());
             throw e;
         }
@@ -63,8 +61,7 @@ public class ReservationCreateService {
         validateDuplication(schedule);
         final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        log.info("[{}] EVENT: RESERVATION_CREATED_BY_MEMBER, id={}, memberId={}, themeName={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: RESERVATION_CREATED_BY_MEMBER, id={}, memberId={}, themeName={}, date={}, time={}",
                 reservation.getId(),
                 reservation.getMember().getId(),
                 reservation.getSchedule().getTheme().getName(),
@@ -80,8 +77,7 @@ public class ReservationCreateService {
 
     private void validatePast(final Schedule schedule) {
         if (schedule.isPast()) {
-            log.warn("[{}] EVENT: RESERVATION_CREATE_FAILED - PAST_SCHEDULE, date={}, time={}",
-                    MDC.get("requestId"),
+            log.warn("EVENT: RESERVATION_CREATE_FAILED - PAST_SCHEDULE, date={}, time={}",
                     schedule.getDate(),
                     schedule.getReservationTime().getStartAt());
             throw new ReservationPastDateException();
@@ -90,8 +86,7 @@ public class ReservationCreateService {
 
     private void validateDuplication(final Schedule schedule) {
         if (reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED)) {
-            log.warn("[{}] RESERVATION_CREATE_FAILED - DUPLICATED, date={}, time={}, themeName={}",
-                    MDC.get("requestId"),
+            log.warn("RESERVATION_CREATE_FAILED - DUPLICATED, date={}, time={}, themeName={}",
                     schedule.getDate(),
                     schedule.getReservationTime().getStartAt(),
                     schedule.getTheme().getName());
@@ -113,8 +108,7 @@ public class ReservationCreateService {
     private Reservation saveReservationForAdmin(final Schedule schedule, final Member member) {
         final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        log.info("[{}] EVENT: RESERVATION_CREATED_BY_ADMIN, id={}, memberId={}, themeName={}, date={}, time={}",
-                MDC.get("requestId"),
+        log.info("EVENT: RESERVATION_CREATED_BY_ADMIN, id={}, memberId={}, themeName={}, date={}, time={}",
                 reservation.getId(),
                 reservation.getMember().getId(),
                 reservation.getSchedule().getTheme().getName(),
