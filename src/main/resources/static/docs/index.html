@@ -460,27 +460,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_테마_목록_조회">테마 목록 조회</a></li>
 <li><a href="#_테마_생성">테마 생성</a></li>
 <li><a href="#_테마_삭제">테마 삭제</a></li>
-<li><a href="#_인기_테마_조회">인기 테마 조회</a></li>
-</ul>
-</li>
-<li><a href="#_member_reservation_api">Member Reservation API</a>
-<ul class="sectlevel2">
-<li><a href="#_예약_생성">예약 생성</a></li>
-<li><a href="#_대기_생성">대기 생성</a></li>
-<li><a href="#_나의_예약대기_목록_조회">나의 예약/대기 목록 조회</a></li>
-</ul>
-</li>
-<li><a href="#_admin_reservation_api">Admin Reservation API</a>
-<ul class="sectlevel2">
-<li><a href="#_예약_생성_2">예약 생성</a></li>
-<li><a href="#_예약_조건_검색">예약 조건 검색</a></li>
-<li><a href="#_예약_대기_목록_조회">예약 대기 목록 조회</a></li>
-</ul>
-</li>
-<li><a href="#_reservation_api">Reservation API</a>
-<ul class="sectlevel2">
-<li><a href="#_예약_목록_전체_조회">예약 목록 전체 조회</a></li>
-<li><a href="#_예약_삭제">예약 삭제</a></li>
 </ul>
 </li>
 <li><a href="#_admin_login_api">Admin Login API</a>
@@ -512,42 +491,206 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_예약_시간_목록_조회"><a class="link" href="#_예약_시간_목록_조회">예약 시간 목록 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_시간_목록_조회</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::time-slot/find-all</p>
+<div class="sect3">
+<h4 id="_예약_시간_목록_조회_http_request"><a class="link" href="#_예약_시간_목록_조회_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times HTTP/1.1
+Host: localhost:53854</code></pre>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_목록_조회_http_response"><a class="link" href="#_예약_시간_목록_조회_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 170
+
+[ {
+  "id" : 1,
+  "startAt" : "10:00:00"
+}, {
+  "id" : 2,
+  "startAt" : "11:00:00"
+}, {
+  "id" : 3,
+  "startAt" : "12:00:00"
+}, {
+  "id" : 4,
+  "startAt" : "10:30:00"
+} ]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_목록_조회_response_fields"><a class="link" href="#_예약_시간_목록_조회_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시간 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].startAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시작 시간 (HH:mm:ss)</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_예약_시간_추가"><a class="link" href="#_예약_시간_추가">예약 시간 추가</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_시간_추가</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_예약_시간_추가_http_request"><a class="link" href="#_예약_시간_추가_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /times HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854
+Content-Length: 25
+
+{
+  "startAt" : "10:30"
+}</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::time-slot/create</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_예약_시간_추가_request_fields"><a class="link" href="#_예약_시간_추가_request_fields">Request fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시작 시간</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_추가_http_response"><a class="link" href="#_예약_시간_추가_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+Location: /admin/time
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 40
+
+{
+  "id" : 4,
+  "startAt" : "10:30:00"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_추가_response_fields"><a class="link" href="#_예약_시간_추가_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시간 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startAt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">시작 시간 (HH:mm:ss)</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_예약_시간_삭제"><a class="link" href="#_예약_시간_삭제">예약 시간 삭제</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_시간_삭제</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_예약_시간_삭제_http_request"><a class="link" href="#_예약_시간_삭제_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /times/5 HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::time-slot/delete</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_삭제_path_parameters"><a class="link" href="#_예약_시간_삭제_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /times/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">예약 시간 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_예약_시간_삭제_http_response"><a class="link" href="#_예약_시간_삭제_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive</code></pre>
 </div>
 </div>
 </div>
@@ -559,183 +702,248 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_테마_목록_조회"><a class="link" href="#_테마_목록_조회">테마 목록 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>테마_목록_조회</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::theme/find-all</p>
+<div class="sect3">
+<h4 id="_테마_목록_조회_http_request"><a class="link" href="#_테마_목록_조회_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /themes HTTP/1.1
+Host: localhost:53854</code></pre>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_테마_목록_조회_http_response"><a class="link" href="#_테마_목록_조회_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 484
+
+[ {
+  "id" : 1,
+  "name" : "테마1",
+  "description" : "재밌음",
+  "thumbnail" : "/image/default.jpg"
+}, {
+  "id" : 2,
+  "name" : "테마2",
+  "description" : "무서움",
+  "thumbnail" : "/image/default.jpg"
+}, {
+  "id" : 3,
+  "name" : "테마3",
+  "description" : "놀라움",
+  "thumbnail" : "/image/default.jpg"
+}, {
+  "id" : 5,
+  "name" : "미스터리룸",
+  "description" : "미스터리한 분위기의 테마입니다.",
+  "thumbnail" : "http://example.com/image.jpg"
+} ]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_테마_목록_조회_response_fields"><a class="link" href="#_테마_목록_조회_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].thumbnail</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 썸네일 URL</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_테마_생성"><a class="link" href="#_테마_생성">테마 생성</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>테마_생성</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_테마_생성_http_request"><a class="link" href="#_테마_생성_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /themes HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854
+Content-Length: 147
+
+{
+  "description" : "미스터리한 분위기의 테마입니다.",
+  "name" : "미스터리룸",
+  "thumbnail" : "http://example.com/image.jpg"
+}</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::theme/create</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_테마_생성_request_fields"><a class="link" href="#_테마_생성_request_fields">Request fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnail</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 썸네일 URL</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_테마_생성_http_response"><a class="link" href="#_테마_생성_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+Location: /admin/theme
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 159
+
+{
+  "id" : 5,
+  "name" : "미스터리룸",
+  "description" : "미스터리한 분위기의 테마입니다.",
+  "thumbnail" : "http://example.com/image.jpg"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_테마_생성_response_fields"><a class="link" href="#_테마_생성_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>description</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 설명</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnail</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 썸네일 URL</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_테마_삭제"><a class="link" href="#_테마_삭제">테마 삭제</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>테마_삭제</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::theme/delete</p>
-</div>
+<div class="sect3">
+<h4 id="_테마_삭제_http_request"><a class="link" href="#_테마_삭제_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /themes/4 HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_인기_테마_조회"><a class="link" href="#_인기_테마_조회">인기 테마 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>인기_테마_조회</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_테마_삭제_path_parameters"><a class="link" href="#_테마_삭제_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /themes/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">테마 ID</p></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::theme/popular-themes</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_member_reservation_api"><a class="link" href="#_member_reservation_api">Member Reservation API</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_예약_생성"><a class="link" href="#_예약_생성">예약 생성</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_생성</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::member-reservation/create-reservation</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_대기_생성"><a class="link" href="#_대기_생성">대기 생성</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>대기_생성</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::member-reservation/create-waiting</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_나의_예약대기_목록_조회"><a class="link" href="#_나의_예약대기_목록_조회">나의 예약/대기 목록 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>나의_예약대기_목록_조회</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::member-reservation/my-reservations</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_admin_reservation_api"><a class="link" href="#_admin_reservation_api">Admin Reservation API</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_예약_생성_2"><a class="link" href="#_예약_생성_2">예약 생성</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_생성_2</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::admin-reservation/create</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_예약_조건_검색"><a class="link" href="#_예약_조건_검색">예약 조건 검색</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_조건_검색</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::admin-reservation/search</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_예약_대기_목록_조회"><a class="link" href="#_예약_대기_목록_조회">예약 대기 목록 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_대기_목록_조회</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::admin-reservation/waitings</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_reservation_api"><a class="link" href="#_reservation_api">Reservation API</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_예약_목록_전체_조회"><a class="link" href="#_예약_목록_전체_조회">예약 목록 전체 조회</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_목록_전체_조회</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::reservation/find-all</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_예약_삭제"><a class="link" href="#_예약_삭제">예약 삭제</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>예약_삭제</em>‘http_request]]
-== ‘http request</p>
-</div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::reservation/delete</p>
+<div class="sect3">
+<h4 id="_테마_삭제_http_response"><a class="link" href="#_테마_삭제_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 204 No Content
+Date: Mon, 09 Jun 2025 08:17:25 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive</code></pre>
 </div>
 </div>
 </div>
@@ -747,30 +955,125 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_관리자_로그인"><a class="link" href="#_관리자_로그인">관리자 로그인</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>관리자_로그인</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_관리자_로그인_http_request"><a class="link" href="#_관리자_로그인_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /admin/login HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854
+Content-Length: 60
+
+{
+  "email" : "admin@email.com",
+  "password" : "password"
+}</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::admin-login/login</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_관리자_로그인_request_fields"><a class="link" href="#_관리자_로그인_request_fields">Request fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">어드민 이메일</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">어드민 비밀번호</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_관리자_로그인_http_response"><a class="link" href="#_관리자_로그인_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDk0NTg4NDQsInN1YiI6IjEiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDk0NTcwNDR9.SVtlSDSu0lnimZeQ1YpV7AvCwFr3bhSGOQU667B4F2w; Path=/; HttpOnly
+Date: Mon, 09 Jun 2025 08:17:24 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_관리자_로그인_response_body"><a class="link" href="#_관리자_로그인_response_body">Response body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs"></code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_로그인_상태_확인"><a class="link" href="#_로그인_상태_확인">로그인 상태 확인</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>로그인_상태_확인</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_http_request"><a class="link" href="#_로그인_상태_확인_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/login/check HTTP/1.1
+Host: localhost:53854
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDk0NTg4NDQsInN1YiI6IjEiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDk0NTcwNDR9.SVtlSDSu0lnimZeQ1YpV7AvCwFr3bhSGOQU667B4F2w</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::admin-login/check</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_http_response"><a class="link" href="#_로그인_상태_확인_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:24 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 26
+
+{
+  "name" : "어드민"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_response_fields"><a class="link" href="#_로그인_상태_확인_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">어드민 이름</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -780,30 +1083,125 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_회원_로그인"><a class="link" href="#_회원_로그인">회원 로그인</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>회원_로그인</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_회원_로그인_http_request"><a class="link" href="#_회원_로그인_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /login HTTP/1.1
+Content-Type: application/json
+Host: localhost:53854
+Content-Length: 62
+
+{
+  "email" : "member1@email.com",
+  "password" : "password"
+}</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::member-login/login</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_회원_로그인_request_fields"><a class="link" href="#_회원_로그인_request_fields">Request fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">멤버 이메일</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">멤버 비밀번호</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_회원_로그인_http_response"><a class="link" href="#_회원_로그인_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDk0NTg4NDQsInN1YiI6IjEiLCJyb2xlIjoiTUVNQkVSIiwiaWF0IjoxNzQ5NDU3MDQ0fQ.7s7tdA04LRa-hmcASQfm2phzkXx1IA_AmrSENIYrkqI; Path=/; Max-Age=1800000; Expires=Mon, 30 Jun 2025 04:17:24 GMT; HttpOnly
+Date: Mon, 09 Jun 2025 08:17:24 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_회원_로그인_response_body"><a class="link" href="#_회원_로그인_response_body">Response body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs"></code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_로그인_상태_확인_2"><a class="link" href="#_로그인_상태_확인_2">로그인 상태 확인</a></h3>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>[[<em>로그인_상태_확인_2</em>‘http_request]]
-== ‘http request</p>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_2_http_request"><a class="link" href="#_로그인_상태_확인_2_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /login/check HTTP/1.1
+Host: localhost:53854
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDk0NTg4NDQsInN1YiI6IjEiLCJyb2xlIjoiTUVNQkVSIiwiaWF0IjoxNzQ5NDU3MDQ0fQ.7s7tdA04LRa-hmcASQfm2phzkXx1IA_AmrSENIYrkqI</code></pre>
 </div>
-<div class="paragraph">
-<p>Snippet ‘http-request not found for operation::member-login/check</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_2_http_response"><a class="link" href="#_로그인_상태_확인_2_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 09 Jun 2025 08:17:24 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+Content-Length: 24
+
+{
+  "name" : "유저1"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_로그인_상태_확인_2_response_fields"><a class="link" href="#_로그인_상태_확인_2_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">멤버 이름</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -812,7 +1210,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2025-06-09 16:13:31 +0900
+Last updated 2025-06-09 16:22:03 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

@@ -6,8 +6,7 @@ import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,84 +20,84 @@ import roomescape.auth.exception.ForbiddenException;
 import roomescape.auth.exception.UnauthorizedException;
 import roomescape.common.dto.response.ErrorResponse;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
             final BusinessException e, final HttpServletRequest request) {
+        log.warn("[{} {}] → BusinessException: {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<ErrorResponse> handleDateTimeParseException(
             final DateTimeParseException e, final HttpServletRequest request) {
+        log.warn("[{} {}] → DateTimeParseException: {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             final IllegalArgumentException e, final HttpServletRequest request) {
+        log.warn("[{} {}] → IllegalArgumentException: {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(final UnauthorizedException e,
-                                                                     final HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(
+            final UnauthorizedException e, final HttpServletRequest request) {
+        log.warn("[{} {}] → UnauthorizedException: {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), request);
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> handleForbiddenException(final ForbiddenException e,
-                                                                  final HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleForbiddenException(
+            final ForbiddenException e, final HttpServletRequest request) {
+        log.warn("[{} {}] → ForbiddenException: {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             final MethodArgumentNotValidException e, final HttpServletRequest request) {
-
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
 
+        log.warn("[{} {}] → Validation error: {}", request.getMethod(), request.getRequestURI(), message);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, message.isBlank() ? "요청 데이터에 오류가 있습니다." : message, request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleInvalidBodyFormat(
             final HttpMessageNotReadableException e, final HttpServletRequest request) {
-
         String message = extractRootCauseMessage(e, "요청 본문 형식이 올바르지 않습니다.");
+        log.warn("[{} {}] → MessageNotReadableException: {}", request.getMethod(), request.getRequestURI(), message);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleExternalConnectionIssue(
             final ResourceAccessException e, final HttpServletRequest request) {
-
         String message = extractRootCauseMessage(e, "외부 서버 접근 중 오류가 발생했습니다.");
+        log.error("[{} {}] → ResourceAccessException: {}", request.getMethod(), request.getRequestURI(), message, e);
         return buildErrorResponse(HttpStatus.GATEWAY_TIMEOUT, message, request);
     }
 
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<ErrorResponse> handleRestClientException(
             final RestClientException e, final HttpServletRequest request) {
-
         log.error("[{} {}] → RestClientException: {}", request.getMethod(), request.getRequestURI(), e.getMessage(), e);
-
         return buildErrorResponse(HttpStatus.BAD_GATEWAY, "결제 서버와의 통신 중 오류가 발생했습니다.", request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpectedException(
             final Exception e, final HttpServletRequest request) {
-
         log.error("[{} {}] → Unhandled exception: {} - {}", request.getMethod(), request.getRequestURI(),
                 e.getClass().getSimpleName(), e.getMessage(), e);
-
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 서버 오류가 발생했습니다.", request);
     }
 
@@ -135,8 +134,7 @@ public class GlobalExceptionHandler {
     }
 
     private String formatErrorMessage(final String message) {
-        String errorTag = "ERROR";
-        return String.format("[%s] %s", errorTag, message);
+        return String.format("[ERROR] %s", message);
     }
 
     private String extractPath(final HttpServletRequest request) {

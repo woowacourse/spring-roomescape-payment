@@ -1,5 +1,6 @@
 package roomescape.auth.presentation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import roomescape.auth.dto.info.LoginAdminInfo;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.dto.response.LoginCheckResponse;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/login")
 public class AdminLoginController {
@@ -27,6 +29,7 @@ public class AdminLoginController {
 
     @PostMapping
     public ResponseEntity<Void> login(@RequestBody final LoginRequest request) {
+        log.info("관리자 로그인 요청: email={}", request.email());
         String token = loginService.createAdminToken(request);
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
@@ -34,6 +37,7 @@ public class AdminLoginController {
                 .path("/")
                 .build();
 
+        log.info("관리자 로그인 성공: email={}", request.email());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -41,7 +45,10 @@ public class AdminLoginController {
 
     @GetMapping("/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(@LoginAdmin final LoginAdminInfo info) {
+        log.debug("관리자 로그인 확인 요청: adminId={}", info.id());
         Admin admin = loginService.findByAdminId(info.id());
+
+        log.debug("관리자 로그인 확인 완료: adminName={}", admin.getName());
         return ResponseEntity.ok().body(new LoginCheckResponse(admin.getName()));
     }
 }

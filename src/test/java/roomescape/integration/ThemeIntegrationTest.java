@@ -32,12 +32,6 @@ class ThemeIntegrationTest extends IntegrationTest {
             fieldWithPath("[].thumbnail").description("테마 썸네일 URL")
     );
 
-    private static final List<FieldDescriptor> POPULAR_THEME_RESPONSES_FIELDS = List.of(
-            fieldWithPath("[].name").description("테마 이름"),
-            fieldWithPath("[].description").description("테마 설명"),
-            fieldWithPath("[].thumbnail").description("테마 썸네일 URL")
-    );
-
     private static final List<FieldDescriptor> THEME_RESPONSE_FIELDS = List.of(
             fieldWithPath("id").description("테마 ID"),
             fieldWithPath("name").description("테마 이름"),

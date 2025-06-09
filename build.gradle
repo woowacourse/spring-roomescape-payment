@@ -19,6 +19,9 @@ repositories {
 
 configurations {
     asciidoctorExt
+    configureEach {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 dependencies {
@@ -28,6 +31,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
@@ -41,6 +48,9 @@ dependencies {
     add("asciidoctorExt", "org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    // Logging
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
