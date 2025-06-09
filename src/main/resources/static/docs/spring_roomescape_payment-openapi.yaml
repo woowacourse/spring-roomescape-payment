@@ -1,7 +1,7 @@
 openapi: "3.1.0"
 info:
   title: "방탈출 예약 애플리케이션 API Docs"
-  description: "방탈출 예약 애플리케이션 API 문서입니다."
+  description: "방탈출 예약 애플리케이션 API 문서입니다. [실패 사유](https://github.com/YehyeokBang/spring-roomescape-payment/blob/step2/ApiFail.md)"
   version: "1.0.0"
 servers:
   - url: "http://localhost:8080"
