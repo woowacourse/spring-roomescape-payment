@@ -1,5 +1,9 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -20,6 +24,7 @@ import roomescape.entity.Theme;
 import roomescape.global.Role;
 import roomescape.service.ThemeService;
 
+@Tag(name = "테마", description = "테마 관리 API")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
@@ -30,6 +35,8 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "테마 목록 조회", description = "모든 테마 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "테마 목록 조회 성공")
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> getThemes() {
         List<Theme> themes = themeService.findAll();
@@ -40,6 +47,8 @@ public class ThemeController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "인기 테마 조회", description = "현재 날짜 기준으로 인기 있는 테마 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "인기 테마 목록 조회 성공")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> popularThemes() {
         List<Theme> rankingThemes = themeService.getRankingThemes(LocalDate.now());
@@ -50,11 +59,14 @@ public class ThemeController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "테마 추가", description = "관리자 권한으로 새로운 테마를 추가합니다.")
+    @ApiResponse(responseCode = "201", description = "테마 추가 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
     @PostMapping
     @CheckRole(value = Role.ADMIN)
     public ResponseEntity<ThemeResponse> addTheme(
-            @RequestBody @Valid CreateThemeRequest request
-    ) {
+            @Parameter(description = "테마 생성 요청") @RequestBody @Valid CreateThemeRequest request) {
         Theme theme = themeService.addTheme(request);
         ThemeResponse response = ThemeResponse.from(theme);
 
@@ -66,9 +78,13 @@ public class ThemeController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @Operation(summary = "테마 삭제", description = "관리자 권한으로 테마를 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "테마 삭제 성공")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
     @DeleteMapping("/{id}")
     @CheckRole(value = Role.ADMIN)
-    public ResponseEntity<Void> deleteTheme(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTheme(
+            @Parameter(description = "테마 ID") @PathVariable Long id) {
         themeService.deleteThemeById(id);
 
         return ResponseEntity.noContent().build();
