@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "1. Git repo 확인 및 pull"
 if [ -d "spring-roomescape-payment" ]; then
   echo "기존 폴더 있음. git pull 실행"
