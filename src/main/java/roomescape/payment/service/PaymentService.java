@@ -34,17 +34,20 @@ public class PaymentService {
         paymentRepository.save(payment);
     }
 
+    @Transactional
     public void createPendingPayment(final Reservation reservation) {
         Payment payment = Payment.createPendingPayment(reservation);
         paymentRepository.save(payment);
     }
 
+    @Transactional
     public Payment findByReservationId(final Long id) {
         return paymentRepository.findByReservationId(id)
                 .orElseThrow(() -> new PaymentNotFoundException("요청한 reservation_id에 해당하는 결제가 없습니다. "));
 
     }
 
+    @Transactional
     public void deleteById(final Long id) {
         paymentRepository.deleteById(id);
     }
