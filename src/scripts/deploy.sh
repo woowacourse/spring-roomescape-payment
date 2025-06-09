@@ -9,7 +9,7 @@ LOG_FILE="${LOG_FILE:-app.log}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 JAR_PATH="$PROJECT_ROOT/build/libs/$JAR_NAME"
 LOG_PATH="$PROJECT_ROOT/$LOG_FILE"
-HEALTH_URL="http://localhost:8080/actuator/health"
+HEALTH_URL="http://3.36.69.170:8080/actuator/health"
 # ---------------------------------------------
 
 echo "[배포 시작]"
