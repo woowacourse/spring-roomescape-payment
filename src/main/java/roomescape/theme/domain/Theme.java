@@ -13,6 +13,7 @@ public class Theme {
     private static int MAX_NAME = 255;
     private static int MAX_DESCRIPTION = 255;
     private static int MAX_THUMBNAIL = 255;
+    private static int CURRENT_PRICE = 1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +54,20 @@ public class Theme {
         }
     }
 
+    @Override
+    public boolean equals(final Object object) {
+        if (!(object instanceof Theme theme)) {
+            return false;
+        }
+        return Objects.equals(getId(), theme.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -69,17 +84,7 @@ public class Theme {
         return thumbnail;
     }
 
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Theme theme)) {
-            return false;
-        }
-        return Objects.equals(getId(), theme.getId());
+    public long getCurrentPrice() {
+        return CURRENT_PRICE;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
 }

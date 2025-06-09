@@ -19,6 +19,8 @@ import roomescape.theme.domain.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -48,17 +50,28 @@ public class ReservationService {
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
 
-        if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                request.date(),
-                time.getStartAt(),
-                theme.getId()
-        )) {
-            throw new IllegalArgumentException("이미 예약이 존재합니다.");
-        }
+        validateRequestAmount(request.amount(), theme);
+        checkDuplicateReservation(request.date(), time.getStartAt(), request.themeId());
 
         Reservation reservation = Reservation.createPendingWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
         Reservation saveReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(saveReservation);
+    }
+
+    private void validateRequestAmount(final long amount, final Theme theme) {
+        if(amount != theme.getCurrentPrice()){
+            throw new IllegalArgumentException("요청된 가격이 올바르지 않습니다.");
+        }
+    }
+
+    private void checkDuplicateReservation(final LocalDate date, final LocalTime startAt, final long themeId){
+        if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
+                date,
+                startAt,
+                themeId
+        )) {
+            throw new IllegalArgumentException("이미 예약이 존재합니다.");
+        }
     }
 
     private ReservationTime findReservationTime(final long timeId) {
@@ -76,6 +89,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> getReservations(final ReservationConditionRequest request) {
         if (request.isEmpty()) {
             return reservationRepository.findAll().stream()
