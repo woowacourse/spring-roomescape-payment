@@ -42,17 +42,25 @@ fi
 
 # 5. 새 jar 실행
 echo "[실행] $JAR_NAME 실행"
-nohup java -jar "$JAR_PATH" > "$LOG_PATH" 2>&1 &
+
+mkdir -p "$(dirname "$LOG_PATH")"
+nohup java -jar "$JAR_PATH" >> "$LOG_PATH" 2>&1 &
 
 echo "[배포 완료] 로그 파일: $LOG_PATH"
 
 # 6. 헬스체크
-echo "[헬스체크] 10초 대기 후 확인..."
-sleep 10
-RESPONSE=$(curl -s "$HEALTH_URL")
-if echo "$RESPONSE" | grep -q '"status":"UP"'; then
-  echo "[✅ 헬스체크 통과]"
-else
+echo "[헬스체크] 최대 30초 동안 확인.."
+
+for i in {1..30}; do
+  if curl -s "$HEALTH_URL" | grep -q '"status":"UP"'; then
+    echo "[✅ 헬스체크 통과]"
+    break
+  fi
+  sleep 1
+done
+
+# 그래도 실패했으면 종료
+if ! curl -s "$HEALTH_URL" | grep -q '"status":"UP"'; then
   echo "[❌ 헬스체크 실패]"
   exit 1
 fi
