@@ -10,6 +10,7 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.auth.SignUpRequestDto;
 import roomescape.dto.member.MemberResponseDto;
 import roomescape.dto.member.MemberSignupResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.MemberCommandService;
 import roomescape.service.query.MemberQueryService;
 
@@ -38,6 +39,7 @@ public class MemberController {
         return memberQueryService.findAllMembers();
     }
 
+    @Loggable
     @Operation(summary = "회원 가입")
     @ApiResponse(responseCode = "200", description = "가입 성공")
     @PostMapping

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import roomescape.dto.reservation.AdminReservationCreateRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
@@ -36,6 +37,7 @@ public class AdminReservationController {
         return reservationQueryService.findReservedReservations();
     }
 
+    @Loggable
     @Operation(summary = "관리자에 의해 예약 추가")
     @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
@@ -61,6 +63,7 @@ public class AdminReservationController {
         return reservationQueryService.searchReservationsBy(themeId, memberId, dateFrom, dateTo);
     }
 
+    @Loggable
     @Operation(summary = "예약 삭제")
     @ApiResponse(responseCode = "204", description = "삭제 성공")
     @DeleteMapping("/{id}")

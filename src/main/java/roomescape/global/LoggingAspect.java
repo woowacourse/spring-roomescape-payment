@@ -30,10 +30,10 @@ public class LoggingAspect {
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 
-    @Pointcut("within(roomescape.controller.api..*)")
-    public void controllerMethods() {}
+    @Pointcut("@annotation(roomescape.global.Loggable)")
+    public void loggableMethods() {}
 
-    @Before("controllerMethods()")
+    @Before("loggableMethods()")
     public void beforeLog(JoinPoint joinPoint) throws JsonProcessingException {
         startTime.set(System.currentTimeMillis());
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
@@ -53,7 +53,7 @@ public class LoggingAspect {
         }
     }
 
-    @AfterReturning(pointcut = "controllerMethods()", returning = "result")
+    @AfterReturning(pointcut = "loggableMethods()", returning = "result")
     public void afterLog(JoinPoint joinPoint, Object result) throws JsonProcessingException {
         try {
             Map<String, Object> responseLogInfos = new LinkedHashMap<>();

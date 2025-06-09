@@ -9,6 +9,7 @@ import roomescape.controller.annotation.AdminMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.theme.ThemeCreateRequestDto;
 import roomescape.dto.theme.ThemeResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.ThemeCommandService;
 import roomescape.service.query.ThemeQueryService;
 
@@ -43,6 +44,7 @@ public class ThemeController {
         return themeQueryService.findPopularThemes();
     }
 
+    @Loggable
     @Operation(summary = "테마 추가")
     @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
@@ -54,6 +56,7 @@ public class ThemeController {
         return themeCommandService.createTheme(requestDto);
     }
 
+    @Loggable
     @Operation(summary = "테마 삭제")
     @ApiResponse(responseCode = "204", description = "삭제 성공")
     @DeleteMapping("/{id}")

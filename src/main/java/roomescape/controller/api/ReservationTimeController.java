@@ -10,6 +10,7 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.time.AvailableReservationTimeResponseDto;
 import roomescape.dto.time.ReservationTimeCreateRequestDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.ReservationTimeCommandService;
 import roomescape.service.query.ReservationTimeQueryService;
 
@@ -51,6 +52,7 @@ public class ReservationTimeController {
         return reservationTimeQueryService.findAllReservationTimesWithAvailabilityBy(date, themeId);
     }
 
+    @Loggable
     @Operation(summary = "예약 시간 추가")
     @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
@@ -62,6 +64,7 @@ public class ReservationTimeController {
         return reservationTimeCommandService.createReservationTime(requestDto);
     }
 
+    @Loggable
     @Operation(summary = "예약 시간 삭제")
     @ApiResponse(responseCode = "204", description = "삭제 성공")
     @DeleteMapping("/{id}")

@@ -12,6 +12,7 @@ import roomescape.controller.util.CookieHandler;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.auth.LoginRequestDto;
 import roomescape.dto.member.MemberNameResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.query.AuthQueryService;
 
 @Tag(name = "인증 API")
@@ -28,6 +29,7 @@ public class AuthController {
         this.cookieHandler = cookieHandler;
     }
 
+    @Loggable
     @Operation(summary = "로그인")
     @ApiResponse(responseCode = "200", description = "로그인 성공")
     @PostMapping("/login")
@@ -51,6 +53,7 @@ public class AuthController {
         return new MemberNameResponseDto(loginMember.name());
     }
 
+    @Loggable
     @Operation(summary = "로그아웃")
     @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     @PostMapping("/logout")

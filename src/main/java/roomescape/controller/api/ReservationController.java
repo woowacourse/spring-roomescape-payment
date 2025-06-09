@@ -13,6 +13,7 @@ import roomescape.dto.reservation.CreatedReservationResponseDto;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
@@ -57,6 +58,7 @@ public class ReservationController {
         return reservationQueryService.findMyReservations(loginInfo);
     }
 
+    @Loggable
     @Operation(summary = "예약 추가")
     @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping

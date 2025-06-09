@@ -10,6 +10,7 @@ import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.ReservationWaitingCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
@@ -40,6 +41,7 @@ public class ReservationWaitingController {
         return reservationQueryService.findAllReservationWaitings();
     }
 
+    @Loggable
     @Operation(summary = "예약 대기 추가")
     @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
@@ -53,6 +55,7 @@ public class ReservationWaitingController {
         return reservationWaitingCommandService.createReservationWaiting(reservationCreateDto);
     }
 
+    @Loggable
     @Operation(summary = "예약 대기 삭제")
     @ApiResponse(responseCode = "204", description = "삭제 성공")
     @DeleteMapping("/{id}")
