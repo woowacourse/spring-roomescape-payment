@@ -58,12 +58,12 @@ class PaymentTest {
     @Test
     void 주문_금액이_null이면_예외가_발생한다() {
         // given
-        final String paymetKey = "payment123";
+        final String paymentKey = "payment123";
         final String orderId = "order123";
         final Long amount = null;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> Payment.of(paymetKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
