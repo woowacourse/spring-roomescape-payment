@@ -2,7 +2,9 @@ package roomescape.common.security.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,26 +18,23 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        String method = request.getMethod();
-        String uri = request.getRequestURI();
-        String clientIp = getClientIp(request);
-        String userAgent = request.getHeader("User-Agent");
+        MDC.clear();
+        String traceId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
 
-        String controllerInfo = "";
+        MDC.put("traceId", traceId);
+        MDC.put("method", request.getMethod());
+        MDC.put("uri", request.getRequestURI());
+        MDC.put("clientIp", request.getRemoteAddr());
+        MDC.put("userAgent", shortenUserAgent(request.getHeader("User-Agent")));
+
         if (handler instanceof HandlerMethod) {
             HandlerMethod hm = (HandlerMethod) handler;
-            controllerInfo = String.format("%s.%s",
-                    hm.getBeanType().getSimpleName(),
-                    hm.getMethod().getName());
+            MDC.put("controller", hm.getBeanType().getSimpleName());
+            MDC.put("action", hm.getMethod().getName());
         }
-
-        log.info("API 요청 - {} {} | {} | IP: {} | UA: {}",
-                method, uri, controllerInfo, clientIp,
-                userAgent != null ? userAgent.substring(0, Math.min(50, userAgent.length())) : "");
+        log.info("요청 시작");
 
         request.setAttribute("startTime", System.currentTimeMillis());
-        request.setAttribute("requestInfo", String.format("%s %s", method, uri));
-
         return true;
     }
 
@@ -45,31 +44,31 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
                                 Object handler,
                                 Exception ex) throws Exception {
 
-        Long startTime = (Long) request.getAttribute("startTime");
-        String requestInfo = (String) request.getAttribute("requestInfo");
+        try {
+            Long startTime = (Long) request.getAttribute("startTime");
+            if (startTime != null) {
+                long duration = System.currentTimeMillis() - startTime;
+                MDC.put("duration", duration + "ms");
+                MDC.put("status", String.valueOf(response.getStatus()));
 
-        if (startTime != null) {
-            long duration = System.currentTimeMillis() - startTime;
-            int statusCode = response.getStatus();
-
-            if (ex != null) {
-                log.error("API 실패 - {} | {}ms | 상태: {} | 예외: {}",
-                        requestInfo, duration, statusCode, ex.getClass().getSimpleName());
-            } else if (statusCode >= 400) {
-                log.warn("API 에러 - {} | {}ms | 상태: {}",
-                        requestInfo, duration, statusCode);
-            } else {
-                log.info("API 완료 - {} | {}ms | 상태: {}",
-                        requestInfo, duration, statusCode);
+                if (ex != null) {
+                    MDC.put("exception", ex.getClass().getSimpleName());
+                    log.error("요청 실패", ex);
+                } else if (response.getStatus() >= 400) {
+                    log.warn("요청 에러");
+                } else {
+                    log.info("요청 완료");
+                }
             }
+        } finally {
+            MDC.clear();
         }
     }
 
-    private String getClientIp(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
+    private String shortenUserAgent(String userAgent) {
+        if (userAgent == null) {
+            return "UNKNOWN";
         }
-        return request.getRemoteAddr();
+        return userAgent.length() > 50 ? userAgent.substring(0, 50) + "..." : userAgent;
     }
 }
