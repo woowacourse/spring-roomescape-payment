@@ -9,6 +9,138 @@
 = 방탈출 예약 API 문서
 노랑 <norang@gmail.com>
 
+== 문서 사용 가이드
+
+=== API 테스트 방법
+
+==== 테스트 계정 정보
+
+[source]
+----
+일반 사용자 계정:
+- Email: aaa@gmail.com
+- Password: 1234
+
+관리자 계정 (/admin 경로 API 테스트용):
+- Email: admin@gmail.com
+- Password: 1234
+----
+
+==== cURL을 이용한 테스트 방법
+
+**Step 1: 각 API 문서의 `Curl request` 예제 활용**
+
+문서에 있는 각 API의 `Curl request` 섹션에서 제공되는 curl 명령어를 복사하여 사용할 수 있습니다.
+
+**Step 2: 서버 주소 변경**
+
+문서의 curl 명령어에서 주소를 적절히 변경해주세요:
+
+[source,bash]
+----
+# 개발 서버 테스트 시
+localhost:8080 → 43.202.40.166:8080
+
+# 로컬 서버 테스트 시
+localhost:8080
+----
+
+**Step 3: 인증이 필요한 API 테스트**
+
+인증이 필요한 API는 먼저 로그인을 통해 쿠키를 획득한 후 사용해야 합니다.
+
+. **일반 사용자로 로그인**
++
+[source,bash]
+----
+curl -X POST http://43.202.40.166:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"aaa@gmail.com","password":"1234"}' \
+  -v
+----
+
+. **응답 헤더에서 쿠키 값 확인**
++
+[source]
+----
+< Set-Cookie: token=ABC123DEF456...
+----
+
+. **쿠키를 포함하여 API 호출**
++
+[source,bash]
+----
+curl -X GET http://43.202.40.166:8080/reservations \
+  -H "Cookie: token=ABC123DEF456..."
+----
+
+**Step 4: 관리자 API 테스트**
+
+`/admin` 경로의 API는 관리자 계정으로 로그인해야 합니다:
+
+[source,bash]
+----
+# 관리자 로그인
+curl -X POST http://43.202.40.166:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@gmail.com","password":"1234"}' \
+  -v
+
+# 관리자 API 호출 (쿠키 포함)
+curl -X GET http://43.202.40.166:8080/admin/themes \
+  -H "Cookie: token=발급받은쿠키값"
+----
+
+==== 테스트 팁
+
+* 쿠키 값이 너무 길어서 불편하다면 `-c cookies.txt` 옵션으로 파일에 저장하고 ``-b cookies.txt``로 사용할 수 있습니다
+* 로그인 실패 시 401 응답을 확인하고 계정 정보를 다시 확인해보세요
+* API 응답의 상태 코드와 메시지를 통해 요청이 올바른지 확인할 수 있습니다
+
+=== 에러 응답 형식
+
+==== 에러 메시지 구조
+
+모든 에러 응답은 다음과 같은 JSON 형식으로 반환됩니다:
+
+[source,json]
+----
+{
+  "timestamp": "2024-06-09T10:30:00.123Z",
+  "message": "사용자에게 표시할 에러 메시지"
+}
+----
+
+* `timestamp`: 에러 발생 시각 (ISO 8601 형식)
+* `message`: 사용자에게 출력할 수 있는 에러 메시지
+
+==== HTTP 상태 코드별 에러 상황
+
+[cols="1,2,3"]
+|===
+|상태코드 |에러 상황 |해결 방법
+
+|400
+|잘못된 요청 형식 (Bad Request)
+|요청 body의 JSON 형식과 필수 필드를 확인하세요
+
+|401
+|인증이 필요함 (Unauthorized)
+|로그인을 먼저 수행하거나 쿠키가 올바르게 전송되는지 확인하세요
+
+|403
+|접근 권한 없음 (Forbidden)
+|해당 리소스에 대한 권한이 있는지 확인하세요
+
+|404
+|리소스를 찾을 수 없음 (Not Found)
+|요청 URL과 리소스 ID가 올바른지 확인하세요
+
+|500
+|서버 내부 오류 (Internal Server Error)
+|서버 로그를 확인하거나 관리자에게 문의하세요
+|===
+
 include::api-auth.adoc[]
 include::api-reservation.adoc[]
 include::api-member.adoc[]

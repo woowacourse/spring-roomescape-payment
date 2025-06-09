@@ -1,6 +1,7 @@
 == 인증(Auth) API 목록
 
 '''
+[[login]]
 === 로그인 API (POST /login)
 
 operation::auth-api-test/login[snippets='curl-request,http-request,request-fields,http-response,response-headers']
