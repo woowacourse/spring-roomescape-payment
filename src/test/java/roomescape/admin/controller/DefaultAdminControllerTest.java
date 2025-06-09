@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class AdminControllerImplTest {
+class DefaultAdminControllerTest {
 
     @Autowired
     MemberRepository memberRepository;

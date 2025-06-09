@@ -20,11 +20,11 @@ import roomescape.service.MemberService;
 
 @RestController
 @RequestMapping("/members")
-public class MemberControllerImpl implements MemberController {
+public class DefaultMemberController implements MemberController {
 
     private final MemberService memberService;
 
-    public MemberControllerImpl(MemberService memberService) {
+    public DefaultMemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 

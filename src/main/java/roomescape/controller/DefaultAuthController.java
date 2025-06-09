@@ -16,12 +16,12 @@ import roomescape.service.MemberService;
 import roomescape.util.CookieUtil;
 
 @RestController
-public class AuthControllerImpl implements AuthController {
+public class DefaultAuthController implements AuthController {
 
     private final MemberService memberService;
     private final AuthService authService;
 
-    public AuthControllerImpl(MemberService memberService, AuthService authService) {
+    public DefaultAuthController(MemberService memberService, AuthService authService) {
         this.memberService = memberService;
         this.authService = authService;
     }

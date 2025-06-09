@@ -28,11 +28,11 @@ import roomescape.service.ReservationService;
 @RestController
 @RequestMapping("/admin")
 @CheckRole(Role.ADMIN)
-public class AdminControllerImpl implements AdminController {
+public class DefaultAdminController implements AdminController {
 
     private final ReservationService reservationService;
 
-    public AdminControllerImpl(ReservationService reservationService) {
+    public DefaultAdminController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
 

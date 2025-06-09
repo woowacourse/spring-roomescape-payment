@@ -27,11 +27,11 @@ import roomescape.service.ReservationFacadeService;
 
 @RestController
 @RequestMapping("/reservations")
-public class ReservationControllerImpl implements ReservationController {
+public class DefaultReservationController implements ReservationController {
 
     private final ReservationFacadeService reservationFacadeService;
 
-    public ReservationControllerImpl(ReservationFacadeService reservationFacadeService) {
+    public DefaultReservationController(ReservationFacadeService reservationFacadeService) {
         this.reservationFacadeService = reservationFacadeService;
     }
 
