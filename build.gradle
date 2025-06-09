@@ -59,11 +59,12 @@ asciidoctor {
     inputs.dir snippetsDir
     configurations 'asciidoctorExt'
     dependsOn test
+    outputDir = file("${buildDir}/asciidoc/html5") // 유지
 }
 
 bootJar {
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
+    from("${buildDir}/asciidoc/html5") { // asciidoctor.outputDir 경로와 일치시킴
         into 'static/docs'
     }
 }
