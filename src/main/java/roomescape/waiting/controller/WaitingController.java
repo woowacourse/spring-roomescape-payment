@@ -1,6 +1,8 @@
 package roomescape.waiting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -32,16 +34,21 @@ public class WaitingController {
     }
 
     @Operation(summary = "예약 대기 취소", description = "로그인 유저의 예약 대기를 삭제한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(LoginMember loginMember, @PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) LoginMember loginMember,
+            @PathVariable("id") Long id
+    ) {
         waitingService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "예약 대기 생성", description = "로그인 유저의 예약 대기를 생성한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @PostMapping
     public ResponseEntity<CreateWaitingResponse> create(
-            LoginMember loginMember,
+            @Parameter(hidden = true) LoginMember loginMember,
             @Valid @RequestBody CreateWaitingRequest request
     ) {
         CreateWaitingResponse response = waitingService.createWaiting(request, loginMember);

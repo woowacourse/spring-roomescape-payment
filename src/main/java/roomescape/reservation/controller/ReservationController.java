@@ -1,6 +1,8 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -66,10 +68,11 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약 및 결제 요청", description = "로그인 유저의 결제 정보로 결제를 진행하고, 원하는 예약을 생성한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @PostMapping
     public ResponseEntity<ReservationResponse> createWithPayment(
             @Valid @RequestBody ReservationWithPaymentRequest request,
-            final LoginMember loginMember
+            @Parameter(hidden = true) final LoginMember loginMember
     ) {
         ReservationWithPaymentResponse response = createReservationWithPaymentService.create(request, loginMember);
 
@@ -77,8 +80,12 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약 삭제", description = "로그인 유저가 생성한 예약을 삭제한다. 타인의 예약은 삭제할 수 없다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") final Long id, LoginMember loginMember) {
+    public ResponseEntity<Void> delete(
+            @PathVariable("id") final Long id,
+            @Parameter(hidden = true) LoginMember loginMember
+    ) {
         deleteReservationService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
@@ -94,8 +101,9 @@ public class ReservationController {
     }
 
     @Operation(summary = "내 예약 조회", description = "로그인 유저가 생성한 모든 예약 내역을 조회한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @GetMapping("/my")
-    public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Valid LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Parameter(hidden = true) @Valid LoginMember loginMember) {
         List<MyReservationsResponse> response = reservationQueryService.getAllLoginMemberReservations(loginMember);
         return ResponseEntity.ok(response);
     }

@@ -1,6 +1,8 @@
 package roomescape.theme.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,7 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 생성", description = "어드민 권한으로 방탈출 테마를 생성한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @RequiredAdmin
     @PostMapping
     public ResponseEntity<ThemeResponse> create(@Valid @RequestBody final ThemeRequest request) {
@@ -57,6 +60,7 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 삭제", description = "어드민 권한으로 테마를 삭제한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @RequiredAdmin
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id) {

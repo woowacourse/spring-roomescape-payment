@@ -1,6 +1,8 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,7 @@ public class AdminReservationController {
     }
 
     @Operation(summary = "어드민 예약 생성", description = "어드민 권한의 예약을 생성하여 결제 정보가 포함되지 않는다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @RequiredAdmin
     @PostMapping
     public ResponseEntity<ReservationResponse> create(

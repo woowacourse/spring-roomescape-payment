@@ -1,6 +1,10 @@
 package roomescape.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +35,12 @@ public class AuthController {
     }
 
     @Operation(summary = "로그인")
+    @ApiResponse(responseCode = "200", description = "Success",
+            headers = {
+                    @Header(name = "Set-Cookie", description = "쿠키 헤더", schema = @Schema(implementation = String.class))
+            },
+            content = @Content(schema = @Schema(implementation = String.class))
+    )
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody @Valid final LoginRequest request) {
         LoginResponse loginResponse = authService.login(request);

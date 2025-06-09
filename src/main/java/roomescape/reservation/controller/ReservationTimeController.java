@@ -1,6 +1,8 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,7 @@ public class ReservationTimeController {
     }
 
     @Operation(summary = "예약 시간 생성", description = "어드민 권한으로 예약 가능 시간을 추가한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @RequiredAdmin
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody final ReservationTimeRequest request) {
@@ -49,6 +52,7 @@ public class ReservationTimeController {
     }
 
     @Operation(summary = "예약 시간 삭제", description = "어드민 권한으로 예약 가능 시간을 삭제한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @RequiredAdmin
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
