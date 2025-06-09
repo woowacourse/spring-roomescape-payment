@@ -20,7 +20,6 @@ echo "[Git] 브랜치 전환 및 업데이트: $BRANCH_NAME"
 git fetch origin
 git checkout "$BRANCH_NAME"
 git reset --hard "origin/$BRANCH_NAME"
-git clean -fd
 
 # 2. Gradle 빌드
 echo "[Gradle] bootJar 실행"
