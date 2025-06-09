@@ -52,7 +52,8 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
     private void logBasedOnFailure(PaymentFailure failure) {
         if (INTERNAL_ERROR_CODES.contains(failure.code())) {
             log.error("toss payments API 500 error - code: {}, message: {}", failure.code(), failure.message());
+        } else {
+            log.warn("toss payments API 400 error - code: {}, message: {}", failure.code(), failure.message());
         }
-        log.warn("toss payments API 400 error - code: {}, message: {}", failure.code(), failure.message());
     }
 }
