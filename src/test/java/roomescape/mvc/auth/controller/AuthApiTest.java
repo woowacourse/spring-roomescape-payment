@@ -142,7 +142,7 @@ public class AuthApiTest {
                     .port(port)
                     .when().get("/login/check")
                     .then().log().all()
-                    .statusCode(HttpStatus.NOT_FOUND.value());
+                    .statusCode(HttpStatus.UNAUTHORIZED.value());
         }
 
         @DisplayName("엑세스 토큰이 만료된 경우 로그인하지 않은 것으로 간주")

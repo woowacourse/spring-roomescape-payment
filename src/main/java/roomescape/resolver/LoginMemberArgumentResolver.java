@@ -7,8 +7,10 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.annotation.RequiredAccessToken;
+import roomescape.exception.NotFoundException;
+import roomescape.exception.UnauthorizedException;
+import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 
@@ -36,7 +38,15 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             WebDataBinderFactory binderFactory
     ) {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        Cookie accessTokenCookie = cookieUtility.getCookie(request, "access");
+        Cookie accessTokenCookie = getAcceccTokenCookie(request);
         return jwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
+    }
+
+    private Cookie getAcceccTokenCookie(HttpServletRequest request) {
+        try {
+            return cookieUtility.getCookie(request, "access");
+        } catch (NotFoundException exception) {
+            throw new UnauthorizedException("인증 정보가 존재하지 않습니다.");
+        }
     }
 }

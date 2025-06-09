@@ -16,7 +16,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.annotation.RequiredAccessToken;
-import roomescape.exception.NotFoundException;
 import roomescape.exception.UnauthorizedException;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.auth.request.LoginRequest;
@@ -126,8 +125,8 @@ class LoginMemberArgumentResolverTest {
             // when & then
             assertThatThrownBy(
                     () -> argumentResolver.resolveArgument(parameter, modelAndViewContainer, request, binderFactory))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessage("쿠키가 존재하지 않습니다.");
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessage("인증 정보가 존재하지 않습니다.");
         }
 
         @DisplayName("엑세스 토큰이 올바르지 않는 경우 예외를 발생시킨다.")

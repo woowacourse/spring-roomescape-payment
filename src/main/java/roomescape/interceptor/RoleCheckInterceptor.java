@@ -5,10 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.mvc.auth.dto.AccessTokenContent;
-import roomescape.mvc.member.domain.Role;
 import roomescape.annotation.Authority;
 import roomescape.exception.ForbiddenException;
+import roomescape.exception.NotFoundException;
+import roomescape.exception.UnauthorizedException;
+import roomescape.mvc.auth.dto.AccessTokenContent;
+import roomescape.mvc.member.domain.Role;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 
@@ -74,7 +76,15 @@ public class RoleCheckInterceptor implements HandlerInterceptor {
     }
 
     private AccessTokenContent getAccessTokenInCookie(HttpServletRequest request) {
-        Cookie accessTokenCookie = cookieUtility.getCookie(request, "access");
+        Cookie accessTokenCookie = getAcceccTokenCookie(request);
         return jwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
+    }
+
+    private Cookie getAcceccTokenCookie(HttpServletRequest request) {
+        try {
+            return cookieUtility.getCookie(request, "access");
+        } catch (NotFoundException exception) {
+            throw new UnauthorizedException("인증 정보가 존재하지 않습니다.");
+        }
     }
 }

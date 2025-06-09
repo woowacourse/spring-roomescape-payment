@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
 import roomescape.annotation.Authority;
 import roomescape.exception.ForbiddenException;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.UnauthorizedException;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Role;
 import roomescape.utility.CookieUtility;
@@ -116,8 +116,8 @@ class RoleCheckInterceptorTest {
 
             // when & then
             assertThatThrownBy(() -> interceptor.preHandle(request, response, handler))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessage("쿠키가 존재하지 않습니다.");
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessage("인증 정보가 존재하지 않습니다.");
         }
 
         @DisplayName("어드민 요청인데 일반 회원이 접속한 경우 블록")
@@ -187,8 +187,8 @@ class RoleCheckInterceptorTest {
 
             // when & then
             assertThatThrownBy(() -> interceptor.preHandle(request, response, handler))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessage("쿠키가 존재하지 않습니다.");
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessage("인증 정보가 존재하지 않습니다.");
         }
 
         @DisplayName("일반 회원 요청인데 일반 회원이 접속한 경우 통과")
