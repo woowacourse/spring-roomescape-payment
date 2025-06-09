@@ -26,7 +26,7 @@ public class TossPaymentClient implements PaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    public PaymentResponse requestPayment(final PaymentRequest request) {
+    public PaymentResponse requestPaymentConfirm(final PaymentRequest request) {
         return restClient.post()
                 .uri("v1/payments/confirm")
                 .body(TossPaymentRequest.from(request))

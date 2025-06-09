@@ -4,15 +4,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.dto.PaymentConfirmRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
@@ -31,7 +34,6 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReservationCommandService {
 
@@ -42,6 +44,8 @@ public class ReservationCommandService {
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
+    @Autowired
+    private PaymentClient paymentClient;
 
     public ReservationResponse reserveWithPayment(
             final MemberReservationRequest request,
@@ -50,7 +54,10 @@ public class ReservationCommandService {
     ) {
         Reservation reservation = reserve(request, memberId);
 
-        pay(request, prePaymentValidRequest, reservation);
+        PaymentConfirmRequest paymentConfirmRequest = request.toPaymentConfirmRequest();
+
+        paymentService.validatePrePayment(paymentConfirmRequest, prePaymentValidRequest);
+        pay(paymentConfirmRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }
@@ -70,17 +77,18 @@ public class ReservationCommandService {
         return reservationRepository.save(reservation);
     }
 
-    private void pay(MemberReservationRequest request,
-                     PrePaymentValidRequest prePaymentValidRequest,
-                     Reservation reservation) {
+    private void pay(PaymentConfirmRequest request, Reservation reservation) {
+        Payment payment = paymentService.pend(request, reservation);
+
+        requestPaymentConfirm(request, payment);
+    }
+
+    private void requestPaymentConfirm(PaymentRequest paymentRequest, Payment payment) {
         try {
-            paymentService.pay(
-                    prePaymentValidRequest,
-                    request.toPaymentConfirmRequest(),
-                    reservation
-            );
+            paymentClient.requestPaymentConfirm(paymentRequest);
+            paymentService.success(payment);
         } catch (PaymentException e) {
-            reservationRepository.delete(reservation);
+            paymentService.fail(payment);
             throw e;
         }
     }
@@ -128,8 +136,10 @@ public class ReservationCommandService {
         if (!reservationRepository.existsById(id)) {
             throw new NotFoundException("존재하지 않는 예약입니다.");
         }
-        paymentRepository.findByReservationId(id)
-                .forEach(Payment::removeReservation);
+        paymentRepository.findByReservationId(id).forEach(payment -> {
+            payment.removeReservation();
+            paymentRepository.save(payment);
+        });
         reservationRepository.deleteById(id);
     }
 

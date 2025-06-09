@@ -70,7 +70,7 @@ class TossPaymentClientTest {
         PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
         // when
-        PaymentResponse response = tossPaymentClient.requestPayment(request);
+        PaymentResponse response = tossPaymentClient.requestPaymentConfirm(request);
 
         // then
         assertThat(response.orderId()).isEqualTo("orderId");
@@ -94,7 +94,7 @@ class TossPaymentClientTest {
 
         PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
-        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+        assertThatThrownBy(() -> tossPaymentClient.requestPaymentConfirm(request))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessageContaining("잘못된 요청입니다.");
     }
@@ -115,7 +115,7 @@ class TossPaymentClientTest {
 
         PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
-        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+        assertThatThrownBy(() -> tossPaymentClient.requestPaymentConfirm(request))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessageContaining("이미 처리된 결제");
     }
@@ -136,7 +136,7 @@ class TossPaymentClientTest {
 
         PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
-        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+        assertThatThrownBy(() -> tossPaymentClient.requestPaymentConfirm(request))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessageContaining("일시적인 오류");
     }
@@ -159,7 +159,7 @@ class TossPaymentClientTest {
         PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+        assertThatThrownBy(() -> tossPaymentClient.requestPaymentConfirm(request))
                 .hasCauseInstanceOf(SocketTimeoutException.class)
                 .isInstanceOf(RestClientException.class);
     }

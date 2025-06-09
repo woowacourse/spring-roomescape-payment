@@ -6,5 +6,5 @@ public record PaymentConfirmRequest(
         String paymentKey,
         String orderId,
         BigDecimal amount
-) {
+) implements PaymentRequest {
 }

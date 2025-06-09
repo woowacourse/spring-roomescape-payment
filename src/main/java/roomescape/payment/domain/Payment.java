@@ -34,8 +34,8 @@ public class Payment {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    private Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
-                    final Reservation reservation, final PaymentStatus paymentStatus) {
+    public Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
+                   final Reservation reservation, final PaymentStatus paymentStatus) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;

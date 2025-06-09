@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
+import io.restassured.filter.session.SessionFilter;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 
 @ActiveProfiles("test")
@@ -54,7 +56,15 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약을_추가한다() {
-        final MemberReservationRequest request = new MemberReservationRequest(
+        SessionFilter sessionFilter = new SessionFilter();
+
+        PrePaymentValidRequest prePayment = new PrePaymentValidRequest("dummy", "dummy", BigDecimal.valueOf(1000));
+        RestAssured.given().filter(sessionFilter)
+                .contentType(ContentType.JSON)
+                .body(prePayment)
+                .post("/test/pre-payment");
+
+        MemberReservationRequest request = new MemberReservationRequest(
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
@@ -64,13 +74,12 @@ public class MemberReservationApiTest {
                 "NORMAL"
         );
 
-        RestAssured.given().log().all()
+        RestAssured.given().filter(sessionFilter)
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
+                .then().statusCode(201);
     }
 
     @Test

@@ -21,4 +21,13 @@ public class PaymentController {
         session.setAttribute(PRE_PAYMENT, request);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/test/pre-payment")
+    public ResponseEntity<Void> storePrePaymentInSession(
+            @RequestBody PrePaymentValidRequest request,
+            HttpSession session
+    ) {
+        session.setAttribute(PRE_PAYMENT, request);
+        return ResponseEntity.ok().build();
+    }
 }
