@@ -60,7 +60,7 @@ public class Payment {
                 ", paymentKey='" + paymentKey + '\'' +
                 ", orderId='" + orderId + '\'' +
                 ", amount=" + amount +
-                ", reservation=" + reservation +
+                ", reservationId=" + (reservation == null ? null : reservation.getId()) +
                 '}';
     }
 }
