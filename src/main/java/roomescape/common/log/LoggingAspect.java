@@ -81,7 +81,7 @@ public class LoggingAspect {
                 .findFirst()
                 .orElse(ErrorLogEntry.withoutThrowable(getRequestContext(), response));
 
-        log.info(logMessageProvider.getErrorLog(errorLogEntry));
+        log.warn(logMessageProvider.getErrorLog(errorLogEntry));
     }
 
     @AfterReturning(value = "controllerPointCut()", returning = "response")
