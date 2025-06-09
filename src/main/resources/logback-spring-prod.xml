@@ -1,0 +1,20 @@
+<configuration>
+
+    <include resource="logback-common.xml"/>
+
+    <!-- 루트 로거: INFO 이상을 각 파일/콘솔로 전달 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="INFO_FILE"/>
+        <appender-ref ref="WARN_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+
+    <!-- 서비스 패키지 INFO 이상만 -->
+    <logger name="roomescape" level="INFO"/>
+
+    <!-- 프레임워크·SQL WARN 이상만 -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="WARN"/>
+
+</configuration>
