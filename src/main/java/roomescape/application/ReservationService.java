@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationQueues;
 import roomescape.domain.reservation.ReservationRepository;
@@ -44,6 +45,13 @@ public class ReservationService {
     }
 
     @Transactional
+    public void confirm(final long id, final Payment payment) {
+        var reservation = reservationRepository.getById(id);
+        reservation.confirm(payment);
+        log.info("예약이 확정되었습니다. 확정된 예약 = {}", reservation);
+    }
+
+    @Transactional
     public Reservation waitFor(final long userId, final LocalDate date, final long timeId, final long themeId) {
         var schedule = toRoomescapeSchedule(date, timeId, themeId);
         if (!reservationRepository.exists(bySchedule(schedule))) {
@@ -68,7 +76,7 @@ public class ReservationService {
         var reservation = reservationRepository.getById(id);
         removeFromQueueById(reservation);
         reservationRepository.delete(reservation);
-        log.info("예약이 삭제되었습니다. 삭제된 reservation = {}", reservation);
+        log.info("예약이 삭제되었습니다. 삭제된 예약 = {}", reservation);
     }
 
     @Transactional
@@ -77,7 +85,7 @@ public class ReservationService {
         var reservation = reservationRepository.getById(reservationId);
         removeFromQueueById(reservation);
         user.cancelReservation(reservation);
-        log.info("예약이 취소되었습니다. 취소된 reservation = {}", reservation);
+        log.info("예약이 취소되었습니다. 취소된 예약 = {}", reservation);
     }
 
     private void removeFromQueueById(final Reservation reservation) {
@@ -90,7 +98,7 @@ public class ReservationService {
         var reservation = new Reservation(user, schedule, status);
         user.reserve(reservation);
         var savedReservation = reservationRepository.save(reservation);
-        log.info("예약이 생성되었습니다. reservation = {}", savedReservation);
+        log.info("결제 대기중인 예약이 생성되었습니다. 생성된 예약 = {}", savedReservation);
         return savedReservation;
     }
 

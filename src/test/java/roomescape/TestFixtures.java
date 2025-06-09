@@ -3,8 +3,10 @@ package roomescape;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.theme.Description;
@@ -87,6 +89,13 @@ public class TestFixtures {
                 anyThemeWithNewId()
             ),
             status
+        );
+    }
+
+    public static Payment anyPayment() {
+        return new Payment(
+            UUID.randomUUID().toString(),
+            new Random().nextInt()
         );
     }
 

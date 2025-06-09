@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
+import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationSearchFilter;
 import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateReservationRequest;
-import roomescape.presentation.request.ReservationPaymentRequest;
 import roomescape.presentation.response.ReservationResponse;
 
 @RestController
@@ -46,8 +46,9 @@ public class ReservationController {
 
     @PostMapping("/{id}/payment")
     @ResponseStatus(HttpStatus.OK)
-    public void confirm(@PathVariable("id") final long id, @RequestBody final ReservationPaymentRequest request) {
-        paymentService.confirm(id, request.paymentKey(), request.orderId(), request.amount());
+    public void payAndConfirm(@PathVariable("id") final long id, @RequestBody final PaymentRequest paymentRequest) {
+        var payment = paymentService.payReservation(id, paymentRequest);
+        reservationService.confirm(id, payment);
     }
 
     @PostMapping("/wait")

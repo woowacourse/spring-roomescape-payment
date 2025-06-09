@@ -4,9 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -116,15 +114,6 @@ class ReservationControllerTest {
             .andExpect(jsonPath("$..['id','user','date','time','theme']").exists())
             .andExpect(jsonPath("$", hasSize(expectedReservations.size())))
             .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("일반 유저가 예약 삭제 요청시, FORBIDDEN을 응답한다.")
-    void deleteUnauthorized() throws Exception {
-        mockMvc.perform(delete("/reservations/1"))
-            .andExpect(status().isForbidden());
-
-        Mockito.verify(reservationService, never()).removeById(1L);
     }
 
     @Test

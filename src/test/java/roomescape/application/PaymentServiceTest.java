@@ -17,7 +17,7 @@ import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.PaymentFailedException;
 
-@Import(PaymentService.class)
+@Import({PaymentService.class, ReservationService.class})
 class PaymentServiceTest extends ServiceTest {
 
     @Autowired
@@ -26,57 +26,55 @@ class PaymentServiceTest extends ServiceTest {
     @MockitoBean
     private PaymentProvider paymentProvider;
 
+    private final PaymentRequest paymentRequest = new PaymentRequest("a", "1", 1000);
+
     @Test
-    @DisplayName("예약에 대한 결제 승인에 성공한다.")
-    void confirm() {
+    @DisplayName("예약에 대한 결제에 성공한다.")
+    void payReservation() {
         // given
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
         stubPaymentProviderAlwaysSuccess();
 
         // when
-        service.confirm(pendingReservation.id(),"a", "1", 1000);
+        var payment = service.payReservation(pendingReservation.id(), paymentRequest);
 
         // then
-        var confirmedReservation = repositoryHelper.findReservation(pendingReservation.id());
         assertAll(
-            () -> assertThat(confirmedReservation.isConfirmed()).isTrue(),
-            () -> assertThat(confirmedReservation.payment().paymentKey()).isEqualTo("a")
+            () -> assertThat(payment).isNotNull(),
+            () -> assertThat(payment.paymentKey()).isNotNull()
         );
     }
 
     @Test
-    @DisplayName("보류 상태가 아닌 예약을 결제 승인하려 하면 예외가 발생한다.")
-    void confirmNotPendingReservation() {
+    @DisplayName("보류 상태가 아닌 예약을 결제하려 하면 예외가 발생한다.")
+    void payReservationNotPending() {
         // given
         var confirmedReservation = repositoryHelper.saveAnyReservation(ReservationStatus.CONFIRMED);
         stubPaymentProviderAlwaysSuccess();
 
         // when & then
         assertThatThrownBy(
-            () -> service.confirm(confirmedReservation.id(),"a", "1", 1000)
+            () -> service.payReservation(confirmedReservation.id(),paymentRequest)
         ).isInstanceOf(PaymentFailedException.class);
     }
 
     @Test
-    @DisplayName("결제 승인 실패 시 예외가 발생한다.")
-    void failToConfirm() {
+    @DisplayName("결제 실패 시 예외가 발생한다.")
+    void failToPayReservation() {
         // given
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
         stubPaymentProviderAlwaysThrowsException();
 
         // when & then
         assertThatThrownBy(
-            () -> service.confirm(pendingReservation.id(),"a", "1", 1000)
+            () -> service.payReservation(pendingReservation.id(),paymentRequest)
         ).isInstanceOf(PaymentFailedException.class);
     }
 
     private void stubPaymentProviderAlwaysSuccess() {
         Mockito
             .when(paymentProvider.confirm(any()))
-            .thenAnswer(invocation -> {
-                var paymentRequest = invocation.getArgument(0, PaymentRequest.class);
-                return new Payment(paymentRequest.paymentKey(), paymentRequest.amount());
-            });
+            .thenReturn(new Payment(paymentRequest.paymentKey(), paymentRequest.amount()));
     }
 
     private void stubPaymentProviderAlwaysThrowsException() {
