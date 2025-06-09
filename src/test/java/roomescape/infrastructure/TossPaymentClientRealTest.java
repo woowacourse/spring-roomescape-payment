@@ -16,7 +16,7 @@ import roomescape.domain.payment.PaymentRequest;
 @Disabled
 @SpringBootTest
 @DisplayName("[실제 토스 페이먼츠] API 테스트")
-public class TossPaymentProviderRealTest {
+public class TossPaymentClientRealTest {
 
     @Value("${api.toss.base-url}")
     private String tossBaseUrl;

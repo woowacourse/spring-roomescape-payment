@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.exception.PaymentFailedException;
@@ -14,13 +14,13 @@ import roomescape.exception.PaymentFailedException;
 @Slf4j
 public class PaymentService {
 
-    private final PaymentProvider paymentProvider;
+    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
 
     public Payment payReservation(final long reservationId, final PaymentRequest paymentRequest) {
         validateReservationPending(reservationId);
         try {
-            var payment = paymentProvider.confirm(paymentRequest);
+            var payment = paymentClient.requestPay(paymentRequest);
             log.info("예약 결제에 성공했습니다. 결제 Key = {}, 예약 ID = {}", paymentRequest.paymentKey(), reservationId);
             return payment;
 

@@ -1,8 +1,7 @@
 package roomescape.presentation.rest;
 
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.TestFixtures.anyPayment;
@@ -35,8 +34,8 @@ public class ReservationControllerPaymentTest {
 
     @Test
     @DisplayName("예약에 대한 결제 성공 시 OK를 응답한다.")
-    void confirmReservation() throws Exception {
-        Mockito.doReturn(anyPayment()).when(paymentService).payReservation(anyLong(), anyString(), anyString(), anyInt());
+    void pay() throws Exception {
+        Mockito.doReturn(anyPayment()).when(paymentService).payReservation(anyLong(), any());
 
         mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -51,10 +50,10 @@ public class ReservationControllerPaymentTest {
     }
 
     @Test
-    @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
+    @DisplayName("잘못된 요청으로 결제 실패 시 BAD REQUEST를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
         Mockito.doThrow(PaymentFailedException.byClient("결제 실패"))
-            .when(paymentService).payReservation(anyLong(), anyString(), anyString(), anyInt());
+            .when(paymentService).payReservation(anyLong(), any());
 
         mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -69,10 +68,10 @@ public class ReservationControllerPaymentTest {
     }
 
     @Test
-    @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
-    void cannotReserveWhenInternalServerError() throws Exception {
+    @DisplayName("서버 내부 오류로 결제 실패 시 INTERNAL SERVER ERROR를 응답한다.")
+    void cannotPayWhenInternalServerError() throws Exception {
         Mockito.doThrow(PaymentFailedException.byServer())
-            .when(paymentService).payReservation(anyLong(), anyString(), anyString(), anyInt());
+            .when(paymentService).payReservation(anyLong(), any());
 
         mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,10 +86,10 @@ public class ReservationControllerPaymentTest {
     }
 
     @Test
-    @DisplayName("외부 서버 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
-    void cannotReserveWhenExternalServerError() throws Exception {
+    @DisplayName("외부 서버 오류로 결제 실패 시 INTERNAL SERVER ERROR를 응답한다.")
+    void cannotPayWhenExternalServerError() throws Exception {
         Mockito.doThrow(PaymentFailedException.byExternalServer())
-            .when(paymentService).payReservation(anyLong(), anyString(), anyString(), anyInt());
+            .when(paymentService).payReservation(anyLong(), any());
 
         mockMvc.perform(post("/reservations/" + 1 + "/payment")
                 .contentType(MediaType.APPLICATION_JSON)

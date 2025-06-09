@@ -11,7 +11,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
@@ -20,12 +20,12 @@ import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 @Slf4j
 @Component
 @EnableConfigurationProperties(TossApiProperties.class)
-public class TossPaymentProvider implements PaymentProvider {
+public class TossPaymentClient implements PaymentClient {
 
     private final RestTemplate restTemplate;
     private final TossApiProperties properties;
 
-    public Payment confirm(final PaymentRequest request) {
+    public Payment requestPay(final PaymentRequest request) {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
                 var response = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);

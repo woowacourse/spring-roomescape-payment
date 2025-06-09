@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.PaymentFailedException;
@@ -24,7 +24,7 @@ class PaymentServiceTest extends ServiceTest {
     private PaymentService service;
 
     @MockitoBean
-    private PaymentProvider paymentProvider;
+    private PaymentClient paymentClient;
 
     private final PaymentRequest paymentRequest = new PaymentRequest("a", "1", 1000);
 
@@ -73,13 +73,13 @@ class PaymentServiceTest extends ServiceTest {
 
     private void stubPaymentProviderAlwaysSuccess() {
         Mockito
-            .when(paymentProvider.confirm(any()))
+            .when(paymentClient.requestPay(any()))
             .thenReturn(new Payment(paymentRequest.paymentKey(), paymentRequest.amount()));
     }
 
     private void stubPaymentProviderAlwaysThrowsException() {
         Mockito
-            .when(paymentProvider.confirm(any()))
+            .when(paymentClient.requestPay(any()))
             .thenThrow(PaymentFailedException.class);
     }
 }
