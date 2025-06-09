@@ -16,9 +16,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.cllient.payment.TossPaymentClient;
+import roomescape.domain.payment.dto.PaymentResult;
 import roomescape.exception.ExternalApiConnectionException;
 import roomescape.exception.PaymentException;
-import roomescape.mvc.payment.dto.PaymentResult;
 
 class TossPaymentClientTest {
 

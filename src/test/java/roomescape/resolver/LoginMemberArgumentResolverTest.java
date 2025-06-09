@@ -15,11 +15,12 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.annotation.RequiredAccessToken;
+import roomescape.domain.annotation.RequiredAccessToken;
+import roomescape.domain.auth.dto.AccessTokenContent;
+import roomescape.domain.auth.request.LoginRequest;
+import roomescape.domain.member.domain.Role;
 import roomescape.exception.UnauthorizedException;
-import roomescape.mvc.auth.dto.AccessTokenContent;
-import roomescape.mvc.auth.request.LoginRequest;
-import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.resolver.LoginMemberArgumentResolver;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 

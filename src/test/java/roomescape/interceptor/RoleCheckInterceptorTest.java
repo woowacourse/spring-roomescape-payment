@@ -12,11 +12,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
-import roomescape.annotation.Authority;
+import roomescape.domain.annotation.Authority;
+import roomescape.domain.auth.dto.AccessTokenContent;
+import roomescape.domain.member.domain.Role;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.UnauthorizedException;
-import roomescape.mvc.auth.dto.AccessTokenContent;
-import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.interceptor.RoleCheckInterceptor;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 

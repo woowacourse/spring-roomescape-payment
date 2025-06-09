@@ -3,7 +3,7 @@ package roomescape.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import roomescape.client.payment.PaymentClient;
+import roomescape.cllient.payment.PaymentClient;
 import roomescape.test.stub.PaymentClientStub;
 
 @Configuration

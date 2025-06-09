@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
+import roomescape.cllient.payment.TossPaymentClient;
 import roomescape.exception.PaymentException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
