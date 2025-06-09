@@ -1,6 +1,7 @@
 package roomescape.time.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import roomescape.time.service.ReservationTimeService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ReservationTimeController.BASE_PATH)
+@Tag(name = "ReservationTime", description = "예약 시간 관리 api")
 public class ReservationTimeController {
 
     public static final String BASE_PATH = "/times";

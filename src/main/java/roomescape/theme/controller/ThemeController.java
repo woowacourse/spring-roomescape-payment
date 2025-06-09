@@ -1,6 +1,7 @@
 package roomescape.theme.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import roomescape.theme.service.ThemeService;
 @RestController
 @RequestMapping(ThemeController.BASE_PATH)
 @RequiredArgsConstructor
+@Tag(name = "Theme", description = "테마 관리 api")
 public class ThemeController {
 
     public static final String BASE_PATH = "/themes";

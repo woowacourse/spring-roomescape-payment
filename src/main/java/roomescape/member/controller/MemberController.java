@@ -1,6 +1,7 @@
 package roomescape.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,7 @@ import roomescape.member.service.AccountMemberService;
 
 @RequiredArgsConstructor
 @RestController
-//@Tag(name = "Auth", description = "인증을 위한 api")
+@Tag(name = "Member", description = "회원 관리 api")
 public class MemberController {
 
     private final AccountMemberService accountMemberService;

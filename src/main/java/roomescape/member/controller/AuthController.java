@@ -1,6 +1,7 @@
 package roomescape.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,7 @@ import roomescape.member.service.AuthService;
 
 @RequiredArgsConstructor
 @RestController
-//@Tag(name = "Auth", description = "인증을 위한 api")
+@Tag(name = "Auth", description = "인증을 위한 api")
 public class AuthController {
 
     private final AuthService authService;
