@@ -6,7 +6,7 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <encoder>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="roomescape.support.logging.MaskingPatternLayout">
                 <pattern>${LOG_PATTERN}</pattern>
                 <maskPattern>email\s*=\s*([^\],\s]+)</maskPattern>
