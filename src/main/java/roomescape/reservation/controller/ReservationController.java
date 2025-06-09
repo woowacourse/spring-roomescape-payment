@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,11 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.dto.SessionMember;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
-import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.external.toss.TossPaymentRequest;
 import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
@@ -71,7 +73,11 @@ public class ReservationController {
             @RequestBody @Valid final CreateReservationRequest request,
             final SessionMember sessionMember
     ) {
-        ReservationResponse response = reservationService.createReservationWithPayment(request, sessionMember.id());
+        ReservationResponse response = reservationService.createReservationWithPayment(
+                request,
+                request.toTossPaymentRequest(), // 만약 PG사 여러개라면 결정하는 로직이 앞서 있어야 할 듯
+                sessionMember.id());
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);

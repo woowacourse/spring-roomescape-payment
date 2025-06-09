@@ -133,7 +133,7 @@ class ReservationServiceTest {
                 1000L,
                 "key"
         );
-        ReservationResponse response = service.createReservationWithPayment(request, member.getId());
+        ReservationResponse response = service.createReservationWithPayment(request, null, member.getId());
 
         assertThat(response.name()).isEqualTo(member.getName().name());
     }
@@ -157,7 +157,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, null, member.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -178,7 +178,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, null, member.getId()))
                 .isInstanceOf(BadRequestException.class);
     }
 
@@ -205,7 +205,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, null, member.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 

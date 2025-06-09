@@ -9,11 +9,14 @@ import roomescape.member.service.MemberQueryService;
 import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.domain.PaymentType;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
+import roomescape.reservation.service.PaymentService;
+import roomescape.reservation.service.PaymentServiceDecider;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
-import roomescape.reservation.service.TossPaymentCommandService;
+import roomescape.reservation.service.dto.PaymentRequest;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.schedule.service.ScheduleQueryService;
@@ -21,22 +24,22 @@ import roomescape.schedule.service.ScheduleQueryService;
 @Service
 public class ReservationService {
     private final ReservationCommandService reservationCommandService;
-    private final TossPaymentCommandService tossPaymentCommandService;
     private final ScheduleQueryService scheduleQueryService;
     private final MemberQueryService memberQueryService;
     private final ReservationQueryService reservationQueryService;
+    private final PaymentServiceDecider paymentServiceDecider;
 
     public ReservationService(
             final ReservationCommandService reservationCommandService,
-            final TossPaymentCommandService tossPaymentCommandService,
             final ScheduleQueryService scheduleQueryService,
             final MemberQueryService memberQueryService,
-            final ReservationQueryService reservationQueryService) {
+            final ReservationQueryService reservationQueryService,
+            final PaymentServiceDecider paymentServiceDecider) {
         this.reservationCommandService = reservationCommandService;
-        this.tossPaymentCommandService = tossPaymentCommandService;
         this.scheduleQueryService = scheduleQueryService;
         this.memberQueryService = memberQueryService;
         this.reservationQueryService = reservationQueryService;
+        this.paymentServiceDecider = paymentServiceDecider;
     }
 
     public ReservationResponse createReservationByAdmin(final AdminCreateReservationRequest request) {
@@ -46,6 +49,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservationWithPayment(
             final CreateReservationRequest request,
+            final PaymentRequest paymentRequest,
             final Long memberId
     ) {
         ReservationSchedule schedule = scheduleQueryService.getSchedule(
@@ -55,7 +59,8 @@ public class ReservationService {
         );
         Member member = memberQueryService.getById(memberId);
         Reservation reservation = reservationCommandService.createReservation(schedule, member);
-        tossPaymentCommandService.createTossPayment(request.toTossPaymentRequest(), reservation);
+        PaymentService paymentService = paymentServiceDecider.decide(PaymentType.TOSS); // PG사 여러개라면 타입 받아와야
+        paymentService.createPayment(paymentRequest, reservation);
         return ReservationResponse.from(reservation);
     }
 
