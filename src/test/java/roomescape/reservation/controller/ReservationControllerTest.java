@@ -161,10 +161,7 @@ class ReservationControllerTest extends IntegrationTest {
                 .theme(theme2)
                 .build();
         RoomEscapeInformation saved2 = roomEscapeInformationRepository.save(info2);
-        reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(saved2)
-                .member(member)
-                .build());
+        reservationRepository.save(Reservation.booked(saved2, member));
 
         RoomEscapeInformation info3 = RoomEscapeInformation.builder()
                 .date(targetDate2)
@@ -172,10 +169,7 @@ class ReservationControllerTest extends IntegrationTest {
                 .theme(theme3)
                 .build();
         RoomEscapeInformation saved3 = roomEscapeInformationRepository.save(info3);
-        reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(saved3)
-                .member(member)
-                .build());
+        reservationRepository.save(Reservation.booked(saved3, member));
 
         // 기존 예약 건수는 2건
         long existingCount = reservationRepository.findByMember(member).size();

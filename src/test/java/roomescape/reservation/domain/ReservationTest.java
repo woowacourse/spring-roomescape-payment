@@ -35,10 +35,7 @@ class ReservationTest {
                 .theme(defaultTheme)
                 .build();
 
-        Reservation reservation = Reservation.builder()
-                .roomEscapeInformation(info)
-                .member(defaultMember)
-                .build();
+        Reservation reservation = Reservation.booked(info, defaultMember);
 
         // when
         // then
@@ -139,10 +136,7 @@ class ReservationTest {
                 .build();
 
         // when
-        Reservation reservation = Reservation.builder()
-                .roomEscapeInformation(info)
-                .member(member)
-                .build();
+        Reservation reservation = Reservation.booked(info, member);
 
         // then
         assertThat(reservation.getRoomEscapeInformation().getDate()).isEqualTo(localDate);

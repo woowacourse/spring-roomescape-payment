@@ -70,10 +70,7 @@ class ReservationServiceTest {
                 .theme(theme)
                 .build();
 
-        reservation = Reservation.builder()
-                .roomEscapeInformation(roomEscapeInformation)
-                .member(member)
-                .build();
+        reservation = Reservation.booked(roomEscapeInformation, member);
     }
 
     @Test
