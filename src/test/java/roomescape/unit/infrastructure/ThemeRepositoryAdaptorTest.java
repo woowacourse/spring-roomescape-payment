@@ -1,10 +1,5 @@
 package roomescape.unit.infrastructure;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +8,11 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.Theme;
 import roomescape.infrastructure.JpaThemeRepository;
 import roomescape.infrastructure.ThemeRepositoryAdaptor;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Sql(value = "/sql/testTheme.sql")
