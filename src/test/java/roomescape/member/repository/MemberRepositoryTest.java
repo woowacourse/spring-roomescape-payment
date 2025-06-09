@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.infrastructure.MemberRepository;
@@ -30,14 +31,14 @@ class MemberRepositoryTest {
 
     @Test
     void existsByEmail_memberExist_true() {
-        boolean doesExist = memberRepository.existsByEmail(member.getEmail());
+        boolean doesExist = memberRepository.existsByEmail(new Email(member.getEmail()));
         assertThat(doesExist).isTrue();
     }
 
     @Test
     void existsByEmail_memberDoesntExist_false() {
         // given
-        String testEmail = "test@gmail.com";
+        Email testEmail = new Email("test@gmail.com");
 
         // when
         boolean doesExist = memberRepository.existsByEmail(testEmail);

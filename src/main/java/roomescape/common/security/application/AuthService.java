@@ -7,6 +7,7 @@ import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.common.security.dto.response.LoginResponse;
 import roomescape.common.security.exception.UnAuthorizedException;
 import roomescape.common.security.infrastructure.JwtProvider;
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 
@@ -45,10 +46,11 @@ public class AuthService {
         return member;
     }
 
-    private Member findMemberByEmail(final String email) {
+    private Member findMemberByEmail(final String emailString) {
+        Email email = new Email(emailString);
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("로그인 실패 - 존재하지 않는 사용자: email={}", email);
+                    log.warn("로그인 실패 - 존재하지 않는 사용자: email={}", emailString);
                     return new UnAuthorizedException("존재하지 않은 사용자입니다.");
                 });
     }

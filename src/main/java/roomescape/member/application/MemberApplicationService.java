@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.security.application.MyPasswordEncoder;
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberDuplicatedException;
@@ -50,7 +51,8 @@ public class MemberApplicationService {
     }
 
     private void validateMemberExists(final SignupWebRequest signupWebRequest) {
-        if (memberDataService.existsByEmail(signupWebRequest.email())) {
+        Email email = new Email(signupWebRequest.email());
+        if (memberDataService.existsByEmail(email)) {
             log.warn("회원가입 실패 - 이미 존재하는 이메일: email={}", signupWebRequest.email());
             throw new MemberDuplicatedException("이미 존재하는 회원입니다.");
         }

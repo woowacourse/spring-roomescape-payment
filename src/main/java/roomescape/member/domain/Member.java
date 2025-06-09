@@ -1,6 +1,9 @@
 package roomescape.member.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,49 +11,38 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.Objects;
-import roomescape.member.exception.InvalidMemberException;
 
 @Entity
 @Table(name = "members")
 public class Member {
-
-    private static final int MAX_NAME_LENGTH = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Embedded
+    private MemberName name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Embedded
+    private Email email;
 
-    @Column(nullable = false)
-    private String password;
+    @Embedded
+    private Password password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "member_role", nullable = false)
     private MemberRole memberRole;
 
     public Member(final String name, final String email, final String password,
                   final MemberRole memberRole) {
-        validate(name);
-        this.name = name;
-        this.email = email;
-        this.password = password;
+        this.name = MemberName.from(name);
+        this.email = Email.from(email);
+        this.password = Password.from(password);
         this.memberRole = memberRole;
     }
 
     protected Member() {
-    }
-
-    private void validate(final String name) {
-        if (name.length() > MAX_NAME_LENGTH) {
-            throw new InvalidMemberException("name은 10글자 이하이어야합니다.");
-        }
     }
 
     @Override
@@ -71,15 +63,15 @@ public class Member {
     }
 
     public String getName() {
-        return name;
+        return name.value();
     }
 
     public String getEmail() {
-        return email;
+        return email.value();
     }
 
     public String getPassword() {
-        return password;
+        return password.value();
     }
 
     public MemberRole getMemberRole() {

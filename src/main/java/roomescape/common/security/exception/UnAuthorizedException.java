@@ -1,6 +1,8 @@
 package roomescape.common.security.exception;
 
-public class UnAuthorizedException extends RuntimeException {
+import roomescape.common.exception.BusinessException;
+
+public class UnAuthorizedException extends BusinessException {
 
     public UnAuthorizedException(final String message) {
         super(message);

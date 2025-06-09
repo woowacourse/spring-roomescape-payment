@@ -1,6 +1,8 @@
 package roomescape.payment.exception;
 
-public class PaymentException extends RuntimeException {
+import roomescape.common.exception.BusinessException;
+
+public class PaymentException extends BusinessException {
 
     public PaymentException(final String message) {
         super(message);

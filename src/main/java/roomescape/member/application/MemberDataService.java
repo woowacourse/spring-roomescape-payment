@@ -2,6 +2,7 @@ package roomescape.member.application;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberNotFoundException;
@@ -29,7 +30,7 @@ public class MemberDataService {
         return memberRepository.findByMemberRole(memberRole);
     }
 
-    public boolean existsByEmail(final String email) {
+    public boolean existsByEmail(final Email email) {
         return memberRepository.existsByEmail(email);
     }
 

@@ -121,7 +121,7 @@ class ThemeApplicationServiceTest {
                 new ReservationTimeCreateWebRequest(now));
         ThemeWebResponse themeWebResponse = themeApplicationService.create(
                 new ThemeCreateWebRequest("논리", "논리 게임 with Vector", "image.png"));
-        SignUpWebResponse signup = memberApplicationService.signup(new SignupWebRequest("Mint", "password", "mint"));
+        SignUpWebResponse signup = memberApplicationService.signup(new SignupWebRequest("Mint@gmail.com", "password", "mint"));
         confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, reservationTimeWebResponse.id(),
                         themeWebResponse.id(), signup.id(), LocalDateTime.now(), null));
