@@ -7,6 +7,7 @@ import static roomescape.infrastructure.ReservationSpecs.byStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.RoomescapeSchedule;
@@ -24,6 +25,7 @@ import roomescape.domain.user.UserRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ReservationService {
@@ -38,6 +40,7 @@ public class ReservationService {
     public Reservation reserve(final long userId, final LocalDate date, final long timeId, final long themeId) {
         var schedule = toRoomescapeSchedule(date, timeId, themeId);
         if (reservationRepository.exists(bySchedule(schedule))) {
+            log.warn("[예외 발생] userId={}, date={}, timeId={}, themeId={}", userId, date, timeId, themeId);
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
         }
 
@@ -48,6 +51,7 @@ public class ReservationService {
     public Reservation waitFor(final long userId, final LocalDate date, final long timeId, final long themeId) {
         var schedule = toRoomescapeSchedule(date, timeId, themeId);
         if (!reservationRepository.exists(bySchedule(schedule))) {
+            log.warn("[예외 발생] userId={}, date={}, timeId={}, themeId={}", userId, date, timeId, themeId);
             throw new BusinessRuleViolationException("해당 날짜, 시간, 테마에 예약이 없습니다. 바로 예약해 주세요.");
         }
 
