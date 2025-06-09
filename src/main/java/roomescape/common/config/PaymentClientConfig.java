@@ -17,11 +17,7 @@ public class PaymentClientConfig {
 
     public static final int REQUEST_CONNECT_TIMEOUT_SECOND = 3;
     public static final int REQUEST_READ_TIMEOUT_SECOND = 1;
-    private final PaymentClientProperties paymentClientProperties;
-
-    public PaymentClientConfig(final PaymentClientProperties paymentClientProperties) {
-        this.paymentClientProperties = paymentClientProperties;
-    }
+    public static final String TOSS_PAYMENTS_BASE_URL = "https://api.tosspayments.com";
 
     @Bean
     public RestClientCustomizer restClientCustomizer() {
@@ -39,7 +35,7 @@ public class PaymentClientConfig {
     @Bean
     public RestClient paymentRestClient(RestClient.Builder restClientBuilder) {
         return restClientBuilder
-                .baseUrl(paymentClientProperties.getBaseUrl())
+                .baseUrl(TOSS_PAYMENTS_BASE_URL)
                 .build();
     }
 

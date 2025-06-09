@@ -16,8 +16,6 @@ import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 public class PaymentClient {
 
     private static final String AUTHORIZATION = "Authorization";
-    private static final String BASIC = "Basic ";
-    private static final String COLON = ":";
 
     private final RestClient restClient;
     private final PaymentApproveExceptionHandler paymentApproveExceptionHandler;
@@ -36,8 +34,8 @@ public class PaymentClient {
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
         try {
             return restClient.post()
-                    .uri(paymentClientProperties.getConfirmApi())
-                    .header(AUTHORIZATION, BASIC + toBase64(paymentClientProperties.getSecretKey() + COLON))
+                    .uri("/v1/payments/confirm")
+                    .header(AUTHORIZATION, "Basic " + toBase64(paymentClientProperties.getSecretKey() + ":"))
                     .body(paymentApproveRequest)
                     .retrieve()
                     .onStatus(paymentApproveExceptionHandler)

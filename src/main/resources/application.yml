@@ -27,6 +27,4 @@ security:
       expire-length: 900000 # 15분
 
 payment:
-  base-url: "https://api.tosspayments.com"
-  confirm-api: "/v1/payments/confirm"
   secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"

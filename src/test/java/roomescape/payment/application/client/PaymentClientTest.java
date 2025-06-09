@@ -43,20 +43,18 @@ class PaymentClientTest {
     @Autowired
     private PaymentClientProperties paymentClientProperties;
 
-    private String baseUrl;
-    private String confirmApi;
+    private final String baseUrl = "https://api.tosspayments.com";
+    private String confirmApiUri = "/v1/payments/confirm";
 
     @BeforeEach
     void setUp() {
-        baseUrl = paymentClientProperties.getBaseUrl();
-        confirmApi = paymentClientProperties.getConfirmApi();
         mockServer.reset();
     }
 
     @Test
     void 결제_승인_요청을_보내고_응답을_파싱할_수_있다() {
         // Given
-        mockServer.expect(requestTo(baseUrl + confirmApi))
+        mockServer.expect(requestTo(baseUrl + confirmApiUri))
                 .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 1_000L);
@@ -76,7 +74,7 @@ class PaymentClientTest {
     @Test
     void 결제_도중_오류가_발생할_경우_예외를_던져야_한다() {
         // Given
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
+        mockServer.expect(requestTo(baseUrl + confirmApiUri))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -96,7 +94,7 @@ class PaymentClientTest {
     @Test
     void 잘못된_시크릿_키로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
+        mockServer.expect(requestTo(baseUrl + confirmApiUri))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -116,7 +114,7 @@ class PaymentClientTest {
     @Test
     void 잘못된_인증_방식으로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
+        mockServer.expect(requestTo(baseUrl + confirmApiUri))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -136,7 +134,7 @@ class PaymentClientTest {
     @Test
     void 인증되지_않은_시크릿_키로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
+        mockServer.expect(requestTo(baseUrl + confirmApiUri))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
