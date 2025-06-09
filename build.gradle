@@ -1,3 +1,5 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+
 plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
@@ -49,7 +51,7 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
     outputs.dir snippetsDir
 
@@ -58,12 +60,14 @@ tasks.named('test') {
     }
 }
 
-asciidoctor {
+tasks.named('asciidoctor', AsciidoctorTask) {
     configurations 'asciidoctorExt'
     dependsOn test
     inputs.dir snippetsDir
     outputDir = file('src/main/resources/static/docs')
-
+    sources {
+        include('**/index.adoc')
+    }
     baseDirFollowsSourceFile()
     doFirst {
         delete outputDir
