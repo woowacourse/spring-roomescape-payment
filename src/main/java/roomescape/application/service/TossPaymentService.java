@@ -11,6 +11,7 @@ import roomescape.common.exception.PaymentClientException;
 import roomescape.dto.request.TossPaymentConfirmDto;
 import roomescape.dto.request.TossPaymentRequestDto;
 import roomescape.dto.response.TossPaymentConfirmResponseDto;
+import roomescape.infrastructure.payment.toss.PaymentStatus;
 import roomescape.model.PaymentTargetType;
 import roomescape.model.ReservationTicket;
 import roomescape.model.TossPayment;
@@ -38,7 +39,8 @@ public class TossPaymentService {
         TossPaymentConfirmResponseDto tossPaymentConfirmResponseDto = tossPaymentWithHttpClient.requestConfirmation(
                 tossPaymentConfirmDto, requestKey);
 
-        if (!tossPaymentConfirmResponseDto.status().equals("DONE")) {
+        String status = tossPaymentConfirmResponseDto.status();
+        if (!PaymentStatus.isAcceptedStatus(status)) {
             throw new PaymentClientException("승인되지 않은 결제 내역입니다.");
         }
     }
