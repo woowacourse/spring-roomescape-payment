@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
+import roomescape.controller.apidocs.ThemeController;
 import roomescape.dto.request.CreateThemeRequest;
 import roomescape.dto.response.ThemeResponse;
 import roomescape.entity.Theme;
@@ -22,11 +23,11 @@ import roomescape.service.ThemeService;
 
 @RestController
 @RequestMapping("/themes")
-public class ThemeController {
+public class DefaultThemeController implements ThemeController {
 
     private final ThemeService themeService;
 
-    public ThemeController(final ThemeService themeService) {
+    public DefaultThemeController(final ThemeService themeService) {
         this.themeService = themeService;
     }
 

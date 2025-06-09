@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
+import roomescape.controller.apidocs.MemberController;
 import roomescape.dto.request.SignupRequest;
 import roomescape.dto.response.MemberResponse;
 import roomescape.entity.Member;
@@ -19,11 +20,11 @@ import roomescape.service.MemberService;
 
 @RestController
 @RequestMapping("/members")
-public class MemberController {
+public class DefaultMemberController implements MemberController {
 
     private final MemberService memberService;
 
-    public MemberController(MemberService memberService) {
+    public DefaultMemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 

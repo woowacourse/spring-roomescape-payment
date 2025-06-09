@@ -47,10 +47,9 @@ public class ReservationService {
         this.themeRepository = themeRepository;
     }
 
-    public ReservationResponse addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
-        Reservation reservation = createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
-                request.timeId(), ReservationStatus.RESERVED);
-        return ReservationResponse.from(reservation);
+    public Reservation addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
+        return createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
+                request.timeId(), ReservationStatus.PENDING);
     }
 
     public ReservationResponse addReservationByAdmin(AdminCreateReservationRequest request) {
@@ -71,9 +70,7 @@ public class ReservationService {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
 
-        if (waitReservation.getStatus() == ReservationStatus.RESERVED) {
-            throw new InvalidReservationException("이미 예약 처리 되었습니다.");
-        }
+        checkWaitReservation(waitReservation);
 
         Optional<Reservation> cancelTargetOptional = reservationRepository.findByDateAndReservationTimeAndThemeAndStatus(
                 waitReservation.getDate(),
@@ -82,13 +79,22 @@ public class ReservationService {
                 ReservationStatus.RESERVED);
         cancelTargetOptional.ifPresent(Reservation::cancel);
 
-        waitReservation.changeStatusWaitToReserve();
+        waitReservation.waitToPending();
     }
 
     public void rejectWaitReservationByAdmin(long waitReservationId) {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
+
+        checkWaitReservation(waitReservation);
+
         waitReservation.cancel();
+    }
+
+    private void checkWaitReservation(Reservation waitReservation) {
+        if (waitReservation.getStatus() != ReservationStatus.WAIT) {
+            throw new InvalidReservationException("대기 중인 예약이 아닙니다.");
+        }
     }
 
     private Reservation createReservation(long memberId,
@@ -103,11 +109,23 @@ public class ReservationService {
         Theme theme = themeRepository.findById(themeId)
                 .orElseThrow(() -> new InvalidThemeException("존재하지 않는 테마입니다."));
 
+        if (status == ReservationStatus.RESERVED || status == ReservationStatus.PENDING) {
+            checkExistedReservation(date, timeId, themeId);
+        }
+
         return member.reserve(date, reservationTime, theme, status);
     }
 
-    public List<ReservationResponse> findAll() {
-        List<Reservation> reservations = reservationRepository.findAll();
+    private void checkExistedReservation(LocalDate date, long timeId, long themeId) {
+        boolean exists = reservationRepository.existsAlreadyReservedReservation(date, timeId, themeId,
+                ReservationStatus.RESERVED, ReservationStatus.PENDING);
+        if (exists) {
+            throw new InvalidReservationException("이미 예약이 존재합니다.");
+        }
+    }
+
+    public List<ReservationResponse> findAllReserved() {
+        List<Reservation> reservations = reservationRepository.findAllFetchByStatus(ReservationStatus.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -130,13 +148,13 @@ public class ReservationService {
             return;
         }
         Member member = targetMembers.getFirst();
-        member.waitToReserve(reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
+        member.waitToPending(reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
     }
 
     public List<MyReservationResponse> findAllReservationOfMember(Long memberId) {
         Member member = memberRepository.findFetchById(memberId)
                 .orElseThrow(() -> new InvalidMemberException("존재하지 않는 멤버 ID입니다."));
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> reservations = reservationRepository.findAllFetch();
         List<ReservationWithRank> reservationWithRanks = member.calculateReservationRanks(reservations);
 
         return reservationWithRanks.stream()
@@ -158,5 +176,18 @@ public class ReservationService {
         return waitReservations.stream()
                 .map(ReservationWaitResponse::from)
                 .toList();
+    }
+
+    public Reservation pendingToReserve(Long reservationId,
+                                        LoginMemberRequest loginMemberRequest) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
+
+        if (!loginMemberRequest.id().equals(reservation.getMember().getId())) {
+            throw new InvalidMemberException("예약자 본인만 예약 확정 가능합니다.");
+        }
+
+        reservation.pendingToReserve();
+        return reservation;
     }
 }

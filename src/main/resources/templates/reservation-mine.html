@@ -7,6 +7,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/toss-style.css">
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
@@ -49,16 +51,29 @@
     <table class="table">
         <thead>
         <tr>
+            <th>예약 번호</th>
             <th>테마</th>
             <th>날짜</th>
             <th>시간</th>
             <th>상태</th>
+            <th>예약 확정</th>
+            <th>취소</th>
+            <th>paymentKey</th>
+            <th>결제금액</th>
             <th></th>
         </tr>
         </thead>
         <tbody id="table-body">
         </tbody>
     </table>
+</div>
+
+<div id="payment-container" class="payment-sidebar">
+    <div class="payment-content">
+        <div id="payment-method"></div>
+        <div id="agreement"></div>
+        <button id="payment-button" class="btn btn-primary w-100">결제하기</button>
+    </div>
 </div>
 
 <script src="/js/user-scripts.js"></script>

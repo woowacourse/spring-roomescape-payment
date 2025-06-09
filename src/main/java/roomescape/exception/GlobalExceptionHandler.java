@@ -7,6 +7,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import roomescape.exception.apidocs.GlobalExceptionHandlerApi;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.exception.custom.PaymentException;
 import roomescape.exception.custom.UnauthorizedException;
@@ -18,7 +19,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler implements GlobalExceptionHandlerApi {
 
     @ExceptionHandler(exception = PaymentException.class)
     public ResponseEntity<ErrorResponse> handleClientPaymentException(PaymentException e) {

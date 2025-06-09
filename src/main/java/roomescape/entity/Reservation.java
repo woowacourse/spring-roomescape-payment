@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,22 +29,26 @@ public class Reservation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "time_id")
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private ReservationStatus status;
+
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -57,20 +62,15 @@ public class Reservation {
                        LocalDate date,
                        ReservationTime reservationTime,
                        Theme theme,
-                       ReservationStatus status) {
+                       ReservationStatus status,
+                       Payment payment) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.reservationTime = reservationTime;
         this.theme = theme;
         this.status = status;
-    }
-
-    public Reservation(LocalDate date,
-                       ReservationTime reservationTime,
-                       Theme theme,
-                       ReservationStatus status) {
-        this(null, null, date, reservationTime, theme, status);
+        this.payment = payment;
     }
 
     public Reservation(Member member,
@@ -78,7 +78,7 @@ public class Reservation {
                        ReservationTime reservationTime,
                        Theme theme,
                        ReservationStatus status) {
-        this(null, member, date, reservationTime, theme, status);
+        this(null, member, date, reservationTime, theme, status, null);
     }
 
     public long calculateWaitRank(List<Reservation> allReservations) {
@@ -105,16 +105,31 @@ public class Reservation {
     }
 
     public void cancel() {
-        if (member != null) {
-            member.removeReservation(this);
-        }
+        this.status = ReservationStatus.CANCELED;
     }
 
-    public void changeStatusWaitToReserve() {
-        if (member == null) {
-            throw new InvalidReservationException("Member 가 없는 대기 reservation은 예약으로 변경할 수 없습니다.");
+    public void waitToPending() {
+        if (this.status != ReservationStatus.WAIT) {
+            throw new InvalidReservationException("대기 중인 예약이 아닙니다.");
         }
 
+        if (member == null) {
+            throw new InvalidReservationException("Member 가 없는 대기 reservation은 결제 대기로 변경할 수 없습니다.");
+        }
+
+        this.status = ReservationStatus.PENDING;
+    }
+
+    public void payForReservation(Payment payment) {
+        this.payment = payment;
+        this.status = ReservationStatus.RESERVED;
+        payment.setReservation(this);
+    }
+
+    public void pendingToReserve() {
+        if (this.status != ReservationStatus.PENDING) {
+            throw new InvalidReservationException("결제 대기중인 예약이 아닙니다.");
+        }
         this.status = ReservationStatus.RESERVED;
     }
 
@@ -154,12 +169,8 @@ public class Reservation {
         return status;
     }
 
-    protected void setMember(Member member) {
-        this.member = member;
-    }
-
-    protected void setStatus(ReservationStatus status) {
-        this.status = status;
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

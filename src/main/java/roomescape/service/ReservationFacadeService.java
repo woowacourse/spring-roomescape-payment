@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.ConfirmPaymentRequest;
+import roomescape.dto.request.ConfirmWaitReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
+import roomescape.entity.Reservation;
 
 @Service
 @Transactional
@@ -27,16 +29,28 @@ public class ReservationFacadeService {
     public ReservationResponse addReservation(CreateReservationRequest request,
                                               LoginMemberRequest loginMemberRequest) {
         AddReservationRequest addReservationRequest = AddReservationRequest.from(request);
-        ReservationResponse response = reservationService.addReservation(addReservationRequest, loginMemberRequest);
+        Reservation reservation = reservationService.addReservation(addReservationRequest, loginMemberRequest);
 
         ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest);
+        paymentService.processPayment(confirmPaymentRequest, reservation);
 
-        return response;
+        return ReservationResponse.from(reservation);
+    }
+
+    public ReservationResponse pendingToReserve(Long reservationId,
+                                                ConfirmWaitReservationRequest request,
+                                                LoginMemberRequest loginMemberRequest) {
+
+        Reservation reservation = reservationService.pendingToReserve(reservationId, loginMemberRequest);
+
+        ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
+        paymentService.processPayment(confirmPaymentRequest, reservation);
+
+        return ReservationResponse.from(reservation);
     }
 
     public List<ReservationResponse> findAllReservation() {
-        return reservationService.findAll();
+        return reservationService.findAllReserved();
     }
 
     public List<MyReservationResponse> findAllReservationOfMember(LoginMemberRequest loginMemberRequest) {
@@ -48,7 +62,8 @@ public class ReservationFacadeService {
         return reservationService.addWaitReservation(request, loginMemberRequest);
     }
 
-    public void deleteReservation(final Long id) {
+    public void deleteReservation(Long id) {
         reservationService.deleteReservation(id);
+        paymentService.refundReservation(id);
     }
 }

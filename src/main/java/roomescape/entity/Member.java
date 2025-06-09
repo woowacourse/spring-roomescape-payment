@@ -80,18 +80,6 @@ public class Member {
         return reservation;
     }
 
-    public void waitToReserve(LocalDate date, ReservationTime time, Theme theme) {
-        Reservation waitReservation = reservations.stream()
-                .filter(reservation -> reservation.getDate().equals(date)
-                        && reservation.getReservationTime().getId().equals(time.getId())
-                        && reservation.getTheme().getId().equals(theme.getId())
-                        && reservation.getStatus() == ReservationStatus.WAIT)
-                .findFirst()
-                .orElseThrow(() -> new InvalidReservationException("대기중인 예약이 없습니다"));
-
-        waitReservation.setStatus(ReservationStatus.RESERVED);
-    }
-
     private void validateDuplicateReservation(Reservation target) {
         boolean exist = reservations.stream()
                 .anyMatch(reservation ->
@@ -105,13 +93,22 @@ public class Member {
     }
 
     private void validatePastDateTime(Reservation reservation) {
-        reservation.isBefore(LocalDateTime.now());
+        boolean isBefore = reservation.isBefore(LocalDateTime.now());
+        if (isBefore) {
+            throw new InvalidReservationException("과거 날짜 및 시간으로 예약할 수 없습니다.");
+        }
     }
 
+    public void waitToPending(LocalDate date, ReservationTime time, Theme theme) {
+        Reservation waitReservation = reservations.stream()
+                .filter(reservation -> reservation.getDate().equals(date)
+                        && reservation.getReservationTime().getId().equals(time.getId())
+                        && reservation.getTheme().getId().equals(theme.getId())
+                        && reservation.getStatus() == ReservationStatus.WAIT)
+                .findFirst()
+                .orElseThrow(() -> new InvalidReservationException("대기중인 예약이 없습니다"));
 
-    public void removeReservation(Reservation reservation) {
-        reservations.remove(reservation);
-        reservation.setMember(null);
+        waitReservation.waitToPending();
     }
 
     public Long getId() {
@@ -137,8 +134,7 @@ public class Member {
     public List<Reservation> getReservations() {
         return Collections.unmodifiableList(reservations);
     }
-
-
+    
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Member member)) {

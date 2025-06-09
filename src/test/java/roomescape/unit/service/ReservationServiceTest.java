@@ -9,12 +9,16 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
@@ -72,17 +76,18 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 예약_전체를_조회할_수_있다() {
+    void 예약된_방탈출_데이터들을_조회할_수_있다() {
         //given
-        Reservation reservation = new Reservation(1L, member, LocalDate.now(), time, theme, ReservationStatus.RESERVED);
-        Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
+        Reservation reservation = new Reservation(member, LocalDate.now(), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation2 = new Reservation(
+                new Member("test2", "test2@email.com", "1234", Role.USER),
                 LocalDate.now(), time, theme, ReservationStatus.RESERVED);
 
-        when(reservationRepository.findAll())
+        when(reservationRepository.findAllFetchByStatus(any()))
                 .thenReturn(List.of(reservation, reservation2));
 
         //when
-        List<ReservationResponse> actual = reservationService.findAll();
+        List<ReservationResponse> actual = reservationService.findAllReserved();
 
         //then
         assertThat(actual).hasSize(2);
@@ -103,20 +108,22 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(theme));
 
         //when
-        ReservationResponse actual = reservationService.addReservation(request, loginMemberRequest);
+        Reservation actual = reservationService.addReservation(request, loginMemberRequest);
 
         //then
         assertAll(
-                () -> assertThat(actual.time()).isEqualTo(time.getStartAt()),
-                () -> assertThat(actual.themeName()).isEqualTo(theme.getName()),
-                () -> assertThat(actual.name()).isEqualTo(member.getName())
+                () -> assertThat(actual.getStartAt()).isEqualTo(time.getStartAt()),
+                () -> assertThat(actual.getThemeName()).isEqualTo(theme.getName()),
+                () -> assertThat(actual.getName()).isEqualTo(member.getName()),
+                () -> assertThat(actual.getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
     }
 
     @Test
-    void 예약을_삭제할_수_있다() {
+    void 예약을_취소할_수_있다() {
         //given
-        Reservation reservation = new Reservation(LocalDate.of(3000, 1, 1), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
+                ReservationStatus.RESERVED);
 
         when(reservationRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(reservation));
@@ -128,12 +135,13 @@ class ReservationServiceTest {
         reservationService.deleteReservation(1L);
 
         //then
-        assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getMember()).isNull();
+        assertAll(
+                () -> assertThat(member.getReservations()).doesNotContain(reservation),
+                () -> assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED)
+        );
     }
 
     @Test
-    @Transactional
     void 중복_예약은_불가능하다() {
         //given
         LocalDate targetDate = LocalDate.of(3000, 1, 1);
@@ -145,6 +153,8 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(time));
         when(themeRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(theme));
+        when(reservationRepository.existsAlreadyReservedReservation(any(), any(), any(), any(), any()))
+                .thenReturn(true);
 
         //when & then
         assertThatThrownBy(() -> reservationService.addReservation(
@@ -163,8 +173,12 @@ class ReservationServiceTest {
         when(themeRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(theme));
 
-        Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
-                LocalDate.now(), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation2 = new Reservation(
+                new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
+                LocalDate.now(),
+                time,
+                theme,
+                ReservationStatus.RESERVED);
 
         AddReservationRequest request = new AddReservationRequest(date, time.getId(), theme.getId());
 
@@ -178,7 +192,9 @@ class ReservationServiceTest {
                 reservation2.getTheme().getName(),
                 reservation2.getDate(),
                 reservation2.getStartAt(),
-                reservation2.getStatus().renderText(0));
+                reservation2.getStatus().renderText(0),
+                "",
+                1000);
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),
@@ -211,9 +227,10 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 예약_대기를_삭제할_수_있다() {
+    void 예약_대기를_취소할_수_있다() {
         //given
-        Reservation reservation = new Reservation(LocalDate.of(3000, 1, 1), time, theme, ReservationStatus.WAIT);
+        Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
+                ReservationStatus.WAIT);
 
         when(reservationRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(reservation));
@@ -222,8 +239,11 @@ class ReservationServiceTest {
         reservationService.deleteReservation(1L);
 
         //then
-        assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getMember()).isNull();
+        assertAll(
+                () -> assertThat(member.getReservations()).doesNotContain(reservation),
+                () -> assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED)
+        );
+
     }
 
     @Test
@@ -247,12 +267,12 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 기존_예약_삭제_시_첫번째_대기가_예약된다() {
+    void 기존_예약_취소_시_첫번째_대기가_결제_대기_상태가_된다() {
         //given
-        Member reserved = new Member(1L, "reserved", "reserved", "1234", Role.USER);
+        Member reservedMember = new Member(1L, "reserved", "reserved", "1234", Role.USER);
         LocalDate date = LocalDate.of(3000, 1, 1);
 
-        Reservation reserve = reserved.reserve(date, time, theme, ReservationStatus.RESERVED);
+        Reservation reserve = reservedMember.reserve(date, time, theme, ReservationStatus.RESERVED);
         Reservation wait = member.reserve(date, time, theme, ReservationStatus.WAIT);
 
         when(reservationRepository.findById(any(Long.class)))
@@ -267,9 +287,139 @@ class ReservationServiceTest {
         //then
         Reservation first = member.getReservations().getFirst();
         assertAll(
-                () -> assertThat(first.getStatus()).isEqualTo(ReservationStatus.RESERVED),
+                () -> assertThat(first.getStatus()).isEqualTo(ReservationStatus.PENDING),
                 () -> assertThat(wait.getMember()).isEqualTo(member),
-                () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.RESERVED)
+                () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ReservationStatus.class, mode = Mode.EXCLUDE, names = {"PENDING"})
+    void 결제_대기가_아닌_예약을_확정_시도_시_예외가_발생한다(ReservationStatus status) {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+
+        Reservation reserved = member.reserve(date, time, theme, status);
+
+        when(reservationRepository.findById(any(Long.class)))
+                .thenReturn(Optional.of(reserved));
+
+        //when //then
+        assertThatThrownBy(() -> reservationService.pendingToReserve(member.getId(), loginMemberRequest))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessageContaining("결제 대기중인 예약이 아닙니다.");
+    }
+
+    @Test
+    void 관리자가_예약을_추가한다() {
+        //given
+        LocalDate reservationDate = LocalDate.now().plusDays(1);
+        AdminCreateReservationRequest request = new AdminCreateReservationRequest(
+                member.getId(), 
+                reservationDate,
+                time.getId(), 
+                theme.getId());
+
+        when(memberRepository.findFetchById(any(Long.class)))
+                .thenReturn(Optional.of(member));
+        when(reservationTimeRepository.findById(any(Long.class)))
+                .thenReturn(Optional.of(time));
+        when(themeRepository.findById(any(Long.class)))
+                .thenReturn(Optional.of(theme));
+
+        //when
+        ReservationResponse response = reservationService.addReservationByAdmin(request);
+
+        //then
+        assertAll(
+                () -> assertThat(response.time()).isEqualTo(time.getStartAt()),
+                () -> assertThat(response.themeName()).isEqualTo(theme.getName()),
+                () -> assertThat(response.name()).isEqualTo(member.getName()),
+                () -> assertThat(response.date()).isEqualTo(reservationDate)
+        );
+    }
+
+    @Test
+    void 관리자가_예약_대기를_승인한다() {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+        long waitReservationId = 1L;
+
+        // 대기 중인 예약 생성
+        Reservation waitReservation = member.reserve(date, time, theme, ReservationStatus.WAIT);
+
+        // 이미 예약된 예약 생성
+        Member reservedMember = new Member(2L, "reserved", "reserved@email.com", "1234", Role.USER);
+        Reservation existingReservation = reservedMember.reserve(date, time, theme, ReservationStatus.RESERVED);
+
+        when(reservationRepository.findById(waitReservationId))
+                .thenReturn(Optional.of(waitReservation));
+        when(reservationRepository.findByDateAndReservationTimeAndThemeAndStatus(
+                date, time, theme, ReservationStatus.RESERVED))
+                .thenReturn(Optional.of(existingReservation));
+
+        //when
+        reservationService.approveWaitReservationByAdmin(waitReservationId);
+
+        //then
+        assertAll(
+                () -> assertThat(waitReservation.getStatus()).isEqualTo(ReservationStatus.PENDING),
+                () -> assertThat(existingReservation.getStatus()).isEqualTo(ReservationStatus.CANCELED)
+        );
+    }
+
+    @Test
+    void 관리자가_예약_대기를_거절한다() {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+        long waitReservationId = 1L;
+
+        // 대기 중인 예약 생성
+        Reservation waitReservation = member.reserve(date, time, theme, ReservationStatus.WAIT);
+
+        when(reservationRepository.findById(waitReservationId))
+                .thenReturn(Optional.of(waitReservation));
+
+        //when
+        reservationService.rejectWaitReservationByAdmin(waitReservationId);
+
+        //then
+        assertThat(waitReservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ReservationStatus.class, mode = Mode.EXCLUDE, names = {"WAIT"})
+    void 대기_상태가_아닌_예약을_승인_시도_시_예외가_발생한다(ReservationStatus status) {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+        long reservationId = 1L;
+
+        Reservation reservation = member.reserve(date, time, theme, status);
+
+        when(reservationRepository.findById(reservationId))
+                .thenReturn(Optional.of(reservation));
+
+        //when & then
+        assertThatThrownBy(() -> reservationService.approveWaitReservationByAdmin(reservationId))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessageContaining("대기 중인 예약이 아닙니다.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ReservationStatus.class, mode = Mode.EXCLUDE, names = {"WAIT"})
+    void 대기_상태가_아닌_예약을_거절_시도_시_예외가_발생한다(ReservationStatus status) {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+        long reservationId = 1L;
+
+        Reservation reservation = member.reserve(date, time, theme, status);
+
+        when(reservationRepository.findById(reservationId))
+                .thenReturn(Optional.of(reservation));
+
+        //when & then
+        assertThatThrownBy(() -> reservationService.rejectWaitReservationByAdmin(reservationId))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessageContaining("대기 중인 예약이 아닙니다.");
     }
 }

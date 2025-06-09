@@ -3,19 +3,28 @@ package roomescape.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
+import roomescape.dto.request.RefundPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
 import roomescape.dto.response.PaymentErrorResponse;
+import roomescape.dto.response.RefundPaymentResponse;
+import roomescape.entity.Payment;
 import roomescape.exception.custom.PaymentException;
 
+/**
+ * <a href="https://docs.tosspayments.com/reference">toss api 문서</a>
+ */
 @Component
 public class TossPaymentClient implements PaymentClient {
 
-    public static String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -36,15 +45,47 @@ public class TossPaymentClient implements PaymentClient {
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
+                    log.error("fail to confirm payment for orderId: {}: status = {}",
+                            paymentRequest.orderId(), response.getStatusCode());
                     PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
                             response.getBody().readAllBytes(),
                             PaymentErrorResponse.class);
+                    log.error("fail to confirm payment for orderId: {}: cause = {}",
+                            paymentRequest.orderId(), paymentErrorResponse.code());
                     if (TossErrorCode.containsCode(paymentErrorResponse.code())) {
                         throw new PaymentException("결제 오류: " + paymentErrorResponse.code());
                     }
                     throw new PaymentException(paymentErrorResponse.message());
                 }))
                 .toEntity(ConfirmPaymentResponse.class)
+                .getBody();
+    }
+
+    @Override
+    public RefundPaymentResponse refund(Payment payment) {
+        String authorizations = getAuthorizationToken();
+        RefundPaymentRequest refundPaymentRequest = new RefundPaymentRequest("사용자 결제 취소");
+
+        return restClient.post()
+                .uri("/v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
+                .header("Authorization", authorizations)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(refundPaymentRequest)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, ((request, response) -> {
+                    log.error("fail to refund payment for orderId = {}: status = {}",
+                            payment.getOrderId(), response.getStatusCode());
+                    PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
+                            response.getBody().readAllBytes(),
+                            PaymentErrorResponse.class);
+                    log.error("fail to refund payment for orderId = {}: cause = {}",
+                            payment.getOrderId(), paymentErrorResponse.code());
+                    if (TossErrorCode.containsCode(paymentErrorResponse.code())) {
+                        throw new PaymentException("환불 오류: " + paymentErrorResponse.code());
+                    }
+                    throw new PaymentException(paymentErrorResponse.message());
+                }))
+                .toEntity(RefundPaymentResponse.class)
                 .getBody();
     }
 

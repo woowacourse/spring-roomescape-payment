@@ -15,6 +15,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.request.CreateThemeRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
@@ -24,6 +25,7 @@ import roomescape.entity.Member;
 import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
+import roomescape.global.ReservationStatus;
 import roomescape.global.Role;
 import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
@@ -66,12 +68,14 @@ public class ReservationWaitIntegrateTest {
     @Autowired
     MemberService memberService;
 
+    Member member;
+
     String token;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
+        member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
     }
 
@@ -131,6 +135,66 @@ public class ReservationWaitIntegrateTest {
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().delete("/reservations/waiting/" + reservation.getId())
+                .then().log().all()
+                .statusCode(204);
+    }
+
+    @Test
+    void 관리자_예약_대기_승인_테스트() {
+        // given
+        LocalTime afterTime = LocalTime.now().plusHours(1L);
+        CreateReservationTimeRequest reservationTimeRequest = new CreateReservationTimeRequest(afterTime);
+        ReservationTime reservationTime = reservationTimeService.addReservationTime(reservationTimeRequest);
+
+        CreateThemeRequest themeRequest = new CreateThemeRequest("테마", "설명", "썸네일");
+        Theme theme = themeService.addTheme(themeRequest);
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        AdminCreateReservationRequest reservationRequest = new AdminCreateReservationRequest(
+                member.getId(), tomorrow, reservationTime.getId(), theme.getId());
+        reservationService.addReservationByAdmin(reservationRequest);
+
+        Member member = memberService.addMember(new SignupRequest("test", "wait@wait.com", "wait"));
+
+        Reservation wait = new Reservation(member, tomorrow, reservationTime, theme, ReservationStatus.WAIT);
+        reservationRepository.save(wait);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .when().put("/admin/reservations/waiting/" + wait.getId())
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @Test
+    void 관리자_예약_대기_거절_테스트() {
+        // given
+        LocalTime afterTime = LocalTime.now().plusHours(1L);
+        CreateReservationTimeRequest reservationTimeRequest = new CreateReservationTimeRequest(afterTime);
+        ReservationTime reservationTime = reservationTimeService.addReservationTime(reservationTimeRequest);
+
+        CreateThemeRequest themeRequest = new CreateThemeRequest("테마", "설명", "썸네일");
+        Theme theme = themeService.addTheme(themeRequest);
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        AdminCreateReservationRequest reservationRequest = new AdminCreateReservationRequest(
+                member.getId(), tomorrow, reservationTime.getId(), theme.getId());
+        reservationService.addReservationByAdmin(reservationRequest);
+
+        Member member = memberService.addMember(new SignupRequest("test", "wait@wait.com", "wait"));
+
+        Reservation wait = new Reservation(member, tomorrow, reservationTime, theme, ReservationStatus.WAIT);
+        reservationRepository.save(wait);
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .when().delete("/admin/reservations/waiting/" + wait.getId())
                 .then().log().all()
                 .statusCode(204);
     }

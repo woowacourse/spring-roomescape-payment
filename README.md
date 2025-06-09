@@ -33,3 +33,71 @@ host: localhost:8080
 ### 비고
 
 - 이번 미션에서는 보안, DB 트랜잭션 관련하여 고려하지 않는다.
+
+## 🚀 2단계 - 내 예약 페이지 변경
+
+### 요구사항
+
+- 내 예약 페이지에서 예약 정보 외에 결제 정보도 함께 볼 수 있도록 수정한다.
+- 내 예약 페이지에서 확인해야 하는 결제 정보는 paymentKey, 결제 금액이다.
+
+## 🚀 3단계 - 배포하기
+
+### 요구사항
+
+- 클라우드 서버에 방탈출 예약 서비스를 배포한다.
+
+## 🚀 4단계 - 문서화, 로깅
+
+### 요구사항
+
+- 사용자 예약 페이지에서 호출하는 모든 API를 확인 할 수 있는 API 문서를 작성한다.
+- Database ERD 를 작성한다.
+- 서비스 운영 시 모니터링 및 에러 트래킹을 위해 로그 레벨(e.g. DEBUG, INFO, WARN, ERROR 등)을 구분하여 로그를 기록한다.
+
+### E-R Diagram
+
+```mermaid
+erDiagram
+    MEMBER {
+        member_id BIGINT PK
+        email VARCHAR(255) "NOT NULL"
+        name VARCHAR(255) "NOT NULL"
+        password VARCHAR(255) "NOT NULL"
+        role ENUM "NOT NULL (ADMIN, USER)"
+    }
+
+    PAYMENT {
+        payment_id BIGINT PK
+        amount INT "NOT NULL"
+        order_id VARCHAR(255) "NOT NULL"
+        payment_key VARCHAR(255) "NOT NULL"
+        reservation_id BIGINT FK "NOT NULL"
+    }
+
+    RESERVATION {
+        reservation_id BIGINT PK
+        time_id BIGINT FK "NOT NULL"
+        theme_id BIGINT FK "NOT NULL"
+        create_at TIMESTAMP "NOT NULL"
+        date DATE "NOT NULL"
+        status ENUM "NOT NULL (RESERVED, WAIT, PENDING, CANCELED)"
+    }
+
+    RESERVATION_TIME {
+        time_id BIGINT PK
+        start_at TIME "NOT NULL"
+    }
+
+    THEME {
+        theme_id BIGINT PK
+        description VARCHAR(255) "NOT NULL"
+        name VARCHAR(255) "NOT NULL"
+        thumbnail VARCHAR(255) "NOT NULL"
+    }
+
+    MEMBER ||--|{ RESERVATION: ""
+    RESERVATION |o--|| PAYMENT: ""
+    RESERVATION }|--|| RESERVATION_TIME: ""
+    RESERVATION }|--|| THEME: ""
+```

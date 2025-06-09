@@ -14,4 +14,13 @@ public record ConfirmPaymentRequest(
                 createReservationRequest.paymentType()
         );
     }
+
+    public static ConfirmPaymentRequest from(ConfirmWaitReservationRequest confirmWaitReservationRequest) {
+        return new ConfirmPaymentRequest(
+                confirmWaitReservationRequest.paymentKey(),
+                confirmWaitReservationRequest.orderId(),
+                confirmWaitReservationRequest.amount(),
+                confirmWaitReservationRequest.paymentType()
+        );
+    }
 }

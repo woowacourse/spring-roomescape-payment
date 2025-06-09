@@ -1,4 +1,6 @@
 DELETE
+FROM payment;
+DELETE
 FROM reservation;
 DELETE
 FROM reservation_time;
@@ -36,4 +38,23 @@ VALUES (1, DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 'RESERVED', DATEADD('DAY', -1
        (3, DATEADD('DAY', -5, CURRENT_DATE), 4, 3, 'RESERVED', DATEADD('DAY', -5, CURRENT_DATE)),
        (1, '2025-07-01', 1, 1, 'RESERVED', '2025-05-20 10:15:00'),
        (2, '2025-07-01', 1, 1, 'WAIT', '2025-05-21 08:00:00'),
-       (3, '2025-07-01', 1, 1, 'WAIT', '2025-05-21 08:01:00');
+       (3, '2025-07-01', 1, 1, 'WAIT', '2025-05-21 08:01:00'),
+       (2, '2025-07-02', 1, 1, 'RESERVED', '2025-05-23 10:15:00'),
+       (1, '2025-07-02', 1, 1, 'WAIT', '2025-05-24 08:00:00'),
+       (1, '2025-07-30', 1, 1, 'PENDING', '2025-05-25 08:11:00');
+
+/*
+  payment 데이터
+
+  결제 정보 화면 출력 확인용 데이터입니다.
+  해당 데이터 삽입 후에 기존 예약 취소 시, 예외가 발생합니다.
+  취소 api 테스트 필요 시, 결제 승인 포함 예약 추가 후에 해당 데이터로 진행해주세요.
+*/
+-- INSERT INTO payment(order_id, payment_key, amount, reservation_id)
+-- VALUES ('orderId1', 'paymentKey1', 1000, 1),
+--         ('orderId2', 'paymentKey2', 1000, 2),
+--         ('orderId3', 'paymentKey3', 1000, 3),
+--         ('orderId4', 'paymentKey4', 1000, 4),
+--         ('orderId5', 'paymentKey5', 1000, 5),
+--         ('orderId6', 'paymentKey6', 1000, 6),
+--         ('orderId7', 'paymentKey7', 1000, 7);

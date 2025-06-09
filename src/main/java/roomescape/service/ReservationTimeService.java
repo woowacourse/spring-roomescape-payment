@@ -48,8 +48,8 @@ public class ReservationTimeService {
     public ReservationSlots getReservationSlots(AvailableTimeRequest request) {
         List<ReservationTime> times = reservationTimeRepository.findAll();
 
-        List<Reservation> alreadyReservedReservations = reservationRepository.findAllByDateAndThemeIdAndStatus(
-                request.date(), request.themeId(), ReservationStatus.RESERVED);
+        List<Reservation> alreadyReservedReservations = reservationRepository.findAllAlreadyReservedReservation(
+                request.date(), request.themeId(), ReservationStatus.RESERVED, ReservationStatus.PENDING);
 
         return new ReservationSlots(times, alreadyReservedReservations);
     }

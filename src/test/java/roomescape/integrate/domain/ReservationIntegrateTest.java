@@ -20,6 +20,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.AdminCreateReservationRequest;
+import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.request.CreateThemeRequest;
@@ -105,15 +107,40 @@ class ReservationIntegrateTest {
         );
 
         // when
-        when(paymentService.confirmPayment(any())).thenReturn(new ConfirmPaymentResponse(
-                "paymentKey", "orderId", 1000
-        ));
+        when(paymentService.processPayment(any(ConfirmPaymentRequest.class), any(Reservation.class)))
+                .thenReturn(new ConfirmPaymentResponse("paymentKey", "orderId", 1000));
+
         // then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(reservation)
                 .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+    }
+
+    @Test
+    void 관리자_예약_추가_테스트() {
+        // given
+        LocalTime afterTime = LocalTime.now().plusHours(1L);
+        CreateReservationTimeRequest reservationTimeRequest = new CreateReservationTimeRequest(afterTime);
+        ReservationTime reservationTime = reservationTimeService.addReservationTime(reservationTimeRequest);
+        Member user = new Member("user", "user@user.com", "user", Role.USER);
+        Member saved = memberRepository.save(user);
+
+        CreateThemeRequest themeRequest = new CreateThemeRequest("테마", "설명", "썸네일");
+        Theme theme = themeService.addTheme(themeRequest);
+
+        AdminCreateReservationRequest reservation = new AdminCreateReservationRequest(saved.getId(),
+                LocalDate.now().plusDays(1), reservationTime.getId(), theme.getId());
+
+        //when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(reservation)
+                .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201);
     }
