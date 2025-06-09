@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure.vo;
+package roomescape.reservation.domain.vo;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

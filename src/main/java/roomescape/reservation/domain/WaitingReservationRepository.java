@@ -1,6 +1,6 @@
 package roomescape.reservation.domain;
 
-import roomescape.reservation.infrastructure.vo.MyReservation;
+import roomescape.reservation.domain.vo.MyReservation;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 

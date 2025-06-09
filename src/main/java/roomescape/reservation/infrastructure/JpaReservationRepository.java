@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.infrastructure.vo.MyReservation;
-import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
+import roomescape.reservation.domain.vo.MyReservation;
+import roomescape.reservation.domain.vo.ThemeBookingCount;
 
 import java.util.List;
 

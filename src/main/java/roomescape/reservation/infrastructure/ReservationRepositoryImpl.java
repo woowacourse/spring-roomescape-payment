@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.infrastructure.vo.MyReservation;
-import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
+import roomescape.reservation.domain.vo.MyReservation;
+import roomescape.reservation.domain.vo.ThemeBookingCount;
 import roomescape.time.domain.ReservationTime;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package roomescape.reservation.domain;
 
-import roomescape.reservation.infrastructure.vo.MyReservation;
-import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
+import roomescape.reservation.domain.vo.MyReservation;
+import roomescape.reservation.domain.vo.ThemeBookingCount;
 
 import java.util.List;
 import java.util.Optional;

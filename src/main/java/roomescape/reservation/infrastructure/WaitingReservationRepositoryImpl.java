@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
-import roomescape.reservation.infrastructure.vo.MyReservation;
+import roomescape.reservation.domain.vo.MyReservation;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
