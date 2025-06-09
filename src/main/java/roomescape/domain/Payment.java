@@ -1,8 +1,10 @@
 package roomescape.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import roomescape.dto.PaymentRequest;
 import roomescape.exception.ArgumentNullException;
 
 import java.util.Objects;
@@ -19,23 +21,19 @@ public class Payment {
     @OneToOne
     private Reservation reservation;
 
-    public Payment(PaymentInfo paymentInfo, Reservation reservation) {
-        validateNull(paymentInfo.paymentKey(), paymentInfo.orderId(), reservation);
-        this.paymentKey = paymentInfo.paymentKey();
-        this.amount = paymentInfo.totalAmount();
-        this.orderId = paymentInfo.orderId();
+    public Payment(PaymentRequest request, Reservation reservation) {
+        validateNull(request.paymentKey(), reservation);
+        this.paymentKey = request.paymentKey();
+        this.amount = request.amount();
         this.reservation = reservation;
     }
 
     protected Payment() {
     }
 
-    private void validateNull(String paymentKey, String orderId, Reservation reservation) {
+    private void validateNull(String paymentKey, Reservation reservation) {
         if (paymentKey == null || paymentKey.isEmpty()) {
             throw new ArgumentNullException("paymentKey");
-        }
-        if (orderId == null || orderId.isEmpty()) {
-            throw new ArgumentNullException("orderId");
         }
         if (reservation == null) {
             throw new ArgumentNullException("reservation");
@@ -48,10 +46,6 @@ public class Payment {
 
     public int getAmount() {
         return amount;
-    }
-
-    public String getOrderId() {
-        return orderId;
     }
 
     public Reservation getReservation() {

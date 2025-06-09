@@ -7,10 +7,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import roomescape.auth.Role;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
-import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
+import roomescape.dto.PaymentRequest;
 import roomescape.exception.ArgumentNullException;
 
 import java.time.LocalDate;
@@ -20,35 +20,22 @@ public class PaymentTest {
     @ParameterizedTest
     @CsvSource(value = {"null", "''"}, nullValues = "null")
     void 결제_키가_빈_값인_경우_예외가_발생한다(String paymentKey) {
-        PaymentInfo paymentInfo = new PaymentInfo(paymentKey, 1000, "orderId");
+        PaymentRequest request = new PaymentRequest(paymentKey, 1000, "orderId");
         ReservationTime reservationTime = new ReservationTime(1L, LocalTime.now().plusHours(1));
 
         Reservation reservation = Reservation.of(1L, new Member(1L, "member", "member@test.com", "password", Role.MEMBER), LocalDate.now(), reservationTime, new Theme(1L, "theme name", "theme description", "thumbnail"));
 
         Assertions.assertThatThrownBy(
-                () -> new Payment(paymentInfo, reservation)
-        ).isInstanceOf(ArgumentNullException.class);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"null", "''"}, nullValues = "null")
-    void 주문_번호가_빈_값인_경우_예외가_발생한다(String orderId) {
-        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", 1000, orderId);
-        ReservationTime reservationTime = new ReservationTime(1L, LocalTime.now().plusHours(1));
-
-        Reservation reservation = Reservation.of(1L, new Member(1L, "member", "member@test.com", "password", Role.MEMBER), LocalDate.now(), reservationTime, new Theme(1L, "theme name", "theme description", "thumbnail"));
-
-        Assertions.assertThatThrownBy(
-                () -> new Payment(paymentInfo, reservation)
+                () -> new Payment(request, reservation)
         ).isInstanceOf(ArgumentNullException.class);
     }
 
     @Test
     void 예약_정보가_빈_값인_경우_예외가_발생한다() {
-        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", 1000, "orderId");
+        PaymentRequest request = new PaymentRequest("paymentKey", 1000, "orderId");
 
         Assertions.assertThatThrownBy(
-                () -> new Payment(paymentInfo, null)
+                () -> new Payment(request, null)
         ).isInstanceOf(ArgumentNullException.class);
     }
 }

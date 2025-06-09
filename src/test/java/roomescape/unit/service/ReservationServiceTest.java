@@ -23,6 +23,7 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.MyReservationsResponse;
@@ -94,7 +95,7 @@ class ReservationServiceTest {
         Member member = memberRepository.save(new Member(null, "포라", "email1@domain.com", "password1", Role.MEMBER));
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1), savedReservationTime.getId(), savedTheme.getId(), "1", "normal", "1", 1000);
+                LocalDate.now().plusDays(1), savedReservationTime.getId(), savedTheme.getId(), "paymentKey", "normal", "1", 1000);
 
         PaymentInfo paymentInfo = new PaymentInfo("paymentKey", 1000, "order_id");
         given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
@@ -159,7 +160,7 @@ class ReservationServiceTest {
         Reservation savedReservation = reservationRepository.save(reservation1);
 
         Payment payment = new Payment(
-                new PaymentInfo("paymentKey", 1000, "orderId"),
+                new PaymentRequest("paymentKey", 1000, "orderId"),
                 savedReservation
         );
 

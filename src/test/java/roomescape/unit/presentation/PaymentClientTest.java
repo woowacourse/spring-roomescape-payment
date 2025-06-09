@@ -47,7 +47,7 @@ public class PaymentClientTest {
                 .andRespond(withSuccess(paymentInfoJson, MediaType.APPLICATION_JSON));
 
         //when
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
+        PaymentRequest paymentRequest = new PaymentRequest("1", 1000, "10");
         PaymentInfo result = clientController.postPaymentInfo(paymentRequest);
 
         assertThat(paymentInfo).isEqualTo(result);
@@ -67,7 +67,7 @@ public class PaymentClientTest {
                         .body(errorJson));
 
         //when
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
+        PaymentRequest paymentRequest = new PaymentRequest("1", 1000, "10");
         assertThatThrownBy(() -> clientController.postPaymentInfo(paymentRequest))
                 .isInstanceOf(FilteredPaymentException.class)
                 .hasMessage("결제가 실패했습니다. 고객센터로 문의해 주세요.");

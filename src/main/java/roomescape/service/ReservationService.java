@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
-import roomescape.domain.PaymentInfo;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -106,7 +105,8 @@ public class ReservationService {
 
     public ReservationWithPaymentResponse createReservationForMember(Long memberId, ReservationCreateRequest request) {
         Reservation reservation = saveReservation(request, memberId);
-        Payment savedPayment = processPayment(request, reservation);
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.amount(), request.orderId());
+        Payment savedPayment = processPayment(paymentRequest, reservation);
         return ReservationWithPaymentResponse.of(reservation, savedPayment);
     }
 
@@ -125,12 +125,11 @@ public class ReservationService {
         validateDuplicate(request.date(), reservationTime, theme);
     }
 
-    private Payment processPayment(ReservationCreateRequest request, Reservation reservation) {
-        PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey(), request.orderId());
-        PaymentInfo paymentInfo = paymentClient.postPaymentInfo(paymentRequest);
-
-        Payment payment = new Payment(paymentInfo, reservation);
-        return paymentRepository.save(payment);
+    private Payment processPayment(PaymentRequest request, Reservation reservation) {
+        Payment payment = new Payment(request, reservation);
+        Payment savedPayment = paymentRepository.save(payment);
+        paymentClient.postPaymentInfo(request);
+        return savedPayment;
     }
 
 
