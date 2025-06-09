@@ -23,9 +23,9 @@ public record MyReservationResponse(
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 convertToReservationStatusMessage(reservation),
-                getOrderId(reservation),
-                getPaymentKey(reservation),
-                getAmount(reservation)
+                reservation.getPaymentOrderId().orElse(null),
+                reservation.getPaymentKey().orElse(null),
+                reservation.getPaymentAmount().orElse(null)
         );
     }
 
@@ -36,26 +36,5 @@ public record MyReservationResponse(
         }
         status.append(reservation.getReservationStatus().getStatus().getOutput());
         return status.toString();
-    }
-
-    private static String getOrderId(Reservation reservation) {
-        if (reservation.getPayment() == null) {
-            return null;
-        }
-        return reservation.getPayment().getOrderId();
-    }
-
-    private static String getPaymentKey(Reservation reservation) {
-        if (reservation.getPayment() == null) {
-            return null;
-        }
-        return reservation.getPayment().getPaymentKey();
-    }
-
-    private static Long getAmount(Reservation reservation) {
-        if (reservation.getPayment() == null) {
-            return null;
-        }
-        return reservation.getPayment().getAmount();
     }
 }

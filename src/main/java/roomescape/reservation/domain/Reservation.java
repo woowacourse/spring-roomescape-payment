@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -143,5 +144,17 @@ public class Reservation {
 
     public boolean isBooked() {
         return reservationStatus.getStatus() == Status.BOOKED;
+    }
+
+    public Optional<String> getPaymentOrderId() {
+        return Optional.ofNullable(payment).map(Payment::getOrderId);
+    }
+
+    public Optional<String> getPaymentKey() {
+        return Optional.ofNullable(payment).map(Payment::getPaymentKey);
+    }
+
+    public Optional<Long> getPaymentAmount() {
+        return Optional.ofNullable(payment).map(Payment::getAmount);
     }
 }
