@@ -12,8 +12,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -37,13 +36,13 @@ import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentFailedException;
 import roomescape.exception.PaymentInternalException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatusCode status, final WebRequest request) {
+        log.warn("유효성 검사 실패: {}", ex.getFieldErrors());
         var problemDetail = ProblemDetail.forStatusAndDetail(ex.getStatusCode(), "유효성 검증에 실패했습니다.");
         var fieldErrors = ex.getFieldErrors()
                 .stream()
@@ -54,6 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final HttpHeaders headers, final HttpStatusCode status, final WebRequest request) {
+        log.warn("요청 본문을 읽을 수 없습니다: {}", ex.getMessage());
         var problemDetail = ProblemDetail.forStatusAndDetail(BAD_REQUEST, "해석할 수 없는 요청입니다.");
         if (ex.getCause() instanceof InvalidFormatException ife) {
             var invalidFields = ife.getPath().stream().collect(toMap(Reference::getFieldName, r -> ife.getValue()));
@@ -65,63 +65,70 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(code = NOT_FOUND)
     public ProblemDetail handleNotFound(final NotFoundException ex) {
-        logger.warn("예외 유형 - {}: {}", NOT_FOUND.getReasonPhrase(), ex.getMessage());
+        log.warn("예외 유형 - {}: {}", NOT_FOUND.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(NOT_FOUND, "존재하지 않는 값입니다.", ex.getMessage());
     }
 
     @ExceptionHandler(InUseException.class)
     @ResponseStatus(code = CONFLICT)
     public ProblemDetail handleInUse(final InUseException ex) {
-        logger.warn("예외 유형 - {}: {}", CONFLICT.getReasonPhrase(), ex.getMessage());
+        log.warn("예외 유형 - {}: {}", CONFLICT.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(CONFLICT, "사용 중인 값입니다.", ex.getMessage());
     }
 
     @ExceptionHandler(AlreadyExistedException.class)
     @ResponseStatus(code = CONFLICT)
     public ProblemDetail handleAlreadyExisted(final AlreadyExistedException ex) {
+        log.warn("예외 유형 - {}: {}", CONFLICT.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(CONFLICT, "이미 존재하는 값입니다.", ex.getMessage());
     }
 
     @ExceptionHandler(BusinessRuleViolationException.class)
     @ResponseStatus(code = UNPROCESSABLE_ENTITY)
     public ProblemDetail handleBusinessRuleViolation(final BusinessRuleViolationException ex) {
+        log.warn("예외 유형 - {}: {}", UNPROCESSABLE_ENTITY.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(UNPROCESSABLE_ENTITY, "비즈니스 규칙을 위반합니다.", ex.getMessage());
     }
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(code = FORBIDDEN)
     public ProblemDetail handleAuthorization(final AuthorizationException ex) {
+        log.warn("인가 실패 - {}: {}", FORBIDDEN.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(FORBIDDEN, "인가에 실패했습니다.", ex.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(code = UNAUTHORIZED)
     public ProblemDetail handleAuthentication(final AuthenticationException ex) {
+        log.warn("인증 실패 - {}: {}", UNAUTHORIZED.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(UNAUTHORIZED, "인증에 실패했습니다.", ex.getMessage());
     }
 
     @ExceptionHandler(InvalidInputException.class)
     @ResponseStatus(code = BAD_REQUEST)
     public ProblemDetail handleInvalidInput(final InvalidInputException ex) {
+        log.warn("예외 유형 - {}: {}", BAD_REQUEST.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(BAD_REQUEST, "올바르지 못한 입력입니다.", ex.getMessage());
     }
 
     @ExceptionHandler(PaymentFailedException.class)
     @ResponseStatus(code = BAD_REQUEST)
     public ProblemDetail handlePaymentFailed(final PaymentFailedException ex) {
+        log.warn("결제 실패. 재시도 요망. - {}: {}", BAD_REQUEST.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(BAD_REQUEST, "결제에 실패했습니다.", ex.getMessage());
     }
 
     @ExceptionHandler(PaymentInternalException.class)
     @ResponseStatus(code = INTERNAL_SERVER_ERROR)
     public ProblemDetail handlePaymentInternal(final PaymentInternalException ex) {
+        log.error("결제 실패. 잠시 후 다시 시도해주세요. - {}: {}", INTERNAL_SERVER_ERROR.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(INTERNAL_SERVER_ERROR, "서버 내부 오류로 결제에 실패했습니다.", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(code = INTERNAL_SERVER_ERROR)
     public ProblemDetail handleException(final Exception ex) {
-        logger.error(ex.getMessage(), ex);
+        log.error(ex.getMessage(), ex);
         return ProblemDetail.forStatusAndDetail(INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다.");
     }
 
