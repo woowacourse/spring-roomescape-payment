@@ -33,7 +33,6 @@ public class MemberService {
         return SignupResponse.from(save);
     }
 
-    @Transactional(readOnly = true)
     public List<MemberResponse> findAllMember() {
         List<Member> members = memberRepository.findAll();
         return members.stream()

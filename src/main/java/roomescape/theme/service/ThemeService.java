@@ -50,14 +50,12 @@ public class ThemeService {
         themeRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     public List<ThemeResponse> getThemes() {
         return themeRepository.findAll().stream()
                 .map(ThemeResponse::from)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<PopularThemeResponse> getPopularThemes() {
         ReservationPeriod period = new ReservationPeriod(dateTime.nowDate(), START_OFFSET_DAYS, END_OFFSET_DAYS);
 

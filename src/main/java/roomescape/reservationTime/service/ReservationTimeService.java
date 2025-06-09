@@ -43,14 +43,12 @@ public class ReservationTimeService {
         reservationTimeRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationTimeResponse> getReservationTimes() {
         return reservationTimeRepository.findAll().stream()
                 .map(ReservationTimeResponse::from)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<TimeConditionResponse> getTimesWithCondition(final TimeConditionRequest request) {
         List<Reservation> reservations = reservationRepository.findByDateAndThemeId(request.date(), request.themeId());
         List<ReservationTime> times = reservationTimeRepository.findAll();

@@ -87,7 +87,6 @@ public class WaitingService {
         waitingRepository.delete(waiting);
     }
 
-    @Transactional(readOnly = true)
     public List<WaitingResponse> getAllWaitings() {
         return waitingRepository.findAll().stream()
                 .map(WaitingResponse::from)

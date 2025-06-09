@@ -76,7 +76,6 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationResponse> getReservations(final ReservationConditionRequest request) {
         if (request.isEmpty()) {
             return reservationRepository.findAll().stream()

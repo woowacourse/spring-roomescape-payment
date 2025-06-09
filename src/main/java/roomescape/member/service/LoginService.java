@@ -1,7 +1,6 @@
 package roomescape.member.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.LoginException;
 import roomescape.common.logging.LogExecution;
 import roomescape.common.util.DateTime;
@@ -26,7 +25,6 @@ public class LoginService {
         this.dateTime = dateTime;
     }
 
-    @Transactional(readOnly = true)
     public String loginAndReturnToken(final LoginRequest request) {
         Optional<Member> loginMember = memberRepository.findByEmailAndPassword(request.email(),
                 request.password());
@@ -36,7 +34,6 @@ public class LoginService {
         return jwtTokenContainer.createJwtToken(loginMember.get(), dateTime.now());
     }
 
-    @Transactional(readOnly = true)
     public String findMemberName(final long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버입니다."));
