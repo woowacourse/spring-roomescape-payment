@@ -11,7 +11,7 @@
   <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>logs/my-application.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>//home/ubuntu/app/my-application-%d{yyyy-MM-dd_HH-mm}.log</fileNamePattern>
+      <fileNamePattern>//home/ubuntu/app/my-application-%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
