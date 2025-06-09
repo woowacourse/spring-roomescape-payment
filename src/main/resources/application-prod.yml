@@ -42,10 +42,3 @@ management:
   endpoint:
     health:
       show-details: when-authorized  # 상세 정보 표시 조건
-
-logging:
-  level:
-    root: INFO
-    org.springframework: WARN
-  pattern:
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] %logger{40} - %msg%n"
