@@ -16,8 +16,10 @@ public class LoggingAspect {
 
     @Pointcut("@annotation(roomescape.logging.aspect.Loggable)")
     public void logAnnotation() {
-
     }
+
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.ExceptionHandler)")
+    public void exceptionHandlerMethods() {}
 
     @Around("logAnnotation()")
     public Object logging(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -41,6 +43,21 @@ public class LoggingAspect {
             } else {
                 log.info("[PERFORMANCE] {} | 실행 시간: {} ms", joinPoint.getSignature(), duration);
             }
+        }
+    }
+
+    @Around("exceptionHandlerMethods()")
+    public Object logExceptionHandler(ProceedingJoinPoint joinPoint) throws Throwable {
+        String methodName = joinPoint.getSignature().toShortString();
+        Object[] args = joinPoint.getArgs();
+        try {
+            log.info("[ExceptionHandler-START] {} args={}", methodName, args);
+            Object result = joinPoint.proceed();
+            log.info("[ExceptionHandler-END] {} result={}", methodName, result);
+            return result;
+        } catch (Exception e) {
+            log.warn("[ExceptionHandler-EXCEPTION] {} | 예외 발생: {}", methodName, e.getMessage(), e);
+            throw e;
         }
     }
 }
