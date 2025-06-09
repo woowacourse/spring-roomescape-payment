@@ -19,6 +19,17 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
+    public GroupedOpenApi allApi() {
+        String[] paths = {"/**"};
+
+        return GroupedOpenApi
+                .builder()
+                .group("전체 API")
+                .pathsToMatch(paths)
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi loginApi() {
         String[] paths = {"/login/**"};
 
