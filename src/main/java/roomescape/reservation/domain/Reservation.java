@@ -112,7 +112,7 @@ public class Reservation {
         return paymentKey;
     }
 
-    public String getPaymentKeyasString() {
+    public String getPaymentKeyAsString() {
         return paymentKey.paymentKey();
     }
 

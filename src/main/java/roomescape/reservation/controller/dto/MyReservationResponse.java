@@ -40,7 +40,7 @@ public record MyReservationResponse(
                 reservation.getDate(),
                 reservation.getStartAt(),
                 "예약",
-                reservation.getPaymentKeyasString(),
+                reservation.getPaymentKeyAsString(),
                 reservation.getAmountAsLong()
         );
     }
