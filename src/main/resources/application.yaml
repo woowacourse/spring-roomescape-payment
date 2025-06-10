@@ -1,3 +1,6 @@
+app:
+  version: 0.0.1-SNAPSHOT
+
 spring:
   h2:
     console:

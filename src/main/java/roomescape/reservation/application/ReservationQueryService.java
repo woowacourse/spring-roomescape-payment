@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.NotFoundException;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MyHistoryResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
@@ -30,6 +33,7 @@ public class ReservationQueryService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public List<ReservationResponse> findReservedReservations() {
         return reservationRepository.findAllWithAssociations()
@@ -78,11 +82,15 @@ public class ReservationQueryService {
     public List<MyHistoryResponse> findMyReservation(final Long memberId) {
         final List<MyHistoryResponse> responses = new ArrayList<>();
 
-        final List<Reservation> reservations = reservationRepository.findByMemberIdWithAssociations(memberId);
-        reservations.forEach(r -> responses.add(MyHistoryResponse.ofReservation(r)));
+        final List<Payment> payments = paymentRepository.findByMemberIdAndStatusWithAssociations(
+                memberId,
+                List.of(PaymentStatus.AWAIT, PaymentStatus.SUCCESS)
+        );
+        payments.forEach(payment -> responses.add(MyHistoryResponse.ofReservation(payment.getReservation(), payment)));
 
         final List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
-        waitingWithRanks.forEach(w -> responses.add(MyHistoryResponse.ofWaiting(w.waiting(), w.rank())));
+        waitingWithRanks.forEach(waitingWithRank -> responses.add(
+                MyHistoryResponse.ofWaiting(waitingWithRank.waiting(), waitingWithRank.rank())));
 
         return responses;
     }

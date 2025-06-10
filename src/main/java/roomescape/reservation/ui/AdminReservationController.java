@@ -1,5 +1,6 @@
 package roomescape.reservation.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.reservation.application.ReservationCommandService;
 import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -36,16 +36,19 @@ public class AdminReservationController {
         this.reservationQueryService = reservationQueryService;
     }
 
+    @Operation(summary = "관리자 모든 예약 조회 API")
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> findAllReserved() {
         return ResponseEntity.ok(reservationQueryService.findReservedReservations());
     }
 
+    @Operation(summary = "관리자 모든 대기 조회 API")
     @GetMapping("/waitings")
     public ResponseEntity<List<WaitingResponse>> findAllWaiting() {
         return ResponseEntity.ok(reservationQueryService.findWaitingReservations());
     }
 
+    @Operation(summary = "관리자 예약 조건 조회 API")
     @GetMapping("/reservations/search")
     public ResponseEntity<List<ReservationResponse>> getFilteredReservations(
             @RequestParam(required = false, name = "themeId") final Long themeId,
@@ -58,6 +61,7 @@ public class AdminReservationController {
         return ResponseEntity.ok(reservationResponses);
     }
 
+    @Operation(summary = "관리자 예약 추가 API")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> add(
             @Valid @RequestBody final AdminReservationRequest request
@@ -67,24 +71,26 @@ public class AdminReservationController {
                 .body(response);
     }
 
+    @Operation(summary = "관리자 예약 제거 API")
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long id) {
         reservationCommandService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "관리자 대기 거절 API")
     @PutMapping("/waitings/reject/{id}")
     public ResponseEntity<Void> rejectWaiting(@PathVariable("id") final Long id) {
         reservationCommandService.rejectWaitingById(id);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "관리자 대기 승인 API")
     @PutMapping("/waitings/accept/{id}")
     public ResponseEntity<Void> acceptReservation(
-            @PathVariable("id") final Long id,
-            final PaymentDataRequest request
+            @PathVariable("id") final Long id
     ) {
-        reservationCommandService.acceptReservation(id, request);
+        reservationCommandService.acceptReservation(id);
         return ResponseEntity.ok().build();
     }
 }

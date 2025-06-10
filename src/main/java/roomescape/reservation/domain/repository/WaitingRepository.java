@@ -52,16 +52,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     List<WaitingWithRank> findWaitingWithRankByMemberId(@Param("memberId") Long memberId);
 
     @Query("""
-            SELECT w FROM Waiting w
-            JOIN FETCH w.theme
-            JOIN FETCH w.time
-            WHERE w.member.id = :memberId
-              AND w.waitingStatus = :waitingStaus
-            """)
-    List<Waiting> findByMemberIdAndWaitingStatusWithAssociations(@Param("memberId") Long memberId,
-                                                                 @Param("waitingStaus") WaitingStatus waitingStatus);
-
-    @Query("""
               SELECT COUNT(w)
               FROM Waiting w
               WHERE w.theme = :theme

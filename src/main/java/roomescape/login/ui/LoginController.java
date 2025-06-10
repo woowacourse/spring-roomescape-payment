@@ -1,5 +1,6 @@
 package roomescape.login.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,7 @@ public class LoginController {
         this.tokenCookieService = tokenCookieService;
     }
 
+    @Operation(summary = "로그인 API")
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody final LoginRequest request) {
         final Token token = loginService.login(request);
@@ -40,12 +42,14 @@ public class LoginController {
                 .build();
     }
 
+    @Operation(summary = "로그인 확인 API")
     @GetMapping("/login/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(final LoginCheckRequest request) {
         final LoginCheckResponse loginCheckResponse = loginService.checkLogin(request);
         return ResponseEntity.ok(loginCheckResponse);
     }
 
+    @Operation(summary = "로그아웃 API")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         final String cookie = tokenCookieService.createTokenCookie("", 0);
@@ -55,6 +59,7 @@ public class LoginController {
                 .build();
     }
 
+    @Operation(summary = "회원가입 API")
     @PostMapping("/signup")
     public ResponseEntity<LoginCheckResponse> signup(@Valid @RequestBody final SignupRequest request) {
         final LoginCheckResponse loginCheckResponse = loginService.signup(request);

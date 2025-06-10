@@ -2,6 +2,7 @@ package roomescape.reservation.ui;
 
 import static roomescape.payment.ui.PaymentController.PAYMENT_DATA;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -40,12 +41,14 @@ public class UserReservationController {
         this.reservationQueryService = reservationQueryService;
     }
 
+    @Operation(summary = "본인 예약 조회 API")
     @GetMapping("/mine")
     public ResponseEntity<List<MyHistoryResponse>> findMyReservation(final LoginCheckRequest request) {
         List<MyHistoryResponse> response = reservationQueryService.findMyReservation(request.id());
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "이용 가능한 예약 시간 조회 API")
     @GetMapping("/reservations/themes/{themeId}/times")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAvailableReservationTime(
             @PathVariable final Long themeId,
@@ -54,6 +57,7 @@ public class UserReservationController {
         return ResponseEntity.ok(reservationQueryService.findAvailableReservationTime(themeId, date));
     }
 
+    @Operation(summary = "예약 추가 API")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> add(
             @Valid @RequestBody final MemberReservationRequest request,
@@ -66,6 +70,7 @@ public class UserReservationController {
         return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "대기 추가 API")
     @PostMapping("/waitings")
     public ResponseEntity<WaitingResponse> add(
             @Valid @RequestBody final MemberWaitingRequest request,
@@ -76,6 +81,7 @@ public class UserReservationController {
         return new ResponseEntity<>(waitingResponse, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "대기 취소 API")
     @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable("id") final Long id,

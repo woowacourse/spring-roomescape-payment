@@ -3,9 +3,7 @@ package roomescape.payment.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -23,6 +21,7 @@ import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
+import roomescape.theme.domain.Theme;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -54,7 +53,7 @@ class TossPaymentServiceTest {
         final Payment payment = paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS);
     }
 
     @Test
@@ -127,45 +126,13 @@ class TossPaymentServiceTest {
     @Test
     void 결제_요청을_대기한다() {
         // given
-        final PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                "dummy",
-                "dummy",
-                BigDecimal.valueOf(1000)
-        );
-        final Reservation reservation = new Reservation(1L, null, null, null, null);
+        final Theme theme = new Theme(1L, "dummy", "dummy", "dummy", BigDecimal.valueOf(10000));
+        final Reservation reservation = new Reservation(1L, null, null, theme, null);
 
         // when
-        final Payment payment = paymentService.await(paymentDataRequest, reservation);
+        final Payment payment = paymentService.await(reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.AWAIT);
-    }
-
-    @Test
-    void 결제_요청이_실패하면_3번_재시도한다() {
-        // given
-        final String orderId = "retryId";
-        final PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                orderId,
-                "orderName",
-                BigDecimal.valueOf(1000)
-        );
-        final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
-                "retryKey",
-                orderId,
-                BigDecimal.valueOf(1000)
-        );
-        final Reservation reservation = new Reservation(1L, null, null, null, null);
-
-        when(paymentClient.requestPayment(any())).thenThrow(
-                new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
-
-        // when & then
-        assertThatThrownBy(() -> paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation))
-                .isInstanceOf(TossPaymentException.class)
-                .hasMessage("재시도 테스트 실패");
-
-        // 재시도 횟수 검증
-        verify(paymentClient, times(3)).requestPayment(any());
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);
     }
 }

@@ -1,3 +1,65 @@
+## ERD
+
+```mermaid
+erDiagram
+    MEMBER {
+        BIGINT id PK
+        VARCHAR email
+        VARCHAR name
+        VARCHAR password
+        VARCHAR role  "ENUM('ADMIN','MEMBER')"
+    }
+
+    PAYMENT {
+        BIGINT id PK
+        NUMERIC amount
+        BIGINT reservation_id FK
+        VARCHAR order_id
+        VARCHAR payment_key
+        VARCHAR payment_status  "ENUM('AWAIT','FAILED','PENDING','SUCCESS')"
+    }
+
+    RESERVATION {
+        BIGINT id PK
+        DATE date
+        BIGINT member_id FK
+        BIGINT theme_id FK
+        BIGINT time_id FK
+    }
+
+    RESERVATION_TIME {
+        BIGINT id PK
+        TIME start_at
+    }
+
+    THEME {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR description
+        VARCHAR thumbnail
+        NUMERIC price
+    }
+
+    WAITING {
+        BIGINT id PK
+        DATE date
+        TIMESTAMP created_at
+        BIGINT member_id FK
+        BIGINT theme_id FK
+        BIGINT time_id FK
+        VARCHAR waiting_status  "ENUM('ACCEPTED','CANCELLED','PENDING','REJECTED')"
+    }
+
+    MEMBER ||--o{ RESERVATION: ""
+    MEMBER ||--o{ WAITING: ""
+    RESERVATION ||--|{ PAYMENT: ""
+    RESERVATION ||--|| RESERVATION_TIME: ""
+    RESERVATION ||--|| THEME: ""
+    WAITING ||--|| RESERVATION_TIME: ""
+    WAITING ||--|| THEME: ""
+
+```
+
 ## 기능 구현 목록
 
 ### 어드민 페이지
@@ -78,7 +140,10 @@
 
 ### 결제
 
-- [x] 사용자가 날짜, 테마, 시간을 선택하고 결제를 해야 예약할 수 있도록 변경합니다.
-- [x] 결제 기능은 외부의 결제 서비스를 사용하여 외부의 결제 API를 연동하세요.
-- [x] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링 하세요.
-    - 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있어야 합니다.
+- [x] 사용자가 날짜, 테마, 시간을 선택하고 결제를 해야 예약할 수 있도록 변경한다.
+- [x] 결제 기능은 외부의 결제 서비스를 사용하여 외부의 결제 API를 연동한다.
+- [x] 결제 승인 API 호출에 실패 한 경우, 안전하게 에러를 핸들링 한다.
+    - 사용자는 예약 실패 시, 결제 실패 사유를 알 수 있어야 한다.
+- [x] 내 예약 페이지에서 예약 정보 외에 결제 정보도 함께 볼 수 있도록 수정한다.
+    - 내 예약 페이지에서 필수로 확인 할 수 있어야 하는 결제 정보는 paymentKey, 결제 금액이다.
+    - 그 외 결제 정보는 DB에 선택적으로 저장한다.

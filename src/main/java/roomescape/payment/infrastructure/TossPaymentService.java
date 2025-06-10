@@ -1,11 +1,7 @@
 package roomescape.payment.infrastructure;
 
-import java.net.SocketTimeoutException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
@@ -25,17 +21,13 @@ public class TossPaymentService implements PaymentService {
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
-    @Retryable(
-            value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000)
-    )
     public Payment pay(
             final PaymentDataRequest paymentDataRequest,
             final PaymentConfirmRequest request,
             final Reservation reservation
     ) {
         validatePaymentData(request, paymentDataRequest);
+
         final PaymentRequest paymentRequest = new TossPaymentRequest(
                 request.amount(),
                 request.orderId(),
@@ -48,6 +40,7 @@ public class TossPaymentService implements PaymentService {
                 reservation
         );
         paymentRepository.save(payment);
+
         try {
             paymentClient.requestPayment(paymentRequest);
             payment.success();
@@ -55,11 +48,12 @@ public class TossPaymentService implements PaymentService {
             payment.fail();
             throw e;
         }
+
         return payment;
     }
 
-    public Payment await(final PaymentDataRequest request, final Reservation reservation) {
-        final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
+    public Payment await(final Reservation reservation) {
+        final Payment payment = Payment.await(null, reservation.getAmount(), reservation);
         return paymentRepository.save(payment);
     }
 

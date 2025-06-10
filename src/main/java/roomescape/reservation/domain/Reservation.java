@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
@@ -76,5 +77,9 @@ public class Reservation {
 
     public LocalTime getStartAt() {
         return time.getStartAt();
+    }
+
+    public BigDecimal getAmount() {
+        return theme.getPrice();
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.TossPaymentProperties;
 
@@ -20,17 +20,22 @@ public class ClientConfig {
 
     @Bean(name = "tossPaymentRestClient")
     public RestClient tossPaymentRestClient() {
-        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(tossPaymentProperties.connectionTimeout());
-        requestFactory.setReadTimeout(tossPaymentProperties.readTimeout());
-
-        final String encodedKey = Base64.getEncoder()
-                .encodeToString((tossPaymentProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
-
         return RestClient.builder()
                 .baseUrl(tossPaymentProperties.baseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedKey)
-                .requestFactory(requestFactory)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + getEncodedKey())
+                .requestFactory(getFactory())
                 .build();
+    }
+
+    private String getEncodedKey() {
+        return Base64.getEncoder()
+                .encodeToString((tossPaymentProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
+    }
+
+    private HttpComponentsClientHttpRequestFactory getFactory() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(tossPaymentProperties.connectionTimeout());
+        factory.setReadTimeout(tossPaymentProperties.readTimeout());
+        return factory;
     }
 }

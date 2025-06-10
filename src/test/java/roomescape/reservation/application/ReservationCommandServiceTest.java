@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.ReservationTestConfig;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -29,6 +30,9 @@ class ReservationCommandServiceTest {
 
     @Autowired
     private ReservationCommandService reservationCommandService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     void 예약을_추가한다() {
@@ -69,7 +73,6 @@ class ReservationCommandServiceTest {
         assertThat(response.member().id()).isEqualTo(memberId);
     }
 
-
     @Test
     void 예약을_삭제한다() {
         assertThatCode(() -> reservationCommandService.deleteReservationById(8L))
@@ -85,23 +88,22 @@ class ReservationCommandServiceTest {
 
     @Test
     void 대기_예약을_확정_예약으로_변경한다() {
-        PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                "dummy", "dummy", BigDecimal.valueOf(1000)
+        reservationCommandService.addMemberWaiting(
+                new MemberWaitingRequest(
+                        LocalDate.now().plusDays(10),
+                        1L,
+                        1L
+                ),
+                1L
         );
 
-        reservationCommandService.deleteReservationById(8L);
-
-        assertThatCode(() -> reservationCommandService.acceptReservation(2L, paymentDataRequest))
+        assertThatCode(() -> reservationCommandService.acceptReservation(4L))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void 존재하지_않는_예약은_상태를_변경할_수_없다() {
-        PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                "dummy", "dummy", BigDecimal.valueOf(1000)
-        );
-
-        assertThatThrownBy(() -> reservationCommandService.acceptReservation(999L, paymentDataRequest))
+        assertThatThrownBy(() -> reservationCommandService.acceptReservation(999L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 예약입니다.");
     }
@@ -156,10 +158,7 @@ class ReservationCommandServiceTest {
 
     @Test
     void 이미_예약된_시간은_확정할_수_없다() {
-        PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                "dummy", "dummy", BigDecimal.valueOf(1000)
-        );
-        assertThatThrownBy(() -> reservationCommandService.acceptReservation(1L, paymentDataRequest))
+        assertThatThrownBy(() -> reservationCommandService.acceptReservation(1L))
                 .isInstanceOf(roomescape.common.exception.impl.ConflictException.class)
                 .hasMessage("이미 예약 확정된 건이 있습니다.");
     }
