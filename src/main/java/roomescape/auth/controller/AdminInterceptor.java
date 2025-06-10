@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import roomescape.auth.annotation.RequiredAdmin;
 import roomescape.auth.service.JwtTokenHandler;
-import roomescape.common.exception.AuthenticationException;
+import roomescape.common.exception.business.AuthenticationException;
 import roomescape.member.domain.Role;
 
 @Component

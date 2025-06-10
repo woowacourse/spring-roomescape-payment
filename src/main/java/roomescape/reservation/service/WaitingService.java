@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;

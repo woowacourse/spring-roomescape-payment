@@ -23,8 +23,8 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
 
 import roomescape.auth.dto.LoginMember;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.MemberResponse;

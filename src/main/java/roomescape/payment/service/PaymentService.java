@@ -17,9 +17,9 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.PaymentBadRequestException;
-import roomescape.common.exception.PaymentServerException;
+import roomescape.common.exception.business.EntityNotFoundException;
+import roomescape.common.exception.business.PaymentBadRequestException;
+import roomescape.common.exception.business.PaymentServerException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.TossPaymentErrorResponse;

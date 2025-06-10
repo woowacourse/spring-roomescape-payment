@@ -11,11 +11,7 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.AuthenticationException;
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.LoginFailException;
-import roomescape.common.exception.PaymentBadRequestException;
+import roomescape.common.exception.business.BusinessException;
 
 @Slf4j
 @Aspect
@@ -45,12 +41,8 @@ public class LoggingAspect {
     }
 
     private boolean isExpectedException(final Throwable throwable) {
-        return throwable instanceof IllegalArgumentException
-               || throwable instanceof PaymentBadRequestException
-               || throwable instanceof EntityNotFoundException
-               || throwable instanceof AlreadyInUseException
-               || throwable instanceof LoginFailException
-               || throwable instanceof AuthenticationException;
+        return throwable instanceof IllegalArgumentException ||
+               throwable instanceof BusinessException;
     }
 
     @Around("execution(* roomescape.payment.service.PaymentService.confirm(..))")

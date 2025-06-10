@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
