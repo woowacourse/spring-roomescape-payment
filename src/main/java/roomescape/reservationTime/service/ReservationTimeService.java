@@ -1,6 +1,8 @@
 package roomescape.reservationTime.service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.InvalidReservationException;
@@ -16,6 +18,7 @@ import roomescape.reservationTime.dto.response.TimeConditionResponse;
 @Service
 public class ReservationTimeService {
 
+    private static final Logger log = LoggerFactory.getLogger(ReservationTimeService.class);
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
 
@@ -30,14 +33,17 @@ public class ReservationTimeService {
         ReservationTime reservationTime = ReservationTime.createWithoutId(request.startAt());
         ReservationTime save = reservationTimeRepository.save(reservationTime);
 
+        log.info("예약 시간 생성 완료 - id: {}, startAt: {}", save.getId(), save.getStartAt());
         return ReservationTimeResponse.from(save);
     }
 
     @Transactional
     public void deleteReservationTimeById(final Long id) {
         if (reservationRepository.existsByTimeId(id)) {
+            log.error("예약 시간 삭제 실패 - 사용 중인 예약 시간 id: {}", id);
             throw new InvalidReservationException("삭제할 수 없는 예약 시간입니다.");
         }
+        log.info("예약 시간 삭제 완료 - id: {}", id);
         reservationTimeRepository.deleteById(id);
     }
 

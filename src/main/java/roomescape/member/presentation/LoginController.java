@@ -1,5 +1,6 @@
 package roomescape.member.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인 API")
     public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         String token = loginService.loginAndReturnToken(request);
         tokenCookieManager.addTokenCookie(response, token);
@@ -32,11 +34,13 @@ public class LoginController {
     }
 
     @GetMapping("/login/check")
+    @Operation(summary = "로그인 확인 API")
     public ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember member) {
         return ResponseEntity.ok().body(new LoginCheckResponse(member.name()));
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃 API")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         tokenCookieManager.deleteTokenCookie(response);
         return ResponseEntity.ok().build();

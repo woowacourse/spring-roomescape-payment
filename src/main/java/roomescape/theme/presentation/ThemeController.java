@@ -1,5 +1,6 @@
 package roomescape.theme.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -29,24 +30,28 @@ public class ThemeController {
     }
 
     @GetMapping
+    @Operation(summary = "테마 조회 API")
     public ResponseEntity<List<ThemeResponse>> getThemes() {
         List<ThemeResponse> responses = themeService.getThemes();
         return ResponseEntity.ok().body(responses);
     }
 
     @GetMapping("/popular")
+    @Operation(summary = "인기 테마 조회 API")
     public ResponseEntity<List<PopularThemeResponse>> getPopularThemes() {
         List<PopularThemeResponse> responses = themeService.getPopularThemes();
         return ResponseEntity.ok().body(responses);
     }
 
     @PostMapping
+    @Operation(summary = "테마 추가 API")
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeRequest request) {
         ThemeResponse theme = themeService.createTheme(request);
         return ResponseEntity.created(URI.create(THEME_BASE_URL + SLASH + theme.id())).body(theme);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "테마 삭제 API")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final Long id) {
         themeService.deleteThemeById(id);
         return ResponseEntity.noContent().build();

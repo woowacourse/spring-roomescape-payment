@@ -3,30 +3,36 @@ package roomescape.reservation.dto.response;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 
-public record MyReservationResponse(
+public record MyReservationWithPaymentResponse(
         Long id,
         String theme,
         String date,
         String time,
-        String status
+        String status,
+        String paymentKey,
+        String amount
 ) {
-    public static MyReservationResponse from(Reservation reservation) {
-        return new MyReservationResponse(
+    public static MyReservationWithPaymentResponse from(Reservation reservation) {
+        return new MyReservationWithPaymentResponse(
                 reservation.getId(),
                 reservation.getThemeName(),
                 reservation.getDate().toString(),
                 reservation.getReservationTime().toString(),
-                "예약"
+                "예약",
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount().toString()
         );
     }
 
-    public static MyReservationResponse fromWaiting(Waiting waiting, long rank) {
-        return new MyReservationResponse(
+    public static MyReservationWithPaymentResponse fromWaiting(Waiting waiting, long rank) {
+        return new MyReservationWithPaymentResponse(
                 waiting.getId(),
                 waiting.getTheme().getName(),
                 waiting.getDate().toString(),
                 waiting.getTime().getStartAt().toString(),
-                String.valueOf(rank)
+                String.valueOf(rank),
+                "",
+                ""
         );
     }
 }

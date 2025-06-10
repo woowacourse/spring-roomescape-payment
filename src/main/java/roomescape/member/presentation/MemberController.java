@@ -2,6 +2,7 @@ package roomescape.member.presentation;
 
 import static roomescape.member.presentation.MemberController.RESERVATION_BASE_URL;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class MemberController {
     }
 
     @PostMapping
+    @Operation(summary = "회원가입 API")
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         SignupResponse response = memberService.createUser(request);
         URI uri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
@@ -36,6 +38,7 @@ public class MemberController {
     }
 
     @GetMapping
+    @Operation(summary = "전체 회원 조회 API")
     public ResponseEntity<List<MemberResponse>> findAllMembers() {
         return ResponseEntity.ok().body(memberService.findAllMember());
     }

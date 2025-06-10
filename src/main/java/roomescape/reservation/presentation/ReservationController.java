@@ -2,6 +2,7 @@ package roomescape.reservation.presentation;
 
 import static roomescape.reservation.presentation.ReservationController.RESERVATION_BASE_URL;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
@@ -21,7 +22,7 @@ import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 import roomescape.reservation.service.ReservationPaymentFacade;
@@ -43,6 +44,7 @@ public class ReservationController {
     }
 
     @GetMapping
+    @Operation(summary = "전체 예약 조회 API")
     public ResponseEntity<List<ReservationResponse>> getReservations(
             @ModelAttribute ReservationConditionRequest request) {
         List<ReservationResponse> response = reservationService.getReservations(request);
@@ -50,6 +52,7 @@ public class ReservationController {
     }
 
     @PostMapping
+    @Operation(summary = "예약 추가 API")
     public ResponseEntity<ReservationWithPaymentResponse> createReservation(
             @RequestBody final ReservationWithPaymentRequest request,
             @Login final LoginMember loginMember
@@ -62,6 +65,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 삭제 API")
     public ResponseEntity<Void> deleteReservationById(@PathVariable("id") final Long id) {
         reservationService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
@@ -76,8 +80,9 @@ public class ReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {
-        List<MyReservationResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
-        return ResponseEntity.ok().body(myReservationResponses);
+    @Operation(summary = "본인 예약 조회 API")
+    public ResponseEntity<List<MyReservationWithPaymentResponse>> getMyReservations(@Login LoginMember loginMember) {
+        List<MyReservationWithPaymentResponse> myReservationWithPaymentResponse = reservationService.getMyReservations(loginMember.id());
+        return ResponseEntity.ok().body(myReservationWithPaymentResponse);
     }
 }

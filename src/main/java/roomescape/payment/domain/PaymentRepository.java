@@ -8,7 +8,5 @@ public interface PaymentRepository {
 
     Optional<Payment> findById(long id);
 
-    Optional<Payment> findByReservationId(long id);
-
     List<Payment> findAll();
 }

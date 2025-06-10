@@ -3,6 +3,7 @@ package roomescape.admin.presentation;
 import static roomescape.admin.presentation.AdminController.ADMIN_BASE_URL;
 import static roomescape.member.presentation.MemberController.RESERVATION_BASE_URL;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class AdminController {
     }
 
     @PostMapping("/reservations")
+    @Operation(summary = "관리자 예약 추가 API")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request) {
         ReservationResponse response = adminReservationService.createReservation(request.getReservationRequest(), request.memberId());
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());

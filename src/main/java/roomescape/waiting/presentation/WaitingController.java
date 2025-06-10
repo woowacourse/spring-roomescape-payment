@@ -1,5 +1,6 @@
 package roomescape.waiting.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class WaitingController {
     }
 
     @PostMapping("/waitings")
+    @Operation(summary = "예약 대기 추가 API")
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody final WaitingRequest request,
             @Login final LoginMember loginMember
@@ -35,12 +37,14 @@ public class WaitingController {
     }
 
     @GetMapping("/waitings")
+    @Operation(summary = "예약 대기 조회 API")
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
-        List<WaitingResponse> waitings = waitingService.getAllWaitings();
+        List<WaitingResponse> waitings = waitingService.getAllWaiting();
         return ResponseEntity.ok(waitings);
     }
 
     @DeleteMapping("/waitings/{id}")
+    @Operation(summary = "예약 대기 삭제 API")
     public ResponseEntity<Void> cancelWaiting(@PathVariable Long id) {
         waitingService.cancelWaiting(id);
         return ResponseEntity.noContent().build();

@@ -62,7 +62,8 @@ class ReservationTimeServiceMockTest {
                                         LocalDateTime.of(2025, 9, 25, 10, 0),
                                         member1, localDate,
                                         ReservationTime.createWithoutId(LocalTime.of(10, 0)),
-                                        Theme.createWithoutId("a", "a", "a"))
+                                        Theme.createWithoutId("a", "a", "a"),
+                                        null)
                         )
                 );
         Mockito.when(reservationTimeRepository.findAll())

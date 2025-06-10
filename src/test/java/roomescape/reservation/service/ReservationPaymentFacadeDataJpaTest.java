@@ -157,7 +157,7 @@ public class ReservationPaymentFacadeDataJpaTest {
                 .thenReturn(ResponseEntity.status(400).body(TOSS_PAYMENT_400_ERROR_RESPONSE));
         doThrow(new PaymentException(HttpStatus.BAD_REQUEST, "결제 실패"))
                 .when(mockTossPaymentClient)
-                .handleTosPamentException(any(ResponseEntity.class));
+                .handleTosPaymentException(any(ResponseEntity.class));
 
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
                 LocalDate.now().plusDays(1),
@@ -188,7 +188,7 @@ public class ReservationPaymentFacadeDataJpaTest {
                 .thenReturn(ResponseEntity.status(500).body(TOSS_PAYMENT_500_ERROR_RESPONSE));
         doThrow(new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"))
                 .when(mockTossPaymentClient)
-                .handleTosPamentException(any(ResponseEntity.class));
+                .handleTosPaymentException(any(ResponseEntity.class));
 
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
                 LocalDate.now().plusDays(1),

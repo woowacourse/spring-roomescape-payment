@@ -21,24 +21,44 @@ VALUES ('율무', 'ind07162@naver.com', 'asd', 'USER');
 INSERT INTO member (name, email, password, role)
 VALUES ('ADMIN', 'admin@naver.com', '1234', 'ADMIN');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2026-04-28', 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2026-05-28', 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2026-05-29', 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, '2026-05-28', 2, 2);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2026-04-28', 2, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, '2026-04-26', 1, 3);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, '2026-04-18', 1, 2);
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('MC4wNDYzMzA0OTc2MDgy', 'paymentKey1', 1000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('SS4yMTYyNjMxNjY3MjAw', 'paymentKey2', 2000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('Mi4zNzE1NjE1NDEyMDA1', 'paymentKey3', 30000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('Ny4wOTk2Nzk0Nzc5MzI1', 'paymentKey4', 50000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('OC40NjM0NzI3MzUwNDM0', 'paymentKey5', 7000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('FS41MzI1NzM2NDk1ODk5', 'paymentKey6', 9000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('PC44MjY4MjA0NDY0NzI5', 'paymentKey7', 100000, 'DONE');
+INSERT INTO payment (order_id, payment_key, amount, status)
+VALUES ('By42NzQzMTg2NzkzNTI3', 'paymentKey8', 500, 'CANCELED');
+
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (1, '2026-12-25', 1, 1, 1);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (1, '2026-12-26', 1, 1, 2);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (1, '2026-12-27', 1, 1, 3);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (1, '2026-12-27', 2, 1, 4);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (2, '2026-12-01', 1, 1, 5);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (2, '2026-12-02', 1, 3, 6);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (2, '2026-12-03', 1, 2, 8);
 
 INSERT INTO waiting (member_id, date, time_id, theme_id, created_at)
-VALUES (2, '2026-05-28', 1, 1, CURRENT_TIMESTAMP);
+VALUES (1, '2026-12-01', 1, 1, CURRENT_TIMESTAMP);
 INSERT INTO waiting (member_id, date, time_id, theme_id, created_at)
-VALUES (2, '2026-05-29', 1, 1, CURRENT_TIMESTAMP);
+VALUES (2, '2026-12-25', 1, 1, CURRENT_TIMESTAMP);
 INSERT INTO waiting (member_id, date, time_id, theme_id, created_at)
-VALUES (3, '2026-05-28', 1, 1, CURRENT_TIMESTAMP);
+VALUES (2, '2026-12-26', 1, 1, CURRENT_TIMESTAMP);
+INSERT INTO waiting (member_id, date, time_id, theme_id, created_at)
+VALUES (3, '2026-12-25', 1, 1, CURRENT_TIMESTAMP);
+
