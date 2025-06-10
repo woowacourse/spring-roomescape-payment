@@ -33,8 +33,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.38'
+    implementation 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

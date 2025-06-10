@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
-import roomescape.auth.exception.ForbiddenException;
-import roomescape.auth.exception.UnauthorizedException;
 import roomescape.common.dto.response.ErrorResponse;
+import roomescape.exception.auth.ForbiddenException;
+import roomescape.exception.auth.UnauthorizedException;
 
 @Slf4j
 @RestControllerAdvice

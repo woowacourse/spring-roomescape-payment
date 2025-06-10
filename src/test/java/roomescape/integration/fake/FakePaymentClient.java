@@ -4,9 +4,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.infrastructure.dto.request.TossPaymentRequest;
-import roomescape.payment.infrastructure.dto.response.TossPaymentResponse;
+import roomescape.domain.payment.PaymentClient;
+import roomescape.infrastructure.payment.toss.dto.request.TossPaymentRequest;
+import roomescape.infrastructure.payment.toss.dto.response.TossPaymentResponse;
 
 @Component
 @Profile("test")

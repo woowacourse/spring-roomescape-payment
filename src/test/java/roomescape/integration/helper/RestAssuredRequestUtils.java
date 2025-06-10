@@ -5,13 +5,13 @@ import io.restassured.filter.Filter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.util.Map;
 
 public class RestAssuredRequestUtils {
 
     // === 기본 요청 ===
     public static Response sendGet(String uri, RequestSpecification spec) {
-        return RestAssured.given(spec).log().all().when().get(uri);
+        return RestAssured.given(spec).log().all()
+                .when().get(uri);
     }
 
     public static Response sendPost(String uri, Object body, RequestSpecification spec) {
@@ -22,15 +22,18 @@ public class RestAssuredRequestUtils {
     }
 
     public static Response sendDelete(String uri, RequestSpecification spec, Object... pathParams) {
-        return RestAssured.given(spec).log().all().when().delete(uri, pathParams);
+        return RestAssured.given(spec).log().all()
+                .when().delete(uri, pathParams);
     }
 
     // === 인증 토큰 포함 요청 ===
-    public static Response getWithToken(String uri, RequestSpecification spec, String token) {
-        return RestAssured.given(spec).log().all().cookie("token", token).when().get(uri);
+    public static Response sendGetWithToken(String uri, RequestSpecification spec, String token) {
+        return RestAssured.given(spec).log().all()
+                .cookie("token", token)
+                .when().get(uri);
     }
 
-    public static Response postWithToken(String uri, Object body, RequestSpecification spec, String token) {
+    public static Response sendPostWithToken(String uri, Object body, RequestSpecification spec, String token) {
         return RestAssured.given(spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
@@ -38,18 +41,20 @@ public class RestAssuredRequestUtils {
                 .when().post(uri);
     }
 
-    public static Response deleteWithToken(String uri, RequestSpecification spec, String token, Object... pathParams) {
+    public static Response sendDeleteWithToken(String uri, RequestSpecification spec, String token, Object... pathParams) {
         return RestAssured.given(spec).log().all()
                 .cookie("token", token)
                 .when().delete(uri, pathParams);
     }
 
     // === 필터 포함 요청 ===
-    public static Response getWithFilter(String uri, RequestSpecification spec, Filter filter) {
-        return RestAssured.given(spec).log().all().filters(filter).when().get(uri);
+    public static Response sendGetWithFilter(String uri, RequestSpecification spec, Filter filter) {
+        return RestAssured.given(spec).log().all()
+                .filters(filter)
+                .when().get(uri);
     }
 
-    public static Response postWithFilter(String uri, Object body, RequestSpecification spec, Filter filter) {
+    public static Response sendPostWithFilter(String uri, Object body, RequestSpecification spec, Filter filter) {
         return RestAssured.given(spec).log().all()
                 .filters(filter)
                 .contentType(ContentType.JSON)
@@ -57,14 +62,7 @@ public class RestAssuredRequestUtils {
                 .when().post(uri);
     }
 
-    public static Response deleteWithFilter(String uri, RequestSpecification spec, Filter filter) {
-        return RestAssured.given(spec).log().all()
-                .filters(filter)
-                .contentType(ContentType.JSON)
-                .when().delete(uri);
-    }
-
-    public static Response deleteWithFilter(String uri, RequestSpecification spec, Filter filter, Object... pathParams) {
+    public static Response sendDeleteWithFilter(String uri, RequestSpecification spec, Filter filter, Object... pathParams) {
         return RestAssured.given(spec).log().all()
                 .filters(filter)
                 .contentType(ContentType.JSON)
@@ -72,22 +70,14 @@ public class RestAssuredRequestUtils {
     }
 
     // === 필터 + 토큰 포함 요청 ===
-    public static Response getWithFilterAndToken(String uri, RequestSpecification spec, String token, Filter filter) {
+    public static Response sendGetWithTokenAndFilter(String uri, RequestSpecification spec, String token, Filter filter) {
         return RestAssured.given(spec).log().all()
                 .filters(filter)
                 .cookie("token", token)
                 .when().get(uri);
     }
 
-    public static Response getWithFilterAndToken(String uri, RequestSpecification spec, String token, Filter filter, Map<String, Object> queryParams) {
-        return RestAssured.given(spec).log().all()
-                .filters(filter)
-                .cookie("token", token)
-                .queryParams(queryParams)
-                .when().get(uri);
-    }
-
-    public static Response postWithFilterAndToken(String uri, Object body, RequestSpecification spec, String token, Filter filter) {
+    public static Response sendPostWithTokenAndFilter(String uri, Object body, RequestSpecification spec, String token, Filter filter) {
         return RestAssured.given(spec).log().all()
                 .filters(filter)
                 .contentType(ContentType.JSON)
@@ -96,18 +86,10 @@ public class RestAssuredRequestUtils {
                 .when().post(uri);
     }
 
-    public static Response deleteWithFilterAndToken(String uri, RequestSpecification spec, String token, Filter filter) {
+    public static Response sendDeleteWithTokenAndFilter(String uri, RequestSpecification spec, String token, Filter filter, Object... pathParams) {
         return RestAssured.given(spec).log().all()
                 .cookie("token", token)
                 .filters(filter)
-                .when().delete(uri);
-    }
-
-    public static Response deleteWithFilterAndToken(String uri, RequestSpecification spec, String token, Filter filter,  Map<String, Object> queryParams) {
-        return RestAssured.given(spec).log().all()
-                .cookie("token", token)
-                .filters(filter)
-                .queryParams(queryParams)
-                .when().delete(uri);
+                .when().delete(uri, pathParams);
     }
 }

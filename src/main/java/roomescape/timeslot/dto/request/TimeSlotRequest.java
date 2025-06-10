@@ -1,9 +1,0 @@
-package roomescape.timeslot.dto.request;
-
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalTime;
-
-public record TimeSlotRequest(
-        @NotNull(message = "예약 시간은 필수입니다.") LocalTime startAt
-) {
-}
