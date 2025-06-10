@@ -16,7 +16,7 @@ public class TossPaymentConfig {
     @Bean
     public RestClient tossPaymentRestClient() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(30));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofSeconds(60));
 
         return RestClient.builder()
