@@ -13,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -29,19 +27,6 @@ import roomescape.presentation.dto.request.PaymentAndReservationRequest;
 import roomescape.presentation.dto.response.PaymentResponse;
 
 public class PaymentApiControllerTest extends ControllerTest {
-
-    private static long startTime;
-
-    @BeforeAll
-    static void startTimer() {
-        startTime = System.currentTimeMillis();
-    }
-
-    @AfterAll
-    static void endTimer() {
-        long endTime = System.currentTimeMillis();
-        System.out.println("🕖전체 테스트 실행 시간 = " + (endTime - startTime) + "ms");
-    }
 
     @Test
     void 결제_생성에_성공한다() throws Exception {
