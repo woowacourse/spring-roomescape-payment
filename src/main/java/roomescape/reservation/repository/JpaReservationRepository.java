@@ -70,8 +70,5 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
             @Param("themeId") Long themeId
     );
 
-    @Query("""
-            
-            """)
     List<Reservation> findByMemberId(Long memberId);
 }
