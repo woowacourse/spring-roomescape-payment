@@ -6,13 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
@@ -23,6 +21,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -52,6 +51,9 @@ class ReservationServiceIntegrationTest extends BaseTest {
     @Autowired
     private PaymentClient paymentClient;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private Member member;
     private Theme theme;
     private ReservationTime time;
@@ -62,13 +64,13 @@ class ReservationServiceIntegrationTest extends BaseTest {
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(clock, paymentClient, reservationRepository,
-                reservationTimeRepository, themeRepository, memberRepository);
+                reservationTimeRepository, themeRepository, memberRepository, paymentRepository);
         member = memberRepository.save(Member.withDefaultRole("홍길동", "hong@example.com", "password"));
         theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
-        paymentKey = null;
-        orderId = null;
-        amount = null;
+        paymentKey = "test_payment_key";
+        orderId = "test_order_id";
+        amount = 10000L;
     }
 
     @Test

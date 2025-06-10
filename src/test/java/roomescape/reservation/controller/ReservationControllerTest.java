@@ -5,12 +5,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.BaseTest;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -45,15 +44,14 @@ class ReservationControllerTest extends BaseTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -62,6 +60,7 @@ class ReservationControllerTest extends BaseTest {
     private Theme theme;
     private ReservationTime time;
     private String token;
+    private Payment payment;
 
     @BeforeEach
     void setUp() {
@@ -69,20 +68,20 @@ class ReservationControllerTest extends BaseTest {
         theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
         token = jwtTokenProvider.createToken(Jwts.claims().subject(member.getId().toString()).build());
+        payment = paymentRepository.save(Payment.from("test_order_id_1", "test_payment_key_1", 1000L));
     }
 
     @Test
     void 예약_생성_성공() throws Exception {
         // given
-        LocalDate date = LocalDate.now().plusDays(1);
-
         Map<String, String> params = new HashMap<>();
+        LocalDate date = LocalDate.now().plusDays(1);
         params.put("date", date.toString());
         params.put("timeId", "1");
         params.put("themeId", "1");
-        params.put("paymentKey", "aaa");
-        params.put("orderId", "aaa");
-        params.put("amount", "1000");
+        params.put("paymentKey", payment.getPaymentKey());
+        params.put("orderId", payment.getOrderId());
+        params.put("amount", payment.getAmount().toString());
         String content = new ObjectMapper().writeValueAsString(params);
 
         // when & then
@@ -102,7 +101,8 @@ class ReservationControllerTest extends BaseTest {
                 time,
                 theme,
                 member,
-                currentDateTime
+                currentDateTime,
+                payment
         );
         reservationRepository.save(reservation);
 
@@ -121,7 +121,8 @@ class ReservationControllerTest extends BaseTest {
                 time,
                 theme,
                 member,
-                currentDateTime
+                currentDateTime,
+                payment
         );
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -155,11 +156,15 @@ class ReservationControllerTest extends BaseTest {
     @Test
     void 예약_시간_검증_실패() throws Exception {
         // given
+        Map<String, String> params = new HashMap<>();
         LocalDate date = LocalDate.now().minusDays(1);
-        String content = String.format("{\"date\": \"%s\",\"timeId\": %d,\"themeId\": %d,\"isWaiting\": false}",
-                date.toString(),
-                time.getId(),
-                theme.getId());
+        params.put("date", date.toString());
+        params.put("timeId", "1");
+        params.put("themeId", "1");
+        params.put("orderId", payment.getOrderId());
+        params.put("paymentKey", payment.getPaymentKey());
+        params.put("amount", payment.getAmount().toString());
+        String content = new ObjectMapper().writeValueAsString(params);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -172,15 +177,14 @@ class ReservationControllerTest extends BaseTest {
     @Test
     void 인증_실패() throws Exception {
         // given
-        LocalDate date = LocalDate.now().plusDays(1);
-
         Map<String, String> params = new HashMap<>();
+        LocalDate date = LocalDate.now().plusDays(1);
         params.put("date", date.toString());
         params.put("timeId", "1");
         params.put("themeId", "1");
-        params.put("paymentKey", "aaa");
-        params.put("orderId", "aaa");
-        params.put("amount", "1000");
+        params.put("orderId", payment.getOrderId());
+        params.put("paymentKey", payment.getPaymentKey());
+        params.put("amount", payment.getAmount().toString());
         String content = new ObjectMapper().writeValueAsString(params);
 
         // when & then

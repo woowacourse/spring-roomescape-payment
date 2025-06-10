@@ -1,5 +1,6 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "회원 조회 API")
     @GetMapping
     public List<MemberResponse> findAllMember() {
         return memberService.findAllMember();
     }
 
+    @Operation(summary = "회원 가입 API")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void signup(@RequestBody @Valid MemberRequest request) {

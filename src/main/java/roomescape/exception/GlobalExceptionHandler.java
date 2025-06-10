@@ -1,5 +1,6 @@
 package roomescape.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import lombok.extern.slf4j.Slf4j;
-
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -19,6 +18,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handlePaymentClientException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.BAD_REQUEST, e.getMessage(), null,
                 null, request);
+        log.warn("결제 처리 실패: {}", e.getMessage());
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -26,6 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleBadRequestException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.BAD_REQUEST, e.getMessage(), null,
                 null, request);
+        log.debug("잘못된 요청: {}", e.getMessage());
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -33,6 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleNotFoundException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.NOT_FOUND, e.getMessage(), null,
                 null, request);
+        log.debug("리소스를 찾을 수 없음: {}", e.getMessage());
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
@@ -40,7 +42,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleUnauthorizedException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.UNAUTHORIZED, e.getMessage(), null,
                 null, request);
-        log.error(e.getMessage(), e);
+        log.warn("인증 실패: {}", e.getMessage());
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
@@ -48,6 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleForbiddenException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.FORBIDDEN, e.getMessage(), null,
                 null, request);
+        log.warn("접근 권한 없음: {}", e.getMessage());
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
@@ -55,7 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleTokenCreationException(final Exception e, final WebRequest request) {
         final ProblemDetail body = super.createProblemDetail(e, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),
                 null, null, request);
-        log.error("JWT 토큰 생성 실패: " + e.getMessage(), e);
+        log.error("보안 토큰 생성 실패: {}", e.getMessage(), e);
         return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 

@@ -1,8 +1,5 @@
 package roomescape.reservation.domain;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +51,10 @@ public class Reservation {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ReservationStatus reservationStatus;
 
+    @JoinColumn
+    @OneToOne
+    private Payment payment;
+
     @Builder
     private Reservation(
             final Long id,
@@ -59,18 +63,40 @@ public class Reservation {
             @NonNull final Theme theme,
             @NonNull final Member member,
             @NonNull final ReservationStatus reservationStatus,
-            @NonNull final LocalDateTime currentDateTime
+            @NonNull final LocalDateTime currentDateTime,
+            final Payment payment
     ) {
+        validateFutureOrPresent(currentDateTime, date, time);
         this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
         this.reservationStatus = reservationStatus;
-        validateFutureOrPresent(currentDateTime);
+        this.payment = payment;
     }
 
     public static Reservation of(
+            final LocalDate date,
+            final ReservationTime reservationTime,
+            final Theme theme,
+            final Member member,
+            final LocalDateTime currentDateTime,
+            final Payment payment
+    ) {
+        return builder()
+                .id(null)
+                .date(date)
+                .time(reservationTime)
+                .theme(theme)
+                .member(member)
+                .currentDateTime(currentDateTime)
+                .reservationStatus(ReservationStatus.booked())
+                .payment(payment)
+                .build();
+    }
+
+    public static Reservation admin(
             final LocalDate date,
             final ReservationTime reservationTime,
             final Theme theme,
@@ -85,6 +111,7 @@ public class Reservation {
                 .member(member)
                 .currentDateTime(currentDateTime)
                 .reservationStatus(ReservationStatus.booked())
+                .payment(null)
                 .build();
     }
 
@@ -96,18 +123,19 @@ public class Reservation {
             final LocalDateTime currentDateTime,
             final Long rank
     ) {
-            return builder()
-                    .id(null)
-                    .date(date)
-                    .time(reservationTime)
-                    .theme(theme)
-                    .member(member)
-                    .currentDateTime(currentDateTime)
-                    .reservationStatus(ReservationStatus.waiting(rank))
-                    .build();
+        return builder()
+                .id(null)
+                .date(date)
+                .time(reservationTime)
+                .theme(theme)
+                .member(member)
+                .currentDateTime(currentDateTime)
+                .reservationStatus(ReservationStatus.waiting(rank))
+                .payment(null)
+                .build();
     }
 
-    private void validateFutureOrPresent(LocalDateTime currentDateTime) {
+    private void validateFutureOrPresent(LocalDateTime currentDateTime, LocalDate date, ReservationTime time) {
         final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
             throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");
@@ -116,5 +144,17 @@ public class Reservation {
 
     public boolean isBooked() {
         return reservationStatus.getStatus() == Status.BOOKED;
+    }
+
+    public Optional<String> getPaymentOrderId() {
+        return Optional.ofNullable(payment).map(Payment::getOrderId);
+    }
+
+    public Optional<String> getPaymentKey() {
+        return Optional.ofNullable(payment).map(Payment::getPaymentKey);
+    }
+
+    public Optional<Long> getPaymentAmount() {
+        return Optional.ofNullable(payment).map(Payment::getAmount);
     }
 }

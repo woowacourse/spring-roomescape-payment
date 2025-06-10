@@ -20,9 +20,16 @@ VALUES ('WAITING', 1);
 INSERT INTO reservation_status(status, rank)
 VALUES ('WAITING', 2);
 
-INSERT INTO reservation(date, time_id, theme_id, member_id, status_id)
-VALUES ('2025-05-11', 1, 1, 1, 1);
-INSERT INTO reservation(date, time_id, theme_id, member_id, status_id)
-VALUES ('2025-05-11', 1, 1, 1, 2);
-INSERT INTO reservation(date, time_id, theme_id, member_id, status_id)
-VALUES ('2025-05-11', 1, 1, 1, 3);
+INSERT INTO payment(order_id, payment_key, amount)
+VALUES ('ORD-123456A', 'tgen_20250511A01', 1000);
+INSERT INTO payment(order_id, payment_key, amount)
+VALUES ('ORD-123456B', 'tgen_20250511B01', 2000);
+INSERT INTO payment(order_id, payment_key, amount)
+VALUES ('ORD-123456C', 'tgen_20250511C01', 3000);
+
+INSERT INTO reservation(date, time_id, theme_id, member_id, status_id, payment_id)
+VALUES ('2025-06-11', 1, 1, 1, 1, 1);
+INSERT INTO reservation(date, time_id, theme_id, member_id, status_id, payment_id)
+VALUES ('2025-06-11', 1, 1, 1, 2, 2);
+INSERT INTO reservation(date, time_id, theme_id, member_id, status_id, payment_id)
+VALUES ('2025-06-11', 1, 1, 1, 3, 3);

@@ -14,29 +14,30 @@ import roomescape.exception.PaymentClientException;
 @Slf4j
 @Component
 public class PaymentErrorHandler implements ResponseErrorHandler {
-    private static final String ERROR_NOTIFICATION_MESSAGE = "문제가 발생했습니다. 다시 시도해주세요.";
+    private static final String RETRY_NOTICE_ERROR_MESSAGE = "문제가 발생했습니다. 다시 시도해주세요.";
+    private static final String RETRY_THEN_CONTACT_MESSAGE = "문제가 발생했습니다. 다시 시도 후 동일한 문제가 발생 시 관리자에게 문의해주세요.";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
+        return response.getStatusCode().isError();
     }
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         String responseBody = new String(response.getBody().readAllBytes());
         if (responseBody.isBlank()) {
-            log.error("응답 데이터가 비어 있습니다");
-            throw new PaymentClientException(ERROR_NOTIFICATION_MESSAGE);
+            log.warn("응답 데이터가 비어 있습니다");
+            throw new PaymentClientException(RETRY_NOTICE_ERROR_MESSAGE);
         }
         try {
             Response errorResponse = mapper.readValue(responseBody, Response.class);
-            log.error("Toss Payments API 에러: {}", errorResponse.message());
-            throw new PaymentClientException(ERROR_NOTIFICATION_MESSAGE);
+            log.warn("Toss Payments API 에러: {}", errorResponse.code());
+            throw new PaymentClientException(RETRY_THEN_CONTACT_MESSAGE);
         } catch (JsonProcessingException e) {
-            log.error("Json 파싱 에러: {}", responseBody, e);
-            throw new IllegalStateException(ERROR_NOTIFICATION_MESSAGE);
+            log.warn("Json 파싱 에러: {}", responseBody, e);
+            throw new IllegalStateException(RETRY_NOTICE_ERROR_MESSAGE);
         }
     }
 

@@ -59,7 +59,7 @@ class PaymentErrorHandlerTest {
     @Test
     void 예외_응답에서_메시지만_추출하여_던진다() throws IOException {
         // given
-        String message = "문제가 발생했습니다. 다시 시도해주세요.";
+        String message = "문제가 발생했습니다. 다시 시도 후 동일한 문제가 발생 시 관리자에게 문의해주세요.";
         Map<String, String> params = Map.of(
                 "code", "INVALID_REQUEST",
                 "message", message

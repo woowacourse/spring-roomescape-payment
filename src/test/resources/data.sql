@@ -3,6 +3,7 @@ ALTER TABLE reservation ALTER COLUMN id RESTART WITH 1;
 ALTER TABLE reservation_time ALTER COLUMN id RESTART WITH 1;
 ALTER TABLE theme ALTER COLUMN id RESTART WITH 1;
 ALTER TABLE reservation_status ALTER COLUMN id RESTART WITH 1;
+ALTER TABLE payment ALTER COLUMN id RESTART WITH 1;
 
 INSERT INTO reservation_time(start_at)
 VALUES ('10:00');
@@ -24,7 +25,12 @@ VALUES ('BOOKED', null);
 INSERT INTO reservation_status(status, rank)
 VALUES ('BOOKED', null);
 
-INSERT INTO reservation(date, time_id, theme_id, member_id, status_id)
-VALUES ('2999-05-01', 1, 1, 1, 1);
-INSERT INTO reservation(date, time_id, theme_id, member_id, status_id)
-VALUES ('2999-05-01', 2, 2, 2, 2);
+INSERT INTO payment(order_id, payment_key, amount)
+VALUES ('ORD-123456A', 'tgen_29990501A01', 1000);
+INSERT INTO payment(order_id, payment_key, amount)
+VALUES ('ORD-123456B', 'tgen_29990502B01', 2000);
+
+INSERT INTO reservation(date, time_id, theme_id, member_id, status_id, payment_id)
+VALUES ('2999-05-01', 1, 1, 1, 1, 1);
+INSERT INTO reservation(date, time_id, theme_id, member_id, status_id, payment_id)
+VALUES ('2999-05-02', 2, 2, 2, 2, 2);

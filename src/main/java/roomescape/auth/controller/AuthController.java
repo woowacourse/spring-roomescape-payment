@@ -1,5 +1,6 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AuthController {
     private final AuthService authService;
     private final CookieManager cookieManager;
 
+    @Operation(summary = "로그인 API")
     @PostMapping("/login")
     public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse response) {
         log.debug("로그인 시작");
@@ -43,6 +45,7 @@ public class AuthController {
         log.debug("로그인 성공");
     }
 
+    @Operation(summary = "로그아웃 API")
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(final HttpServletResponse response) {
@@ -50,6 +53,7 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
+    @Operation(summary = "로그인 확인 API")
     @GetMapping("/login/check")
     public LoginCheckResponse checkLogin(@CookieValue(name = COOKIE_TOKEN, required = false) String token) {
         if (token == null || token.isBlank()) {
