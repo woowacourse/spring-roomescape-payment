@@ -87,7 +87,7 @@ public class ReservationFacadeService {
         Reservation reservation = reservationCreatorService.createReservation(request.reservation(), memberId);
         paymentService.createPaymentWithRequest(reservation, request.payment());
         PaymentResponse paymentResponse = paymentApiClient.authPayment(request.payment());
-        paymentService.updatePaymentWithConfirm(paymentResponse, reservation);
+        paymentService.updatePaymentWithConfirm(paymentResponse);
         return ReservationResponse.of(reservation);
     }
 

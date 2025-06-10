@@ -20,7 +20,7 @@ public class PaymentService {
 
 
     @Transactional
-    public void updatePaymentWithConfirm(final PaymentResponse response, final Reservation reservation) {
+    public void updatePaymentWithConfirm(final PaymentResponse response) {
         Payment payment = paymentRepository.findByPaymentKey(response.paymentKey())
                 .orElseThrow(() -> new PaymentNotFoundException("요청한 paymentKey에 해당하는 결제가 없습니다."));
         payment.confirm(response.status(), response.requestedAt());
