@@ -36,14 +36,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(checkRoleHandlerInterceptor).addPathPatterns("/**")
                 .excludePathPatterns("/admin/**");
     }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8080", "http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
 }
