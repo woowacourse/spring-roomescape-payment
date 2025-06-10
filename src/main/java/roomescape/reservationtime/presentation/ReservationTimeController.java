@@ -75,8 +75,8 @@ public class ReservationTimeController {
     )
     @GetMapping("/times/available")
     public ResponseEntity<List<AvailableReservationTimeWebResponse>> findAvailable(
-            @RequestParam("date") LocalDate date,
-            @RequestParam("themeId") Long themeId
+            @RequestParam("date") @Schema(description = "예약시간을 조회할 날짜") LocalDate date,
+            @RequestParam("themeId") @Schema(description = "예약시간을 조회할 테마의 id") Long themeId
     ) {
         return ResponseEntity.ok(reservationTimeApplicationService.findAvailable(date, themeId));
     }
@@ -91,7 +91,7 @@ public class ReservationTimeController {
     @RequireRole(MemberRole.ADMIN)
     @DeleteMapping("/admin/times/{id}")
     public ResponseEntity<Void> remove(
-            @PathVariable("id") Long id
+            @PathVariable("id") @Schema(description = "삭제할 예약시간의 id") Long id
     ) {
         reservationTimeApplicationService.removeById(id);
         return ResponseEntity.noContent().build();

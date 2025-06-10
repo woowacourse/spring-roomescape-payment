@@ -29,7 +29,6 @@ import roomescape.reservation.application.dto.request.WaitingConfirmRequest;
 import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.presentation.dto.request.WaitingConfirmWebRequest;
 import roomescape.reservation.presentation.dto.request.WaitingReservationCreateWebRequest;
-import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -91,7 +90,7 @@ public class WaitingReservationController {
     @RequireRole(MemberRole.REGULAR)
     @DeleteMapping("/waiting-reservations/{reservationSlotId}")
     public ResponseEntity<Void> cancel(
-            @PathVariable Long reservationSlotId,
+            @PathVariable @Schema(description = "예약 대기를 취소할 예약슬롯의 id") Long reservationSlotId,
             @Parameter(hidden = true) MemberInfo memberInfo
     ) {
         waitingReservationApplicationService.cancelByReservationSlotIdAndMemberId(reservationSlotId, memberInfo.id());
@@ -109,7 +108,7 @@ public class WaitingReservationController {
     @RequireRole(MemberRole.ADMIN)
     @DeleteMapping("/admin/waiting-reservations/{waitingId}")
     public ResponseEntity<Void> cancel(
-            @PathVariable Long waitingId
+            @PathVariable @Schema(description = "예약 대기를 취소할 예약의 id") Long waitingId
     ) {
         waitingReservationApplicationService.cancel(waitingId);
         return ResponseEntity.noContent().build();

@@ -55,10 +55,10 @@ public class ConfirmedReservationController {
     @RequireRole(MemberRole.ADMIN)
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ConfirmedReservationWebResponse>> findByCriteria(
-            @RequestParam(required = false) Long themeId,
-            @RequestParam(required = false) Long memberId,
-            @RequestParam(required = false) LocalDate dateFrom,
-            @RequestParam(required = false) LocalDate dateTo
+            @RequestParam(required = false)  @Schema(description = "조회 조건으로 넣을 테마의 id") Long themeId,
+            @RequestParam(required = false)  @Schema(description = "조회 조건으로 넣을 멤버의 id") Long memberId,
+            @RequestParam(required = false)  @Schema(description = "조회 조건으로 넣을 날짜의 시작일") LocalDate dateFrom,
+            @RequestParam(required = false)  @Schema(description = "조회 조건으로 넣을 날짜의 마지막일") LocalDate dateTo
     ) {
         List<ConfirmedReservationWebResponse> reservations = confirmedReservationApplicationService.findByCriteria(
                 new ConfirmedReservationByCriteriaWebRequest(themeId, memberId, dateFrom, dateTo));
@@ -75,7 +75,7 @@ public class ConfirmedReservationController {
     @RequireRole(MemberRole.ADMIN)
     @DeleteMapping("/admin/reservations/{reservationId}")
     public ResponseEntity<Void> cancel(
-            @PathVariable("reservationId") Long reservationId
+            @PathVariable("reservationId") @Schema(description = "취소할 예약의 id") Long reservationId
     ) {
         confirmedReservationApplicationService.cancel(reservationId);
         return ResponseEntity.noContent().build();

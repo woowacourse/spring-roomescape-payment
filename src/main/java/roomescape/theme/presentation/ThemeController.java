@@ -87,7 +87,7 @@ public class ThemeController {
     @RequireRole(MemberRole.ADMIN)
     @DeleteMapping("/admin/themes/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable("id") Long id
+            @PathVariable("id") @Schema(description = "삭제할 테마의 id") Long id
     ) {
         themeApplicationService.delete(id);
         return ResponseEntity.noContent().build();

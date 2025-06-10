@@ -1,14 +1,14 @@
 package roomescape.reservation.presentation.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
 public record WaitingReservationCreateWebRequest (
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    LocalDate date,
-    Long timeId,
-    Long themeId
+    @JsonFormat(pattern = "yyyy-MM-dd") @Schema(description = "예약 대기할 날짜") LocalDate date,
+    @Schema(description = "예약 대기할 예약시간의 id") Long timeId,
+    @Schema(description = "예약 대기할 테마의 id") Long themeId
 ) {
     public WaitingReservationCreateWebRequest {
             if (date == null) {
