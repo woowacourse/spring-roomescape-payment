@@ -7,11 +7,13 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginRequest;
@@ -22,6 +24,9 @@ import roomescape.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ReservationControllerTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -41,6 +46,15 @@ class ReservationControllerTest {
     class ReservationDeleteTest {
 
         String loginToken;
+
+        @BeforeEach
+        void setUp() {
+            jdbcTemplate.execute("""
+                    SET REFERENTIAL_INTEGRITY FALSE;
+                    TRUNCATE TABLE member RESTART IDENTITY;
+                    SET REFERENTIAL_INTEGRITY TRUE;
+                    """);
+        }
 
         @DisplayName("예약을 삭제할 수 있다")
         @Test

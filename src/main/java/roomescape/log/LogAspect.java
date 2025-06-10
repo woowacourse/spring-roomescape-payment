@@ -3,7 +3,6 @@ package roomescape.log;
 import java.util.Arrays;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -32,11 +31,5 @@ public class LogAspect {
     public void logAfter(JoinPoint joinPoint, Object result) {
         String methodName = joinPoint.getSignature().getName();
         log.debug("[RESPONSE] {}() - {}", methodName, result);
-    }
-
-    @AfterThrowing(pointcut = "publicMethodsFromApiPackage()", throwing = "exception")
-    public void logException(JoinPoint joinPoint, Throwable exception) {
-        String methodName = joinPoint.getSignature().getName();
-        log.error("[ERROR] {}() - {}", methodName, exception.getMessage());
     }
 }
