@@ -23,19 +23,23 @@ public class TossPaymentConfig {
     private final ObjectMapper objectMapper;
     private final String token;
     private final int connectTimeoutMs;
+    private final int readTimeoutMs;
 
     public TossPaymentConfig(ObjectMapper objectMapper,
                              @Value("${toss.payment.token}") String token,
-                             @Value("${toss.payment.connection-timeout}") int connectTimeoutMs) {
+                             @Value("${toss.payment.connection-timeout}") int connectTimeoutMs,
+                             @Value("${toss.payment.read-timeout}") int readTimeoutMs) {
         this.objectMapper = objectMapper;
         this.token = token;
         this.connectTimeoutMs = connectTimeoutMs;
+        this.readTimeoutMs = readTimeoutMs;
     }
 
     @Bean
     public TossPaymentClient paymentClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(connectTimeoutMs);
+        requestFactory.setReadTimeout(readTimeoutMs);
 
         RestClient client = getRestClient(requestFactory);
 

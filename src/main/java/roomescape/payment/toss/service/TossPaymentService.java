@@ -1,21 +1,29 @@
 package roomescape.payment.toss.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import roomescape.payment.toss.domain.TossPayment;
 import roomescape.payment.toss.dto.TossPaymentRequest;
 import roomescape.payment.toss.dto.TossPaymentResponse;
-import roomescape.payment.exception.PaymentTemporaryException;
+import roomescape.payment.toss.repository.TossPaymentRepository;
+import roomescape.reservation.domain.Reservation;
 
 @Service
 @RequiredArgsConstructor
 public class TossPaymentService {
 
     private final TossPaymentClient tossPaymentClient;
+    private final TossPaymentRepository tossPaymentRepository;
 
-    @Retryable(retryFor = {PaymentTemporaryException.class}, maxAttempts = 3, backoff = @Backoff(delay = 500))
-    public TossPaymentResponse confirmPayment(TossPaymentRequest paymentRequest) {
-        return tossPaymentClient.getPaymentConfirm(paymentRequest);
+    public TossPayment savePayment(final Reservation reservation, final TossPaymentRequest request) {
+        return tossPaymentRepository.save(new TossPayment(reservation, request.paymentKey(), request.orderId(), request.amount()));
+    }
+
+    public TossPaymentResponse confirmPayment(final TossPayment tossPayment) {
+        return tossPaymentClient.confirmPayment(TossPaymentRequest.from(tossPayment));
+    }
+
+    public TossPayment getPaymentByReservation(Reservation reservation) {
+        return tossPaymentRepository.findByReservation_Id(reservation.getId());
     }
 }

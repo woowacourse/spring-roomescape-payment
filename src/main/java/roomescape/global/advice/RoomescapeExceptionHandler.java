@@ -7,6 +7,7 @@ import static roomescape.global.response.GlobalErrorCode.IN_ALREADY_EXCEPTION;
 import static roomescape.global.response.GlobalErrorCode.NO_ELEMENTS;
 import static roomescape.global.response.GlobalErrorCode.WRONG_ARGUMENT;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,25 +23,34 @@ import roomescape.global.response.ApiResponse;
 public class RoomescapeExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFoundException() {
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(HttpServletRequest request,
+                                                                     NotFoundException e) {
+        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         return ResponseEntity.status(NOT_FOUND)
                 .body(ApiResponse.fail(NO_ELEMENTS));
     }
 
     @ExceptionHandler(InvalidArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInvalidArgumentException() {
+    public ResponseEntity<ApiResponse<Void>> handleInvalidArgumentException(HttpServletRequest request,
+                                                                            InvalidArgumentException e) {
+        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         return ResponseEntity.status(BAD_REQUEST)
                 .body(ApiResponse.fail(WRONG_ARGUMENT));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException() {
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(HttpServletRequest request,
+                                                                                   MethodArgumentNotValidException e) {
+        log.error("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
+        log.error("{} | {}", request.getAttribute("traceId"), e.getStackTrace());
         return ResponseEntity.status(BAD_REQUEST)
                 .body(ApiResponse.fail(WRONG_ARGUMENT));
     }
 
     @ExceptionHandler(InAlreadyException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInAlreadyException() {
+    public ResponseEntity<ApiResponse<Void>> handleInAlreadyException(HttpServletRequest request,
+                                                                      InAlreadyException e) {
+        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         return ResponseEntity.status(CONFLICT)
                 .body(ApiResponse.fail(IN_ALREADY_EXCEPTION));
     }

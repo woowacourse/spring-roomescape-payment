@@ -49,7 +49,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
                 .andExpect(content().json(json))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(tossPaymentResponse), MediaType.APPLICATION_JSON));
 
-        TossPaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
+        TossPaymentResponse result = tossPaymentClient.confirmPayment(request);
 
         Assertions.assertThat(result.orderId()).isEqualTo(orderId);
     }
@@ -72,7 +72,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"message\":\"결제 키와 주문 ID는 필수입니다.\"}"));
 
-        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentProcessException.class)
                 .hasMessage(expectedMessage);
     }
@@ -100,7 +100,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"code\":\"" + code + "\"}"));
 
-        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentServerException.class);
     }
 
@@ -125,7 +125,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"code\":\"" + code + "\"}"));
 
-        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentTemporaryException.class);
     }
 }

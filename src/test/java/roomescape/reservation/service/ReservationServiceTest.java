@@ -20,6 +20,8 @@ import roomescape.fixture.entity.ReservationDateFixture;
 import roomescape.global.exception.InvalidArgumentException;
 import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
+import roomescape.payment.toss.domain.TossPayment;
+import roomescape.payment.toss.repository.TossPaymentRepository;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
@@ -46,6 +48,8 @@ class ReservationServiceTest {
     private MemberDbFixture memberDbFixture;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private TossPaymentRepository tossPaymentRepository;
     @Autowired
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
     @Autowired
@@ -153,7 +157,9 @@ class ReservationServiceTest {
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
         // 예약 등록
-        reservationRepository.save(Reservation.reserve(member, 내일_열시, theme));
+        Reservation reservation = reservationRepository.save(Reservation.reserve(member, 내일_열시, theme));
+        TossPayment tossPayment = new TossPayment(reservation, "test-key", "test-id", 100L);
+        tossPaymentRepository.save(tossPayment);
         // 대기 등록
         reservationRepository.save(Reservation.waiting(member, 내일_열시, theme));
 
@@ -177,7 +183,9 @@ class ReservationServiceTest {
         Theme theme = themeDbFixture.공포();
 
         Reservation reservation1 = reservationRepository.save(Reservation.reserve(member1, reservationDateTime, theme));
+        TossPayment tossPayment = new TossPayment(reservation1, "test-key", "test-id", 100L);
         reservationRepository.save(Reservation.reserve(member2, reservationDateTime, theme));
+        tossPaymentRepository.save(tossPayment);
 
         List<MyReservationResponse> myReservations = reservationService.getAllReservations(member1.getId());
 

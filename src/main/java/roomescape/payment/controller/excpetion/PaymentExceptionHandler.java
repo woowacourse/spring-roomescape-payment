@@ -1,5 +1,7 @@
 package roomescape.payment.controller.excpetion;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +13,7 @@ import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 
 @ControllerAdvice
+@Slf4j
 public class PaymentExceptionHandler {
 
     private static final String SERVER_ERROR_CODE = "PF001";
@@ -18,7 +21,9 @@ public class PaymentExceptionHandler {
     private static final String NOT_FOUND_ERROR_CODE = "PF003";
 
     @ExceptionHandler(PaymentNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePaymentNotFoundException(PaymentNotFoundException e) {
+    public ResponseEntity<ApiResponse<Void>> handlePaymentNotFoundException(HttpServletRequest request,
+                                                                            PaymentNotFoundException e) {
+        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(NOT_FOUND_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
@@ -27,7 +32,9 @@ public class PaymentExceptionHandler {
     }
 
     @ExceptionHandler(PaymentServerException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePaymentServerException(PaymentServerException e) {
+    public ResponseEntity<ApiResponse<Void>> handlePaymentServerException(HttpServletRequest request,
+                                                                          PaymentServerException e) {
+        log.warn("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(SERVER_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
@@ -36,7 +43,9 @@ public class PaymentExceptionHandler {
     }
 
     @ExceptionHandler(PaymentProcessException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessException(PaymentProcessException e) {
+    public ResponseEntity<ApiResponse<Void>> handlePaymentProcessException(HttpServletRequest request,
+                                                                           PaymentProcessException e) {
+        log.warn("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(PROCESS_ERROR_CODE, e.getMessage());
 
         return ResponseEntity

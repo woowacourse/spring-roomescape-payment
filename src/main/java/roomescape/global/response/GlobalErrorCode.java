@@ -11,6 +11,7 @@ public enum GlobalErrorCode implements ErrorCode {
     WRONG_ARGUMENT("GF002", "잘못된 인자입니다."),
     ROOMESCAPE_SERVER_ERROR("GF003", "서버 오류입니다."),
     IN_ALREADY_EXCEPTION("GF004", "이미 사용 중입니다."),
+    UNKNOWN_EXCEPTION("GF005", "알 수 없는 예외가 발생했습니다.")
     ;
 
     private final String value;

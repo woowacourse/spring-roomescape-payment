@@ -46,10 +46,8 @@ public class ReservedQueryService {
         return reservations.map(ReservationResponse::from);
     }
 
-    public List<MyReservationResponse> getReservations(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findByMemberIdAndStatus(memberId, RESERVED);
-
-        return MyReservationResponse.from(reservations);
+    public List<Reservation> getReservations(Long memberId) {
+        return reservationRepository.findByMemberIdAndStatus(memberId, RESERVED);
     }
 
     public boolean existsReserved(Long memberId, LocalDate date, Long timeId) {

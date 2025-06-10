@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.payment.toss.domain.TossPayment;
 import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.service.TossPaymentService;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
@@ -46,15 +46,13 @@ public class ReservationService {
         return ReservationResponse.from(waiting);
     }
 
-    @Transactional
     public ReservationResponse reserve(ReservePaymentRequest request, Long memberId) {
-        ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
-        Reservation reserved = reservationManager.reserved(reserveCommand);
+        Reservation reservation = reservationManager.reserved(ReserveCommand.byPayment(request, memberId));
+        TossPayment tossPayment = tossPaymentService.savePayment(reservation, TossPaymentRequest.from(request));
 
-        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        TossPaymentResponse tossPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
+        tossPaymentService.confirmPayment(tossPayment);
 
-        return ReservationResponse.from(reserved);
+        return ReservationResponse.from(reservation);
     }
 
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {
@@ -84,7 +82,15 @@ public class ReservationService {
     public List<MyReservationResponse> getAllReservations(Long memberId) {
         List<MyReservationResponse> responses = new ArrayList<>();
 
-        responses.addAll(reservedQueryService.getReservations(memberId));
+        List<Reservation> reservations = reservedQueryService.getReservations(memberId);
+        List<MyReservationResponse> myReservations = reservations.stream()
+                .map(reservation -> {
+                    TossPayment tossPayment = tossPaymentService.getPaymentByReservation(reservation);
+                    return MyReservationResponse.from(reservation, tossPayment);
+                })
+                .toList();
+
+        responses.addAll(myReservations);
         responses.addAll(waitingQueryService.getMyWaitings(memberId));
 
         return responses;
