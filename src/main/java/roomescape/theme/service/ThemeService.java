@@ -15,7 +15,6 @@ import roomescape.theme.dto.response.ThemeResponse;
 import java.util.List;
 
 @Service
-@LogExecution
 public class ThemeService {
 
     private static final int POPULAR_THEME_COUNT = 10;
@@ -35,6 +34,7 @@ public class ThemeService {
     }
 
     @Transactional
+    @LogExecution
     public ThemeResponse createTheme(final ThemeRequest request) {
         Theme theme = Theme.createWithoutId(request.name(), request.description(), request.thumbnail());
         Theme save = themeRepository.save(theme);
@@ -43,6 +43,7 @@ public class ThemeService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteThemeById(final Long id) {
         if (reservationRepository.existsByThemeId(id)) {
             throw new IllegalArgumentException("예약한 기록이 존재하여 삭제할 수 없습니다.");

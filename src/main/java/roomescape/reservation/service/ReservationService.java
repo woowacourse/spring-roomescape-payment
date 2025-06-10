@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-@LogExecution
 public class ReservationService {
 
     private final DateTime dateTime;
@@ -43,6 +42,7 @@ public class ReservationService {
     }
 
     @Transactional
+    @LogExecution
     public ReservationResponse createPendingReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
@@ -90,6 +90,7 @@ public class ReservationService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteReservationById(final Long id) {
         Reservation reservation = findReservation(id);
 

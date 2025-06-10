@@ -13,7 +13,6 @@ import roomescape.member.dto.response.SignupResponse;
 import java.util.List;
 
 @Service
-@LogExecution
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -23,6 +22,7 @@ public class MemberService {
     }
 
     @Transactional
+    @LogExecution
     public SignupResponse createUser(SignupRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 가입된 이메일입니다");

@@ -2,7 +2,6 @@ package roomescape.payment.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import roomescape.common.logging.LogExecution;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.domain.PaymentStatus;
@@ -12,7 +11,6 @@ import roomescape.reservation.domain.ReservationRepository;
 
 @Service
 @Transactional
-@LogExecution
 public class PaymentTransactionService {
 
     private final ReservationRepository reservationRepository;

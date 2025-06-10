@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingAspect {
 
-    @Around("@annotation(roomescape.common.logging.LogExecution) || within(@roomescape.common.logging.LogExecution *)")
+    @Around("@annotation(roomescape.common.logging.LogExecution)")
     public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().toShortString();
         log.info(">> 진입: {}", methodName);

@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@LogExecution
 public class WaitingService {
 
     private static final long MAX_WAITING_COUNT = 10;
@@ -39,6 +38,7 @@ public class WaitingService {
     }
 
     @Transactional
+    @LogExecution
     public WaitingResponse createWaiting(WaitingRequest request, LoginMember loginMember) {
         Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다"));
@@ -81,6 +81,7 @@ public class WaitingService {
     }
 
     @Transactional
+    @LogExecution
     public void cancelWaiting(Long waitingId) {
         Waiting waiting = waitingRepository.findById(waitingId)
                 .orElseThrow(() -> new IllegalArgumentException("대기 정보를 찾을 수 없습니다."));

@@ -9,7 +9,6 @@ import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.reservation.domain.ReservationRepository;
 
 @Service
-@LogExecution
 public class PaymentService {
 
     private final TossPaymentClient paymentClient;
@@ -20,6 +19,7 @@ public class PaymentService {
         this.paymentTransactionService = paymentTransactionService;
     }
 
+    @LogExecution
     public void confirmAndSavePayment(TossPaymentConfirmRequest request, long reservationId) {
         TossPaymentResponse tossPaymentResponse = paymentClient.confirmPayment(request);
         Payment payment = paymentTransactionService.savePayment(tossPaymentResponse);
