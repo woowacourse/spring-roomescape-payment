@@ -127,23 +127,13 @@ class AuthControllerTest {
         }
     }
 
-    @Nested
-    class MemberLogoutTest {
+    @DisplayName("로그인 상태라면 로그아웃을 할 수있다")
+    @Test
+    void logoutMemberTest() throws Exception {
+        when(cookieHandler.createCookie(anyString(), any())).thenAnswer(invocation -> new Cookie(invocation.getArgument(0), invocation.getArgument(1)));
 
-        String loginToken;
-
-        @BeforeEach
-        void setUpRegistration() {
-            loginToken = "mockToken";
-            when(cookieHandler.createCookie(anyString(), any())).thenAnswer(invocation -> new Cookie(invocation.getArgument(0), invocation.getArgument(1)));
-        }
-
-        @DisplayName("로그인 상태라면 로그아웃을 할 수있다")
-        @Test
-        void logoutMemberTest() throws Exception {
-            mockMvc.perform(post("/logout")
-                    .cookie(new Cookie("token", "mockToken")))
-                    .andExpect(status().isOk());
-        }
+        mockMvc.perform(post("/logout")
+                .cookie(new Cookie("token", "mockToken")))
+                .andExpect(status().isOk());
     }
 }

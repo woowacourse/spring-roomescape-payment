@@ -32,7 +32,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class TossPaymentClientTestWithMockServer {
 
     public static final String PAYMENTS_CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    public static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
 
     @Autowired
     private RestClient.Builder builder;
