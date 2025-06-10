@@ -6,6 +6,6 @@ import roomescape.domain.Reservation;
 
 import java.util.Optional;
 
-public interface JpaPaymentRepository extends JpaRepository<Payment, String> {
+public interface JpaPaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findByReservation(Reservation reservation);
 }
