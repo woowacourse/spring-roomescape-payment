@@ -50,7 +50,7 @@ class ReservedServiceTest {
         Theme 공포 = themeDbFixture.공포();
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
-        Reservation reservation = reservationRepository.save(Reservation.reserve(유저1, 내일_열시, 공포));
+        Reservation reservation = reservationRepository.save(Reservation.reserved(유저1, 내일_열시, 공포));
 
         // when
         reservedService.cancel(reservation.getId(), 유저1.getId());
@@ -78,7 +78,7 @@ class ReservedServiceTest {
         Theme 공포 = themeDbFixture.공포();
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
-        Reservation reservation = reservationRepository.save(Reservation.reserve(유저1, 내일_열시, 공포));
+        Reservation reservation = reservationRepository.save(Reservation.reserved(유저1, 내일_열시, 공포));
 
         // when & then
         assertThatThrownBy(() -> reservedService.cancel(reservation.getId(), 유저2.getId())).isInstanceOf(
@@ -94,7 +94,7 @@ class ReservedServiceTest {
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
         // 유저1이 예약
-        Long reservationId = reservationRepository.save(Reservation.reserve(유저1, 내일_열시, 공포)).getId();
+        Long reservationId = reservationRepository.save(Reservation.reserved(유저1, 내일_열시, 공포)).getId();
 
         // 유저2 대기
         reservationRepository.save(Reservation.waiting(유저2, 내일_열시, 공포));

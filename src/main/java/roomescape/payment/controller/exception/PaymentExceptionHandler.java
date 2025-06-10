@@ -29,7 +29,7 @@ public class PaymentExceptionHandler {
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(PROCESS_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(e.getStatus())
                 .body(ApiResponse.fail(paymentErrorCode));
     }
 }

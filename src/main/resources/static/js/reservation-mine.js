@@ -54,7 +54,7 @@ function render(data) {
                 requestDelete(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
-
+            row.insertCell(5).textContent = item.order.orderId;
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
         }

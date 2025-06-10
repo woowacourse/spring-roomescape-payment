@@ -65,7 +65,7 @@ class WaitingApiTest {
         LocalDate date = reservationDateTime.getDate();
 
         // 예약이 이미 존재해야 대기 등록 가능
-        reservationRepository.save(Reservation.reserve(유저2, reservationDateTime, 공포));
+        reservationRepository.save(Reservation.reserved(유저2, reservationDateTime, 공포));
 
         HashMap<String, Object> request = new HashMap<>();
         request.put("themeId", themeId);

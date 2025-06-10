@@ -23,7 +23,8 @@
 ### 결제 기능
 - [x] 예약을 할려면 토스 결제 API를 통해 결제를 진행해야 한다.
 - [x] API 호출이 되지 않은 경우 상황에 맞는 예외 처리
-- [x] 결제 실패 시 예외 사유를 반환한디.
+- [x] 결제 실패 시 예외 사유를 반환한다.
+- [x] 결제가 성공되면 주문 정보를 저장한다
 
 ### 테마/시간 관리
 
@@ -176,3 +177,11 @@
 - [x] 예약 기능은 로그인 사용자만 가능
 
 ---
+
+## ERD 다이어그램
+
+![ERD](./src/main/resources/static/image/roomescape-erd.png)
+
+## API 문서
+
+[API 문서](./src/main/resources/static/docs/index.html)

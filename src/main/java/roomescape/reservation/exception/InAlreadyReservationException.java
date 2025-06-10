@@ -1,8 +1,6 @@
 package roomescape.reservation.exception;
 
-import roomescape.global.exception.InAlreadyException;
-
-public class InAlreadyReservationException extends InAlreadyException {
+public class InAlreadyReservationException extends RuntimeException {
     public InAlreadyReservationException(String message) {
         super(message);
     }

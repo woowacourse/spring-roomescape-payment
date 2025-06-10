@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.function.TriFunction;
 import roomescape.member.domain.Member;
@@ -28,17 +29,25 @@ public class ReservationManager {
     private final ReservationTimeQueryService reservationTimeQueryService;
     private final ReservationRepository reservationRepository;
 
-    @Transactional
-    public Reservation reserved(ReserveCommand reserveCommand) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Reservation reserve(ReserveCommand reserveCommand) {
         isAlreadyReservedTime(reserveCommand.date(), reserveCommand.timeId());
-        Reservation reserved = reservationFrom(reserveCommand, Reservation::reserve);
+        Reservation reserved = reservationFrom(reserveCommand, Reservation::reserved);
+
+        return reservationRepository.save(reserved);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Reservation pending(ReserveCommand reserveCommand) {
+        isAlreadyReservedTime(reserveCommand.date(), reserveCommand.timeId());
+        Reservation reserved = reservationFrom(reserveCommand, Reservation::pending);
 
         return reservationRepository.save(reserved);
     }
 
     private void isAlreadyReservedTime(LocalDate date, Long timeId) {
-        List<Reservation> reservations = reservationRepository.findByDateAndTimeIdAndStatusWithLock(
-                date, timeId, ReservationStatus.RESERVED);
+        List<Reservation> reservations = reservationRepository.findByDateAndTimeIdAndStatus(date, timeId,
+                ReservationStatus.RESERVED);
 
         if (!reservations.isEmpty()) {
             throw new InAlreadyReservationException("이미 예약된 시간입니다.");

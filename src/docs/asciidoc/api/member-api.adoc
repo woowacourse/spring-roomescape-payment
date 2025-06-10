@@ -1,0 +1,27 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== 멤버 관련 API
+
+=== 회원가입
+
+회원가입을 통해 새로운 유저를 생성할 수 있다.
+
+==== 요청
+
+include::{snippets}/member-api-controller-test/회원가입을_할_수_있다/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/member-api-controller-test/회원가입을_할_수_있다/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/member-api-controller-test/회원가입을_할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/member-api-controller-test/회원가입을_할_수_있다/response-fields.adoc[]

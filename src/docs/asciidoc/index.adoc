@@ -1,0 +1,24 @@
+= 방탈출 예약 시스템 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== API 명세서
+
+include::api/auth-api.adoc[]
+
+include::api/reservation-api.adoc[]
+
+include::api/reservation-admin-api.adoc[]
+
+include::api/waiting-api.adoc[]
+
+include::api/reservation-time-api.adoc[]
+
+include::api/theme-api.adoc[]
+
+include::api/member-api.adoc[]
+
+include::api/member-admin-api.adoc[]

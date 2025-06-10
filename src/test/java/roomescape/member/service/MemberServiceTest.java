@@ -1,6 +1,5 @@
 package roomescape.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static roomescape.fixture.db.MemberDbFixture.RAW_PASSWORD;
 
@@ -13,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import roomescape.common.CleanUp;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.global.exception.NotFoundException;
 import roomescape.member.controller.request.SignUpRequest;
 import roomescape.member.controller.response.MemberResponse;
 import roomescape.member.domain.Member;
@@ -108,7 +108,7 @@ class MemberServiceTest {
     @Test
     void 존재하지_않는_멤버를_조회하면_예외가_발생한다() {
         assertThatThrownBy(() -> memberService.getMember(999L))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }
 
@@ -117,7 +117,7 @@ class MemberServiceTest {
         memberDbFixture.유저1_생성();
 
         assertThatThrownBy(() -> memberService.getMember("wrong@email.com", RAW_PASSWORD))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
 
@@ -126,7 +126,7 @@ class MemberServiceTest {
         Member 유저1 = memberDbFixture.유저1_생성();
 
         assertThatThrownBy(() -> memberService.getMember(유저1.getEmail(), "wrongPassword"))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
 

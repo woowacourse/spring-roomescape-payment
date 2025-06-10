@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,7 +94,7 @@ class ThemeServiceTest {
         Theme theme = themeDbFixture.공포();
         Member reserver = memberDbFixture.유저1_생성();
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
-        Reservation reservation = Reservation.reserve(
+        Reservation reservation = Reservation.reserved(
                 reserver, reservationDateTime, theme
         );
         reservationRepository.save(reservation);
@@ -139,7 +138,7 @@ class ThemeServiceTest {
 
     private void addReservation(int count, Member member, ReservationDate date, ReservationTime time, Theme theme) {
         for (int i = 0; i < count; i++) {
-            reservationRepository.save(Reservation.reserve(
+            reservationRepository.save(Reservation.reserved(
                     member, new ReservationDateTime(date, time), theme
             ));
         }
