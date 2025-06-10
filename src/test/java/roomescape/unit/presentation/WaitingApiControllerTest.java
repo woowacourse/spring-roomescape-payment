@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -17,33 +15,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
-import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
-import roomescape.business.service.WaitingService;
 import roomescape.exception.reservation.WaitingNotFoundException;
-import roomescape.presentation.api.WaitingApiController;
 import roomescape.presentation.dto.request.WaitingRequest;
 import roomescape.presentation.dto.response.MemberResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -51,32 +35,7 @@ import roomescape.presentation.dto.response.TimeSlotResponse;
 import roomescape.presentation.dto.response.WaitingResponse;
 import roomescape.presentation.dto.response.WaitingWithRankResponse;
 
-@WebMvcTest(value = {WaitingApiController.class, JJWTJwtUtil.class})
-@ExtendWith(RestDocumentationExtension.class)
-class WaitingApiControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private JJWTJwtUtil jwtUtil;
-
-    @MockitoBean
-    private WaitingService waitingService;
-
-    @BeforeEach
-    void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(documentationConfiguration(restDocumentation)
-                        .operationPreprocessors()
-                        .withRequestDefaults(prettyPrint())
-                        .withResponseDefaults(prettyPrint())
-                )
-                .build();
-    }
+class WaitingApiControllerTest extends ControllerTest {
 
     @Test
     void 대기_생성에_성공한다() throws Exception {

@@ -2,8 +2,6 @@ package roomescape.unit.presentation;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -13,61 +11,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
-import roomescape.auth.jwt.JJWTJwtUtil;
-import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
-import roomescape.business.service.PaymentService;
 import roomescape.exception.reservation.ReservationExistsException;
-import roomescape.presentation.api.PaymentApiController;
 import roomescape.presentation.api.PaymentApproveRequest;
 import roomescape.presentation.dto.request.PaymentAndReservationRequest;
 import roomescape.presentation.dto.response.PaymentResponse;
 
-@WebMvcTest(value = {PaymentApiController.class, JJWTJwtUtil.class})
-@ExtendWith(RestDocumentationExtension.class)
-public class PaymentApiControllerTest {
+public class PaymentApiControllerTest extends ControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private static long startTime;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    @BeforeAll
+    static void startTimer() {
+        startTime = System.currentTimeMillis();
+    }
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private PaymentService paymentService;
-
-    @BeforeEach
-    void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(documentationConfiguration(restDocumentation)
-                        .operationPreprocessors()
-                        .withRequestDefaults(prettyPrint())
-                        .withResponseDefaults(prettyPrint())
-                )
-                .build();
+    @AfterAll
+    static void endTimer() {
+        long endTime = System.currentTimeMillis();
+        System.out.println("🕖전체 테스트 실행 시간 = " + (endTime - startTime) + "ms");
     }
 
     @Test
