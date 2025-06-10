@@ -14,6 +14,7 @@ public class Theme {
     private static int MAX_NAME = 255;
     private static int MAX_DESCRIPTION = 255;
     private static int MAX_THUMBNAIL = 255;
+    private static int CURRENT_PRICE = 1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,5 +49,9 @@ public class Theme {
         if (thumbnail == null || thumbnail.isBlank() || thumbnail.length() > MAX_THUMBNAIL) {
             throw new IllegalArgumentException("썸네일 URI는 1글자 이상, 255글자 이하여야합니다.");
         }
+    }
+
+    public long getCurrentPrice() {
+        return CURRENT_PRICE;
     }
 }

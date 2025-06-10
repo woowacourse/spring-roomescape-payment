@@ -16,6 +16,6 @@ public record AdminReservationRequest(
         @Schema(description = "멤버 ID", example = "1")
         Long memberId) {
     public ReservationRequest getReservationRequest() {
-        return new ReservationRequest(date, timeId, themeId, null, null, null);
+        return new ReservationRequest(date, timeId, themeId, null, null, 1000L);
     }
 }
