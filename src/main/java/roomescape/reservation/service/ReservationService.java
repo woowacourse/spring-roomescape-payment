@@ -85,7 +85,7 @@ public class ReservationService {
         List<Reservation> reservations = reservedQueryService.getReservations(memberId);
         List<MyReservationResponse> myReservations = reservations.stream()
                 .map(reservation -> {
-                    TossPayment tossPayment = tossPaymentService.findByReservation(reservation);
+                    TossPayment tossPayment = tossPaymentService.getPaymentByReservation(reservation);
                     return MyReservationResponse.from(reservation, tossPayment);
                 })
                 .toList();

@@ -20,10 +20,10 @@ public class TossPaymentService {
     }
 
     public TossPaymentResponse confirmPayment(final TossPayment tossPayment) {
-        return tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(tossPayment));
+        return tossPaymentClient.confirmPayment(TossPaymentRequest.from(tossPayment));
     }
 
-    public TossPayment findByReservation(Reservation reservation) {
+    public TossPayment getPaymentByReservation(Reservation reservation) {
         return tossPaymentRepository.findByReservation_Id(reservation.getId());
     }
 }
