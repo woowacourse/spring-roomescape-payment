@@ -4,13 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.request.ReservationCondition;
-import roomescape.infrastructure.*;
+import roomescape.infrastructure.JpaMemberRepository;
+import roomescape.infrastructure.JpaReservationRepository;
+import roomescape.infrastructure.JpaReservationTimeRepository;
+import roomescape.infrastructure.JpaThemeRepository;
+import roomescape.infrastructure.ReservationRepositoryAdaptor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@ActiveProfiles("test")
 @DataJpaTest
 @Sql(value =
         {

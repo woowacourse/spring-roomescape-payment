@@ -1,12 +1,10 @@
 package roomescape.unit.infrastructure;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.auth.Role;
@@ -14,6 +12,11 @@ import roomescape.domain.Member;
 import roomescape.infrastructure.JpaMemberRepository;
 import roomescape.infrastructure.MemberRepositoryAdapter;
 
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+@ActiveProfiles("test")
 @DataJpaTest
 @Sql(value = "/sql/testMember.sql", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 class MemberRepositoryAdapterTest {

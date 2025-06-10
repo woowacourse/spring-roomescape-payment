@@ -1,19 +1,22 @@
 package roomescape.unit.infrastructure;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.ReservationTime;
 import roomescape.infrastructure.JpaReservationTimeRepository;
 import roomescape.infrastructure.ReservationTimeRepositoryAdaptor;
 
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+@ActiveProfiles("test")
 @DataJpaTest
 @Sql(value = "/sql/testReservationTime.sql")
 class ReservationTimeRepositoryAdaptorTest {
@@ -67,7 +70,7 @@ class ReservationTimeRepositoryAdaptorTest {
         //when & then
         reservationTimeRepositoryAdaptor.save(reservationTime);
         List<ReservationTime> reservationTimes = reservationTimeRepositoryAdaptor.findAll();
-        
+
         assertThat(reservationTimes.size()).isEqualTo(4);
     }
 }
