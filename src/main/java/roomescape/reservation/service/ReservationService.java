@@ -58,6 +58,9 @@ public class ReservationService {
     }
 
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
+        log.info("[(유저) 예약 추가 요청] date: {}, timeId: {}, themeId: {}, memberId: {}", request.date(), request.timeId(),
+                request.themeId(), loginMember.getId());
+
         ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         Theme theme = themeRepository.getById(request.themeId());
         Payment payment = Payment.builder()
@@ -105,6 +108,9 @@ public class ReservationService {
     }
 
     public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
+        log.info("[(관리자) 예약 추가 요청] date: {}, timeId: {}, themeId: {}, memberId: {}", request.date(), request.timeId(),
+                request.themeId(), request.memberId());
+
         ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         Theme theme = themeRepository.getById(request.themeId());
         Member member = memberRepository.getById(request.memberId());
@@ -121,6 +127,8 @@ public class ReservationService {
     }
 
     public void deleteReservation(final Long id) {
+        log.info("[예약 삭제 요청] reservationId: {}", id);
+
         Reservation reservation = reservationRepository.getById(id);
         Long deleteRank = reservation.getReservationStatus().getRank();
         if (reservation.isBooked()) {

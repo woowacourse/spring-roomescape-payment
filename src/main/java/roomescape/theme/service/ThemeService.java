@@ -25,6 +25,8 @@ public class ThemeService {
     private final ReservationRepository reservationRepository;
 
     public ThemeResponse saveTheme(final ThemeRequest request) {
+        log.info("[테마 추가 요청] name: {}, description: {}, thumbnail: {}", request.name(), request.description(),
+                request.thumbnail());
         Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
         log.info("[테마 추가 성공] themeId: {}", theme.getId());
         return new ThemeResponse(theme);
@@ -50,6 +52,7 @@ public class ThemeService {
     }
 
     public void delete(final Long themeId) {
+        log.info("[테마 삭제 요청] themeId: {}", themeId);
         if (reservationRepository.existsByThemeId((themeId))) {
             log.warn("[테마 삭제 실패] 테마 사용 중 - themeId: {}", themeId);
             throw new ReservationException("해당 테마로 예약된 건이 존재합니다.");

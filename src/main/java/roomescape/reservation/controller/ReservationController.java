@@ -56,19 +56,12 @@ public class ReservationController {
             @Valid @RequestBody final ReservationRequest request,
             @AuthenticationPrincipal final LoginMember loginMember
     ) {
-        log.info("[(유저) 예약 추가] date: {}, timeId: {}, themeId: {}, memberId: {}",
-                request.date(),
-                request.timeId(),
-                request.themeId(),
-                loginMember.getId()
-        );
         return reservationService.saveReservation(request, loginMember);
     }
 
     @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable final Long reservationId) {
-        log.info("[(유저) 예약 삭제 요청] reservationId: {}", reservationId);
         reservationService.deleteReservation(reservationId);
     }
 

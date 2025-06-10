@@ -26,19 +26,12 @@ public class AdminReservationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse saveReservation(@Valid @RequestBody final AdminReservationRequest request) {
-        log.info("[(관리자) 예약 추가 요청] date: {}, timeId: {}, themeId: {}, memberId: {}",
-                request.date(),
-                request.timeId(),
-                request.themeId(),
-                request.memberId()
-        );
         return reservationService.saveAdminReservation(request);
     }
 
     @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelReservation(@PathVariable final Long reservationId) {
-        log.info("[(관리자) 예약 취소 요청] reservationId: {}", reservationId);
         reservationService.deleteReservation(reservationId);
     }
 }

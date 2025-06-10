@@ -29,8 +29,6 @@ public class ThemeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ThemeResponse saveTheme(@Valid @RequestBody final ThemeRequest request) {
-        log.info("[테마 추가 요청] name: {}, description: {}, thumbnail: {}", request.name(), request.description(),
-                request.thumbnail());
         return themeService.saveTheme(request);
     }
 
@@ -47,7 +45,6 @@ public class ThemeController {
     @DeleteMapping("/{themeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTheme(@PathVariable final Long themeId) {
-        log.info("[테마 삭제] themeId: {}", themeId);
         themeService.delete(themeId);
     }
 }

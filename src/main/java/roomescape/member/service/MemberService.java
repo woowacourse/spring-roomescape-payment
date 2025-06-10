@@ -22,6 +22,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public void save(final MemberRequest request) {
+        log.info("[회원가입 요청] email: {}, password: {}, name: {}", request.email(), request.password(), request.name());
+
         if (memberRepository.existsByEmail(request.email())) {
             log.warn("[회원가입 실패] 중복 이메일 가입 - duplicateEmail: {}", request.email());
             throw new IllegalArgumentException("이미 가입된 이메일입니다.");

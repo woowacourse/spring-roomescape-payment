@@ -21,6 +21,7 @@ public class ReservationTimeService {
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeResponse saveTime(final ReservationTimeRequest request) {
+        log.info("[예약 시간 추가 요청] startAt: {}", request.startAt());
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTime.from(request.startAt()));
         log.info("[예약 시간 추가 성공] timeId: {}", reservationTime.getId());
         return new ReservationTimeResponse(reservationTime);
@@ -35,6 +36,7 @@ public class ReservationTimeService {
     }
 
     public void delete(final Long timeId) {
+        log.info("[예약 시간 삭제 요청] timeId: {}", timeId);
         if (reservationRepository.existsByTimeId(timeId)) {
             log.warn("[예약 시간 삭제 실패] 예약 시간 사용 중 - timeId: {}", timeId);
             throw new ReservationException("해당 시간으로 예약된 건이 존재합니다.");
