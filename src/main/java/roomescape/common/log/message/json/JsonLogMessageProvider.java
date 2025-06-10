@@ -29,7 +29,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     private final ObjectMapper objectMapper;
 
     private static DefaultPrettyPrinter createPrettyPrinter() {
-        DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
+        final DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
         printer.indentArraysWith(new DefaultIndenter("  ", System.lineSeparator()));
         return printer;
     }
@@ -67,7 +67,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
                     format,
                     objectMapper.writer(DEFAULT_PRETTY_PRINTER).writeValueAsString(logEntry)
             );
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             return defaultMessage;
         }
     }

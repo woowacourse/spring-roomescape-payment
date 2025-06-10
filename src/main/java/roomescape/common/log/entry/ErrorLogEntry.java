@@ -42,7 +42,7 @@ public record ErrorLogEntry(
         static ErrorDetail fromThrowable(
                 final Throwable throwable
         ) {
-            StackTraceElement finalStackTraceElement = throwable.getStackTrace()[0];
+            final StackTraceElement finalStackTraceElement = throwable.getStackTrace()[0];
             return new ErrorDetail(
                     throwable.getMessage(),
                     finalStackTraceElement.getClassName(),
