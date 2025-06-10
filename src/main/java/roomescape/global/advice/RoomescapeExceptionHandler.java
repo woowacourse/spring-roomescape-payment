@@ -2,11 +2,9 @@ package roomescape.global.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static roomescape.global.response.GlobalErrorCode.IN_ALREADY_EXCEPTION;
 import static roomescape.global.response.GlobalErrorCode.NO_ELEMENTS;
-import static roomescape.global.response.GlobalErrorCode.UNKNOWN_EXCEPTION;
 import static roomescape.global.response.GlobalErrorCode.WRONG_ARGUMENT;
 
 import jakarta.servlet.http.HttpServletRequest;

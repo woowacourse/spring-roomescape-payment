@@ -34,7 +34,7 @@ public class PaymentExceptionHandler {
     @ExceptionHandler(PaymentServerException.class)
     public ResponseEntity<ApiResponse<Void>> handlePaymentServerException(HttpServletRequest request,
                                                                           PaymentServerException e) {
-        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
+        log.warn("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(SERVER_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
@@ -45,7 +45,7 @@ public class PaymentExceptionHandler {
     @ExceptionHandler(PaymentProcessException.class)
     public ResponseEntity<ApiResponse<Void>> handlePaymentProcessException(HttpServletRequest request,
                                                                            PaymentProcessException e) {
-        log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
+        log.warn("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(PROCESS_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
