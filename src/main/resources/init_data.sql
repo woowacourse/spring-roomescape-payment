@@ -111,9 +111,9 @@ INSERT INTO orders (id, amount, member_id, schedule_id)
 VALUES ('SURFMAY_12345', 25000, 1, 1);
 
 -- reservation
-INSERT INTO reservation (member_id, schedule_id, reservation_status)
-VALUES (1, 1, 'CONFIRMED');
+INSERT INTO reservation (member_id, schedule_id, reservation_status, order_id)
+VALUES (1, 1, 'CONFIRMED', 'SURFMAY_12345');
 
 -- reservation_payment
-INSERT INTO reservation_payment (payment_key, amount, order_id, reservation_id)
-VALUES ('pk_12345', 25000, 'SURFMAY_12345', 1);
+INSERT INTO reservation_payment (payment_key, amount, reservation_id)
+VALUES ('pk_12345', 25000, 1);

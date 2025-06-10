@@ -22,19 +22,19 @@ public class ReservationPaymentService {
 
     @Transactional
     public void confirmPayment(final ReservationPaymentRequest request) {
-        ReservationPayment reservationPayment = new ReservationPayment(request.paymentKey(), request.amount(), request.orderId(), request.reservation());
+        ReservationPayment reservationPayment = new ReservationPayment(request.paymentKey(), request.amount(), request.reservation());
         ReservationPayment savedReservationPayment = reservationPaymentRepository.save(reservationPayment);
 
         TossPaymentConfirmCommand command = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
         try {
             tossPaymentAdapter.confirmPayment(command);
         } catch (Exception e) {
-            throw new ReservationPaymentConfirmException(e.getMessage(), savedReservationPayment.getReservation().getId(), savedReservationPayment.getPaymentKey(), savedReservationPayment.getOrderId());
+            throw new ReservationPaymentConfirmException(e.getMessage(), savedReservationPayment.getReservation().getId(), savedReservationPayment.getPaymentKey(), request.orderId());
         }
         log.info("EVENT: PAYMENT_CONFIRMED, reservationId={}, paymentKey={}, orderId={}",
                 savedReservationPayment.getReservation().getId(),
                 savedReservationPayment.getPaymentKey(),
-                savedReservationPayment.getOrderId());
+                request.orderId());
     }
 
     public ReservationPayment getByReservationId(final Long reservationId) {

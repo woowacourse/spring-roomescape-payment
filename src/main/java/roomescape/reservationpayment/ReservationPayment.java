@@ -1,7 +1,6 @@
 package roomescape.reservationpayment;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,16 +22,12 @@ public class ReservationPayment {
 
     private Long amount;
 
-    @NotNull
-    private String orderId;
-
     @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    public ReservationPayment(final String paymentKey, final Long amount, final String orderId, final Reservation reservation) {
+    public ReservationPayment(final String paymentKey, final Long amount, final Reservation reservation) {
         this.paymentKey = paymentKey;
         this.amount = amount;
-        this.orderId = orderId;
         this.reservation = reservation;
     }
 }
