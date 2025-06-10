@@ -77,7 +77,7 @@ public class ReservationCreateServiceTest {
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member(loginMember.email(), "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
         }
 
         @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태가 CONFIRMED이 되고, response 값을 반환한다.")
@@ -94,7 +94,7 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
 
             // when
@@ -138,7 +138,7 @@ public class ReservationCreateServiceTest {
                     .willReturn(member);
             ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(request.orderId(), request.amount(), request.paymentKey(), reservation);
             doThrow(new PaymentException("결제에 실패하였습니다.")).when(reservationPaymentService).confirmPayment(reservationPaymentRequest);
-            given(reservationRepository.save(new Reservation(member, schedule)))
+            given(reservationRepository.save(new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
 
             // when & then
@@ -163,7 +163,7 @@ public class ReservationCreateServiceTest {
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member("user@example.com", "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
         }
 
         @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
@@ -177,7 +177,7 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
 
             // when

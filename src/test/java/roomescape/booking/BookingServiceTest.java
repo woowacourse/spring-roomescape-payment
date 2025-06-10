@@ -11,6 +11,7 @@ import roomescape.booking.dto.PromotingReservationRequest;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationCreateService;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.member.Member;
@@ -55,7 +56,7 @@ class BookingServiceTest {
     void changeFirstWaitingToReservation() {
         // given
         Waiting firstWaiting = waitingWithId(1L, new Waiting(schedule, member, LocalDateTime.now()));
-        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule));
+        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
         given(reservationService.getByIdForUpdate(1L)).willReturn(reservation);
         given(waitingService.existsBySchedule(schedule)).willReturn(true);
         given(waitingService.findFirstWaitingOfSchedule(schedule)).willReturn(firstWaiting);

@@ -63,7 +63,7 @@ public class ReservationServiceTest {
             Schedule schedule = new Schedule(date, reservationTime, theme);
             Member member = memberWithId(1L, new Member("boogie", "password", "boogie", MemberRole.MEMBER));
 
-            Reservation reservation = new Reservation(member, schedule);
+            Reservation reservation = new Reservation(member, schedule, ReservationStatus.PENDING);
             given(reservationRepository.findAll())
                     .willReturn(List.of(reservationWithId(1L, reservation)));
 
@@ -114,8 +114,8 @@ public class ReservationServiceTest {
             Schedule schedule2 = new Schedule(LocalDate.of(2024, 6, 14), reservationTime, theme);
             given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(request.memberId(), request.themeId(), request.from(), request.to()))
                     .willReturn(List.of(
-                            reservationWithId(1L, new Reservation(member, schedule1)),
-                            reservationWithId(1L, new Reservation(member, schedule2))
+                            reservationWithId(1L, new Reservation(member, schedule1, ReservationStatus.PENDING)),
+                            reservationWithId(1L, new Reservation(member, schedule2, ReservationStatus.PENDING))
                     ));
 
             // when

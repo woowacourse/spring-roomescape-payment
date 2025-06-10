@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationRepository;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.member.Member;
 import roomescape.member.MemberRepository;
 import roomescape.member.MemberRole;
@@ -54,12 +55,12 @@ class ThemeRepositoryTest {
         Member member = new Member("may@example.com", "1234", "메이", MemberRole.MEMBER);
         Member savedMember = memberRepository.save(member);
 
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule3OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme2));
-        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme2));
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme3));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme1, ReservationStatus.PENDING));
+        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme1, ReservationStatus.PENDING));
+        reservationRepository.save(new Reservation(savedMember, schedule3OfTheme1, ReservationStatus.PENDING));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme2, ReservationStatus.PENDING));
+        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme2, ReservationStatus.PENDING));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme3, ReservationStatus.PENDING));
 
         // when
         List<Theme> themes = themeRepository.findAllOrderByRank(LocalDate.now(), LocalDate.now().plusDays(2), 3);

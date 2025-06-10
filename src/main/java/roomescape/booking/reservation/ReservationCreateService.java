@@ -36,7 +36,7 @@ public class ReservationCreateService {
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
         validateOrder(request, member, schedule);
-        final Reservation reservation = saveReservation(schedule, member);
+        final Reservation reservation = saveReservation(schedule, member, request.orderId());
         ReservationResponse response = ReservationResponse.from(reservation);
 
         reservation.markStatusAsConfirmed();
@@ -50,10 +50,10 @@ public class ReservationCreateService {
         order.validateOrderAndPaymentRequest(request.amount(), member, schedule);
     }
 
-    private Reservation saveReservation(final Schedule schedule, final Member member) {
+    private Reservation saveReservation(final Schedule schedule, final Member member, final String orderId) {
         validatePast(schedule);
         validateDuplication(schedule);
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING, orderId);
         Reservation reservation = reservationRepository.save(notSavedReservation);
         log.info("EVENT: RESERVATION_CREATED_BY_MEMBER, id={}, memberId={}, themeName={}, date={}, time={}",
                 reservation.getId(),

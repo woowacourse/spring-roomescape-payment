@@ -30,16 +30,20 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    public Reservation(final Member member, final Schedule schedule) {
-        this.member = member;
-        this.schedule = schedule;
-        this.reservationStatus = ReservationStatus.CONFIRMED;
-    }
+    @Column(nullable = true)
+    private String orderId;
 
     public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus) {
         this.member = member;
         this.schedule = schedule;
         this.reservationStatus = reservationStatus;
+    }
+
+    public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus, final String orderId) {
+        this.member = member;
+        this.schedule = schedule;
+        this.reservationStatus = reservationStatus;
+        this.orderId = orderId;
     }
 
     public void markStatusAsConfirmed() {

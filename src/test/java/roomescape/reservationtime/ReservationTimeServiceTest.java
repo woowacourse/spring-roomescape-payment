@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeConflictException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeNotFoundException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeUsedException;
@@ -166,7 +167,7 @@ public class ReservationTimeServiceTest {
                     .willReturn(theme);
             given(reservationService.getAllByThemeAndDate(theme, targetDate))
                     .willReturn(List.of(
-                            new Reservation(null, savedSchedule))
+                            new Reservation(null, savedSchedule, ReservationStatus.PENDING))
                     );
 
             // when
