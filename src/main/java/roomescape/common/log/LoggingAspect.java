@@ -72,18 +72,6 @@ public class LoggingAspect {
         log.info(logMessageProvider.getRequestLog(requestLogEntry));
     }
 
-    @AfterReturning(value = "exceptionHandlerCut()", returning = "response")
-    public void exceptionHandlerLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
-        final ErrorLogEntry errorLogEntry = Arrays.stream(joinPoint.getArgs())
-                .filter(Throwable.class::isInstance)
-                .map(Throwable.class::cast)
-                .map(arg -> ErrorLogEntry.withThrowable(getRequestContext(), arg, response))
-                .findFirst()
-                .orElse(ErrorLogEntry.withoutThrowable(getRequestContext(), response));
-
-        log.warn(logMessageProvider.getErrorLog(errorLogEntry));
-    }
-
     @AfterReturning(value = "controllerPointCut()", returning = "response")
     public void responseLog(final ResponseEntity<?> response) {
         final ResponseLogEntry responseLogEntry = new ResponseLogEntry(
@@ -91,6 +79,17 @@ public class LoggingAspect {
                 response
         );
         log.info(logMessageProvider.getResponseLog(responseLogEntry));
+    }
+
+    @AfterReturning(value = "exceptionHandlerCut()", returning = "response")
+    public void exceptionHandlerLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
+        final ErrorLogEntry errorLogEntry = Arrays.stream(joinPoint.getArgs())
+                .filter(Throwable.class::isInstance)
+                .map(Throwable.class::cast)
+                .findFirst()
+                .map(arg -> ErrorLogEntry.withThrowable(getRequestContext(), arg, response))
+                .orElse(ErrorLogEntry.withoutThrowable(getRequestContext(), response));
+        log.warn(logMessageProvider.getErrorLog(errorLogEntry));
     }
 
     private String getHandlerName(final JoinPoint joinPoint) {
