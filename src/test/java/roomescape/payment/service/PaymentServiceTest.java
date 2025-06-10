@@ -16,8 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.global.error.exception.BadRequestException;
-import roomescape.global.error.exception.ServerException;
+import roomescape.global.error.exception.ExternalApiClientException;
+import roomescape.global.error.exception.ExternalApiServerException;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.payment.entity.Payment;
@@ -72,13 +72,13 @@ class PaymentServiceTest {
         // given
         Payment payment = PaymentFixture.createDefault();
         given(paymentClient.requestPaymentConfirm(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
-                .willThrow(new BadRequestException("API 오류"));
+                .willThrow(new ExternalApiClientException("잘못된 사용자 결제 요청입니다."));
 
         // when & then
         assertAll(
                 () -> assertThatThrownBy(() -> paymentService.confirmPayment(
                         payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
-                        .isInstanceOf(BadRequestException.class),
+                        .isInstanceOf(ExternalApiClientException.class),
                 () -> verify(paymentRepository, never()).save(any())
         );
     }
@@ -89,13 +89,13 @@ class PaymentServiceTest {
         // given
         Payment payment = PaymentFixture.createDefault();
         given(paymentClient.requestPaymentConfirm(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
-                .willThrow(new ServerException("API 오류"));
+                .willThrow(new ExternalApiServerException("현재 외부 서비스에 문제가 발생하여 요청을 처리할 수 없습니다. 잠시 후 다시 시도해주세요."));
 
         // when & then
         assertAll(
                 () -> assertThatThrownBy(() -> paymentService.confirmPayment(
                         payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
-                        .isInstanceOf(ServerException.class),
+                        .isInstanceOf(ExternalApiServerException.class),
                 () -> verify(paymentRepository, never()).save(any())
         );
     }

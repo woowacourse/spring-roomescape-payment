@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.global.error.exception.BadRequestException;
-import roomescape.global.error.exception.ServerException;
+import roomescape.global.error.exception.ExternalApiClientException;
+import roomescape.global.error.exception.ExternalApiServerException;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.payment.dto.response.PaymentErrorResponse;
@@ -35,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
                                     response.getBody(),
                                     PaymentErrorResponse.class
                             );
-                            throw new BadRequestException(paymentErrorResponse.message());
+                            throw new ExternalApiClientException(paymentErrorResponse.message());
                         }
                 )
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
@@ -45,7 +45,7 @@ public class TossPaymentClient implements PaymentClient {
                                     response.getBody(),
                                     PaymentErrorResponse.class
                             );
-                            throw new ServerException(paymentErrorResponse.message());
+                            throw new ExternalApiServerException(paymentErrorResponse.message());
                         }
                 )
                 .body(PaymentConfirmResponse.class);

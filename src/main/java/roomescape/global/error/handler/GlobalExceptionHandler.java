@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import roomescape.global.error.dto.ErrorResponse;
+import roomescape.global.error.exception.ExternalApiClientException;
+import roomescape.global.error.exception.ExternalApiServerException;
 import roomescape.global.error.exception.WarningException;
 
 @Slf4j
@@ -50,6 +52,26 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(" / "));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(errorMessage));
+    }
+
+    @ExceptionHandler(ExternalApiClientException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApiClientException(
+            ExternalApiClientException ex,
+            HttpServletRequest request
+    ) {
+        logErrorDetails(ex, request, LOG_LEVEL_WARN);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalApiServerException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApiServerException(
+            ExternalApiServerException ex,
+            HttpServletRequest request
+    ) {
+        logErrorDetails(ex, request, LOG_LEVEL_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
