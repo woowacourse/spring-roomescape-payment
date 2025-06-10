@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.reservationTime.dto.request.ReservationTimeRequest;
 import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
@@ -28,24 +27,19 @@ public interface ReservationTimeControllerDocs {
                     )
             }))
     })
-    @PostMapping
-    ResponseEntity<ReservationTimeResponse> createReservationTime(
-            @RequestBody final ReservationTimeRequest request);
+    ResponseEntity<ReservationTimeResponse> createReservationTime(ReservationTimeRequest request);
 
     @Operation(summary = "예약 시간 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "예약 시간 목록 조회 성공")
     })
-    @GetMapping
     ResponseEntity<List<ReservationTimeResponse>> getReservationTimes();
 
     @Operation(summary = "조건별 예약 시간 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조건별 예약 시간 조회 성공")
     })
-    @GetMapping(consumes = {"application/json"})
-    ResponseEntity<List<TimeConditionResponse>> getReservationTimes(
-            final TimeConditionRequest request);
+    ResponseEntity<List<TimeConditionResponse>> getReservationTimes(TimeConditionRequest request);
 
     @Operation(summary = "예약 시간 삭제")
     @ApiResponses({
@@ -63,6 +57,5 @@ public interface ReservationTimeControllerDocs {
                     )
             }))
     })
-    @DeleteMapping("/{id}")
-    ResponseEntity<Void> deleteReservationTimeById(@PathVariable("id") final Long id);
+    ResponseEntity<Void> deleteReservationTimeById(Long id);
 } 

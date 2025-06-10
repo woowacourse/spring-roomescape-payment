@@ -19,6 +19,7 @@ public class WaitingController implements WaitingControllerDocs {
     private final WaitingService waitingService;
 
     @Override
+    @PostMapping("/waitings")
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody final WaitingRequest request,
             @Login final LoginMember loginMember
@@ -29,12 +30,14 @@ public class WaitingController implements WaitingControllerDocs {
     }
 
     @Override
+    @GetMapping("/waitings")
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
         List<WaitingResponse> waitings = waitingService.getAllWaitings();
         return ResponseEntity.ok(waitings);
     }
 
     @Override
+    @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> cancelWaiting(@PathVariable Long id) {
         waitingService.cancelWaiting(id);
         return ResponseEntity.noContent().build();

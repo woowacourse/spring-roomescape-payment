@@ -23,6 +23,7 @@ public class ReservationTimeController implements ReservationTimeControllerDocs 
     private final ReservationTimeService reservationTimeService;
 
     @Override
+    @PostMapping
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody final ReservationTimeRequest request) {
         ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
@@ -32,12 +33,14 @@ public class ReservationTimeController implements ReservationTimeControllerDocs 
     }
 
     @Override
+    @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTimeResponse> response = reservationTimeService.getReservationTimes();
         return ResponseEntity.ok(response);
     }
 
     @Override
+    @GetMapping(consumes = {"application/json"})
     public ResponseEntity<List<TimeConditionResponse>> getReservationTimes(
             final TimeConditionRequest request) {
         List<TimeConditionResponse> responses = reservationTimeService.getTimesWithCondition(request);
@@ -45,6 +48,7 @@ public class ReservationTimeController implements ReservationTimeControllerDocs 
     }
 
     @Override
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationTimeById(@PathVariable("id") final Long id) {
         reservationTimeService.deleteReservationTimeById(id);
         return ResponseEntity.noContent().build();

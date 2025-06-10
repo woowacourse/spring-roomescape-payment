@@ -3,10 +3,7 @@ package roomescape.member.presentation;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.dto.request.LoginMember;
@@ -22,6 +19,7 @@ public class LoginController implements LoginControllerDocs {
     private final LoginService loginService;
 
     @Override
+    @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         String token = loginService.loginAndReturnToken(request);
         tokenCookieManager.addTokenCookie(response, token);
@@ -29,6 +27,7 @@ public class LoginController implements LoginControllerDocs {
     }
 
     @Override
+    @GetMapping("/login/check")
     public ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember loginMember) {
         String memberName = loginService.findMemberName(loginMember.id());
         LoginCheckResponse loginCheckResponse = new LoginCheckResponse(memberName);
@@ -36,6 +35,7 @@ public class LoginController implements LoginControllerDocs {
     }
 
     @Override
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         tokenCookieManager.deleteTokenCookie(response);
         return ResponseEntity.ok().build();

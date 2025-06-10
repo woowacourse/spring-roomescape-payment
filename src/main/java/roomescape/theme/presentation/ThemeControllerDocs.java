@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.dto.response.ThemeResponse;
@@ -21,14 +20,12 @@ public interface ThemeControllerDocs {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "테마 목록 조회 성공")
     })
-    @GetMapping
     ResponseEntity<List<ThemeResponse>> getThemes();
 
     @Operation(summary = "인기 테마 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "인기 테마 목록 조회 성공")
     })
-    @GetMapping("/popular")
     ResponseEntity<List<PopularThemeResponse>> getPopularThemes();
 
     @Operation(summary = "테마 생성")
@@ -43,8 +40,7 @@ public interface ThemeControllerDocs {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "403", description = "권한이 없는 사용자")
     })
-    @PostMapping
-    ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeRequest request);
+    ResponseEntity<ThemeResponse> createTheme(ThemeRequest request);
 
     @Operation(summary = "테마 삭제")
     @ApiResponses({
@@ -64,6 +60,5 @@ public interface ThemeControllerDocs {
                     )
             }))
     })
-    @DeleteMapping("/{id}")
-    ResponseEntity<Void> deleteTheme(@PathVariable("id") final Long id);
+    ResponseEntity<Void> deleteTheme(Long id);
 } 

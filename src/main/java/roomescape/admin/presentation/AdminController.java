@@ -2,10 +2,7 @@ package roomescape.admin.presentation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -26,6 +23,7 @@ public class AdminController implements AdminControllerDocs {
     private final ReservationService reservationService;
 
     @Override
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request) {
         ReservationResponse response = reservationService.createPendingReservation(request.getReservationRequest(),
                 request.memberId());

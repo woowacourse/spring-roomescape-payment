@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.waiting.dto.request.WaitingRequest;
@@ -29,17 +28,12 @@ public interface WaitingControllerDocs {
             })),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    @PostMapping("/waitings")
-    ResponseEntity<WaitingResponse> createWaiting(
-            @RequestBody final WaitingRequest request,
-            @Login final LoginMember loginMember
-    );
+    ResponseEntity<WaitingResponse> createWaiting(WaitingRequest request, LoginMember loginMember);
 
     @Operation(summary = "대기 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "대기 목록 조회 성공")
     })
-    @GetMapping("/waitings")
     ResponseEntity<List<WaitingResponse>> getWaitings();
 
     @Operation(summary = "대기 취소")
@@ -52,6 +46,5 @@ public interface WaitingControllerDocs {
                     )
             }))
     })
-    @DeleteMapping("/waitings/{id}")
-    ResponseEntity<Void> cancelWaiting(@PathVariable Long id);
+    ResponseEntity<Void> cancelWaiting(Long id);
 } 

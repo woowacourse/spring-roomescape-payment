@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.member.dto.request.SignupRequest;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.dto.response.SignupResponse;
@@ -31,8 +30,7 @@ public interface MemberControllerDocs {
                     )
             }))
     })
-    @PostMapping
-    ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request);
+    ResponseEntity<SignupResponse> signup(SignupRequest request);
 
     @Operation(summary = "회원 목록 조회")
     @ApiResponses({
@@ -40,6 +38,5 @@ public interface MemberControllerDocs {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "403", description = "권한이 없는 사용자")
     })
-    @GetMapping
     ResponseEntity<List<MemberResponse>> findAllMembers();
 } 

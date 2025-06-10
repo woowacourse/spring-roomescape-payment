@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.dto.request.LoginRequest;
@@ -27,21 +26,18 @@ public interface LoginControllerDocs {
                     )
             }))
     })
-    @PostMapping("/login")
-    ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response);
+    ResponseEntity<Void> login(LoginRequest request, HttpServletResponse response);
 
     @Operation(summary = "로그인 상태 확인")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 상태 확인 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    @GetMapping("/login/check")
     ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember loginMember);
 
     @Operation(summary = "로그아웃")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     })
-    @PostMapping("/logout")
     ResponseEntity<Void> logout(HttpServletResponse response);
 } 

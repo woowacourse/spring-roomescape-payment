@@ -30,6 +30,7 @@ public class ReservationController implements ReservationControllerDocs {
     private final PaymentService paymentService;
 
     @Override
+    @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations(
             @ModelAttribute final ReservationConditionRequest request) {
         List<ReservationResponse> response = reservationService.getReservations(request);
@@ -37,6 +38,7 @@ public class ReservationController implements ReservationControllerDocs {
     }
 
     @Override
+    @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody final ReservationRequest request,
             @Login final LoginMember loginMember
@@ -50,12 +52,14 @@ public class ReservationController implements ReservationControllerDocs {
     }
 
     @Override
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationById(@PathVariable("id") final Long id) {
         reservationService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @GetMapping("/mine")
     public ResponseEntity<List<MyReservationAndWaitingResponse>> getMyReservations(@Login LoginMember loginMember) {
         List<MyReservationAndWaitingResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
         return ResponseEntity.ok().body(myReservationResponses);

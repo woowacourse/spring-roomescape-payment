@@ -24,6 +24,7 @@ public class MemberController implements MemberControllerDocs {
     private final MemberService memberService;
 
     @Override
+    @PostMapping
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         SignupResponse response = memberService.createUser(request);
         URI uri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
@@ -31,6 +32,7 @@ public class MemberController implements MemberControllerDocs {
     }
 
     @Override
+    @GetMapping
     public ResponseEntity<List<MemberResponse>> findAllMembers() {
         List<MemberResponse> allMember = memberService.findAllMember();
         return ResponseEntity.ok().body(allMember);

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 
@@ -30,6 +29,5 @@ public interface AdminControllerDocs {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "403", description = "권한이 없는 사용자")
     })
-    @PostMapping("/reservations")
-    ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request);
+    ResponseEntity<ReservationResponse> createReservation(AdminReservationRequest request);
 } 
