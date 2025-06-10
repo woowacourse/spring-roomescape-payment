@@ -66,7 +66,7 @@ class PendingPaymentControllerTest {
         @DisplayName("정상적으로 결제를 진행하면 200을 반환한다.")
         void confirmPayment() {
             // given
-            var pendingPaymentId = 6L;
+            var pendingPaymentId = 1L;
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when & then

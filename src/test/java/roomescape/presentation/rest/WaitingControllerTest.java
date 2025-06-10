@@ -105,7 +105,7 @@ class WaitingControllerTest {
         @Test
         @DisplayName("주어진 아이디에 해당하는 예약 대기가 있다면 삭제하고 NO CONTENT를 응답한다.")
         void deleteWaiting() {
-            Long removeId = 4L;
+            Long removeId = 1L;
 
             String token = getUserToken();
 

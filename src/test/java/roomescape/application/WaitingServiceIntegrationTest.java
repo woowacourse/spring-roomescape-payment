@@ -119,7 +119,7 @@ class WaitingServiceIntegrationTest {
     @DisplayName("대기를 삭제할 수 있다.")
     void removeById() {
         // given
-        var waitingId = 4L;
+        var waitingId = 1L;
 
         // when
         service.removeById(waitingId);

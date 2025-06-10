@@ -32,5 +32,23 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
             """)
     List<WaitingWithRank> findWaitingWithRankByUserId(Long userId);
 
-    boolean existsByDateAndTimeSlotIdAndThemeIdAndUserId(LocalDate date, long timeId, long themeId, long userId);
+    @Query("""
+            SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END 
+            FROM Reserved r 
+            WHERE r.date = :date AND r.timeSlot.id = :timeSlotId AND r.theme.id = :themeId AND r.user.id = :userId 
+            OR EXISTS (
+                SELECT w FROM Waiting w 
+                WHERE w.date = :date AND w.timeSlot.id = :timeSlotId AND w.theme.id = :themeId AND w.user.id = :userId
+            ) 
+            OR EXISTS (
+                SELECT p FROM PendingPayment p 
+                WHERE p.date = :date AND p.timeSlot.id = :timeSlotId AND p.theme.id = :themeId AND p.user.id = :userId
+            )
+            """)
+    boolean existsAnyReservationBy(
+            LocalDate date,
+            Long timeSlotId,
+            Long themeId,
+            Long userId
+    );
 }

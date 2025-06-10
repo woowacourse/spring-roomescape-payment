@@ -22,9 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.reservation.waiting.Waiting;
 import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.theme.Theme;
@@ -42,7 +42,7 @@ public class WaitingServiceTest {
     WaitingRepository waitingRepository;
 
     @Mock
-    ReservationRepository reservationRepository;
+    ReservedRepository reservedRepository;
 
     @Mock
     PendingPaymentRepository pendingPaymentRepository;
@@ -114,7 +114,7 @@ public class WaitingServiceTest {
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+            when(reservedRepository.existsAnyReservationBy(
                     date, timeSlot.getId(),
                     theme.getId(), user.getId()
             )).thenReturn(true);
@@ -126,7 +126,7 @@ public class WaitingServiceTest {
                             AlreadyExistedException.class).hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다."),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    () -> verify(reservedRepository).existsAnyReservationBy(
                             date,
                             timeSlot.getId(), theme.getId(), user.getId()
                     )
@@ -146,7 +146,7 @@ public class WaitingServiceTest {
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+            when(reservedRepository.existsAnyReservationBy(
                     date, timeSlot.getId(),
                     theme.getId(), user.getId()
             )).thenReturn(false);
@@ -158,7 +158,7 @@ public class WaitingServiceTest {
                     () -> assertThat(waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId())).isEqualTo(
                             waiting), () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    () -> verify(reservedRepository).existsAnyReservationBy(
                             date,
                             timeSlot.getId(), theme.getId(), user.getId()
                     ),

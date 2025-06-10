@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.reservation.reserved.ReservedSearchFilter;
@@ -29,7 +28,6 @@ import roomescape.infrastructure.ReservedSpecifications;
 public class ReservedService {
 
     private final ReservedRepository reservedRepository;
-    private final ReservationRepository reservationRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
@@ -104,9 +102,8 @@ public class ReservedService {
             final LocalDate date, final Long timeSlotId, final Long themeId,
             final Long userId
     ) {
-        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
-                date,
-                timeSlotId, themeId, userId
+        boolean hasDuplicatedReservation = reservedRepository.existsAnyReservationBy(
+                date, timeSlotId, themeId, userId
         );
 
         if (hasDuplicatedReservation) {

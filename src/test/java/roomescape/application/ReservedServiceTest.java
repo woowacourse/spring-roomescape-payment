@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
@@ -41,8 +40,6 @@ class ReservedServiceTest {
     @Mock
     ReservedRepository reservedRepository;
 
-    @Mock
-    ReservationRepository reservationRepository;
 
     @Mock
     TimeSlotRepository timeSlotRepository;
@@ -75,7 +72,7 @@ class ReservedServiceTest {
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+            when(reservedRepository.existsAnyReservationBy(
                     date, timeSlot.getId(),
                     theme.getId(), user.getId()
             )).thenReturn(true);
@@ -90,7 +87,7 @@ class ReservedServiceTest {
                                     paymentInfo
                             )).isInstanceOf(AlreadyExistedException.class)
                             .hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다."),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    () -> verify(reservedRepository).existsAnyReservationBy(
                             date,
                             timeSlot.getId(), theme.getId(), user.getId()
                     )

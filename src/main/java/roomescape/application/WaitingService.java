@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.reservation.waiting.Waiting;
 import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.theme.Theme;
@@ -25,7 +25,7 @@ import roomescape.exception.NotFoundException;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservedRepository;
     private final PendingPaymentRepository pendingPaymentRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
@@ -74,7 +74,7 @@ public class WaitingService {
             final LocalDate date, final Long timeSlotId, final Long themeId,
             final Long userId
     ) {
-        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+        boolean hasDuplicatedReservation = reservedRepository.existsAnyReservationBy(
                 date,
                 timeSlotId, themeId, userId
         );
