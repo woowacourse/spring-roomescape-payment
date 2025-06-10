@@ -24,21 +24,16 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private String orderId;
-
-    @Column(nullable = false)
     private long amount;
 
     @Builder
     private Payment(
             final Long id,
             @NonNull final String paymentKey,
-            @NonNull final String orderId,
             @NonNull final Long amount
     ) {
         this.id = id;
         this.paymentKey = paymentKey;
-        this.orderId = orderId;
         this.amount = amount;
     }
 }

@@ -65,7 +65,6 @@ public class ReservationService {
         Theme theme = themeRepository.getById(request.themeId());
         Payment payment = Payment.builder()
                 .paymentKey(request.paymentKey())
-                .orderId(request.orderId())
                 .amount(request.amount())
                 .build();
 
