@@ -235,7 +235,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         date: reservationData.date,
         themeId: reservationData.themeId,
         timeId: reservationData.timeId,
-        payment : {
+        payment: {
             paymentKey: paymentData.paymentKey,
             orderId: paymentData.orderId,
             amount: paymentData.amount,
@@ -253,8 +253,8 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }).then(response => {
         if (!response.ok) {
             return response.json().then(errorBody => {
-                console.error("예약 결제 실패 : " + JSON.stringify(errorBody.message));
-                window.alert(errorBody.message);
+                console.error(`예약 결제 실패.\nTrace-ID: ${errorBody.traceId}\nError Message:${errorBody.message}`);
+                window.alert(`Trace-ID: ${errorBody.traceId}\nError Message:${errorBody.message}`);
             });
         } else {
             response.json().then(successBody => {

@@ -37,9 +37,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WarningException.class)
     public ResponseEntity<ErrorResponse> handleWarningException(WarningException ex, HttpServletRequest request) {
-        logErrorDetails(ex, request, LOG_LEVEL_WARN);
+        String traceId = logErrorDetails(ex, request, LOG_LEVEL_WARN);
         return ResponseEntity.status(ex.getHttpStatus())
-                .body(new ErrorResponse(ex.getMessage()));
+                .body(new ErrorResponse(traceId, ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,11 +47,12 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException e,
             HttpServletRequest request
     ) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
+        String traceId = logErrorDetails(e, request, LOG_LEVEL_WARN);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(" / "));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(errorMessage));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(traceId, errorMessage));
     }
 
     @ExceptionHandler(ExternalApiClientException.class)
@@ -59,9 +60,9 @@ public class GlobalExceptionHandler {
             ExternalApiClientException ex,
             HttpServletRequest request
     ) {
-        logErrorDetails(ex, request, LOG_LEVEL_WARN);
+        String traceId = logErrorDetails(ex, request, LOG_LEVEL_WARN);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(ex.getMessage()));
+                .body(new ErrorResponse(traceId, ex.getMessage()));
     }
 
     @ExceptionHandler(ExternalApiServerException.class)
@@ -69,15 +70,16 @@ public class GlobalExceptionHandler {
             ExternalApiServerException ex,
             HttpServletRequest request
     ) {
-        logErrorDetails(ex, request, LOG_LEVEL_ERROR);
+        String traceId = logErrorDetails(ex, request, LOG_LEVEL_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(ex.getMessage()));
+                .body(new ErrorResponse(traceId, ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleException(RuntimeException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_ERROR);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+        String traceId = logErrorDetails(e, request, LOG_LEVEL_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(traceId, e.getMessage()));
     }
 
     /**
@@ -87,7 +89,7 @@ public class GlobalExceptionHandler {
      * @param request  HttpServletRequest 객체
      * @param logLevel 로깅할 레벨 (WARN 또는 ERROR)
      */
-    private void logErrorDetails(Exception ex, HttpServletRequest request, String logLevel) {
+    private String logErrorDetails(Exception ex, HttpServletRequest request, String logLevel) {
         Map<String, Object> logData = new LinkedHashMap<>();
         // 에러 헤더
         logData.put("level", logLevel);
@@ -161,5 +163,6 @@ public class GlobalExceptionHandler {
             log.error("Failed to convert log data to JSON: {}", jsonEx.getMessage());
             log.error("Fallback log (Level: {}, Message: {})", logLevel, ex.getMessage(), ex);
         }
+        return MDC.get("traceId");
     }
 }
