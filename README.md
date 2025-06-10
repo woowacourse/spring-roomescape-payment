@@ -80,7 +80,6 @@
 |:----:|:-----------------------------------------:|
 | 사용자  |        [user.md](api_docs/user.md)        |
 |  예약  | [reservation.md](api_docs/reservation.md) |
-|  결제  |     [payment.md](api_docs/payment.md)     |
 |  테마  |       [theme.md](api_docs/theme.md)       |
 | 예약시간 |        [time.md](api_docs/time.md)        |
 | 관리자  |       [admin.md](api_docs/admin.md)       |
