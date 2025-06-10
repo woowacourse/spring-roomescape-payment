@@ -14,12 +14,12 @@ public record RequestLogEntry(
         List<HandlerArgument> handlerArguments
 ) {
 
-    private static final List<Predicate<Class<?>>> JSON_UNSERIALIZABLE_CLASSES = List.of(
+    private static final List<Predicate<Class<?>>> IGNORE_CLASSES = List.of(
             HttpServletRequest.class::isAssignableFrom,
             HttpServletResponse.class::isAssignableFrom
     );
 
-    public static RequestLogEntry createWithHandlerArgumentMap(
+    public static RequestLogEntry createWithHandlerArguments(
             final RequestContext requestContext,
             final String handlerName,
             final Map<String, Object> handlerArguments
@@ -28,14 +28,14 @@ public record RequestLogEntry(
                 requestContext,
                 handlerName,
                 handlerArguments.entrySet().stream()
-                        .filter(entry -> isJsonSerializable(entry.getValue()))
+                        .filter(entry -> isAssignableType(entry.getValue()))
                         .map(HandlerArgument::fromArgumentEntry)
                         .toList()
         );
     }
 
-    private static boolean isJsonSerializable(final Object argument) {
-        return JSON_UNSERIALIZABLE_CLASSES.stream()
+    private static boolean isAssignableType(final Object argument) {
+        return IGNORE_CLASSES.stream()
                 .noneMatch(predicate -> predicate.test(argument.getClass()));
     }
 

@@ -64,7 +64,7 @@ public class LoggingAspect {
 
     @Before("allMapping()")
     public void requestLog(final JoinPoint joinPoint) {
-        final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArgumentMap(
+        final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArguments(
                 getRequestContext(),
                 getHandlerName(joinPoint),
                 getHandlerArguments(joinPoint)
