@@ -185,6 +185,7 @@ class ReservationAcceptanceTest {
                                 fieldWithPath("payment.paymentType").description("결제 타입 (Toss Payments, 예: NORMAL)")
                         ),
                         responseFields( // 응답 필드 문서화
+                                fieldWithPath("traceId").description("에러 추적 ID"),
                                 fieldWithPath("message").description("에러 메시지")
                         )
                 ))
@@ -229,6 +230,7 @@ class ReservationAcceptanceTest {
                                 fieldWithPath("payment.paymentType").description("결제 타입 (Toss Payments, 예: NORMAL)")
                         ),
                         responseFields( // 응답 필드 문서화
+                                fieldWithPath("traceId").description("에러 추적 ID"),
                                 fieldWithPath("message").description("에러 메시지")
                         )
                 ))
@@ -440,6 +442,7 @@ class ReservationAcceptanceTest {
                                 parameterWithName("dateTo").description("조회 종료 날짜 (YYYY-MM-DD 형식)")
                         ),
                         responseFields(
+                                fieldWithPath("traceId").description("에러 추적 ID"),
                                 fieldWithPath("message").description("에러 메시지")
                         )
                 ))
@@ -527,6 +530,7 @@ class ReservationAcceptanceTest {
                                 fieldWithPath("memberId").description("예약할 회원의 ID")
                         ),
                         responseFields( // 응답 필드 문서화
+                                fieldWithPath("traceId").description("에러 추적 ID"),
                                 fieldWithPath("message").description("에러 메시지")
                         )
                 ))
