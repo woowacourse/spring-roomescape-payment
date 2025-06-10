@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import roomescape.common.exception.impl.TokenExpiredException;
 import roomescape.common.exception.impl.UnauthorizedException;
 import roomescape.login.application.dto.Token;
 import roomescape.member.domain.Member;
@@ -63,7 +64,7 @@ public class JwtHandler {
                 .parseClaimsJws(token)
                 .getBody();
         } catch (final ExpiredJwtException e) {
-            throw new UnauthorizedException("로그인 정보가 만료되었습니다.");
+            throw new TokenExpiredException("로그인 정보가 만료되었습니다.");
         } catch (final UnsupportedJwtException | MalformedJwtException | SignatureException e) {
             throw new UnauthorizedException("로그인 정보가 유효하지 않습니다.");
         }

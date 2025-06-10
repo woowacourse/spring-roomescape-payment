@@ -31,7 +31,9 @@ function renderCombined(reservations, waitings) {
       theme: r.theme,
       date: r.date,
       time: r.time,
-      status: r.status
+      status: r.status,
+      paymentKey: r.paymentKey,
+      amount: r.amount
     })),
     ...waitings.map(w => ({
       id: w.id,
@@ -51,6 +53,8 @@ function renderCombined(reservations, waitings) {
     row.insertCell(1).textContent = item.date;
     row.insertCell(2).textContent = item.time;
     row.insertCell(3).textContent = item.status;
+    row.insertCell(4).textContent = item.paymentKey;
+    row.insertCell(5).textContent = item.amount;
 
     const cancelCell = row.insertCell(4);
     if (item.status.includes('예약대기')) {
@@ -61,6 +65,14 @@ function renderCombined(reservations, waitings) {
         requestDeleteWaiting(item.id).then(() => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
+    } else if (item.status.includes('결제 대기')) {
+      const payButton = document.createElement('button');
+      payButton.textContent = '결제';
+      payButton.className = 'btn btn-primary';
+      payButton.onclick = function () {
+        window.location.href = `/payment?reservationId=${item.id}`;
+      };
+      cancelCell.appendChild(payButton);
     } else {
       cancelCell.textContent = '';
     }

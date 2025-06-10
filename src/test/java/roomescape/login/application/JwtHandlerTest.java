@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import roomescape.common.exception.impl.TokenExpiredException;
 import roomescape.common.exception.impl.UnauthorizedException;
 import roomescape.login.application.dto.Token;
 import roomescape.member.domain.Member;
@@ -75,7 +76,7 @@ class JwtHandlerTest {
             .compact();
 
         assertThatThrownBy(() -> jwtHandler.decode(expiredToken))
-            .isInstanceOf(UnauthorizedException.class)
+            .isInstanceOf(TokenExpiredException.class)
             .hasMessage("로그인 정보가 만료되었습니다.");
     }
 

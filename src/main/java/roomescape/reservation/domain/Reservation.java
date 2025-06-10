@@ -1,16 +1,23 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -19,17 +26,19 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private LocalDate date;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private ReservationTime time;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private Payment payment;
+
+    private final LocalDateTime createdAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime();
 
     protected Reservation() {
 
@@ -40,18 +49,20 @@ public class Reservation {
         final LocalDate date,
         final ReservationTime time,
         final Theme theme,
-        final Member member
+        final Member member,
+        final PaymentStatus paymentStatus
     ) {
         this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
+        this.paymentStatus = paymentStatus;
     }
 
     public Reservation(final LocalDate date, final ReservationTime time, final Theme theme,
-        final Member member) {
-        this(null, date, time, theme, member);
+        final Member member, PaymentStatus paymentStatus) {
+        this(null, date, time, theme, member, paymentStatus);
     }
 
     public boolean hasConflictWith(final ReservationTime reservationTime, final Theme theme) {
@@ -89,6 +100,18 @@ public class Reservation {
 
     public LocalTime getStartAt() {
         return time.getStartAt();
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public String getPaymentStatusName() {
+        return paymentStatus.getName();
+    }
+
+    public void changePaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     @Override

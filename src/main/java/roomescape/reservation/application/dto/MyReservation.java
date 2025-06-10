@@ -16,7 +16,6 @@ public record MyReservation(
     String status
 ) {
 
-    static final String RESERVED_STATUS = "예약";
     static final String WAITING_STATUS = "%s번째 예약대기";
 
     public static MyReservation from(Reservation reservation) {
@@ -25,7 +24,7 @@ public record MyReservation(
             reservation.getThemeName(),
             reservation.getDate(),
             reservation.getStartAt(),
-            RESERVED_STATUS
+            reservation.getPaymentStatusName()
         );
     }
 

@@ -2,10 +2,6 @@ package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,13 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.member.application.dto.MemberResponse;
-import roomescape.payment.application.PaymentService;
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
+import roomescape.reservation.application.dto.MyReservationAndPaymentInfo;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.ReservationTimeResponse;
 import roomescape.theme.application.dto.ThemeResponse;
@@ -37,9 +31,6 @@ class ReservationServiceTest {
     @Autowired
     private ReservationService reservationService;
 
-    @MockitoBean
-    private PaymentService paymentService;
-
     @Autowired
     private WaitingService waitingService;
 
@@ -53,10 +44,6 @@ class ReservationServiceTest {
     void 예약을_추가한다() {
         // given
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
-
-        when(paymentService.addPayment(any(), anyLong()))
-            .thenReturn(mock(Payment.class));
-
         // when & then
         assertThat(reservationService.addMemberReservation(request, 1L)).isEqualTo(
             new ReservationResponse(
@@ -122,7 +109,7 @@ class ReservationServiceTest {
         final long memberId = 1L;
 
         // when
-        final List<MyReservation> responses = reservationService.findByMemberId(memberId);
+        List<MyReservationAndPaymentInfo> responses = reservationService.findByMemberId(memberId);
 
         // then
         assertThat(responses).hasSize(2);
@@ -139,7 +126,8 @@ class ReservationServiceTest {
             memberReservationRequest, 1L);
 
         // 기존 member2의 예약 내역
-        List<MyReservation> beforeMemberReservations = reservationService.findByMemberId(2L);
+        List<MyReservationAndPaymentInfo> beforeMemberReservations = reservationService.findByMemberId(
+            2L);
         assertThat(beforeMemberReservations).hasSize(2);
 
         WaitingIdResponse waitingIdResponse = waitingService.addWaiting(memberReservationRequest,
@@ -149,7 +137,7 @@ class ReservationServiceTest {
         reservationService.deleteReservationAndGetFirstWaiting(reservationResponse.id());
 
         //then
-        List<MyReservation> reservations = reservationService.findByMemberId(1L);
+        List<MyReservationAndPaymentInfo> reservations = reservationService.findByMemberId(1L);
         boolean hasReservation = reservations.stream()
             .anyMatch(reservation -> reservation.id().equals(reservationResponse.id()));
 
@@ -157,7 +145,7 @@ class ReservationServiceTest {
         boolean hasWaiting = waitingsFromMember.stream()
             .anyMatch(waiting -> waiting.id().equals(waitingIdResponse.waitingId()));
 
-        List<MyReservation> findReservations = reservationService.findByMemberId(2L);
+        List<MyReservationAndPaymentInfo> findReservations = reservationService.findByMemberId(2L);
 
         //then
         assertThat(hasReservation).isFalse();
@@ -166,6 +154,6 @@ class ReservationServiceTest {
     }
 
     private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId) {
-        return new MemberReservationRequest(now, timeId, themeId, "key", "orderId", 1000L);
+        return new MemberReservationRequest(now, timeId, themeId);
     }
 }
