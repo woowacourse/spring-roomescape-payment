@@ -32,6 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -93,7 +94,18 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$.thumbnail").value("abc"))
                 .andDo(document("create-theme",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 이미지 파일명")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("테마 ID"),
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test
@@ -115,7 +127,13 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$[1].name").value("위키드"))
                 .andDo(document("read-themes",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 ID"),
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test
@@ -151,7 +169,13 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$[1].name").value("인기테마2"))
                 .andDo(document("read-popular-themes",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 ID"),
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test

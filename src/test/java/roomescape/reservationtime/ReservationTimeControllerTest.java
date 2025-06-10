@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,7 +78,14 @@ class ReservationTimeControllerTest {
                 .andExpect(jsonPath("$.startAt").value("10:00"))
                 .andDo(document("create-time",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("startAt").description("예약 시작 시간")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("예약 시간 ID"),
+                                fieldWithPath("startAt").description("예약 시작 시간")
+                        )));
     }
 
     @Test
@@ -112,7 +120,11 @@ class ReservationTimeControllerTest {
                 .andExpect(jsonPath("$[1].startAt").value("12:00"))
                 .andDo(document("read-times",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 시간 ID"),
+                                fieldWithPath("[].startAt").description("예약 시작 시간")
+                        )));
     }
 
     @Test
@@ -151,7 +163,12 @@ class ReservationTimeControllerTest {
                 .andExpect(jsonPath("$[1].alreadyBooked").value(true))
                 .andDo(document("read-available-times",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 시간 ID"),
+                                fieldWithPath("[].startAt").description("예약 시작 시간"),
+                                fieldWithPath("[].alreadyBooked").description("예약 가능 여부")
+                        )));
     }
 
     @Test

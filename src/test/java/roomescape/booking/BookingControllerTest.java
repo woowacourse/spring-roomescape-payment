@@ -35,6 +35,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,7 +114,25 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[1].status").value("1번째 예약대기"))
                 .andDo(document("read-bookings-of-member",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].status").description("예약 상태"),
+                                fieldWithPath("[].schedule").description("예약 스케줄 정보"),
+                                fieldWithPath("[].schedule.id").description("스케줄 ID"),
+                                fieldWithPath("[].schedule.date").description("예약 날짜"),
+                                fieldWithPath("[].schedule.time").description("예약 시간 정보"),
+                                fieldWithPath("[].schedule.time.id").description("시간 ID"),
+                                fieldWithPath("[].schedule.time.startAt").description("시작 시간"),
+                                fieldWithPath("[].schedule.theme").description("예약 테마 정보"),
+                                fieldWithPath("[].schedule.theme.id").description("테마 ID"),
+                                fieldWithPath("[].schedule.theme.name").description("테마 이름"),
+                                fieldWithPath("[].schedule.theme.description").description("테마 설명"),
+                                fieldWithPath("[].schedule.theme.thumbnail").description("테마 썸네일 이미지 파일명"),
+                                fieldWithPath("[].payment").description("결제 정보").optional(),
+                                fieldWithPath("[].payment.paymentKey").description("결제 키").optional(),
+                                fieldWithPath("[].payment.amount").description("결제 금액").optional()
+                        )));
     }
 
     @Test

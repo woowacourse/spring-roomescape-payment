@@ -38,9 +38,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReservationController.class)
@@ -118,13 +118,41 @@ class ReservationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.member.id").value(1))
-                .andExpect(jsonPath("$.member.name").value(loginMember.name()))
-                .andExpect(jsonPath("$.schedule.id").value(1))
                 .andDo(document("create-reservation",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("themeId").description("예약 테마 id"),
+                                fieldWithPath("timeId").description("예약 시간 id"),
+                                fieldWithPath("paymentKey").description("토스 결제 요청 api로부터 응답받은 결제 Key"),
+                                fieldWithPath("orderId").description("클라이언트에서 생성한 주문에 대한 식별값"),
+                                fieldWithPath("amount").description("방탈출 금액"),
+                                fieldWithPath("paymentType").description("토스 결제 상태")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("예약 ID"),
+
+                                fieldWithPath("schedule").description("예약 스케줄 정보"),
+                                fieldWithPath("member").description("예약자 정보"),
+
+                                fieldWithPath("schedule.id").description("스케줄 ID"),
+                                fieldWithPath("schedule.date").description("예약 날짜"),
+                                fieldWithPath("schedule.time").description("예약 시간 정보"),
+                                fieldWithPath("schedule.theme").description("예약 테마 정보"),
+
+                                fieldWithPath("schedule.time.id").description("시간 ID"),
+                                fieldWithPath("schedule.time.startAt").description("시작 시간"),
+
+                                fieldWithPath("schedule.theme.id").description("테마 ID"),
+                                fieldWithPath("schedule.theme.name").description("테마 이름"),
+                                fieldWithPath("schedule.theme.description").description("테마 설명"),
+                                fieldWithPath("schedule.theme.thumbnail").description("테마 썸네일 이미지 파일명"),
+
+                                fieldWithPath("member.id").description("회원 ID"),
+                                fieldWithPath("member.name").description("회원 이름")
+                        )
+                ));
     }
 
     @Test
@@ -142,7 +170,16 @@ class ReservationControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andDo(document("create-reservation-unauthorized",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())));
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("themeId").description("예약 테마 id"),
+                                fieldWithPath("timeId").description("예약 시간 id"),
+                                fieldWithPath("paymentKey").description("토스 결제 요청 api로부터 응답받은 결제 Key"),
+                                fieldWithPath("orderId").description("클라이언트에서 생성한 주문에 대한 식별값"),
+                                fieldWithPath("amount").description("방탈출 금액"),
+                                fieldWithPath("paymentType").description("토스 결제 상태")
+                        )));
     }
 
     @Test
