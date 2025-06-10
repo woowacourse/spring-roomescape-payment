@@ -1,6 +1,5 @@
 package roomescape.domain.reservation.reserved;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +46,7 @@ public class Reserved {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     protected User user;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
     private Payment payment;
 
     private Reserved(final User user, final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
