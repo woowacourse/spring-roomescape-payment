@@ -1,4 +1,4 @@
-package roomescape.client.dto;
+package roomescape.infrastructure.dto;
 
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;

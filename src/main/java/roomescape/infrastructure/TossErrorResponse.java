@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.infrastructure;
 
 import org.springframework.http.HttpStatusCode;
 

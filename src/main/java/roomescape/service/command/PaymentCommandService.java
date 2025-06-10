@@ -3,14 +3,14 @@ package roomescape.service.command;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.client.PaymentClient;
-import roomescape.client.dto.PaymentConfirmResultDto;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentResponseDto;
 import roomescape.exception.NotFoundException;
+import roomescape.infrastructure.dto.PaymentConfirmResultDto;
 import roomescape.repository.JpaPaymentRepository;
 import roomescape.repository.JpaReservationRepository;
+import roomescape.service.PaymentClient;
 import roomescape.service.dto.PaymentConfirmDto;
 
 @Service

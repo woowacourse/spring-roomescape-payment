@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.client.dto.PaymentConfirmResultDto;
 import roomescape.config.HttpClientConfiguration;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
+import roomescape.infrastructure.dto.PaymentConfirmResultDto;
 import roomescape.service.dto.PaymentConfirmDto;
 
 import static org.assertj.core.api.Assertions.assertThat;

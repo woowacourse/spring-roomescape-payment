@@ -11,9 +11,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.client.TossErrorResponse;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
+import roomescape.infrastructure.TossErrorResponse;
 
 import java.io.IOException;
 import java.time.Duration;

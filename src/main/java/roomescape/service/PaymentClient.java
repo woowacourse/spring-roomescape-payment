@@ -1,6 +1,6 @@
-package roomescape.client;
+package roomescape.service;
 
-import roomescape.client.dto.PaymentConfirmResultDto;
+import roomescape.infrastructure.dto.PaymentConfirmResultDto;
 import roomescape.service.dto.PaymentConfirmDto;
 
 public interface PaymentClient {

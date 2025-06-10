@@ -1,14 +1,15 @@
-package roomescape.client;
+package roomescape.infrastructure;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.client.dto.PaymentConfirmResultDto;
+import roomescape.infrastructure.dto.PaymentConfirmResultDto;
+import roomescape.service.PaymentClient;
 import roomescape.service.dto.PaymentConfirmDto;
 
 @Component
-public class TossPaymentClient implements PaymentClient{
+public class TossPaymentClient implements PaymentClient {
 
     private static final String PAYMENT_CONFIRM_URL = "/v1/payments/confirm";
 

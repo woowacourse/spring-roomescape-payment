@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.client.PaymentErrorResponse;
 import roomescape.exception.*;
 import roomescape.exception.dto.ApiErrorResponse;
+import roomescape.infrastructure.PaymentErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

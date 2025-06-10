@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.infrastructure;
 
 import org.apache.hc.client5.http.ConnectTimeoutException;
 import org.junit.jupiter.api.DisplayName;
