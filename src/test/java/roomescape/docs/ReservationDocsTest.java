@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import roomescape.config.TestWebMvcConfig;
+import roomescape.docs.support.SnippetSupport;
 import roomescape.member.dto.MemberResponse;
 import roomescape.mock.TestAdminInterceptor;
 import roomescape.mock.TestAuthenticationPrincipalArgumentResolver;
@@ -95,7 +96,7 @@ class ReservationDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isCreated())
-                .andDo(document("예약 생성",
+                .andDo(document(SnippetSupport.snippet(this, "예약 생성"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -132,7 +133,7 @@ class ReservationDocsTest {
                 delete("/reservations/{id}", reservationId));
 
         result.andExpect(status().isNoContent())
-                .andDo(document("예약 삭제",
+                .andDo(document(SnippetSupport.snippet(this, "예약 삭제"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(
@@ -163,7 +164,7 @@ class ReservationDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("내 예약 조회",
+                .andDo(document(SnippetSupport.snippet(this, "내 예약 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
@@ -200,7 +201,7 @@ class ReservationDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("예약 조회(조건 검색)",
+                .andDo(document(SnippetSupport.snippet(this, "예약 조회(조건 검색)"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         queryParameters(
@@ -246,7 +247,7 @@ class ReservationDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("예약 가능한 시간 조회",
+                .andDo(document(SnippetSupport.snippet(this, "예약 가능한 시간 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         queryParameters(

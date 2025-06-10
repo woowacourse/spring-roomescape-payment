@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import roomescape.config.TestWebMvcConfig;
+import roomescape.docs.support.SnippetSupport;
 import roomescape.mock.TestAdminInterceptor;
 import roomescape.mock.TestAuthenticationPrincipalArgumentResolver;
 import roomescape.theme.controller.ThemeController;
@@ -90,7 +91,7 @@ class ThemeDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isCreated())
-                .andDo(document("테마 생성",
+                .andDo(document(SnippetSupport.snippet(this, "테마 생성"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -121,7 +122,7 @@ class ThemeDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("테마 조회",
+                .andDo(document(SnippetSupport.snippet(this, "테마 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
@@ -146,7 +147,7 @@ class ThemeDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("인기 테마 조회",
+                .andDo(document(SnippetSupport.snippet(this, "인기 테마 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
@@ -164,7 +165,7 @@ class ThemeDocsTest {
                 delete("/themes/{id}", themeId));
 
         result.andExpect(status().isNoContent())
-                .andDo(document("테마 삭제",
+                .andDo(document(SnippetSupport.snippet(this, "테마 삭제"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(

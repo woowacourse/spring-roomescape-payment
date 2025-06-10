@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import roomescape.config.TestWebMvcConfig;
+import roomescape.docs.support.SnippetSupport;
 import roomescape.mock.TestAdminInterceptor;
 import roomescape.mock.TestAuthenticationPrincipalArgumentResolver;
 import roomescape.reservationtime.controller.ReservationTimeController;
@@ -82,7 +83,7 @@ class ReservationTimeDocsTest {
                 .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isCreated())
-                .andDo(document("예약 시간 생성",
+                .andDo(document(SnippetSupport.snippet(this, "예약 시간 생성"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -108,7 +109,7 @@ class ReservationTimeDocsTest {
                 .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("예약 시간 조회",
+                .andDo(document(SnippetSupport.snippet(this, "예약 시간 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
@@ -126,7 +127,7 @@ class ReservationTimeDocsTest {
                 MockMvcRequestBuilders.delete("/times/{id}", timeId));
 
         result.andExpect(status().isNoContent())
-                .andDo(document("예약 시간 삭제",
+                .andDo(document(SnippetSupport.snippet(this, "예약 시간 삭제"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(

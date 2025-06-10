@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import roomescape.config.TestWebMvcConfig;
+import roomescape.docs.support.SnippetSupport;
 import roomescape.member.dto.MemberResponse;
 import roomescape.mock.TestAdminInterceptor;
 import roomescape.mock.TestAuthenticationPrincipalArgumentResolver;
@@ -90,7 +91,7 @@ class AdminReservationDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isCreated())
-                .andDo(document("어드민 예약 생성",
+                .andDo(document(SnippetSupport.snippet(this, "어드민 예약 생성"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -126,7 +127,7 @@ class AdminReservationDocsTest {
                 delete("/admin/reservations/{id}", reservationId));
 
         result.andExpect(status().isNoContent())
-                .andDo(document("어드민 예약 취소",
+                .andDo(document(SnippetSupport.snippet(this, "어드민 예약 취소"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(

@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import roomescape.config.TestWebMvcConfig;
+import roomescape.docs.support.SnippetSupport;
 import roomescape.member.controller.MemberController;
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponse;
@@ -76,7 +77,7 @@ class MemberDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk())
-                .andDo(document("회원 전체 조회",
+                .andDo(document(SnippetSupport.snippet(this, "회원 전체 조회"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
@@ -99,7 +100,7 @@ class MemberDocsTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isCreated())
-                .andDo(document("회원 가입",
+                .andDo(document(SnippetSupport.snippet(this, "회원 가입"),
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
