@@ -112,6 +112,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
     }
 
+    @LogExecution
     private void approveWaiting(final List<Waiting> waitings) {
         Waiting firstWaiting = waitings.get(0);
 

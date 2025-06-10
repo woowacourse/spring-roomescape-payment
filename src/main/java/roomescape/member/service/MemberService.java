@@ -1,5 +1,6 @@
 package roomescape.member.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -13,13 +14,10 @@ import roomescape.member.dto.response.SignupResponse;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
-    public MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
 
     @Transactional
     @LogExecution

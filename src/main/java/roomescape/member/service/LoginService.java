@@ -1,5 +1,6 @@
 package roomescape.member.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.LoginException;
 import roomescape.common.util.DateTime;
@@ -11,17 +12,12 @@ import roomescape.member.dto.request.LoginRequest;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
 
     private final JwtTokenContainer jwtTokenContainer;
     private final MemberRepository memberRepository;
     private final DateTime dateTime;
-
-    public LoginService(final JwtTokenContainer jwtTokenContainer, final MemberRepository memberRepository, final DateTime dateTime) {
-        this.jwtTokenContainer = jwtTokenContainer;
-        this.memberRepository = memberRepository;
-        this.dateTime = dateTime;
-    }
 
     public String loginAndReturnToken(final LoginRequest request) {
         Optional<Member> loginMember = memberRepository.findByEmailAndPassword(request.email(),

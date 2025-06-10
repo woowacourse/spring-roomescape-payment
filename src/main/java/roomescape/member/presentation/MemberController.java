@@ -1,5 +1,6 @@
 package roomescape.member.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.member.dto.request.SignupRequest;
@@ -13,6 +14,7 @@ import java.util.List;
 import static roomescape.member.presentation.MemberController.RESERVATION_BASE_URL;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(RESERVATION_BASE_URL)
 public class MemberController {
 
@@ -20,10 +22,6 @@ public class MemberController {
     private static final String SLASH = "/";
 
     private final MemberService memberService;
-
-    public MemberController(final MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @PostMapping
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {

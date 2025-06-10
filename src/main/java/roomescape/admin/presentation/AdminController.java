@@ -1,5 +1,6 @@
 package roomescape.admin.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import static roomescape.admin.presentation.AdminController.ADMIN_BASE_URL;
 import static roomescape.member.presentation.MemberController.RESERVATION_BASE_URL;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ADMIN_BASE_URL)
 public class AdminController {
 
@@ -22,10 +24,6 @@ public class AdminController {
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
-
-    public AdminController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request) {
