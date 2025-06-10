@@ -26,10 +26,10 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(
-            final MethodParameter parameter,
-            final ModelAndViewContainer mavContainer,
-            final NativeWebRequest webRequest,
-            final WebDataBinderFactory binderFactory) throws Exception {
+        final MethodParameter parameter,
+        final ModelAndViewContainer mavContainer,
+        final NativeWebRequest webRequest,
+        final WebDataBinderFactory binderFactory) throws Exception {
 
         final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         final String token = extractTokenFromCookies(request.getCookies());

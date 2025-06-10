@@ -36,8 +36,8 @@ public class ThemeServiceFacade {
         final List<Theme> themes = themeService.findAll();
 
         return themes.stream()
-                .map(ThemeResponse::from)
-                .toList();
+            .map(ThemeResponse::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
@@ -45,7 +45,7 @@ public class ThemeServiceFacade {
         final List<Theme> popularThemes = themeService.findPopularThemes();
 
         return popularThemes.stream()
-                .map(ThemeResponse::from)
-                .toList();
+            .map(ThemeResponse::from)
+            .toList();
     }
 }

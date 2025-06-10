@@ -1,5 +1,7 @@
 package roomescape.member.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -7,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaMemberRepositoryTest {
@@ -81,7 +81,7 @@ class JpaMemberRepositoryTest {
 
         // when
         final boolean exists = jpaMemberRepository.existsByEmailAndPassword(savedMember.getEmail(),
-                savedMember.getPassword());
+            savedMember.getPassword());
 
         // then
         assertThat(exists).isTrue();
@@ -89,9 +89,9 @@ class JpaMemberRepositoryTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "east@email.com, password23",
-            "hello@email.com, 1234",
-            "email@email.com, password"
+        "east@email.com, password23",
+        "hello@email.com, 1234",
+        "email@email.com, password"
     })
     void 이메일_비밀번호_존재_확인_실패(final String email, final String password) {
         // when

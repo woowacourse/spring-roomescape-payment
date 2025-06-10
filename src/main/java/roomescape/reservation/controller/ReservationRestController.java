@@ -31,12 +31,12 @@ public class ReservationRestController {
 
     @PostMapping
     public ResponseEntity<CreateReservationResponse> createReservation(
-            @RequestBody final CreateReservationRequest createReservationRequest,
-            final LoginMember loginMember
+        @RequestBody final CreateReservationRequest createReservationRequest,
+        final LoginMember loginMember
     ) {
         final CreateReservationResponse createReservationResponse = reservationServiceFacade.saveReservation(
-                createReservationRequest,
-                loginMember
+            createReservationRequest,
+            loginMember
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createReservationResponse);
@@ -58,10 +58,10 @@ public class ReservationRestController {
 
     @GetMapping("/available-times")
     public ResponseEntity<List<AvailableReservationTimeResponse>> getAvailableReservationTimes(
-            @ModelAttribute final AvailableReservationTimeRequest request) {
+        @ModelAttribute final AvailableReservationTimeRequest request) {
 
         final List<AvailableReservationTimeResponse> availableTimes = reservationServiceFacade.findAvailableTimes(
-                request);
+            request);
 
         return ResponseEntity.ok(availableTimes);
     }
@@ -76,12 +76,12 @@ public class ReservationRestController {
 
     @PostMapping("/waitings")
     public ResponseEntity<CreateWaitingResponse> createWaitingReservation(
-            @RequestBody final CreateWaitingRequest createWaitingRequest,
-            final LoginMember loginMember
+        @RequestBody final CreateWaitingRequest createWaitingRequest,
+        final LoginMember loginMember
     ) {
 
         final CreateWaitingResponse waitingResponse = reservationServiceFacade.saveWaiting(createWaitingRequest,
-                loginMember);
+            loginMember);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(waitingResponse);
     }

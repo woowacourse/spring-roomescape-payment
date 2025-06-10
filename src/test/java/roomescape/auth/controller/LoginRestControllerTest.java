@@ -1,5 +1,8 @@
 package roomescape.auth.controller;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
@@ -10,9 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql("classpath:data.sql")
@@ -22,7 +22,7 @@ class LoginRestControllerTest {
     void 로그인에_성공하면_쿠키와_토큰을_반환한다() {
         // given
         Map<String, String> loginRequest = Map.of(
-                "email", "wooga@gmail.com",
+                "email", "user",
                 "password", "1234"
         );
 
@@ -49,7 +49,7 @@ class LoginRestControllerTest {
     void 로그인한_후_로그인_상태_체크시_성공한다() {
         // given
         Map<String, String> loginRequest = Map.of(
-                "email", "wooga@gmail.com",
+                "email", "user",
                 "password", "1234"
         );
 

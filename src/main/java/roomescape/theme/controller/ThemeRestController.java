@@ -24,7 +24,7 @@ public class ThemeRestController {
 
     @PostMapping
     public ResponseEntity<ThemeResponse> createTheme(
-            @RequestBody final ThemeRequest themeRequest
+        @RequestBody final ThemeRequest themeRequest
     ) {
         final ThemeResponse response = themeService.saveTheme(themeRequest);
 
@@ -33,7 +33,7 @@ public class ThemeRestController {
 
     @DeleteMapping({"/{id}"})
     public ResponseEntity<Void> deleteTheme(
-            @PathVariable final Long id
+        @PathVariable final Long id
     ) {
         themeService.deleteTheme(id);
 

@@ -17,12 +17,12 @@ public class AdminWaitingService {
     @Transactional
     public void deleteWaitingById(final Long id) {
         waitingRepository.findById(id)
-                .ifPresentOrElse(
-                        waiting -> waitingRepository.deleteById(id),
-                        () -> {
-                            throw new DataNotFoundException("해당 대기 데이터가 존재하지 않습니다. id = " + id);
-                        }
-                );
+            .ifPresentOrElse(
+                waiting -> waitingRepository.deleteById(id),
+                () -> {
+                    throw new DataNotFoundException("해당 대기 데이터가 존재하지 않습니다. id = " + id);
+                }
+            );
     }
 
     @Transactional(readOnly = true)

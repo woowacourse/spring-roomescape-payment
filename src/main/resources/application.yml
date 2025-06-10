@@ -37,3 +37,6 @@ security:
 payment:
   toss:
     secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
+
+logging:
+  config: classpath:log4j2/log4j2-config.xml

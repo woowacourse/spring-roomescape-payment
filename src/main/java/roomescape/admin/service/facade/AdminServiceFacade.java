@@ -11,6 +11,8 @@ import roomescape.admin.dto.ReservationSearchRequest;
 import roomescape.admin.dto.ReservationWaitingResponse;
 import roomescape.admin.service.reservation.AdminReservationService;
 import roomescape.admin.service.waiting.AdminWaitingService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Waiting;
 
@@ -20,6 +22,7 @@ public class AdminServiceFacade {
 
     private final AdminReservationService reservationService;
     private final AdminWaitingService waitingService;
+    private final PaymentService paymentService;
 
     @Transactional
     public AdminReservationResponse saveByAdmin(final AdminReservationRequest adminReservationRequest) {
@@ -27,8 +30,13 @@ public class AdminServiceFacade {
         final Long themeId = adminReservationRequest.themeId();
         final Long timeId = adminReservationRequest.timeId();
         final Long memberId = adminReservationRequest.memberId();
+        final Payment payment = paymentService.processPayment(
+                adminReservationRequest.tossPaymentRequest().amount(),
+                adminReservationRequest.tossPaymentRequest().orderId(),
+                adminReservationRequest.tossPaymentRequest().paymentKey()
+        );
 
-        final Reservation savedReservation = reservationService.saveByAdmin(date, themeId, timeId, memberId);
+        final Reservation savedReservation = reservationService.saveByAdmin(date, themeId, timeId, memberId, payment);
 
         return AdminReservationResponse.from(savedReservation);
     }

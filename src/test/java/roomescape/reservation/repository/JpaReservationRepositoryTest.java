@@ -1,5 +1,7 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -10,14 +12,14 @@ import org.springframework.data.domain.PageRequest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.JpaMemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.JpaPaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.reservation.JpaReservationRepository;
 import roomescape.reservation.repository.time.JpaReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaReservationRepositoryTest {
@@ -30,6 +32,8 @@ class JpaReservationRepositoryTest {
     private ThemeRepository themeRepository;
     @Autowired
     private JpaMemberRepository jpaMemberRepository;
+    @Autowired
+    private JpaPaymentRepository paymentRepository;
 
     @Test
     void 예약_전체_조회() {
@@ -46,8 +50,16 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save((payment));
 
-        final Reservation reservation = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
+        final Reservation reservation = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment
+        );
 
         // when
         jpaReservationRepository.save(reservation);
@@ -65,8 +77,16 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment);
 
-        final Reservation reservation = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
+        final Reservation reservation = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment
+        );
         final Reservation savedReservation = jpaReservationRepository.save(reservation);
 
         // when
@@ -86,8 +106,17 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment);
 
-        final Reservation reservation = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
+        final Reservation reservation = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment
+
+        );
         final Reservation savedReservation = jpaReservationRepository.save(reservation);
 
         // when
@@ -106,8 +135,16 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment);
 
-        final Reservation reservation = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
+        final Reservation reservation = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment
+        );
         jpaReservationRepository.save(reservation);
 
         // when
@@ -127,8 +164,16 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment);
 
-        final Reservation reservation = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
+        final Reservation reservation = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment
+        );
         jpaReservationRepository.save(reservation);
 
         // when
@@ -148,9 +193,27 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment1);
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment2);
 
-        final Reservation reservation1 = new Reservation(member, LocalDate.of(2025, 11, 25), reservationTime, theme);
-        final Reservation reservation2 = new Reservation(member, LocalDate.of(2025, 12, 26), reservationTime, theme);
+        final Reservation reservation1 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment1
+        );
+
+        final Reservation reservation2 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment2
+        );
+
         jpaReservationRepository.save(reservation1);
         jpaReservationRepository.save(reservation2);
 
@@ -160,7 +223,7 @@ class JpaReservationRepositoryTest {
         );
 
         // then
-        assertThat(reservations).containsExactly(reservation2);
+        assertThat(reservations).containsExactlyInAnyOrderElementsOf(List.of(reservation1, reservation2));
     }
 
     @Test
@@ -174,12 +237,52 @@ class JpaReservationRepositoryTest {
         themeRepository.save(theme2);
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment1);
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment2);
+        final Payment payment3 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment3);
+        final Payment payment4 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment4);
+        final Payment payment5 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment5);
 
-        final Reservation reservation1 = new Reservation(member, LocalDate.of(2025, 12, 15), reservationTime, theme1);
-        final Reservation reservation2 = new Reservation(member, LocalDate.of(2025, 12, 18), reservationTime, theme1);
-        final Reservation reservation3 = new Reservation(member, LocalDate.of(2025, 12, 23), reservationTime, theme1);
-        final Reservation reservation4 = new Reservation(member, LocalDate.of(2025, 12, 22), reservationTime, theme2);
-        final Reservation reservation5 = new Reservation(member, LocalDate.of(2025, 12, 24), reservationTime, theme2);
+        final Reservation reservation1 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 15),
+                reservationTime,
+                theme1,
+                payment1
+        );
+        final Reservation reservation2 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 18),
+                reservationTime,
+                theme1,
+                payment2
+        );
+        final Reservation reservation3 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 23),
+                reservationTime,
+                theme1,
+                payment3
+        );
+        final Reservation reservation4 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 22),
+                reservationTime,
+                theme2,
+                payment4
+        );
+        final Reservation reservation5 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 24),
+                reservationTime,
+                theme2,
+                payment5
+        );
         jpaReservationRepository.save(reservation1);
         jpaReservationRepository.save(reservation2);
         jpaReservationRepository.save(reservation3);
@@ -204,8 +307,25 @@ class JpaReservationRepositoryTest {
         final Member member = new Member("name", "email", "password", Role.USER);
         jpaMemberRepository.save(member);
 
-        final Reservation reservation1 = new Reservation(member, LocalDate.of(2025, 12, 25), reservationTime, theme);
-        final Reservation reservation2 = new Reservation(member, LocalDate.of(2025, 12, 26), reservationTime, theme);
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment1);
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+        paymentRepository.save(payment2);
+
+        final Reservation reservation1 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 25),
+                reservationTime,
+                theme,
+                payment1
+        );
+        final Reservation reservation2 = new Reservation(
+                member,
+                LocalDate.of(2025, 12, 26),
+                reservationTime,
+                theme,
+                payment2
+        );
         jpaReservationRepository.save(reservation1);
         jpaReservationRepository.save(reservation2);
 

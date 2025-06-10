@@ -1,5 +1,8 @@
 package roomescape.admin.controller;
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.mockito.Mockito.when;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -17,9 +20,6 @@ import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.reservation.dto.TossPaymentRequest;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql("classpath:data.sql")
@@ -34,7 +34,7 @@ class AdminRestControllerTest {
     void setUp() {
         adminToken = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
+                .body(Map.of("email", "admin", "password", "1234"))
                 .when().post("/login").getCookie("token");
     }
 
@@ -46,6 +46,16 @@ class AdminRestControllerTest {
         params.put("themeId", 1);
         params.put("timeId", 1);
         params.put("memberId", 1);
+        params.put("tossPaymentRequest", Map.of(
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 10000
+        ));
+
+        setTossPaymentConfirm(
+                new TossPaymentConfirmRequest(10000, "orderId", "paymentKey"),
+                new TossPaymentConfirmResponse("orderId", "paymentKey")
+        );
 
         // when & then
         RestAssured.given().log().all()
@@ -62,7 +72,7 @@ class AdminRestControllerTest {
         // given
         final String adminToken = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
+                .body(Map.of("email", "admin", "password", "1234"))
                 .when().post("/login").getCookie("token");
 
         final String dateFrom = LocalDate.now().minusDays(1).toString();
@@ -87,7 +97,7 @@ class AdminRestControllerTest {
         // given
         final String adminToken = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
+                .body(Map.of("email", "admin", "password", "1234"))
                 .when().post("/login").getCookie("token");
 
         // when & then
@@ -105,24 +115,29 @@ class AdminRestControllerTest {
         // given
         final String adminToken = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
+                .body(Map.of("email", "admin", "password", "1234"))
                 .when().post("/login").getCookie("token");
 
         final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
         final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
+                tossPaymentRequest.amount(),
+                tossPaymentRequest.orderId(),
+                tossPaymentRequest.paymentKey()
         );
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+                "2026-04-15",
+                "1",
+                "1",
+                tossPaymentRequest
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
-        final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
+        final Map<String, Object> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1",
+                tossPaymentRequest);
+
+        setTossPaymentConfirm(
+                tossPaymentConfirmRequest,
+                new TossPaymentConfirmResponse(tossPaymentRequest.orderId(), tossPaymentRequest.paymentKey())
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -149,37 +164,43 @@ class AdminRestControllerTest {
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
-    private Map<String, String> createWaitingRequestJsonMap(
+    private Map<String, Object> createWaitingRequestJsonMap(
             final String date,
             final String theme,
-            final String time) {
+            final String time,
+            final TossPaymentRequest request) {
         return Map.of(
                 "date", date,
                 "theme", theme,
-                "time", time
+                "time", time,
+                "tossPaymentRequest", Map.of(
+                        "paymentKey", request.paymentKey(),
+                        "orderId", request.orderId(),
+                        "amount", request.amount()
+                )
         );
     }
 
 
     private Map<String, Object> createReservationRequestJsonMap(
-        final String date,
-        final String themeId,
-        final String timeId,
-        final TossPaymentRequest request) {
+            final String date,
+            final String themeId,
+            final String timeId,
+            final TossPaymentRequest request) {
         return Map.of(
-            "date", date,
-            "themeId", themeId,
-            "timeId", timeId,
-            "tossPaymentRequest", Map.of(
-                "paymentKey", request.paymentKey(),
-                "orderId", request.orderId(),
-                "amount", request.amount()
-            )
+                "date", date,
+                "themeId", themeId,
+                "timeId", timeId,
+                "tossPaymentRequest", Map.of(
+                        "paymentKey", request.paymentKey(),
+                        "orderId", request.orderId(),
+                        "amount", request.amount()
+                )
         );
     }
 
     private void setTossPaymentConfirm(TossPaymentConfirmRequest request, TossPaymentConfirmResponse response) {
         when(tossPaymentProcessor.processPayment(request))
-            .thenReturn(response);
+                .thenReturn(response);
     }
 }

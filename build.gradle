@@ -21,6 +21,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     // jdbc
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -38,6 +39,12 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    // Spring Boot 의 기본 로깅 라이브러리인 Logback을 제외하고 Log4j2를 사용하기 위해 설정
+    // org.springframework.boot 에 속한 모든 구성에서 spring-boot-starter-logging 모듈을 제외
+    configurations.configureEach {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 test {

@@ -53,9 +53,9 @@ public class WaitingRepository implements WaitingRepositoryInterface {
 
     @Override
     public Optional<Waiting> findFirstByThemeAndDateAndTimeOrderByIdAsc(
-            final Theme theme,
-            final LocalDate date,
-            final ReservationTime time) {
+        final Theme theme,
+        final LocalDate date,
+        final ReservationTime time) {
         return jpaWaitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date, time);
     }
 }

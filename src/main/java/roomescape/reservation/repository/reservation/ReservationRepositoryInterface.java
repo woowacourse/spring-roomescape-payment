@@ -12,14 +12,14 @@ public interface ReservationRepositoryInterface {
     List<Reservation> findAll();
 
     boolean existsByDateAndTimeAndTheme(
-            final LocalDate date,
-            final ReservationTime time,
-            final Theme theme);
+        final LocalDate date,
+        final ReservationTime time,
+        final Theme theme);
 
     List<Theme> findPopularThemesByReservationBetween(
-            final LocalDate dateFrom,
-            final LocalDate dateTo,
-            final PageRequest pageRequest);
+        final LocalDate dateFrom,
+        final LocalDate dateTo,
+        final PageRequest pageRequest);
 
     List<Reservation> findByMember(final Member member);
 

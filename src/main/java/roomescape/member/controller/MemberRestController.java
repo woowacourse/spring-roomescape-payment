@@ -21,8 +21,8 @@ public class MemberRestController {
     public ResponseEntity<List<MemberResponse>> getMembers() {
         final List<Member> members = memberService.findAll();
         final List<MemberResponse> memberResponses = members.stream()
-                .map(MemberResponse::from)
-                .toList();
+            .map(MemberResponse::from)
+            .toList();
 
         return ResponseEntity.ok(memberResponses);
     }

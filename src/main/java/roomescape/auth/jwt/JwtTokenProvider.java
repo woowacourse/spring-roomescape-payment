@@ -13,8 +13,8 @@ public class JwtTokenProvider {
     private final long validityInMilliseconds;
 
     public JwtTokenProvider(
-            @Value("${security.jwt.token.secret-key}") String secretKey,
-            @Value("${security.jwt.token.expire-length}") long validityInMilliseconds
+        @Value("${security.jwt.token.secret-key}") String secretKey,
+        @Value("${security.jwt.token.expire-length}") long validityInMilliseconds
     ) {
         this.secretKey = secretKey;
         this.validityInMilliseconds = validityInMilliseconds;
@@ -26,18 +26,18 @@ public class JwtTokenProvider {
         final Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, secretKey)
-                .compact();
+            .setClaims(claims)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, secretKey)
+            .compact();
     }
 
     public String getPayload(final String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+            .setSigningKey(secretKey)
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
     }
 }

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+
+    <!-- 환경 변수 설정 -->
+    <Properties>
+        <!-- 로그 패턴 설정 -->
+        <!-- %d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} : 로그 발생 시간을 ISO 8601 형식으로 출력 -->
+        <!-- %-5level : 로그 레벨을 5자리로 맞추고 왼쪽 정렬 -->
+        <!-- %pid : 프로세스 ID를 출력 -->
+        <!-- %t : 로그를 발생시킨 스레드 이름 -->
+        <!-- %c : 로그를 발생시킨 클래스 이름의 마지막 부분만 풀 네임으로 출력 -->
+        <!-- %msg : 로그 메시지 -->
+        <!-- %n : 줄바꿈 문자 -->
+        <Property name="consoleLogPattern">
+            <!-- @formatter:off -->
+            %d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %highlight{%-5level} %style{%pid}{magenta} --- [%15.15t] %style{%-40.40c{1.}}{cyan} : %msg%n
+            <!-- @formatter:on -->
+        </Property>
+        <Property name="fileLogPattern">
+            <!-- @formatter:off -->
+            %d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level %pid --- [%15.15t] %-40.40c{1.} : %msg%n
+            <!-- @formatter:on -->
+        </Property>
+
+        <!-- 서비스 이름 설정 -->
+        <Property name="serviceName">application</Property>
+    </Properties>
+
+    <!-- Appender 설정 -->
+    <Appenders>
+        <!-- Console Appender: 콘솔에 로그를 출력 -->
+        <!-- name 속성은 Appender의 이름이다. 이름은 Loggers 에서 참조할 때 사용된다. -->
+        <Console name="console" target="SYSTEM_OUT">
+            <!-- 콘솔에 출력할 로그 패턴 설정 -->
+            <PatternLayout
+                    pattern="${consoleLogPattern}"
+                    disableAnsi="false"
+                    noConsoleNoAnsi="false"/>
+        </Console>
+
+        <!-- RollingFile Appender: 파일에 로그를 기록하고, 일정 조건에 따라 롤링 -->
+        <!-- append="true" : 기존 로그 파일에 추가로 기록한다.
+            애플리케이션이 시작될 때 기존 로그 파일을 덮어쓰지 않는다.
+            만약 false 라면 애플리케이션 재실행 시 기존 로그 파일을 덮어쓰게 된다. -->
+        <!-- fileName : 로그 파일 이름 -->
+        <!-- filePattern : 롤링될 로그 파일의 이름 패턴이다.
+            {yyyy-MM-dd} 는 날짜 형식을 의미한다.
+                TimeBasedTriggeringPolicy 에서 interval="1" 로 설정했기 때문에 매일 자정에 롤링된다.
+                만약 {yyyy-MM-dd-HH} 로 설정했다면 매 시간에 롤링된다.
+            %i 는 인덱스를 의미하며, %d{yyyy-MM-dd} 는 날짜를 의미한다.
+            .gz 는 gzip 압축을 의미한다.
+                만약 아직 5MB가 되지 않았다면 .log 확장자를 가진 파일로 남아있다가 5MB가 넘으면 .log.gz 로 압축된 파일로 롤링된다.
+        -->
+        <RollingFile
+                name="rollingFile"
+                append="true"
+                fileName="${sys:logPath}/${serviceName}.log"
+                filePattern="${sys:logPath}/${serviceName}.%d{yyyy-MM-dd}.%i.log.gz">
+
+            <!-- 로그 파일에 기록할 로그 패턴 설정 -->
+            <PatternLayout
+                    pattern="${fileLogPattern}"
+                    disableAnsi="true"
+                    charset="UTF-8"
+            />
+
+            <!-- 로그 파일의 크기와 시간에 따라 롤링 정책 설정 -->
+            <!-- <RollingFile>을 설정했는데 <Policies>를 생략하면 롤링이 되지 않는다. -->
+            <!-- SizeBasedTriggeringPolicy : 로그 파일의 크기가 임계값을 초과하면 롤링한다. 기본값은 10MB 이다. -->
+            <!-- TimeBasedTriggeringPolicy는 시간 단위로 로그를 롤링(분할)하도록 트리거를 설정하는 정책이다.
+                interval="1"은 롤링 주기를 의미하며, 1단위마다 롤링한다. 이때 단위는 filePattern에 포함된 날짜 형식(%d{...})에 따라 결정된다.
+                    filePattern이 "%d{yyyy-MM-dd}"이면 interval="1"은 '매일'을 의미하고,
+                    "%d{yyyy-MM-dd-HH}"이면 interval="1"은 '매 시간'을 의미한다.
+                modulate="true"는 롤링 시점을 정확한 경계선(자정, 정시 등)으로 정렬하도록 하여 매일 자정이나 매시 정각에 롤링이 발생하도록 만든다.
+            -->
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+
+            <!-- DefaultRolloverStrategy: 롤링된 로그 파일을 관리하는 전략 -->
+            <DefaultRolloverStrategy>
+
+                <!-- Delete: 롤링된 로그 파일을 삭제하는 정책 -->
+                <!-- basePath: 로그 파일이 위치한 기본 경로 -->
+                <!-- maxDepth: 삭제할 파일의 최대 깊이. 1이면 basePath 바로 아래의 파일만 삭제한다. -->
+                <Delete basePath="${sys:logPath}" maxDepth="1">
+
+                    <!-- IFFileName: 파일 이름이 특정 패턴과 일치하는 경우에만 삭제한다.
+                        glob: glob 패턴을 사용하여 파일 이름을 지정한다.
+                        age: 파일의 마지막 수정 시간이 지정된 시간보다 오래된 경우에만 삭제한다.
+                    -->
+                    <!-- glob: 삭제할 파일의 패턴을 지정한다.
+                        ${serviceName}.*.log 는 서비스 이름으로 시작하고, 임의의 문자열이 뒤따르며, .log 확장자를 가진 파일을 의미한다.
+                    -->
+                    <!-- age: 파일의 마지막 수정 시간이 지정된 시간보다 오래된 경우에만 삭제한다.
+                        age="30d"는 마지막 수정 시간이 30일 이상 지난 파일을 의미한다.
+                        즉, 30일 이상 된 로그 파일만 삭제한다.
+                    -->
+                    <IfFileName glob="${serviceName}.*.log"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- Loggers 설정 -->
+        <!-- Root: 최상위 로거로, 모든 로그 이벤트를 처리한다. -->
+        <Root level="info">
+
+            <!-- Console Appender를 root logger에 추가하여 콘솔에 로그를 출력 -->
+            <AppenderRef ref="console"/>
+        </Root>
+
+        <!-- 특정 패키지나 클래스에 대한 로거 설정 -->
+        <!-- roomescape.common.log.LoggingAspect 클래스에 대한 로거 설정 -->
+        <!-- additivity="true"는 이 로거가 상위 로거의 Appender를 상속받도록 한다. -->
+        <!-- true 이면 상위 로거의 Appender를 사용하고, false이면 상위 로거의 Appender를 사용하지 않는다. -->
+        <!-- true 이면 파일로도 로그가 기록되고, 콘솔로도 로그가 출력된다. -->
+        <Logger name="roomescape.common.log.LoggingAspect" level="info" additivity="true">
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>

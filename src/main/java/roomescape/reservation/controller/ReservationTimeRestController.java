@@ -24,7 +24,7 @@ public class ReservationTimeRestController {
 
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
-            @RequestBody final ReservationTimeRequest request
+        @RequestBody final ReservationTimeRequest request
     ) {
 
         final ReservationTimeResponse reservationTimeResponse = timeService.save(request);
@@ -42,7 +42,7 @@ public class ReservationTimeRestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationTime(
-            @PathVariable final Long id
+        @PathVariable final Long id
     ) {
         timeService.deleteById(id);
 

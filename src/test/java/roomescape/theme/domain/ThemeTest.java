@@ -15,7 +15,7 @@ class ThemeTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new Theme(name, description, thumbnail))
-                .isInstanceOf(ThemeException.class);
+            .isInstanceOf(ThemeException.class);
     }
 
     @Test
@@ -27,7 +27,7 @@ class ThemeTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new Theme(name, description, thumbnail))
-                .isInstanceOf(ThemeException.class);
+            .isInstanceOf(ThemeException.class);
     }
 
     @Test
@@ -39,6 +39,6 @@ class ThemeTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new Theme(name, description, thumbnail))
-                .isInstanceOf(ThemeException.class);
+            .isInstanceOf(ThemeException.class);
     }
 }

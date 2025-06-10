@@ -29,7 +29,7 @@ public class ReservationRepository implements ReservationRepositoryInterface {
 
     @Override
     public List<Theme> findPopularThemesByReservationBetween(
-            LocalDate dateFrom, LocalDate dateTo, PageRequest pageRequest) {
+        LocalDate dateFrom, LocalDate dateTo, PageRequest pageRequest) {
         return jpaReservationRepository.findPopularThemesByReservationBetween(dateFrom, dateTo, pageRequest);
     }
 
@@ -41,7 +41,7 @@ public class ReservationRepository implements ReservationRepositoryInterface {
     @Override
     public Reservation findById(Long id) {
         return jpaReservationRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("해당 예약 데이터가 존재하지 않습니다. id = " + id));
+            .orElseThrow(() -> new DataNotFoundException("해당 예약 데이터가 존재하지 않습니다. id = " + id));
     }
 
     @Override
@@ -56,10 +56,10 @@ public class ReservationRepository implements ReservationRepositoryInterface {
 
     @Override
     public List<Reservation> findByThemeAndMemberAndDateBetween(
-            final Theme theme,
-            final Member member,
-            final LocalDate dateFrom,
-            final LocalDate dateTo) {
+        final Theme theme,
+        final Member member,
+        final LocalDate dateFrom,
+        final LocalDate dateTo) {
         return jpaReservationRepository.findByThemeAndMemberAndDateBetween(theme, member, dateFrom, dateTo);
     }
 }

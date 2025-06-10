@@ -9,6 +9,7 @@ import roomescape.common.exception.DataNotFoundException;
 import roomescape.common.exception.ReservationNotAllowedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.reservation.ReservationRepositoryInterface;
@@ -26,14 +27,20 @@ public class AdminReservationService {
     private final MemberRepositoryInterface memberRepository;
 
     @Transactional
-    public Reservation saveByAdmin(final LocalDate date, final Long themeId, final Long timeId, final Long memberId) {
+    public Reservation saveByAdmin(
+            final LocalDate date,
+            final Long themeId,
+            final Long timeId,
+            final Long memberId,
+            final Payment payment
+    ) {
         final ReservationTime reservationTime = reservationTimeRepository.findById(timeId);
         final Theme theme = themeRepository.findById(themeId);
         final Member member = findMemberById(memberId);
 
         validateExistReservation(date, reservationTime, theme);
 
-        final Reservation reservation = new Reservation(member, date, reservationTime, theme);
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme, payment);
         final Reservation savedReservation = reservationRepository.save(reservation);
 
         return savedReservation;

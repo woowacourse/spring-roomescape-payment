@@ -24,7 +24,8 @@ public class FakeWaitingRepository implements WaitingRepositoryInterface {
                 waiting.getMember(),
                 waiting.getTime(),
                 waiting.getTheme(),
-                waiting.getDate()
+                waiting.getDate(),
+                waiting.getPayment()
         );
         waitings.put(sequence, newWaiting);
 

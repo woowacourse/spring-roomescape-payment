@@ -35,8 +35,8 @@ public class ReservationTimeServiceFacade {
         final List<ReservationTime> reservationTimes = reservationTimeService.findAll();
 
         return reservationTimes.stream()
-                .map(ReservationTimeResponse::from)
-                .toList();
+            .map(ReservationTimeResponse::from)
+            .toList();
     }
 }
 

@@ -1,5 +1,7 @@
 package roomescape.payment.processor.toss;
 
+import static org.mockito.Mockito.when;
+
 import java.util.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,13 +9,11 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
-import static org.mockito.Mockito.when;
-
 class TossPaymentProcessorTest {
 
     private static final String SECRET_KEY = "SecretKey";
     private static final String ENCODED_SECRET_KEY = Base64.getEncoder()
-            .encodeToString((SECRET_KEY + ":base64").getBytes());
+        .encodeToString((SECRET_KEY + ":base64").getBytes());
 
     private final TossPaymentProcessor paymentProcessor;
 
@@ -28,13 +28,13 @@ class TossPaymentProcessorTest {
     void 토스_결제_요청에_따른_반환_확인() {
         // given
         final TossPaymentConfirmRequest request = new TossPaymentConfirmRequest(
-                10000,
-                "orderId",
-                "paymentKey"
+            10000,
+            "orderId",
+            "paymentKey"
         );
         final TossPaymentConfirmResponse expected = new TossPaymentConfirmResponse(
-                "orderId",
-                "paymentKey"
+            "orderId",
+            "paymentKey"
         );
 
         RestClient.RequestBodyUriSpec uriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);

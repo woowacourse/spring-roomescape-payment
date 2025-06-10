@@ -60,9 +60,9 @@ public class ThemeService {
         final PageRequest pageRequest = PageRequest.of(0, POPULAR_THEME_LIMIT);
 
         return reservationRepository.findPopularThemesByReservationBetween(
-                sevenDaysAgo,
-                today,
-                pageRequest
+            sevenDaysAgo,
+            today,
+            pageRequest
         );
     }
 }

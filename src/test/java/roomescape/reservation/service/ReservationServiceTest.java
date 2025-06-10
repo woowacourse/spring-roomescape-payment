@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -15,6 +17,7 @@ import roomescape.fake.FakeWaitingRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
@@ -25,8 +28,6 @@ import roomescape.reservation.repository.waiting.WaitingRepositoryInterface;
 import roomescape.reservation.service.reservation.ReservationService;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepositoryInterface;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ReservationServiceTest {
 
@@ -67,7 +68,8 @@ class ReservationServiceTest {
                         savedMember,
                         date,
                         savedReservationTime1,
-                        savedTheme
+                        savedTheme,
+                        createPayment()
                 )
         );
 
@@ -76,7 +78,8 @@ class ReservationServiceTest {
                         savedMember2,
                         date2,
                         savedReservationTime2,
-                        savedTheme
+                        savedTheme,
+                        createPayment()
                 )
         );
 
@@ -103,7 +106,8 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatCode(
-                        () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId()))
+                        () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId(),
+                                createPayment()))
                 .doesNotThrowAnyException();
     }
 
@@ -125,7 +129,8 @@ class ReservationServiceTest {
                 savedMember,
                 date,
                 savedTime,
-                savedTheme
+                savedTheme,
+                createPayment()
         ));
 
         // when & then
@@ -137,7 +142,7 @@ class ReservationServiceTest {
     void 예약_정보를_삭제하면_첫번째_대기가_예약이_된다() {
         // given
         final Member member = new Member("이스트", "east@email.com", "1234", Role.ADMIN);
-        final Member member2 = new Member("우가", "wooga@gmail.com", "1234", Role.USER);
+        final Member member2 = new Member("우가", "user", "1234", Role.USER);
         final Member savedMember = memberRepository.save(member);
         final Member savedMember2 = memberRepository.save(member2);
         final LocalTime time = LocalTime.parse("20:00");
@@ -153,14 +158,16 @@ class ReservationServiceTest {
                 savedMember,
                 date,
                 savedTime,
-                savedTheme
+                savedTheme,
+                createPayment()
         ));
 
         waitingRepository.save(new Waiting(
                 savedMember2,
                 savedTime,
                 savedTheme,
-                date
+                date,
+                createPayment()
         ));
 
         // when
@@ -189,7 +196,8 @@ class ReservationServiceTest {
                 savedMember,
                 date,
                 savedTime,
-                savedTheme
+                savedTheme,
+                createPayment()
         ));
 
         final LocalTime time2 = LocalTime.parse("21:00");
@@ -222,7 +230,7 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
+                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId(), createPayment()))
                 .isInstanceOf(PastDateException.class);
     }
 
@@ -245,13 +253,14 @@ class ReservationServiceTest {
                         member,
                         date,
                         savedTime,
-                        savedTheme
+                        savedTheme,
+                        createPayment()
                 )
         );
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
+                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId(), createPayment()))
                 .isInstanceOf(DataExistException.class);
     }
 
@@ -274,7 +283,8 @@ class ReservationServiceTest {
                         savedMember,
                         date,
                         savedTime,
-                        savedTheme
+                        savedTheme,
+                        createPayment()
                 )
         );
 
@@ -286,7 +296,7 @@ class ReservationServiceTest {
                                 "bowook316@gmail.com",
                                 "1234",
                                 Role.USER
-                        ), date, savedTime.getId(), savedTheme.getId()))
+                        ), date, savedTime.getId(), savedTheme.getId(), createPayment()))
                 .isInstanceOf(DataExistException.class);
     }
 
@@ -307,7 +317,8 @@ class ReservationServiceTest {
                         savedMember,
                         date,
                         savedTime,
-                        savedTheme
+                        savedTheme,
+                        createPayment()
                 )
         );
 
@@ -316,5 +327,9 @@ class ReservationServiceTest {
 
         // then
         assertThat(reservations.size()).isEqualTo(1);
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentId");
     }
 }

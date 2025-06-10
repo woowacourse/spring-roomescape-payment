@@ -27,20 +27,20 @@ class ThemeRestControllerTest {
         params.put("thumbnail", "따봉우가.jpg");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/themes")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .body(params)
+            .when().post("/themes")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
     void 테마를_조회한다() {
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().get("/themes")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+            .contentType(ContentType.JSON)
+            .when().get("/themes")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value());
     }
 
     @Test
@@ -51,26 +51,26 @@ class ThemeRestControllerTest {
         params.put("thumbnail", "따봉우가.jpg");
 
         final Integer id = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/themes")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract().path("id");
+            .contentType(ContentType.JSON)
+            .body(params)
+            .when().post("/themes")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract().path("id");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().delete("/themes/{id}", id)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .contentType(ContentType.JSON)
+            .when().delete("/themes/{id}", id)
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
     void 인기있는_테마를_조회한다() {
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().get("/themes/popular-list")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+            .contentType(ContentType.JSON)
+            .when().get("/themes/popular-list")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value());
     }
 }

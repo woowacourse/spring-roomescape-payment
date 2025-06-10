@@ -1,5 +1,8 @@
 package roomescape.reservation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.lang.reflect.Field;
@@ -12,9 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -30,21 +30,21 @@ class ReservationTimeRestControllerTest {
         params.put("startAt", "20:00");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/times")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .body(params)
+            .when().post("/times")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
     void 예약_가능한_시간을_목록에서_조회한다() {
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().get("/times")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", is(10));
+            .contentType(ContentType.JSON)
+            .when().get("/times")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", is(10));
     }
 
     @Test
@@ -53,18 +53,18 @@ class ReservationTimeRestControllerTest {
         params.put("startAt", "20:00");
 
         final Integer id = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/times")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .extract().path("id");
+            .contentType(ContentType.JSON)
+            .body(params)
+            .when().post("/times")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract().path("id");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().delete("/times/{id}", id)
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .contentType(ContentType.JSON)
+            .when().delete("/times/{id}", id)
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test

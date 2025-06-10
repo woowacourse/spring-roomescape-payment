@@ -27,6 +27,6 @@ public class MemberService {
 
     private Member validateMember(final String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. email = " + email));
+            .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. email = " + email));
     }
 }

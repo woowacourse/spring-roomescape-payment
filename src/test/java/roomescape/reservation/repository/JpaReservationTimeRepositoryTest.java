@@ -1,5 +1,7 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.time.JpaReservationTimeRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaReservationTimeRepositoryTest {
@@ -44,7 +44,7 @@ class JpaReservationTimeRepositoryTest {
 
         // when
         final ReservationTime foundReservationTime = jpaReservationTimeRepository.findById(savedReservationTime.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         // then
         assertThat(foundReservationTime.getStartAt()).isEqualTo(startAt);
@@ -67,9 +67,9 @@ class JpaReservationTimeRepositoryTest {
 
     @ParameterizedTest
     @CsvSource(value =
-            {
-                    "20,0,true", "21,0,false"
-            }
+        {
+            "20,0,true", "21,0,false"
+        }
     )
     void 시간_존재하는지_확인(final int hour, final int minute, final boolean expected) {
         // given

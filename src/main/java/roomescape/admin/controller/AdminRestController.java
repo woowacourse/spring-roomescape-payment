@@ -27,7 +27,7 @@ public class AdminRestController {
 
     @PostMapping("/reservations")
     public ResponseEntity<AdminReservationResponse> createReservation(
-            @RequestBody final AdminReservationRequest adminReservationRequest
+        @RequestBody final AdminReservationRequest adminReservationRequest
     ) {
         final AdminReservationResponse adminReservationResponse = adminService.saveByAdmin(adminReservationRequest);
 
@@ -36,7 +36,7 @@ public class AdminRestController {
 
     @GetMapping("/searchable-reservations")
     public ResponseEntity<List<AdminReservationResponse>> getReservationsBySearch(
-            @ModelAttribute ReservationSearchRequest searchRequest
+        @ModelAttribute ReservationSearchRequest searchRequest
     ) {
         final List<AdminReservationResponse> searchedResponses = adminService.findByInFromTo(searchRequest);
 
@@ -53,7 +53,7 @@ public class AdminRestController {
 
     @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> deleteWaiting(
-            @PathVariable final Long id
+        @PathVariable final Long id
     ) {
         adminService.deleteWaitingById(id);
 

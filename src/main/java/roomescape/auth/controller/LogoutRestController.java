@@ -13,7 +13,7 @@ public class LogoutRestController {
 
     @PostMapping
     public ResponseEntity<Void> logout(
-            final HttpServletResponse response
+        final HttpServletResponse response
     ) {
         final Cookie cookie = new Cookie("token", null);
         cookie.setPath("/");

@@ -13,8 +13,8 @@ public class AuthServiceTest {
 
     private final MemberRepositoryInterface memberRepository = new FakeMemberRepository();
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(
-            "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=",
-            3600000L
+        "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=",
+        3600000L
     );
     private final AuthService authService = new AuthService(memberRepository, jwtTokenProvider);
 
@@ -23,7 +23,7 @@ public class AuthServiceTest {
         //given
         final String email = "east@email.com";
         memberRepository.save(
-                new Member("이스트", email, "1234", Role.ADMIN)
+            new Member("이스트", email, "1234", Role.ADMIN)
         );
         final String token = jwtTokenProvider.createToken(email);
 
@@ -41,7 +41,7 @@ public class AuthServiceTest {
 
         //when & then
         Assertions.assertThatThrownBy(
-                () -> authService.findNameByToken(token)
+            () -> authService.findNameByToken(token)
         ).isInstanceOf(DataNotFoundException.class);
     }
 
@@ -51,7 +51,7 @@ public class AuthServiceTest {
         final String email = "east@email.com";
         final String password = "1234";
         memberRepository.save(
-                new Member("이스트", email, password, Role.ADMIN)
+            new Member("이스트", email, password, Role.ADMIN)
         );
 
         //when
@@ -69,7 +69,7 @@ public class AuthServiceTest {
 
         //when & then
         Assertions.assertThatThrownBy(
-                () -> authService.createToken(invalidEmail, invalidPassword)
+            () -> authService.createToken(invalidEmail, invalidPassword)
         ).isInstanceOf(DataNotFoundException.class);
     }
 }

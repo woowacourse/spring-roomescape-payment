@@ -44,4 +44,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTossPaymentException(final TossPaymentException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(final Exception e) {
+        // Log the exception (optional)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+    }
 }

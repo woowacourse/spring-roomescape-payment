@@ -9,6 +9,7 @@ import roomescape.common.exception.DataNotFoundException;
 import roomescape.common.exception.PastDateException;
 import roomescape.common.exception.WaitingNotAllowedException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.repository.reservation.ReservationRepositoryInterface;
@@ -33,7 +34,8 @@ public class ReservationWaitingService {
             final Member member,
             final LocalDate date,
             final Long timeId,
-            final Long themeId) {
+            final Long themeId,
+            final Payment payment) {
 
         validatePastDate(date);
 
@@ -43,7 +45,7 @@ public class ReservationWaitingService {
                 theme);
 
         if (reservationExists) {
-            final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+            final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
             return waitingRepository.save(waiting);
         }
 
