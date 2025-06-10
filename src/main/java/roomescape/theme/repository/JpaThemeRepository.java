@@ -19,7 +19,7 @@ public interface JpaThemeRepository extends ListCrudRepository<Theme, Long>, The
              AND   r.info.date BETWEEN :fromDate AND :toDate
             GROUP  BY th
             ORDER  BY COUNT(r.id) DESC, th.name ASC
-            """)
+           """)
     List<Theme> findPopularThemesWithinDateRange(@Param("fromDate") LocalDate fromDate,
                                                  @Param("toDate") LocalDate toDate, Pageable pageable);
 }
