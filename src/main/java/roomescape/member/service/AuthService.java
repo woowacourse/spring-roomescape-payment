@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.auth.dto.LoginMember;
 import roomescape.global.auth.util.JwtUtil;
-import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.AuthenticationFailException;
 import roomescape.member.dto.request.LoginRequest;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
@@ -20,7 +20,7 @@ public class AuthService {
     @Transactional
     public String login(LoginRequest request) {
         Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BadRequestException("이메일 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new AuthenticationFailException("이메일 또는 비밀번호가 일치하지 않습니다."));
         validatePasswordCorrect(request, member);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());
         return jwtUtil.createToken(loginMember);
@@ -28,7 +28,7 @@ public class AuthService {
 
     private void validatePasswordCorrect(LoginRequest request, Member member) {
         if (!member.matchesPassword(request.password())) {
-            throw new BadRequestException("이메일 또는 비밀번호가 일치하지 않습니다.");
+            throw new AuthenticationFailException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
     }
 }

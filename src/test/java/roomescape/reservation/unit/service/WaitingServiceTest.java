@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.global.error.exception.UnauthorizedException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
@@ -102,7 +102,7 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.createWaiting(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("과거 날짜는 예약할 수 없습니다.");
     }
 
@@ -122,7 +122,7 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.createWaiting(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 해당 예약에 대한 대기 신청이 존재합니다.");
     }
 
@@ -233,7 +233,7 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.createWaiting(member.getId(), request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 예약한 사용자는 해당 예약에 대기 신청할 수 없습니다.");
     }
 
@@ -253,7 +253,7 @@ class WaitingServiceTest {
 
         // when & then
         assertThatThrownBy(() -> waitingService.approveWaiting(response.id()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("이미 예약이 존재하여 대기자를 승인할 수 없습니다.");
     }
 

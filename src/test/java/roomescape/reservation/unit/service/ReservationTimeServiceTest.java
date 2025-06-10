@@ -11,8 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
@@ -75,7 +75,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.createTime(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("운영 시간 이외의 날짜는 예약할 수 없습니다.");
     }
 
@@ -166,7 +166,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.deleteTime(response.id()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("해당 시간에 예약된 내역이 존재하므로 삭제할 수 없습니다.");
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.AuthenticationFailException;
 import roomescape.member.dto.request.LoginRequest;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
@@ -57,7 +57,7 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(AuthenticationFailException.class)
                 .hasMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
     }
 
@@ -69,7 +69,7 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(AuthenticationFailException.class)
                 .hasMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
     }
 } 

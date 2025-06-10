@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.global.error.exception.UnauthorizedException;
 import roomescape.member.entity.Member;
@@ -95,10 +95,10 @@ public class WaitingService {
                 waiting.getDate(),
                 waiting.getTime().getId(),
                 waiting.getTheme().getId()
-        ).orElseThrow(() -> new BadRequestException("예약이 존재하지 않는 상태에서는 예약 대기를 신청할 수 없습니다."));
+        ).orElseThrow(() -> new InvalidReservationException("예약이 존재하지 않는 상태에서는 예약 대기를 신청할 수 없습니다."));
 
         if (reservation.isOwnedBy(waiting.getMember().getId())) {
-            throw new BadRequestException("이미 예약한 사용자는 해당 예약에 대기 신청할 수 없습니다.");
+            throw new InvalidReservationException("이미 예약한 사용자는 해당 예약에 대기 신청할 수 없습니다.");
         }
     }
 
@@ -109,7 +109,7 @@ public class WaitingService {
                 waiting.getTheme().getId(),
                 waiting.getMember().getId()
         )) {
-            throw new BadRequestException("이미 해당 예약에 대한 대기 신청이 존재합니다.");
+            throw new InvalidReservationException("이미 해당 예약에 대한 대기 신청이 존재합니다.");
         }
     }
 
@@ -117,7 +117,7 @@ public class WaitingService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime waitingDateTime = waiting.getDateTime();
         if (waitingDateTime.isBefore(now)) {
-            throw new BadRequestException("과거 날짜는 예약할 수 없습니다.");
+            throw new InvalidReservationException("과거 날짜는 예약할 수 없습니다.");
         }
     }
 
@@ -127,7 +127,7 @@ public class WaitingService {
                 waiting.getTime().getId(),
                 waiting.getTheme().getId()
         ).isPresent()) {
-            throw new BadRequestException("이미 예약이 존재하여 대기자를 승인할 수 없습니다.");
+            throw new InvalidReservationException("이미 예약이 존재하여 대기자를 승인할 수 없습니다.");
         }
     }
 

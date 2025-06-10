@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
@@ -74,7 +74,7 @@ class ReservationTimeIntegrationTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.createTime(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("운영 시간 이외의 날짜는 예약할 수 없습니다.");
     }
 
@@ -162,7 +162,7 @@ class ReservationTimeIntegrationTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.deleteTime(time.getId()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(InvalidReservationException.class)
                 .hasMessage("해당 시간에 예약된 내역이 존재하므로 삭제할 수 없습니다.");
     }
 }
