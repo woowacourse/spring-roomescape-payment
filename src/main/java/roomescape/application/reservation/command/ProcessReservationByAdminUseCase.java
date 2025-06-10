@@ -5,9 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.ReservationWithPaymentResult;
-import roomescape.domain.payment.PaymentType;
-import roomescape.domain.reservation.ReservationPayment;
-import roomescape.domain.reservation.repository.ReservationPaymentRepository;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -15,7 +12,6 @@ import roomescape.domain.reservation.repository.ReservationPaymentRepository;
 public class ProcessReservationByAdminUseCase {
 
     private final RegisterReservationByAdminUseCase registerReservationByAdminUseCase;
-    private final ReservationPaymentRepository reservationPaymentRepository;
 
     public Long execute(final CreateReservationCommand command, final Long adminId) {
         final ReservationWithPaymentResult result = registerReservationByAdminUseCase.execute(command, adminId);
