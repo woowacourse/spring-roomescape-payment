@@ -13,7 +13,7 @@ public class Payment {
     private String orderId;
     private Long totalAmount;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     protected Payment() {
