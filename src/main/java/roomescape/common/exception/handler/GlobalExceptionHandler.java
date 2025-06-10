@@ -1,7 +1,6 @@
 package roomescape.common.exception.handler;
 
 import java.time.format.DateTimeParseException;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.InUseException;
 import roomescape.common.exception.NotFoundException;
+import roomescape.common.exception.RequestTimeOutException;
 import roomescape.common.exception.ValidationException;
 import roomescape.common.security.exception.ForbiddenException;
 import roomescape.common.security.exception.UnAuthorizedException;
@@ -68,6 +68,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePaymentApproveException(PaymentApproveException e) {
         logException(e);
         return ResponseEntity.status(e.getHttpStatusCode()).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(RequestTimeOutException.class)
+    public ResponseEntity<ErrorResponse> handleRequestTimeOutException(RequestTimeOutException e) {
+        logException(e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
     }
 
     private void logException(Exception e) {
