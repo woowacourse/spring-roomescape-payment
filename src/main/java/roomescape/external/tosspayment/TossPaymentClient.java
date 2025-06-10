@@ -25,7 +25,7 @@ public class TossPaymentClient {
     public void confirm(final PaymentConfirmRequest request) {
         try {
             long startTime = System.currentTimeMillis();
-            log.info("EXTERNAL_API: 토스 결제 승인 api 요청");
+            log.info("[EXTERNAL_API - TOSS_PAYMENT_CONFIRM] 토스 결제 승인 api 요청");
             ResponseEntity<Void> response = restClient.post()
                     .uri(URL_PREFIX + "/confirm")
                     .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
@@ -34,19 +34,19 @@ public class TossPaymentClient {
                     .onStatus(tossPaymentConfirmErrorHandler)
                     .toBodilessEntity();
             if (response.getStatusCode() != HttpStatus.OK) {
-                log.warn("EXTERNAL_API_ERROR: TOSSPAYMENT_BUSINESS_FAILURE - 토스 응답 상태 코드: {}",
+                log.warn("[EXTERNAL_API_ERROR - TOSS_PAYMENT_CONFIRM] TOSSPAYMENT_BUSINESS_FAILURE - 토스 응답 상태 코드: {}",
                         response.getStatusCode());
                 throw new PaymentException("결제 승인에 실패하였습니다.");
             }
             long duration = System.currentTimeMillis() - startTime;
-            log.info("EXTERNAL_API: 토스 결제 승인 api 요청 및 응답 성공, 응답까지 소요 시간: {} ms", duration);
+            log.info("[EXTERNAL_API - TOSS_PAYMENT_CONFIRM] 토스 결제 승인 api 요청 및 응답 성공, 응답까지 소요 시간: {} ms", duration);
         } catch (PaymentException e) {
             throw e;
         } catch (ResourceAccessException e) {
-            log.error("EXTERNAL_API_ERROR: TOSSPAYMENT_RESOURCE_ACCESS_FAILURE", e);
+            log.error("[EXTERNAL_API_ERROR - TOSS_PAYMENT_CONFIRM] TOSSPAYMENT_RESOURCE_ACCESS_FAILURE", e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         } catch (Exception e) {
-            log.error("EXTERNAL_API_ERROR: UNEXPECTED_ERROR", e);
+            log.error("[EXTERNAL_API_ERROR - TOSS_PAYMENT_CONFIRM] UNEXPECTED_ERROR", e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         }
     }

@@ -25,7 +25,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
         MDC.put("requestId", requestId);
 
-        log.info("{} {} 요청", request.getMethod(), request.getRequestURI());
+        log.info("[API_REQUEST] {} {} 요청", request.getMethod(), request.getRequestURI());
         return true;
     }
 
@@ -36,12 +36,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
             long duration = System.currentTimeMillis() - startTime;
 
             if (ex != null) {
-                log.error("{} {} 처리 중 예외 발생: {}, HTTP status: {}", request.getMethod(), request.getRequestURI(), ex.getMessage(), response.getStatus());
+                log.error("[API_RESPONSE_ERROR] {} {} 처리 중 예외 발생: {}, HTTP status: {}", request.getMethod(), request.getRequestURI(), ex.getMessage(), response.getStatus());
             } else {
-                log.info("{} {} 처리 성공, 응답까지 소요 시간: {} ms, HTTP status: {}", request.getMethod(), request.getRequestURI(), duration, response.getStatus());
+                log.info("[API_RESPONSE] {} {} 처리 성공, 응답까지 소요 시간: {} ms, HTTP status: {}", request.getMethod(), request.getRequestURI(), duration, response.getStatus());
             }
         } else {
-            log.warn("{} {} 요청 시작 시간을 찾을 수 없음, HTTP status: {}", request.getMethod(), request.getRequestURI(), response.getStatus());
+            log.warn("[API_RESPONSE_ERROR] {} {} 요청 시작 시간을 찾을 수 없음, HTTP status: {}", request.getMethod(), request.getRequestURI(), response.getStatus());
         }
 
         MDC.remove("requestId");
