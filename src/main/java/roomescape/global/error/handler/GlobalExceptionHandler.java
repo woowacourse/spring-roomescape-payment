@@ -18,12 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import roomescape.global.error.dto.ErrorResponse;
-import roomescape.global.error.exception.BadRequestException;
-import roomescape.global.error.exception.ConflictException;
-import roomescape.global.error.exception.ForbiddenException;
-import roomescape.global.error.exception.NotFoundException;
-import roomescape.global.error.exception.ServerException;
-import roomescape.global.error.exception.UnauthorizedException;
+import roomescape.global.error.exception.WarningException;
 
 @Slf4j
 @RestControllerAdvice
@@ -38,41 +33,11 @@ public class GlobalExceptionHandler {
         this.objectMapper = objectMapper;
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e,
-                                                                     HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(ServerException.class)
-    public ResponseEntity<ErrorResponse> handleServerException(ServerException e, HttpServletRequest request) {
-        logErrorDetails(e, request, LOG_LEVEL_WARN);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
+    @ExceptionHandler(WarningException.class)
+    public ResponseEntity<ErrorResponse> handleWarningException(WarningException ex, HttpServletRequest request) {
+        logErrorDetails(ex, request, LOG_LEVEL_WARN);
+        return ResponseEntity.status(ex.getHttpStatus())
+                .body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

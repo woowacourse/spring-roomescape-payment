@@ -1,8 +1,10 @@
 package roomescape.global.error.exception;
 
-public class UnauthorizedException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class UnauthorizedException extends WarningException {
 
     public UnauthorizedException(String message) {
-        super(message);
+        super(message, HttpStatus.UNAUTHORIZED);
     }
 } 

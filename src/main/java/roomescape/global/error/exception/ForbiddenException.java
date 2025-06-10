@@ -1,8 +1,10 @@
 package roomescape.global.error.exception;
 
-public class ForbiddenException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ForbiddenException extends WarningException {
 
     public ForbiddenException(String message) {
-        super(message);
+        super(message, HttpStatus.FORBIDDEN);
     }
 } 
