@@ -1,11 +1,13 @@
 package roomescape.theme.domain;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Objects;
-
 @Entity
+@Getter
+@EqualsAndHashCode(of = "id")
 @RequiredArgsConstructor
 public class Theme {
 
@@ -47,34 +49,4 @@ public class Theme {
             throw new IllegalArgumentException("썸네일 URI는 1글자 이상, 255글자 이하여야합니다.");
         }
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Theme theme)) {
-            return false;
-        }
-        return Objects.equals(getId(), theme.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
 }

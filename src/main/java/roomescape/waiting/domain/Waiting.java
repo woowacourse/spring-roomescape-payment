@@ -11,8 +11,8 @@ import roomescape.theme.domain.Theme;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Waiting {
 

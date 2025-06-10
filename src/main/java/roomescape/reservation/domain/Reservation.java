@@ -1,6 +1,10 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -9,9 +13,11 @@ import roomescape.theme.domain.Theme;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 public class Reservation {
 
     @Id
@@ -34,9 +40,6 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
-
-    protected Reservation() {
-    }
 
     public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment, final ReservationStatus reservationStatus) {
         this.member = member;
@@ -80,34 +83,8 @@ public class Reservation {
         this.reservationStatus = ReservationStatus.PAID;
     }
 
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Reservation that)) {
-            return false;
-        }
-
-        if (getId() == null && that.getId() == null) {
-            return false;
-        }
-
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
-    public Long getId() {
-        return id;
-    }
-
     public String getName() {
         return member.getName();
-    }
-
-    public LocalDate getDate() {
-        return date;
     }
 
     public Long getTimeId() {
@@ -138,11 +115,4 @@ public class Reservation {
         return theme.getThumbnail();
     }
 
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public ReservationStatus getReservationStatus() {
-        return reservationStatus;
-    }
 }
