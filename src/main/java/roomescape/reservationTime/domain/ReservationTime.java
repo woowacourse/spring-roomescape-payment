@@ -1,11 +1,14 @@
 package roomescape.reservationTime.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationTime {
 
     @Id
@@ -18,10 +21,6 @@ public class ReservationTime {
     private ReservationTime(final Long id, final LocalTime startAt) {
         this.id = id;
         this.startAt = startAt;
-    }
-
-    protected ReservationTime() {
-
     }
 
     public static ReservationTime createWithoutId(final LocalTime startAt) {

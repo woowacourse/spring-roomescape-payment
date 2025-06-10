@@ -1,5 +1,6 @@
 package roomescape.reservation.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
@@ -18,6 +19,7 @@ import java.util.List;
 import static roomescape.reservation.presentation.ReservationController.RESERVATION_BASE_URL;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(RESERVATION_BASE_URL)
 public class ReservationController {
 
@@ -26,11 +28,6 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final PaymentService paymentService;
-
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
-        this.reservationService = reservationService;
-        this.paymentService = paymentService;
-    }
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations(

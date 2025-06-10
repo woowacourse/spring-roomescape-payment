@@ -1,23 +1,19 @@
 package roomescape.payment.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.logging.LogExecution;
 import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.dto.response.TossPaymentResponse;
-import roomescape.reservation.domain.ReservationRepository;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
     private final TossPaymentClient paymentClient;
     private final PaymentTransactionService paymentTransactionService;
-
-    public PaymentService(final ReservationRepository reservationRepository, final TossPaymentClient paymentClient, final PaymentTransactionService paymentTransactionService) {
-        this.paymentClient = paymentClient;
-        this.paymentTransactionService = paymentTransactionService;
-    }
 
     @LogExecution
     public void confirmAndSavePayment(TossPaymentConfirmRequest request, long reservationId) {

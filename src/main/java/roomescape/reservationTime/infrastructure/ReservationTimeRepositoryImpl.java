@@ -1,19 +1,18 @@
 package roomescape.reservationTime.infrastructure;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
+@RequiredArgsConstructor
 public class ReservationTimeRepositoryImpl implements ReservationTimeRepository {
 
     private final JpaReservationTimeRepository jpaReservationTimeRepository;
-
-    public ReservationTimeRepositoryImpl(JpaReservationTimeRepository jpaReservationTimeRepository) {
-        this.jpaReservationTimeRepository = jpaReservationTimeRepository;
-    }
 
     @Override
     public ReservationTime save(ReservationTime reservationTime) {

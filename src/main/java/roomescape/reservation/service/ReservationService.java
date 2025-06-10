@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final DateTime dateTime;
@@ -31,15 +33,6 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-
-    public ReservationService(final DateTime dateTime, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
-        this.dateTime = dateTime;
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
-        this.waitingRepository = waitingRepository;
-    }
 
     @Transactional
     @LogExecution

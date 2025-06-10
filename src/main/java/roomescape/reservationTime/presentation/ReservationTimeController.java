@@ -1,5 +1,6 @@
 package roomescape.reservationTime.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.reservationTime.dto.request.ReservationTimeRequest;
@@ -12,6 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ReservationTimeController.RESERVATION_TIME_BASE_URL)
 public class ReservationTimeController {
 
@@ -19,10 +21,6 @@ public class ReservationTimeController {
     private static final String SLASH = "/";
 
     private final ReservationTimeService reservationTimeService;
-
-    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
-        this.reservationTimeService = reservationTimeService;
-    }
 
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> createReservationTime(

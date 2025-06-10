@@ -1,5 +1,6 @@
 package roomescape.waiting.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
@@ -12,13 +13,10 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class WaitingController {
 
     private final WaitingService waitingService;
-
-    public WaitingController(WaitingService waitingService) {
-        this.waitingService = waitingService;
-    }
 
     @PostMapping("/waitings")
     public ResponseEntity<WaitingResponse> createWaiting(

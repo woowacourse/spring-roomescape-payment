@@ -1,5 +1,6 @@
 package roomescape.reservationTime.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -15,16 +16,11 @@ import roomescape.reservationTime.dto.response.TimeConditionResponse;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationTimeService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
-
-    public ReservationTimeService(final ReservationRepository reservationRepository,
-                                  final ReservationTimeRepository reservationTimeRepository) {
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-    }
 
     @Transactional
     @LogExecution

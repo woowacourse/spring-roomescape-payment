@@ -1,5 +1,6 @@
 package roomescape.theme.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -15,6 +16,7 @@ import roomescape.theme.dto.response.ThemeResponse;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ThemeService {
 
     private static final int POPULAR_THEME_COUNT = 10;
@@ -24,14 +26,6 @@ public class ThemeService {
     private final DateTime dateTime;
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
-
-    public ThemeService(final DateTime dateTime,
-                        final ThemeRepository themeRepository,
-                        final ReservationRepository reservationRepository) {
-        this.dateTime = dateTime;
-        this.themeRepository = themeRepository;
-        this.reservationRepository = reservationRepository;
-    }
 
     @Transactional
     @LogExecution

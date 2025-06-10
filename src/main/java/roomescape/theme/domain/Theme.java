@@ -1,13 +1,12 @@
 package roomescape.theme.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.RequiredArgsConstructor;
+
 import java.util.Objects;
 
 @Entity
+@RequiredArgsConstructor
 public class Theme {
 
     private static int MAX_NAME = 255;
@@ -30,10 +29,6 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-    }
-
-    protected Theme() {
-
     }
 
     public static Theme createWithoutId(final String name, final String description, final String thumbnail) {
