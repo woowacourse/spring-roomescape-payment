@@ -46,9 +46,4 @@ public class TossPaymentRestClient {
         byte[] encodedBytes = encoder.encode((tossKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }
-
-    // For testing purposes only
-    RestTemplate getRestTemplate() {
-        return restTemplate;
-    }
 }
