@@ -20,7 +20,6 @@ public class AuthenticationService {
 
     @Transactional(readOnly = true)
     public String issueToken(final String email, final String password) {
-        log.info("로그인 시도 - 이메일: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthenticationException("이메일이 틀렸습니다."));
 

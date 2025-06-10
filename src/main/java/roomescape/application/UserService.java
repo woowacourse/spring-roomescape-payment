@@ -30,7 +30,6 @@ public class UserService {
 
     @Transactional
     public User saveUser(final String email, final String password, final String name) {
-        log.info("사용자 생성 호출 - email: {}", email);
         validateEmailNotRegistered(email);
 
         User user = userRepository.save(User.register(name, email, password));

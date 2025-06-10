@@ -40,8 +40,6 @@ public class ReservedService {
             final long userId, final LocalDate date, final long timeId,
             final long themeId, final PaymentInfo paymentInfo
     ) {
-        log.info("예약 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", userId, date, timeId, themeId);
-
         Reserved reserved = registerReserved(userId, date, timeId, themeId);
         paymentService.requestPayment(reserved, paymentInfo);
 
@@ -54,8 +52,6 @@ public class ReservedService {
             final long userId, final LocalDate date, final long timeId,
             final long themeId
     ) {
-        log.info("관리자 예약 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", userId, date, timeId, themeId);
-
         Reserved reserved = registerReserved(userId, date, timeId, themeId);
 
         log.info("관리자 예약 등록 성공 - 예약ID: {}, userId: {}", reserved.getId(), userId);
@@ -74,8 +70,6 @@ public class ReservedService {
 
     @Transactional
     public void removeById(final long id) {
-        log.info("예약 삭제 호출 - reservationId = {}", id);
-
         Reserved reserved = findById(id);
 
         eventPublisher.publishEvent(

@@ -15,22 +15,25 @@ public class HttpLoggingInterceptor implements HandlerInterceptor {
     private static final String START_TIME = "startTime";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         String requestId = UUID.randomUUID().toString().substring(0, 8);
         MDC.put(REQUEST_ID, requestId);
 
-        log.info("HTTP REQUEST: method={}, uri={}", request.getMethod(), request.getRequestURI());
+        log.debug("HTTP REQUEST: method={}, uri={}", request.getMethod(), request.getRequestURI());
 
         request.setAttribute(START_TIME, System.currentTimeMillis());
         return true;
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-                                Object handler, @Nullable Exception ex) throws Exception {
+    public void afterCompletion(
+            HttpServletRequest request, HttpServletResponse response,
+            Object handler, @Nullable Exception ex
+    ) throws Exception {
         long duration = System.currentTimeMillis() - (Long) request.getAttribute(START_TIME);
 
-        log.info("HTTP RESPONSE: status={}, duration={}ms", response.getStatus(), duration);
+        log.debug("HTTP RESPONSE: status={}, duration={}ms", response.getStatus(), duration);
 
         MDC.remove(REQUEST_ID);
     }

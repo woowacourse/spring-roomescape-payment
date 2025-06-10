@@ -22,7 +22,6 @@ public class PaymentService {
 
     @Transactional
     public void requestPayment(final Reserved reserved, final PaymentInfo paymentInfo) {
-        log.info("결제 요청 시작 - 결제키: {}, 예약 ID: {}", paymentInfo.paymentKey(), reserved.getId());
 
         Payment payment = paymentRepository.save(
                 Payment.register(

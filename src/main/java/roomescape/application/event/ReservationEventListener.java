@@ -17,12 +17,6 @@ public class ReservationEventListener {
 
     @EventListener
     public void handleReservationCancelled(ReservationCancelledEvent event) {
-        log.info(
-                "예약 삭제 이벤트 수신 - date: {}, timeSlotId: {}, themeId: {}",
-                event.getDate(),
-                event.getTimeSlotId(),
-                event.getThemeId()
-        );
         waitingService.approveNextWaiting(event.getDate(), event.getTimeSlotId(), event.getThemeId());
     }
 }

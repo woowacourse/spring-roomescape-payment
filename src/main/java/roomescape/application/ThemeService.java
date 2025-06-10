@@ -26,8 +26,6 @@ public class ThemeService {
 
     @Transactional
     public Theme saveTheme(final String name, final String description, final String thumbnail) {
-        log.info("테마 저장 호출 - name: {}, description: {}", name, description);
-
         Theme theme = themeRepository.save(Theme.register(name, description, thumbnail));
         log.info("테마 저장 성공 - id: {}", theme.getId());
 
@@ -49,8 +47,6 @@ public class ThemeService {
 
     @Transactional
     public void removeById(final long id) {
-        log.info("테마 삭제 호출 - id: {}", id);
-
         validateThemeNotInUse(id);
         validateThemeExists(id);
 

@@ -22,7 +22,6 @@ public class PaymentEventListener {
     @Async
     @EventListener
     public void processPayment(PaymentRequestedEvent event) {
-        log.info("결제 요청 이벤트 수신 - 결제ID: {}", event.getPaymentId());
         try {
             paymentClient.confirmPayment(event.getPaymentInfo());
             log.info("결제 승인 성공 - 결제ID: {}", event.getPaymentId());

@@ -32,8 +32,6 @@ public class WaitingService {
 
     @Transactional
     public Waiting saveWaiting(final User user, final LocalDate date, final long timeId, final long themeId) {
-        log.info("예약 대기 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", user.getId(), date, timeId, themeId);
-
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
 
@@ -52,7 +50,6 @@ public class WaitingService {
 
     @Transactional
     public void removeById(final long id) {
-        log.info("예약 대기 삭제 호출 - id: {}", id);
         validateWaitingExists(id);
 
         waitingRepository.deleteById(id);

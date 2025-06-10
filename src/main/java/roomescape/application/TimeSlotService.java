@@ -25,8 +25,6 @@ public class TimeSlotService {
 
     @Transactional
     public TimeSlot saveTimeSlot(final LocalTime startAt) {
-        log.info("시간 저장 호출 - startAt: {}", startAt);
-
         TimeSlot timeSlot = timeSlotRepository.save(TimeSlot.register(startAt));
         log.info("시간 저장 성공 - id: {}", timeSlot.getId());
 
@@ -50,7 +48,6 @@ public class TimeSlotService {
 
     @Transactional
     public void removeById(final long id) {
-        log.info("시간 삭제 호출 - id: {}", id);
         validateTimSlotNotInUse(id);
         validateTimeSlotExists(id);
 

@@ -23,8 +23,6 @@ public class PendingPaymentService {
 
     @Transactional
     public ReservedResponse confirmPayment(final Long pendingPaymentId, final PaymentInfo paymentInfo) {
-        log.info("결제 요청 호출 - pendingPaymentId: {}, peymentKey= {}", pendingPaymentId, paymentInfo.paymentKey());
-
         PendingPayment pendingPayment = pendingPaymentRepository.findById(pendingPaymentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 결제 대기입니다."));
 
