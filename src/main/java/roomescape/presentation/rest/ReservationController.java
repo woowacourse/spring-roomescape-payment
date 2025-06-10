@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
+import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationSearchFilter;
-import roomescape.exception.AuthorizationException;
+import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateReservationRequest;
 import roomescape.presentation.response.ReservationResponse;
 
@@ -35,19 +37,25 @@ public class ReservationController {
     @PostMapping
     @ResponseStatus(CREATED)
     public ReservationResponse reserve(
-            final AuthenticationInfo authenticationInfo,
-            @RequestBody @Valid final CreateReservationRequest request
+        final AuthenticationInfo authenticationInfo,
+        @RequestBody @Valid final CreateReservationRequest request
     ) {
-        paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
         var reservation = reservationService.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
+    }
+
+    @PostMapping("/{id}/payment")
+    @ResponseStatus(HttpStatus.OK)
+    public void payAndConfirm(@PathVariable("id") final long id, @RequestBody final PaymentRequest paymentRequest) {
+        var payment = paymentService.payReservation(id, paymentRequest);
+        reservationService.confirm(id, payment);
     }
 
     @PostMapping("/wait")
     @ResponseStatus(CREATED)
     public ReservationResponse waitFor(
-            final AuthenticationInfo authenticationInfo,
-            @RequestBody @Valid final CreateReservationRequest request
+        final AuthenticationInfo authenticationInfo,
+        @RequestBody @Valid final CreateReservationRequest request
     ) {
         var reservation = reservationService.waitFor(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
@@ -55,35 +63,30 @@ public class ReservationController {
 
     @GetMapping
     public List<ReservationResponse> getAllReservations(
-            @RequestParam(name = "themeId", required = false) final Long themeId,
-            @RequestParam(name = "userId", required = false) final Long userId,
-            @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
-            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
+        @RequestParam(name = "themeId", required = false) final Long themeId,
+        @RequestParam(name = "userId", required = false) final Long userId,
+        @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
+        @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
     ) {
         var searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
         var reservations = reservationService.findAllReservations(searchFilter);
         return ReservationResponse.from(reservations);
     }
 
+    @AdminOnly
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void delete(
-        final AuthenticationInfo authenticationInfo,
-        @PathVariable("id") final long id
-    ) {
-        if (!authenticationInfo.isAdmin()) {
-            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
-        }
+    public void delete(@PathVariable("id") final long id) {
         reservationService.removeById(id);
     }
 
-    @DeleteMapping("/wait/{id}")
+    @PostMapping("/cancel/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void cancelWaiting(
+    public void cancel(
         final AuthenticationInfo authenticationInfo,
         @PathVariable("id") final long reservationId
     ) {
         var userId = authenticationInfo.id();
-        reservationService.cancelWaiting(userId, reservationId);
+        reservationService.cancel(userId, reservationId);
     }
 }

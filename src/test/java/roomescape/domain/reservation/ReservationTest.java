@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import roomescape.TestFixtures;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -24,23 +25,6 @@ public class ReservationTest {
     private final Theme theme = TestFixtures.anyThemeWithNewId();
 
     @Test
-    @DisplayName("주어진 예약과 같은 방탈출 일정인 지 비교할 수 있다.")
-    void sameScheduleWith() {
-        var schedule = RoomescapeSchedule.of(date, timeSlot, theme);
-        var reservation1 = new Reservation(1L, user1, schedule, ReservationStatus.RESERVED);
-        var reservation2 = new Reservation(2L, user2, schedule, ReservationStatus.RESERVED);
-
-        assertThat(reservation1.sameScheduleWith(reservation2)).isTrue();
-    }
-
-    @Test
-    @DisplayName("예약이 확정 상태인 지 확인한다.")
-    void isReserved() {
-        var reservation = reservationOf(ReservationStatus.RESERVED);
-        assertThat(reservation.isReserved()).isTrue();
-    }
-
-    @Test
     @DisplayName("예약이 대기 상태인 지 확인한다.")
     void isWaiting() {
         var reservation = reservationOf(ReservationStatus.WAITING);
@@ -48,10 +32,18 @@ public class ReservationTest {
     }
 
     @Test
-    @DisplayName("대기 상태의 예약을 취소할 수 있다.")
-    void cancel() {
+    @DisplayName("예약이 보류 상태인 지 확인한다.")
+    void isPending() {
+        var reservation = reservationOf(ReservationStatus.PENDING);
+        assertThat(reservation.isPending()).isTrue();
+    }
+
+    @ParameterizedTest
+    @DisplayName("확정 상태가 아닌 예약을 취소할 수 있다.")
+    @CsvSource({"WAITING", "PENDING"})
+    void cancel(ReservationStatus status) {
         // given
-        var reservation = reservationOf(ReservationStatus.WAITING);
+        var reservation = reservationOf(status);
 
         // when
         reservation.cancel();
@@ -61,25 +53,49 @@ public class ReservationTest {
     }
 
     @Test
-    @DisplayName("대기 상태의 예약을 확정시킬 수 있다.")
-    void confirm() {
+    @DisplayName("확정 상태의 예약을 취소하려 하면 예외가 발생한다.")
+    void cannotCancelConfirmedReservation() {
+        var reservation = reservationOf(ReservationStatus.CONFIRMED);
+
+        assertThatThrownBy(reservation::cancel).isInstanceOf(BusinessRuleViolationException.class);
+    }
+
+    @Test
+    @DisplayName("보류 상태가 아닌 예약을 보류시킬 수 있다.")
+    void pend() {
         // given
         var reservation = reservationOf(ReservationStatus.WAITING);
 
         // when
-        reservation.confirm();
+        reservation.pend();
 
         // then
-        assertThat(reservation.status()).isEqualTo(ReservationStatus.RESERVED);
+        assertThat(reservation.status()).isEqualTo(ReservationStatus.PENDING);
     }
 
-    @ParameterizedTest
-    @CsvSource({"RESERVED", "CANCELED"})
-    @DisplayName("대기 상태가 아닌 예약을 취소하려 하면 예외가 발생한다.")
-    void cancelNotWaitingReservation(ReservationStatus statusThatNotWaiting) {
-        var reservation = reservationOf(statusThatNotWaiting);
+    @Test
+    @DisplayName("보류 상태의 예약을 결제 정보와 함께 확정시킬 수 있다.")
+    void confirm() {
+        // given
+        var reservation = reservationOf(ReservationStatus.PENDING);
+        var payment = new Payment("key", 10000);
 
-        assertThatThrownBy(reservation::cancel).isInstanceOf(BusinessRuleViolationException.class);
+        // when
+        reservation.confirm(payment);
+
+        // then
+        assertThat(reservation.status()).isEqualTo(ReservationStatus.CONFIRMED);
+    }
+
+    @Test
+    @DisplayName("보류 상태가 아닌 예약은 확정시킬 수 없다.")
+    void cannotConfirmNotPending() {
+        // given
+        var reservation = reservationOf(ReservationStatus.WAITING);
+        var payment = new Payment("key", 10000);
+
+        // when & then
+        assertThatThrownBy(() -> reservation.confirm(payment)).isInstanceOf(BusinessRuleViolationException.class);
     }
 
     private Reservation reservationOf(final ReservationStatus status) {

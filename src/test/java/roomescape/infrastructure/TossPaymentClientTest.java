@@ -1,7 +1,6 @@
 package roomescape.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -24,14 +23,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
-@RestClientTest(PaymentProvider.class)
+@RestClientTest(PaymentClient.class)
 @Import(TossPaymentProviderConfig.class)
-class TossPaymentProviderTest {
+class TossPaymentClientTest {
 
     private static final String EXPECTED_CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
 
@@ -41,26 +40,34 @@ class TossPaymentProviderTest {
     private TossApiProperties tossApiProperties;
 
     private MockRestServiceServer server;
-    private PaymentProvider paymentProvider;
+    private PaymentClient paymentClient;
 
     @BeforeEach
     public void setup() {
-        paymentProvider = new TossPaymentProvider(restTemplate, tossApiProperties);
+        paymentClient = new TossPaymentClient(restTemplate, tossApiProperties);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
     @DisplayName("결제 승인 API 스펙에 맞게 HTTP 요청을 보낸다.")
-    void requestToConfirm() {
+    void requestToRequestPay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
+        var response = """
+            {
+                "paymentKey": "a",
+                "orderId": 1,
+                "orderName": "name",
+                "totalAmount": 1000
+            }
+            """;
 
         server.expect(requestTo(EXPECTED_CONFIRM_URI))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess());
+            .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when
-        paymentProvider.confirm(request);
+        paymentClient.requestPay(request);
 
         // then
         server.verify();
@@ -81,7 +88,7 @@ class TossPaymentProviderTest {
 
         // when
         try {
-            paymentProvider.confirm(request);
+            paymentClient.requestPay(request);
         } catch (PaymentFailedException ignore) {
         }
 
@@ -102,7 +109,7 @@ class TossPaymentProviderTest {
             });
 
         // when
-        assertThatThrownBy(() -> paymentProvider.confirm(request))
+        assertThatThrownBy(() -> paymentClient.requestPay(request))
 
             // then
             .isInstanceOf(PaymentFailedException.class)
@@ -114,7 +121,7 @@ class TossPaymentProviderTest {
 
     @Test
     @DisplayName("결제 승인에 성공한다.")
-    void confirmPaymentSucceeded() {
+    void requestPayPaymentSucceeded() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
         var response = """
@@ -130,15 +137,17 @@ class TossPaymentProviderTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
-        // when & then
-        assertThatCode(() -> paymentProvider.confirm(request))
-            .doesNotThrowAnyException();
+        // when
+        var payment = paymentClient.requestPay(request);
+
+        // then
+        assertThat(payment).isNotNull();
     }
 
     @ParameterizedTest
     @DisplayName("결제 승인에 실패하면 결제 실패 예외가 발생한다.")
-    @MethodSource("confirmPaymentFailedSource")
-    void confirmPaymentFailed(final String response) {
+    @MethodSource("requestPayPaymentFailedSource")
+    void requestPayPaymentFailed(final String response) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 
@@ -147,11 +156,11 @@ class TossPaymentProviderTest {
             .andRespond(withBadRequest().contentType(MediaType.APPLICATION_JSON).body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentProvider.confirm(request))
+        assertThatThrownBy(() -> paymentClient.requestPay(request))
             .isInstanceOf(PaymentFailedException.class);
     }
 
-    private static Stream<Arguments> confirmPaymentFailedSource() {
+    private static Stream<Arguments> requestPayPaymentFailedSource() {
         return Stream.of(
             Arguments.of("""
                 {

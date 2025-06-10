@@ -7,9 +7,11 @@ import static roomescape.infrastructure.ReservationSpecs.byStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationQueues;
 import roomescape.domain.reservation.ReservationRepository;
@@ -24,6 +26,7 @@ import roomescape.exception.BusinessRuleViolationException;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -38,7 +41,14 @@ public class ReservationService {
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
         }
 
-        return reserve(userId, schedule, ReservationStatus.RESERVED);
+        return reserve(userId, schedule, ReservationStatus.PENDING);
+    }
+
+    @Transactional
+    public void confirm(final long id, final Payment payment) {
+        var reservation = reservationRepository.getById(id);
+        reservation.confirm(payment);
+        log.info("예약이 확정되었습니다. 확정된 예약 = {}", reservation);
     }
 
     @Transactional
@@ -64,30 +74,32 @@ public class ReservationService {
     @Transactional
     public void removeById(final long id) {
         var reservation = reservationRepository.getById(id);
-        if (reservation.isReserved()) {
-            confirmNextReservationInQueue(reservation);
-        }
+        removeFromQueueById(reservation);
         reservationRepository.delete(reservation);
-    }
-
-    private void confirmNextReservationInQueue(final Reservation reservation) {
-        var queues = reservationRepository.findQueuesBySchedules(List.of(reservation.reservedSchedule()));
-        var nextReservation = queues.findNext(reservation);
-        nextReservation.ifPresent(Reservation::confirm);
+        log.info("예약이 삭제되었습니다. 삭제된 예약 = {}", reservation);
     }
 
     @Transactional
-    public void cancelWaiting(final long userId, final long reservationId) {
+    public void cancel(final long userId, final long reservationId) {
         var user = userRepository.getById(userId);
         var reservation = reservationRepository.getById(reservationId);
+        removeFromQueueById(reservation);
         user.cancelReservation(reservation);
+        log.info("예약이 취소되었습니다. 취소된 예약 = {}", reservation);
+    }
+
+    private void removeFromQueueById(final Reservation reservation) {
+        var queues = reservationRepository.findQueuesBySchedules(List.of(reservation.reservedSchedule()));
+        queues.remove(reservation);
     }
 
     private Reservation reserve(final long userId, final RoomescapeSchedule schedule, final ReservationStatus status) {
         var user = userRepository.getById(userId);
         var reservation = new Reservation(user, schedule, status);
         user.reserve(reservation);
-        return reservationRepository.save(reservation);
+        var savedReservation = reservationRepository.save(reservation);
+        log.info("결제 대기중인 예약이 생성되었습니다. 생성된 예약 = {}", savedReservation);
+        return savedReservation;
     }
 
     private RoomescapeSchedule toRoomescapeSchedule(final LocalDate date, final long timeId, final long themeId) {

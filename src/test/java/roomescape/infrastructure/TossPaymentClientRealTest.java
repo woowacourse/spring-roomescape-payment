@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import roomescape.domain.payment.PaymentConfirmation;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRequest;
 
 @Disabled
 @SpringBootTest
 @DisplayName("[실제 토스 페이먼츠] API 테스트")
-public class TossPaymentProviderRealTest {
+public class TossPaymentClientRealTest {
 
     @Value("${api.toss.base-url}")
     private String tossBaseUrl;
@@ -40,7 +40,7 @@ public class TossPaymentProviderRealTest {
     @Test
     @DisplayName("토스 API 스펙에 맞게 요청을 보낸다.")
     void request() {
-        assertThatThrownBy(() -> restTemplate.postForEntity(tossBaseUrl + tossConfirmUri, junkRequest, PaymentConfirmation.class))
+        assertThatThrownBy(() -> restTemplate.postForEntity(tossBaseUrl + tossConfirmUri, junkRequest, Payment.class))
 
             .as("토스에서 API 스펙이 맞지 않는 경우 '필수 파라미터가 누락되었습니다.' 라는 메시지를 응답한다.")
             .hasMessageNotContainingAny("필수", "파라미터", "누락");

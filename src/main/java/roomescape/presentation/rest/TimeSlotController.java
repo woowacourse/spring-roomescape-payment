@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.TimeSlotService;
+import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateTimeSlotRequest;
 import roomescape.presentation.response.AvailableTimeSlotResponse;
 import roomescape.presentation.response.TimeSlotResponse;
@@ -28,6 +29,7 @@ public class TimeSlotController {
 
     private final TimeSlotService service;
 
+    @AdminOnly
     @PostMapping
     @ResponseStatus(CREATED)
     public TimeSlotResponse register(@RequestBody @Valid final CreateTimeSlotRequest request) {
@@ -43,13 +45,14 @@ public class TimeSlotController {
 
     @GetMapping(value = "/available", params = {"date", "themeId"})
     public List<AvailableTimeSlotResponse> getAvailableTimes(
-            @RequestParam("date") final LocalDate date,
-            @RequestParam("themeId") final Long themeId
+        @RequestParam("date") final LocalDate date,
+        @RequestParam("themeId") final Long themeId
     ) {
         var availableTimeSlots = service.findAvailableTimeSlots(date, themeId);
         return AvailableTimeSlotResponse.from(availableTimeSlots);
     }
 
+    @AdminOnly
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable("id") final long id) {

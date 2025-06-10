@@ -34,18 +34,25 @@ function render(data) {
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick = function () {
-                requestDeleteWaiting(item.id).then(() => window.location.reload());
+                requestCancelWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
+            /*
+            TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+            예약 완료 상태일 때 결제 정보를 함께 보여주기
+            결제 정보 필드명은 자신의 response 에 맞게 변경하기
+            */
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.payment.paymentKey;
+            row.insertCell(6).textContent = item.payment.amount;
         }
     });
 }
 
-function requestDeleteWaiting(id) {
-    return fetch('/reservations/wait/' + id, {
-        method: 'DELETE'
+function requestCancelWaiting(id) {
+    return fetch('/reservations/cancel/' + id, {
+        method: 'POST'
     }).then(response => {
         if (response.status === 204) return;
         throw new Error('Delete failed');

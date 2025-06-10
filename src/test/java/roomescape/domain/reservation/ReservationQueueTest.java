@@ -38,17 +38,17 @@ class ReservationQueueTest {
     @DisplayName("주어진 예약의 대기 순번을 알 수 있다.")
     void orderOf() {
         // given
-        var reservation1 = reservationOf(schedule, user1);
-        var reservation2 = reservationOf(schedule, user2);
-        var reservation3 = reservationOf(schedule, user3);
+        var first = reservationOf(schedule, user1);
+        var second = reservationOf(schedule, user2);
+        var third = reservationOf(schedule, user3);
 
-        var queue = new ReservationQueue(List.of(reservation1, reservation2, reservation3));
+        var queue = new ReservationQueue(List.of(first, second, third));
 
         // when & then
         assertAll(
-            () -> assertThat(queue.orderOf(reservation1)).isEqualTo(1),
-            () -> assertThat(queue.orderOf(reservation2)).isEqualTo(2),
-            () -> assertThat(queue.orderOf(reservation3)).isEqualTo(3)
+            () -> assertThat(queue.orderOf(first)).isEqualTo(1),
+            () -> assertThat(queue.orderOf(second)).isEqualTo(2),
+            () -> assertThat(queue.orderOf(third)).isEqualTo(3)
         );
     }
 
@@ -58,8 +58,9 @@ class ReservationQueueTest {
         var queue = new ReservationQueue(emptyList());
         var reservation = reservationOf(schedule, user1);
 
-        assertThatThrownBy(() -> queue.orderOf(reservation))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(
+            () -> queue.orderOf(reservation)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -68,26 +69,64 @@ class ReservationQueueTest {
         var queue = new ReservationQueue(emptyList());
         var reservation = reservationOf(otherSchedule, user1);
 
-        assertThatThrownBy(() -> queue.orderOf(reservation))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(
+            () -> queue.orderOf(reservation)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("주어진 예약 다음 순번의 예약을 찾는다.")
     void findNext() {
         // given
-        var reservation1 = reservationOf(schedule, user1);
-        var reservation2 = reservationOf(schedule, user2);
-        var reservation3 = reservationOf(schedule, user3);
+        var first = reservationOf(schedule, user1);
+        var second = reservationOf(schedule, user2);
+        var third = reservationOf(schedule, user3);
 
-        var queue = new ReservationQueue(List.of(reservation1, reservation2, reservation3));
+        var queue = new ReservationQueue(List.of(first, second, third));
 
         // when & then
         assertAll(
-            () -> assertThat(queue.findNext(reservation1)).hasValue(reservation2),
-            () -> assertThat(queue.findNext(reservation2)).hasValue(reservation3),
-            () -> assertThat(queue.findNext(reservation3)).isEmpty()
+            () -> assertThat(queue.findNext(first)).hasValue(second),
+            () -> assertThat(queue.findNext(second)).hasValue(third),
+            () -> assertThat(queue.findNext(third)).isEmpty()
         );
+    }
+
+    @Test
+    @DisplayName("주어진 예약을 대기열에서 제거한다.")
+    void remove() {
+        // given
+        var reservation = reservationOf(schedule, user1);
+
+        var queue = new ReservationQueue(List.of(
+            reservation,
+            reservationOf(schedule, user2),
+            reservationOf(schedule, user3)
+        ));
+
+        // when
+        queue.remove(reservation);
+
+        // then
+        assertThatThrownBy(() -> queue.orderOf(reservation))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("대기열에서 제거하려는 예약이 첫 번째 순번이고 다음 예약이 존재하는 경우 다음 예약은 보류상태가 된다.")
+    void removeFirstWhenNextReservationExists() {
+        // given
+        var first = reservationOf(schedule, user1, ReservationStatus.CONFIRMED);
+        var second = reservationOf(schedule, user2, ReservationStatus.WAITING);
+        var third = reservationOf(schedule, user3, ReservationStatus.WAITING);
+
+        var queue = new ReservationQueue(List.of(first, second, third));
+
+        // when
+        queue.remove(first);
+
+        // then
+        assertThat(second.isPending()).isTrue();
     }
 
     private Reservation reservationOf(final RoomescapeSchedule schedule, final User user) {
@@ -95,7 +134,16 @@ class ReservationQueueTest {
             DUMMY_ID_GENERATOR.incrementAndGet(),
             user,
             schedule,
-            ReservationStatus.RESERVED
+            ReservationStatus.CONFIRMED
+        );
+    }
+
+    private Reservation reservationOf(final RoomescapeSchedule schedule, final User user, final ReservationStatus status) {
+        return new Reservation(
+            DUMMY_ID_GENERATOR.incrementAndGet(),
+            user,
+            schedule,
+            status
         );
     }
 }

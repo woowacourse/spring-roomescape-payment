@@ -36,7 +36,7 @@ class ReservationRepositoryTest {
         var timeSlot = repositoryHelper.saveAnyTimeSlot();
         var theme = repositoryHelper.saveAnyTheme();
 
-        var reservation = new Reservation(user, RoomescapeSchedule.forReserve(date, timeSlot, theme));
+        var reservation = new Reservation(user, RoomescapeSchedule.of(date, timeSlot, theme), ReservationStatus.CONFIRMED);
         savedReservation = reservationRepository.save(reservation);
         repositoryHelper.flushAndClear();
     }

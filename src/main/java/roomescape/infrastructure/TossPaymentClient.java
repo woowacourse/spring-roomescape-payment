@@ -1,43 +1,44 @@
 package roomescape.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 @EnableConfigurationProperties(TossApiProperties.class)
-public class TossPaymentProvider implements PaymentProvider {
-
-    private final Logger logger = LoggerFactory.getLogger(TossPaymentProvider.class);
+public class TossPaymentClient implements PaymentClient {
 
     private final RestTemplate restTemplate;
     private final TossApiProperties properties;
 
-    public PaymentConfirmation confirm(final PaymentRequest request) {
+    public Payment requestPay(final PaymentRequest request) {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
-                var successResponse = restTemplate.postForEntity(properties.confirmUri(), request, PaymentConfirmation.class);
-                return successResponse.getBody();
+                var response = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);
+                log.info("토스 결제 승인에 성공했습니다. 결제 식별 키 = {}, request = {}, response = {}", request.paymentKey(), request, response);
+                return new Payment(response.paymentKey, response.totalAmount);
 
             } catch (RestClientResponseException e) {
-                var failResponse = readTossFailureResponse(e);
-                throw newPaymentFailedException(failResponse.code, failResponse.message);
+                var response = readTossFailureResponse(e);
+                log.warn("토스 결제 승인에 실패했습니다. 결제 식별 키 = {}, request = {}, response = {}", request.paymentKey(), request, response);
+                throw newPaymentFailedException(response.code, response.message);
 
             } catch (ResourceAccessException e) {
-                logger.error(e.getMessage());
+                log.warn("토스 결제 승인 API 연결에 실패했습니다. 결제 식별 키 = {}, request = {}, exception = {}", request.paymentKey(), request, e.toString());
             }
         }
 
@@ -49,11 +50,14 @@ public class TossPaymentProvider implements PaymentProvider {
         var json = e.getResponseBodyAsString();
         try {
             return objectMapper.readValue(json, TossFailureResponse.class);
-        } catch (JsonProcessingException jsonEx) {
-            throw new RuntimeException(jsonEx);
+        } catch (JsonMappingException ex) {
+            throw new RuntimeException("토스의 실패 JSON 응답과 필드가 일치하지 않습니다 : " + ex);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
+    private record TossSuccessResponse(String paymentKey, int totalAmount) {}
     private record TossFailureResponse(String code, String message) {}
 
     private PaymentFailedException newPaymentFailedException(final String tossCode, final String message) {

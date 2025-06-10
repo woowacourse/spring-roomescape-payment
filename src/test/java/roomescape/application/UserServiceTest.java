@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWithOrder;
 import roomescape.domain.user.User;
 
@@ -21,15 +22,12 @@ class UserServiceTest extends ServiceTest {
     @Test
     @DisplayName("사용자를 추가한다.")
     void registerUser() {
-        // given
-        var email = "user@email.com";
-        var password = "password";
-        var name = "user";
+        var registeredUser = service.register(
+            "user@email.com",
+            "password",
+            "user"
+        );
 
-        // when
-        var registeredUser = service.register(email, password, name);
-
-        // then
         var users = service.findAllUsers();
         assertThat(users).contains(registeredUser);
     }
@@ -51,7 +49,7 @@ class UserServiceTest extends ServiceTest {
     private Reservation reserveWithUser(final User user) {
         var savedTimeSlot = repositoryHelper.saveAnyTimeSlot();
         var savedTheme = repositoryHelper.saveAnyTheme();
-        var reservation = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), savedTimeSlot, savedTheme));
+        var reservation = new Reservation(user, RoomescapeSchedule.forReserve(tomorrow(), savedTimeSlot, savedTheme), ReservationStatus.CONFIRMED);
         return repositoryHelper.saveReservation(reservation);
     }
 }

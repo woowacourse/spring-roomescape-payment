@@ -1,4 +1,4 @@
-package roomescape.domain.reservation;
+package roomescape.domain;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static roomescape.DateUtils.yesterday;
@@ -6,19 +6,24 @@ import static roomescape.DateUtils.yesterday;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.TestFixtures;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.exception.BusinessRuleViolationException;
 
-class ReservationDateTimeTest {
+class RoomescapeScheduleTest {
+
+    @Test
+    void of() {
+    }
 
     @Test
     @DisplayName("예약하려는 방탈출 일정의 일시가 현재 일시보다 이전이면 예외가 발생한다.")
     void forReserve() {
         var yesterday = yesterday();
         var timeSlot = new TimeSlot(LocalTime.of(10, 0));
+        var theme = TestFixtures.anyThemeWithNewId();
 
-        assertThatThrownBy(
-            () -> ReservationDateTime.forReserve(yesterday, timeSlot)
-        ).isInstanceOf(BusinessRuleViolationException.class);
+        assertThatThrownBy(() -> RoomescapeSchedule.forReserve(yesterday, timeSlot, theme))
+            .isInstanceOf(BusinessRuleViolationException.class);
     }
 }

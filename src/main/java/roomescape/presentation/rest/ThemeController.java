@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.ThemeService;
+import roomescape.presentation.auth.AdminOnly;
 import roomescape.presentation.request.CreateThemeRequest;
 import roomescape.presentation.response.ThemeResponse;
 
@@ -27,6 +28,7 @@ public class ThemeController {
 
     private final ThemeService service;
 
+    @AdminOnly
     @PostMapping
     @ResponseStatus(CREATED)
     public ThemeResponse register(@RequestBody @Valid final CreateThemeRequest request) {
@@ -41,7 +43,7 @@ public class ThemeController {
     }
 
     @GetMapping(value = "/popular", params = {"startDate", "endDate", "count"})
-    public List<ThemeResponse> getAvailableTimes(
+    public List<ThemeResponse> getPopularThemes(
             @RequestParam("startDate") final LocalDate startDate,
             @RequestParam("endDate") final LocalDate endDate,
             @RequestParam("count") final Integer count
@@ -50,6 +52,7 @@ public class ThemeController {
         return ThemeResponse.from(themes);
     }
 
+    @AdminOnly
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable("id") final long id) {
