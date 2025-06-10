@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.InvalidReservationException;
@@ -40,9 +39,8 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentRepository paymentRepository;
-    private final FilterRegistrationBean resourceUrlEncodingFilter;
 
-    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository, FilterRegistrationBean resourceUrlEncodingFilter) {
+    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -50,7 +48,6 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentRepository = paymentRepository;
-        this.resourceUrlEncodingFilter = resourceUrlEncodingFilter;
     }
 
     @Transactional

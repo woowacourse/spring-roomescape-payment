@@ -82,7 +82,7 @@ public class ReservationController {
     @GetMapping("/mine")
     @Operation(summary = "본인 예약 조회 API")
     public ResponseEntity<List<MyReservationWithPaymentResponse>> getMyReservations(@Login LoginMember loginMember) {
-        List<MyReservationWithPaymentResponse> myReservationWithPaymentRespons = reservationService.getMyReservations(loginMember.id());
-        return ResponseEntity.ok().body(myReservationWithPaymentRespons);
+        List<MyReservationWithPaymentResponse> myReservationWithPaymentResponse = reservationService.getMyReservations(loginMember.id());
+        return ResponseEntity.ok().body(myReservationWithPaymentResponse);
     }
 }
