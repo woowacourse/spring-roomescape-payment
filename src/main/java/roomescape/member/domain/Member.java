@@ -1,17 +1,8 @@
 package roomescape.member.domain;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import jakarta.persistence.*;
 
-import roomescape.reservation.domain.Reservation;
+import java.util.Objects;
 
 @Entity
 public class Member {
@@ -39,6 +30,10 @@ public class Member {
 
     public static Member createWithoutId(String name, String email, String password) {
         return new Member(null, new Name(name), new Email(email), new Password(password));
+    }
+
+    public static Member createWithId(Long id, String name, String email, String password) {
+        return new Member(id, new Name(name), new Email(email), new Password(password));
     }
 
     public boolean isSamePassword(final String password) {

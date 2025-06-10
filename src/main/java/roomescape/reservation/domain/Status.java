@@ -3,15 +3,16 @@ package roomescape.reservation.domain;
 public enum Status {
 
     RESERVED("예약"),
+
     ;
 
-    private final String status;
+    private final String message;
 
-    Status(String status) {
-        this.status = status;
+    Status(String message) {
+        this.message = message;
     }
 
-    public String getStatus() {
-        return status;
+    public String getMessage() {
+        return message;
     }
 }

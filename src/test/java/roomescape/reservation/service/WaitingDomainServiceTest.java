@@ -7,23 +7,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import roomescape.auth.login.presentation.dto.LoginMemberInfo;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.util.time.DateTime;
-import roomescape.member.domain.MemberRepository;
-import roomescape.member.infrastructure.JpaMemberRepository;
-import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
 import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.MyReservationResponse;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.exception.ReservationException;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
-import roomescape.reservation.infrastructure.JpaWaitingRepository;
-import roomescape.reservation.infrastructure.JpaWaitingRepositoryAdapter;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
 import roomescape.reservation.presentation.dto.WaitingResponse;
@@ -39,11 +29,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.reservation.service.WaitingDomainServiceTest.*;
 
 
-@DataJpaTest
-@Import(WaitingDomainConfig.class)
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class WaitingDomainServiceTest {
 
     private static final String paymentKey = "tgen_20240513184816ZSAZ9";
@@ -144,41 +133,12 @@ class WaitingDomainServiceTest {
         assertThat(secondResponse.time().id()).isEqualTo(1L);
     }
 
+    @TestConfiguration
     static class WaitingDomainConfig {
 
         @Bean
         public DateTime dateTime() {
             return () -> LocalDateTime.of(2025, 4, 28, 10, 0);
-        }
-
-        @Bean
-        public ReservationRepository reservationRepository(JpaReservationRepository jpaReservationRepository) {
-            return new JpaReservationRepositoryAdapter(jpaReservationRepository);
-        }
-
-        @Bean
-        public MemberRepository memberRepository(JpaMemberRepository jpaMemberRepository) {
-            return new JpaMemberRepositoryAdapter(jpaMemberRepository);
-        }
-
-        @Bean
-        public WaitingRepository waitingRepository(JpaWaitingRepository jpaWaitingRepository) {
-            return new JpaWaitingRepositoryAdapter(jpaWaitingRepository);
-        }
-
-        @Bean
-        public WaitingDomainService waitingDomainService(
-            DateTime dateTime,
-            ReservationRepository reservationRepository,
-            MemberRepository memberRepository,
-            WaitingRepository waitingRepository
-        ) {
-            return new WaitingDomainService(
-                dateTime,
-                reservationRepository,
-                memberRepository,
-                waitingRepository
-            );
         }
     }
 }

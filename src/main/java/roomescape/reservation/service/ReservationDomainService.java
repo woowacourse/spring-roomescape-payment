@@ -10,6 +10,9 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.exception.MemberNotFound;
 import roomescape.member.presentation.dto.MemberResponse;
 import roomescape.member.presentation.dto.MyReservationResponse;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.exception.PaymentRequestException;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.exception.ReservationException;
 import roomescape.reservation.infrastructure.dto.WaitingWithRank;
@@ -38,6 +41,7 @@ public class ReservationDomainService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationDomainService(
         final DateTime dateTime,
@@ -45,7 +49,8 @@ public class ReservationDomainService {
         final ReservationTimeRepository reservationTimeRepository,
         final ThemeRepository themeRepository,
         final MemberRepository memberRepository,
-        final WaitingRepository waitingRepository
+        final WaitingRepository waitingRepository,
+        final PaymentRepository paymentRepository
     ) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
@@ -53,6 +58,7 @@ public class ReservationDomainService {
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -69,6 +75,9 @@ public class ReservationDomainService {
 
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
         validateCanReserveDateTime(reservation, dateTime.now());
+
+        Payment payment = Payment.createWithoutId(reservation, request.paymentKey(), request.orderId(), request.amount());
+        paymentRepository.save(payment);
 
         return reservationRepository.save(reservation);
     }
@@ -101,6 +110,7 @@ public class ReservationDomainService {
 
         List<Waiting> waitings = waitingRepository.findByReservationId(id);
         if (waitings.isEmpty()) {
+            paymentRepository.deleteByReservationId(reservation.getId());
             reservationRepository.deleteById(id);
             return;
         }
@@ -134,12 +144,23 @@ public class ReservationDomainService {
             .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
 
         List<Reservation> reservations = reservationRepository.findAllByMemberId(loginMemberInfo.id());
+        List<MyReservationResponse> reservationsWithPayments = mapToMyReservationResponse(reservations);
 
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findByMemberId(loginMemberInfo.id());
 
         return Stream.concat(
-            reservations.stream().map(MyReservationResponse::from),
+            reservationsWithPayments.stream(),
             waitingWithRanks.stream().map(MyReservationResponse::from)
         ).toList();
+    }
+
+    private List<MyReservationResponse> mapToMyReservationResponse(List<Reservation> reservations) {
+        return reservations.stream()
+            .map(reservation -> {
+                Payment findPayment = paymentRepository.findByReservationId(reservation.getId())
+                    .orElseThrow(() -> new PaymentRequestException("결제 정보가 없습니다."));
+                return MyReservationResponse.from(reservation, findPayment);
+            })
+            .toList();
     }
 }

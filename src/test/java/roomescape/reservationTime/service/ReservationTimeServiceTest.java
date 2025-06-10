@@ -1,28 +1,21 @@
 package roomescape.reservationTime.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
-import roomescape.reservationTime.domain.ReservationTimeRepository;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.reservationTime.exception.ReservationTimeException;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdaptor;
 import roomescape.reservationTime.presentation.dto.TimeConditionRequest;
 import roomescape.reservationTime.presentation.dto.TimeConditionResponse;
-import roomescape.reservationTime.service.ReservationTimeServiceTest.ReservationTimeConfig;
 
-@DataJpaTest
-@Import(ReservationTimeConfig.class)
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationTimeServiceTest {
 
     @Autowired
@@ -49,25 +42,5 @@ class ReservationTimeServiceTest {
             new TimeConditionResponse(2L, LocalTime.of(11, 0), true),
             new TimeConditionResponse(3L, LocalTime.of(12, 0), false)
         );
-    }
-
-    static class ReservationTimeConfig {
-
-        @Bean
-        public ReservationRepository reservationRepository(JpaReservationRepository jpaReservationRepository) {
-            return new JpaReservationRepositoryAdapter(jpaReservationRepository);
-        }
-
-        @Bean
-        public ReservationTimeRepository reservationTimeRepository(
-            JpaReservationTimeRepository jpaReservationTimeRepository) {
-            return new JpaReservationTimeRepositoryAdaptor(jpaReservationTimeRepository);
-        }
-
-        @Bean
-        public ReservationTimeService reservationTimeService(ReservationRepository reservationRepository,
-                                                             ReservationTimeRepository reservationTimeRepository) {
-            return new ReservationTimeService(reservationRepository, reservationTimeRepository);
-        }
     }
 }

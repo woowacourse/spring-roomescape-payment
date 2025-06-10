@@ -1,15 +1,15 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import roomescape.common.exception.BusinessException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.infrastructure.StatusConverter;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Reservation {
@@ -60,6 +60,16 @@ public class Reservation {
         if (object == null) {
             throw new BusinessException("예약 정보는 null 일 수 없습니다.");
         }
+    }
+
+    public static Reservation createWithId(
+        final Long id,
+        final LocalDate date,
+        final ReservationTime time,
+        final Theme theme,
+        final Member member,
+        final Status status) {
+        return new Reservation(id, date, time, theme, member, status);
     }
 
     public static Reservation createWithoutId(final LocalDate date,
