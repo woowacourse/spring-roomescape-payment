@@ -83,8 +83,8 @@ class ReservationControllerTest {
             Map<String, Object> params = Map.of(
                     "memberId", "1",
                     "date", LocalDate.now().plusDays(1).toString(),
-                    "themeId", "1",
-                    "timeId", "1",
+                    "themeId", "2",
+                    "timeId", "3",
                     "paymentKey", "test",
                     "orderId", "test",
                     "amount", 1000,
@@ -105,8 +105,8 @@ class ReservationControllerTest {
             Map<String, Object> duplicated = Map.of(
                     "memberId", "1",
                     "date", LocalDate.now().plusDays(1).toString(),
-                    "themeId", "1",
-                    "timeId", "1",
+                    "themeId", "2",
+                    "timeId", "3",
                     "paymentKey", "test",
                     "orderId", "test",
                     "amount", 1000,

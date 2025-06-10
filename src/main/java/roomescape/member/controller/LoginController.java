@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import roomescape.global.logging.LogContent;
+import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginRequest;
 import roomescape.member.service.AuthService;
@@ -24,6 +27,11 @@ public class LoginController {
         this.memberService = memberService;
     }
 
+    @LogExecution(
+            description = "사용자 로그인",
+            content = {LogContent.REQUEST, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
+    )
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody final LoginRequest loginRequest, final HttpSession session) {
         final Member member = authService.getMemberByEmailAndPassword(loginRequest);
@@ -33,6 +41,11 @@ public class LoginController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @LogExecution(
+            description = "사용자 로그아웃",
+            content = {LogContent.USER_ACTION, LogContent.EXECUTION_TIME},
+            level = LogLevel.INFO
+    )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpSession session) {
         session.invalidate();

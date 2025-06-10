@@ -1,0 +1,473 @@
+= RoomescapeService
+:toc: left
+:source-highlighter: highlightjs
+:sectlinks:
+=== HTTP status codes
+
+|===
+| 상태 코드 | 설명
+
+| `200 OK`
+| 성공
+
+| `201 Created`
+| 리소스 생성
+
+| `204 NO_CONTENT`
+| 성공 후 반환 값 없음
+
+| `400 Bad Request`
+| 잘못된 요청
+
+| `401 Unauthorized`
+| 비인증 상태
+
+| `403 Forbidden`
+| 권한 거부
+
+| `404 Not Found`
+| 존재하지 않는 요청 리소스
+
+| `500 Internal Server Error`
+| 서버 에러
+|===
+
+== 로그인 API
+
+=== 로그인 (POST /login)
+
+==== Description
+
+사용자 로그인 API
+
+==== Request
+
+include::{snippets}/login-test/login-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/login-test/login-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/login-test/login-success/http-response.adoc[]
+
+=== 로그아웃 (POST /logout)
+
+==== Description
+
+사용자 로그아웃 API
+
+==== Request
+
+include::{snippets}/logout-test/logout-success/http-request.adoc[]
+
+==== Cookie
+
+include::{snippets}/logout-test/logout-success/request-cookies.adoc[]
+
+==== Response
+
+include::{snippets}/logout-test/logout-success/http-response.adoc[]
+
+=== 로그인 확인 (GET /login/check)
+
+==== Description
+
+현재 로그인 상태 확인 API
+
+==== Request
+
+include::{snippets}/login-check-test/login-check-success/http-request.adoc[]
+
+==== Cookie
+
+include::{snippets}/login-check-test/login-check-success/request-cookies.adoc[]
+
+==== Response
+
+include::{snippets}/login-check-test/login-check-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/login-check-test/login-check-success/response-fields.adoc[]
+
+==== 로그인되지 않은 상태
+
+include::{snippets}/login-check-test/login-check-unauthorized/http-response.adoc[]
+
+== 예약 API
+
+=== 예약 생성 (POST /reservations)
+
+==== Description
+
+새로운 예약을 생성하는 API (결제 정보 포함)
+
+==== Request
+
+include::{snippets}/reservation-create-test/create-reservation-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/reservation-create-test/create-reservation-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-create-test/create-reservation-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/reservation-create-test/create-reservation-success/response-fields.adoc[]
+
+==== 잘못된 날짜 형식 요청
+
+include::{snippets}/reservation-create-test/create-reservation-with-invalid-date-format/http-request.adoc[]
+
+==== 과거 날짜 요청
+
+include::{snippets}/reservation-create-test/create-reservation-with-past-date/http-request.adoc[]
+
+=== 예약 조회 (GET /reservations)
+
+==== Description
+
+모든 예약 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/reservation-list-test/get-all-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-list-test/get-all-reservations/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/reservation-list-test/get-all-reservations/response-fields.adoc[]
+
+=== 예약 삭제 (DELETE /reservations/{id})
+
+==== Description
+
+특정 예약을 삭제하는 API
+
+==== Request
+
+include::{snippets}/reservation-delete-test/delete-reservation-success/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/reservation-delete-test/delete-reservation-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-delete-test/delete-reservation-success/http-response.adoc[]
+
+==== 존재하지 않는 예약 삭제
+
+include::{snippets}/reservation-delete-test/delete-non-existent-reservation/http-response.adoc[]
+
+=== 내 예약 조회 (GET /members/reservations)
+
+==== Description
+
+로그인된 회원의 예약 목록을 조회하는 API (결제 정보 포함)
+
+==== Request
+
+include::{snippets}/my-reservation-list-test/get-my-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/my-reservation-list-test/get-my-reservations/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/my-reservation-list-test/get-my-reservations/response-fields.adoc[]
+
+== 관리자 예약 API
+
+=== 관리자 예약 생성 (POST /admin/reservations)
+
+==== Description
+
+관리자가 특정 회원에 대한 예약을 생성하는 API
+
+==== Request
+
+include::{snippets}/admin-reservation-create-test/create-admin-reservation-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/admin-reservation-create-test/create-admin-reservation-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/admin-reservation-create-test/create-admin-reservation-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/admin-reservation-create-test/create-admin-reservation-success/response-fields.adoc[]
+
+=== 관리자 예약 조회 (GET /admin/reservations)
+
+==== Description
+
+관리자가 필터를 적용하여 예약 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/admin-reservation-list-test/get-admin-reservations-with-all-filters/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/admin-reservation-list-test/get-admin-reservations-with-all-filters/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/admin-reservation-list-test/get-admin-reservations-with-all-filters/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/admin-reservation-list-test/get-admin-reservations-with-all-filters/response-fields.adoc[]
+
+== 테마 API
+
+=== 테마 조회 (GET /themes)
+
+==== Description
+
+모든 테마 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/theme-list-test/get-all-themes/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme-list-test/get-all-themes/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/theme-list-test/get-all-themes/response-fields.adoc[]
+
+=== 인기 테마 조회 (GET /themes/ranking)
+
+==== Description
+
+인기 테마 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/theme-list-test/get-popular-themes/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/theme-list-test/get-popular-themes/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/theme-list-test/get-popular-themes/response-fields.adoc[]
+
+=== 테마 생성 (POST /themes)
+
+==== Description
+
+새로운 테마를 생성하는 API
+
+==== Request
+
+include::{snippets}/theme-create-test/create-theme-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/theme-create-test/create-theme-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/theme-create-test/create-theme-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/theme-create-test/create-theme-success/response-fields.adoc[]
+
+=== 테마 삭제 (DELETE /themes/{id})
+
+==== Description
+
+특정 테마를 삭제하는 API
+
+==== Request
+
+include::{snippets}/theme-delete-test/delete-theme-success/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/theme-delete-test/delete-theme-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/theme-delete-test/delete-theme-success/http-response.adoc[]
+
+== 시간 API
+
+=== 예약 시간 조회 (GET /times)
+
+==== Description
+
+모든 예약 시간 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/time-list-test/get-all-times/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/time-list-test/get-all-times/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/time-list-test/get-all-times/response-fields.adoc[]
+
+=== 예약 가능한 시간 조회 (GET /times/available-times)
+
+==== Description
+
+특정 날짜와 테마에 대한 예약 가능한 시간을 조회하는 API
+
+==== Request
+
+include::{snippets}/time-list-test/get-available-times/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/time-list-test/get-available-times/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/time-list-test/get-available-times/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/time-list-test/get-available-times/response-fields.adoc[]
+
+=== 예약 시간 생성 (POST /times)
+
+==== Description
+
+새로운 예약 시간을 생성하는 API
+
+==== Request
+
+include::{snippets}/time-create-test/create-time-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/time-create-test/create-time-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/time-create-test/create-time-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/time-create-test/create-time-success/response-fields.adoc[]
+
+=== 예약 시간 삭제 (DELETE /times/{id})
+
+==== Description
+
+특정 예약 시간을 삭제하는 API
+
+==== Request
+
+include::{snippets}/time-delete-test/delete-time-success/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/time-delete-test/delete-time-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/time-delete-test/delete-time-success/http-response.adoc[]
+
+== 예약 대기 API
+
+=== 예약 대기 생성 (POST /reservations-waiting)
+
+==== Description
+
+새로운 예약 대기를 생성하는 API
+
+==== Request
+
+include::{snippets}/waiting-create-test/create-waiting-success/http-request.adoc[]
+
+==== Field
+
+include::{snippets}/waiting-create-test/create-waiting-success/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/waiting-create-test/create-waiting-success/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/waiting-create-test/create-waiting-success/response-fields.adoc[]
+
+=== 예약 대기 삭제 (DELETE /reservations-waiting/{id})
+
+==== Description
+
+특정 예약 대기를 삭제하는 API
+
+==== Request
+
+include::{snippets}/waiting-delete-test/delete-waiting-success/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/waiting-delete-test/delete-waiting-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/waiting-delete-test/delete-waiting-success/http-response.adoc[]
+
+== 관리자 예약 대기 API
+
+=== 관리자 예약 대기 조회 (GET /admin/reservations-waiting)
+
+==== Description
+
+관리자가 모든 예약 대기 목록을 조회하는 API
+
+==== Request
+
+include::{snippets}/admin-waiting-list-test/get-admin-waiting-list/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin-waiting-list-test/get-admin-waiting-list/http-response.adoc[]
+
+==== Field
+
+include::{snippets}/admin-waiting-list-test/get-admin-waiting-list/response-fields.adoc[]
+
+=== 관리자 예약 대기 삭제 (DELETE /admin/reservations-waiting/{id})
+
+==== Description
+
+관리자가 특정 예약 대기를 삭제하는 API
+
+==== Request
+
+include::{snippets}/admin-waiting-list-test/delete-admin-waiting-success/http-request.adoc[]
+
+==== Parameter
+
+include::{snippets}/admin-waiting-list-test/delete-admin-waiting-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/admin-waiting-list-test/delete-admin-waiting-success/http-response.adoc[]

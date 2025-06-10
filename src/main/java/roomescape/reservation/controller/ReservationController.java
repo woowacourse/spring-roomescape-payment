@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.LoginId;
+import roomescape.global.logging.LogContent;
+import roomescape.global.logging.LogExecution;
+import roomescape.global.logging.LogLevel;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -32,25 +36,46 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
     }
 
+    @LogExecution(
+            description = "예약 생성 (결제 포함)",
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
+    )
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody @Valid final ReservationPaymentRequest request,
-            final Long memberId) {
+            @LoginId final Long memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request));
     }
 
+    @LogExecution(
+            description = "예약 취소",
+            content = {LogContent.REQUEST, LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.WARN
+    )
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> removeReservation(@PathVariable(name = "id") long id) {
         reservationService.removeReservation(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @LogExecution(
+            description = "관리자 예약 생성",
+            content = {LogContent.REQUEST, LogContent.RESPONSE, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.INFO
+    )
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationForAdmin(@RequestBody AdminReservationPaymentRequest request) {
         ReservationResponse response = reservationService.addReservation(request.memberId(), ReservationPaymentRequest.from(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @LogExecution(
+            description = "관리자 예약 목록 조회 (필터)",
+            content = {LogContent.REQUEST, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG,
+            maskSensitiveData = false
+    )
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilterForAdmin(
             @RequestParam(required = false, name = "memberId") Long memberId,
@@ -62,8 +87,13 @@ public class ReservationController {
                 .body(reservationService.getFilteredReservations(memberId, themeId, dateFrom, dateTo));
     }
 
+    @LogExecution(
+            description = "내 예약 목록 조회",
+            content = {LogContent.USER_ACTION, LogContent.EXECUTION_TIME, LogContent.EXCEPTION},
+            level = LogLevel.DEBUG
+    )
     @GetMapping("/members/reservations")
-    public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(Long memberId) {
+    public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(@LoginId final Long memberId) {
         List<MyPageReservationResponse> reservations = reservationService.getReservationsByMemberId(memberId);
         return ResponseEntity.ok(reservations);
     }

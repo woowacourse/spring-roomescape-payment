@@ -2,6 +2,7 @@ package roomescape.reservation.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.ReservationWaiting;
 
@@ -10,16 +11,20 @@ public record MyPageReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        long amount
 ) {
 
-    public static MyPageReservationResponse from(final Reservation reservation) {
+    public static MyPageReservationResponse of(final Reservation reservation, final Payment payment) {
         return new MyPageReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                "예약"
+                "예약",
+                payment.getPaymentKey(),
+                payment.getAmount()
         );
     }
 
@@ -29,7 +34,9 @@ public record MyPageReservationResponse(
                 reservationWaiting.getTheme().getName(),
                 reservationWaiting.getDate(),
                 reservationWaiting.getTime().getStartAt(),
-                String.format("%d번째 예약대기", rank)
+                String.format("%d번째 예약대기", rank),
+                "",
+                0
         );
     }
 }

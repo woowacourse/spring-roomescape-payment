@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import roomescape.waiting.domain.ReservationWaiting;
 
@@ -32,7 +33,10 @@ public interface ReservationWaitingJpaRepository extends JpaRepository<Reservati
 
     boolean existsByMemberIdAndThemeIdAndTimeIdAndDate(long memberId, long themeId, long timeId, LocalDate date);
 
-    List<ReservationWaiting> findByMemberId(long memberId);
-
-    List<ReservationWaiting> findAll();
+    @Query("SELECT rw FROM ReservationWaiting rw " +
+            "JOIN FETCH rw.member " +
+            "JOIN FETCH rw.theme " +
+            "JOIN FETCH rw.time " +
+            "WHERE rw.member.id = :memberId")
+    List<ReservationWaiting> findByMemberId(@Param("memberId") long memberId);
 }

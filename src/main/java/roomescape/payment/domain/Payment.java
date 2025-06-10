@@ -6,14 +6,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import roomescape.reservation.domain.Reservation;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Payment {
 
@@ -21,9 +19,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
+    private long reservationId;
 
     private String orderId;
 
@@ -34,11 +30,15 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentType type;
 
-    public Payment(Reservation reservation, String orderId, String paymentKey, long amount, PaymentType type) {
-        this.reservation = reservation;
+    public Payment(long reservationId, String orderId, String paymentKey, long amount, PaymentType type) {
+        this.reservationId = reservationId;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.type = type;
+    }
+
+    public static Payment empty() {
+        return new Payment(0, "", "", 0, PaymentType.NONE);
     }
 }
