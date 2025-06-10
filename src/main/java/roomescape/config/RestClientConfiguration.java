@@ -14,7 +14,7 @@ import roomescape.service.PaymentClientService;
 public class RestClientConfiguration {
     @Value("${toss.base-url}")
     private String baseUrl;
-    @Value("${rest-client.connect-timeout}")
+    @Value("${rest-client.connection-timeout}")
     private int connectTimeoutThreshold;
     @Value("${rest-client.read-timeout}")
     private int readTimeoutThreshold;
