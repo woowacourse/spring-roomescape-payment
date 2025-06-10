@@ -13,10 +13,10 @@ public class ReservationPayment extends BaseEntity {
 
     private Long reservationId;
 
-    private Long PaymentId;
+    private Long paymentId;
 
     public ReservationPayment(final Long reservationId, final Long PaymentId) {
         this.reservationId = reservationId;
-        this.PaymentId = PaymentId;
+        this.paymentId = PaymentId;
     }
 }

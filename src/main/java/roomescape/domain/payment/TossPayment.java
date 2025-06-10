@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.domain.BaseEntity;
+import roomescape.infrastructure.error.exception.PaymentException;
 
 @Entity
 @Getter
@@ -46,18 +47,20 @@ public class TossPayment extends BaseEntity {
     }
 
     public void approve() {
-        paymentStatus = PaymentStatus.APPROVED;
+        if (paymentStatus.canBeApproved()) {
+            paymentStatus = PaymentStatus.APPROVED;
+            return;
+        }
+        throw new PaymentException("%s 상태에서 %s 상태로 변경될 수 없습니다"
+                .formatted(this.paymentStatus, PaymentStatus.APPROVED));
     }
 
     public void fail() {
-        paymentStatus = PaymentStatus.FAILED;
+        if (paymentStatus.canBeFailed()) {
+            paymentStatus = PaymentStatus.FAILED;
+        }
+        throw new PaymentException("%s 상태에서 %s 상태로 변경될 수 없습니다"
+                .formatted(this.paymentStatus, PaymentStatus.FAILED));
     }
 
-    public boolean isApproved() {
-        return paymentStatus.isApproved();
-    }
-
-    public String getStatusDescription() {
-        return paymentStatus.getDescription();
-    }
 }

@@ -19,4 +19,20 @@ public enum PaymentStatus {
     public boolean isApproved() {
         return this == APPROVED;
     }
+
+    public boolean canBeApproved() {
+        return this == PENDING;
+    }
+
+    public boolean canBeFailed() {
+        return this == PENDING;
+    }
+
+    public boolean canBeCanceled() {
+        return this == PENDING || this == APPROVED;
+    }
+
+    public boolean canBeExpired() {
+        return this == PENDING;
+    }
 }
