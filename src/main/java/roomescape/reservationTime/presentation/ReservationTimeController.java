@@ -15,14 +15,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ReservationTimeController.RESERVATION_TIME_BASE_URL)
-public class ReservationTimeController {
+public class ReservationTimeController implements ReservationTimeControllerDocs {
 
     public static final String RESERVATION_TIME_BASE_URL = "/times";
     private static final String SLASH = "/";
 
     private final ReservationTimeService reservationTimeService;
 
-    @PostMapping
+    @Override
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody final ReservationTimeRequest request) {
         ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
@@ -31,20 +31,20 @@ public class ReservationTimeController {
         return ResponseEntity.created(locationUri).body(response);
     }
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTimeResponse> response = reservationTimeService.getReservationTimes();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(consumes = {"application/json"})
+    @Override
     public ResponseEntity<List<TimeConditionResponse>> getReservationTimes(
             final TimeConditionRequest request) {
         List<TimeConditionResponse> responses = reservationTimeService.getTimesWithCondition(request);
         return ResponseEntity.ok().body(responses);
     }
 
-    @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteReservationTimeById(@PathVariable("id") final Long id) {
         reservationTimeService.deleteReservationTimeById(id);
         return ResponseEntity.noContent().build();

@@ -14,11 +14,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class WaitingController {
+public class WaitingController implements WaitingControllerDocs {
 
     private final WaitingService waitingService;
 
-    @PostMapping("/waitings")
+    @Override
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody final WaitingRequest request,
             @Login final LoginMember loginMember
@@ -28,13 +28,13 @@ public class WaitingController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @GetMapping("/waitings")
+    @Override
     public ResponseEntity<List<WaitingResponse>> getWaitings() {
         List<WaitingResponse> waitings = waitingService.getAllWaitings();
         return ResponseEntity.ok(waitings);
     }
 
-    @DeleteMapping("/waitings/{id}")
+    @Override
     public ResponseEntity<Void> cancelWaiting(@PathVariable Long id) {
         waitingService.cancelWaiting(id);
         return ResponseEntity.noContent().build();

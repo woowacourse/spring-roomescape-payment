@@ -14,32 +14,32 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ThemeController.THEME_BASE_URL)
-public class ThemeController {
+public class ThemeController implements ThemeControllerDocs {
 
     public static final String THEME_BASE_URL = "/themes";
     private static final String SLASH = "/";
 
     private final ThemeService themeService;
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<ThemeResponse>> getThemes() {
         List<ThemeResponse> responses = themeService.getThemes();
         return ResponseEntity.ok().body(responses);
     }
 
-    @GetMapping("/popular")
+    @Override
     public ResponseEntity<List<PopularThemeResponse>> getPopularThemes() {
         List<PopularThemeResponse> responses = themeService.getPopularThemes();
         return ResponseEntity.ok().body(responses);
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<ThemeResponse> createTheme(@RequestBody final ThemeRequest request) {
         ThemeResponse response = themeService.createTheme(request);
         return ResponseEntity.created(URI.create(THEME_BASE_URL + SLASH + response.id())).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final Long id) {
         themeService.deleteThemeById(id);
         return ResponseEntity.noContent().build();

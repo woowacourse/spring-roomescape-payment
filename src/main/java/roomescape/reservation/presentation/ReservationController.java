@@ -21,7 +21,7 @@ import static roomescape.reservation.presentation.ReservationController.RESERVAT
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(RESERVATION_BASE_URL)
-public class ReservationController {
+public class ReservationController implements ReservationControllerDocs {
 
     public static final String RESERVATION_BASE_URL = "/reservations";
     private static final String SLASH = "/";
@@ -29,14 +29,14 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final PaymentService paymentService;
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<ReservationResponse>> getReservations(
             @ModelAttribute final ReservationConditionRequest request) {
         List<ReservationResponse> response = reservationService.getReservations(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody final ReservationRequest request,
             @Login final LoginMember loginMember
@@ -49,13 +49,13 @@ public class ReservationController {
         return ResponseEntity.created(locationUri).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteReservationById(@PathVariable("id") final Long id) {
         reservationService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/mine")
+    @Override
     public ResponseEntity<List<MyReservationAndWaitingResponse>> getMyReservations(@Login LoginMember loginMember) {
         List<MyReservationAndWaitingResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
         return ResponseEntity.ok().body(myReservationResponses);

@@ -18,14 +18,14 @@ import static roomescape.member.presentation.MemberController.RESERVATION_BASE_U
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ADMIN_BASE_URL)
-public class AdminController {
+public class AdminController implements AdminControllerDocs {
 
     public static final String ADMIN_BASE_URL = "/admin";
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
 
-    @PostMapping("/reservations")
+    @Override
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request) {
         ReservationResponse response = reservationService.createPendingReservation(request.getReservationRequest(),
                 request.memberId());

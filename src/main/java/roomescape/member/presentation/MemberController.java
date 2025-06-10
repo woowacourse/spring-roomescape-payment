@@ -16,21 +16,21 @@ import static roomescape.member.presentation.MemberController.RESERVATION_BASE_U
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(RESERVATION_BASE_URL)
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
 
     public static final String RESERVATION_BASE_URL = "/members";
     private static final String SLASH = "/";
 
     private final MemberService memberService;
 
-    @PostMapping
+    @Override
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         SignupResponse response = memberService.createUser(request);
         URI uri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(uri).body(response);
     }
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<MemberResponse>> findAllMembers() {
         List<MemberResponse> allMember = memberService.findAllMember();
         return ResponseEntity.ok().body(allMember);
