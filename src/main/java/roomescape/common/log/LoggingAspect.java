@@ -102,13 +102,24 @@ public class LoggingAspect {
     }
 
     private Map<String, Object> getHandlerArguments(final JoinPoint joinPoint) {
-        final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        if (!(joinPoint.getSignature() instanceof MethodSignature methodSignature)) {
+            return Map.of();
+        }
+
         final String[] parameterNames = methodSignature.getParameterNames();
         final Object[] parameterValues = joinPoint.getArgs();
+
+        if (!isValidHandlerParameters(parameterNames, parameterValues)) {
+            return Map.of();
+        }
 
         return IntStream.range(0, parameterNames.length)
                 .boxed()
                 .collect(Collectors.toMap(i -> parameterNames[i], i -> parameterValues[i]));
+    }
+
+    private boolean isValidHandlerParameters(final String[] parameterNames, final Object[] parameterValues) {
+        return parameterNames != null && parameterNames.length == parameterValues.length;
     }
 
     private RequestContext getRequestContext() {
