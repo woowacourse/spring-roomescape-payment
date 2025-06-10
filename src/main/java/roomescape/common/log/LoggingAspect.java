@@ -102,9 +102,9 @@ public class LoggingAspect {
     }
 
     private Map<String, Object> getHandlerArguments(final JoinPoint joinPoint) {
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        String[] parameterNames = methodSignature.getParameterNames();
-        Object[] parameterValues = joinPoint.getArgs();
+        final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        final String[] parameterNames = methodSignature.getParameterNames();
+        final Object[] parameterValues = joinPoint.getArgs();
 
         return IntStream.range(0, parameterNames.length)
                 .boxed()

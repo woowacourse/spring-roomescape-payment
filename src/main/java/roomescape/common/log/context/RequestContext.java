@@ -25,11 +25,12 @@ public record RequestContext(
      * @throws IllegalStateException 현재 쓰레드에 요청이 바인딩되어 있지 않은 경우
      */
     public static RequestContext fromCurrentRequest() {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        final ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (servletRequestAttributes == null) {
             throw new IllegalStateException("No request bound to current thread");
         }
-        HttpServletRequest request = servletRequestAttributes.getRequest();
+        final HttpServletRequest request = servletRequestAttributes.getRequest();
         return new RequestContext(
                 generateId(),
                 request.getRemoteAddr(),

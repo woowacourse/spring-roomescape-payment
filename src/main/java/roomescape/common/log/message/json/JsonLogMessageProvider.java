@@ -35,7 +35,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getRequestLog(RequestLogEntry requestLogEntry) {
+    public String getRequestLog(final RequestLogEntry requestLogEntry) {
         return formatLogMessage(
                 REQUEST_MESSAGE_FORMAT,
                 requestLogEntry,
@@ -44,7 +44,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getResponseLog(ResponseLogEntry responseLogEntry) {
+    public String getResponseLog(final ResponseLogEntry responseLogEntry) {
         return formatLogMessage(
                 RESPONSE_MESSAGE_FORMAT,
                 responseLogEntry,
@@ -53,7 +53,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
     }
 
     @Override
-    public String getErrorLog(ErrorLogEntry errorLogEntry) {
+    public String getErrorLog(final ErrorLogEntry errorLogEntry) {
         return formatLogMessage(
                 ERROR_MESSAGE_FORMAT,
                 errorLogEntry,
@@ -61,7 +61,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
         );
     }
 
-    private String formatLogMessage(String format, Object logEntry, String defaultMessage) {
+    private String formatLogMessage(final String format, final Object logEntry, String defaultMessage) {
         try {
             return String.format(
                     format,
