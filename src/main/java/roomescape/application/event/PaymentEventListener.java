@@ -1,9 +1,10 @@
 package roomescape.application.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import roomescape.application.PaymentService;
 import roomescape.infrastructure.payment.PaymentClient;
 
@@ -20,7 +21,7 @@ public class PaymentEventListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void processPayment(PaymentRequestedEvent event) {
         try {
             paymentClient.confirmPayment(event.getPaymentInfo());
