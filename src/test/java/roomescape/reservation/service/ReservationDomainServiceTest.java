@@ -14,6 +14,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import roomescape.auth.login.presentation.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.presentation.dto.MyReservationResponse;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.ReservationException;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
@@ -36,6 +39,9 @@ class ReservationDomainServiceTest {
 
     @Autowired
     private ReservationDomainService reservationDomainService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @DisplayName("멤버별 예약을 조회 할 수 있다.")
     @Test
@@ -115,6 +121,24 @@ class ReservationDomainServiceTest {
         Assertions.assertThatThrownBy(() -> reservationDomainService.deleteReservationById(nonExistentReservationId))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("예약 생성 시 결제 정보도 함께 저장된다")
+    @Test
+    void saves_payment_with_reservation() {
+        ReservationRequest request = new ReservationRequest(
+            LocalDate.now().plusDays(1), 1L, 1L, paymentKey, orderId, amount
+        );
+        Long memberId = 1L;
+
+        Reservation savedReservation = reservationDomainService.saveReservation(request, memberId);
+
+        Payment savedPayment = paymentRepository.findByReservationId(savedReservation.getId())
+            .orElseThrow(() -> new AssertionError("결제 정보가 저장되지 않았습니다."));
+
+        assertThat(savedPayment.getPaymentKey()).isEqualTo(paymentKey);
+        assertThat(savedPayment.getOrderId()).isEqualTo(orderId);
+        assertThat(savedPayment.getAmount()).isEqualTo(amount);
     }
 
     @TestConfiguration

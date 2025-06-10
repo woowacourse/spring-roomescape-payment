@@ -6,21 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.exception.PaymentRequestException;
-import roomescape.payment.infrastructure.dto.PaymentRequest;
-import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.Status;
-import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
-import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,31 +37,6 @@ class PaymentServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @DisplayName("결제 정보를 저장할 수 있다.")
-    @Test
-    void can_save_payment() {
-        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-        Theme theme = themeRepository.save(Theme.createWithoutId("테마1", "테마1 설명", "테마1 썸네일"));
-        Member member = memberRepository.save(Member.createWithoutId("테스터", "test@test.com", "password"));
-
-        Reservation reservation = Reservation.createWithoutId(
-            LocalDate.of(2025, 4, 29),
-            time,
-            theme,
-            member,
-            Status.RESERVED
-        );
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        PaymentRequest request = new PaymentRequest(PAYMENT_KEY, ORDER_ID, AMOUNT);
-
-        Payment savedPayment = paymentService.savePayment(savedReservation, request);
-
-        assertThat(savedPayment.getPaymentKey()).isEqualTo(PAYMENT_KEY);
-        assertThat(savedPayment.getOrderId()).isEqualTo(ORDER_ID);
-        assertThat(savedPayment.getAmount()).isEqualTo(AMOUNT);
-    }
 
     @DisplayName("예약 ID로 결제 정보를 조회할 수 있다.")
     @Test

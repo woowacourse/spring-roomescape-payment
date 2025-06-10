@@ -47,7 +47,6 @@ class ReservationServiceTest {
     );
     private final Long memberId = 1L;
 
-
     @Test
     @DisplayName("정상 결제 시 예약이 저장된다")
     void success_creates_reservation() {
@@ -67,24 +66,12 @@ class ReservationServiceTest {
         assertThat(response.id()).isNotNull();
         assertThat(response.theme().name()).isEqualTo("테마1");
         assertThat(response.member().id()).isEqualTo(memberId);
-
     }
 
     @Test
     @DisplayName("confirmPayment 실패 시 아무것도 저장되지 않는다")
     void confirmPayment_fails_and_rolls_back() {
         doThrow(new RuntimeException("결제 실패")).when(paymentService).confirmPayment(any());
-
-        assertThatThrownBy(() -> reservationService.createReservation(request, memberId))
-            .isInstanceOf(RuntimeException.class);
-
-        assertThat(reservationRepository.findById(5L)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("savePayment 실패 시 예약도 저장되지 않는다")
-    void savePayment_fails_and_rolls_back() {
-        doThrow(new RuntimeException("저장 실패")).when(paymentService).savePayment(any(), any());
 
         assertThatThrownBy(() -> reservationService.createReservation(request, memberId))
             .isInstanceOf(RuntimeException.class);

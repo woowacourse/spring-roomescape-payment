@@ -29,7 +29,6 @@ import roomescape.theme.presentation.dto.ThemeResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -76,6 +75,9 @@ public class ReservationDomainService {
 
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
         validateCanReserveDateTime(reservation, dateTime.now());
+
+        Payment payment = Payment.createWithoutId(reservation, request.paymentKey(), request.orderId(), request.amount());
+        paymentRepository.save(payment);
 
         return reservationRepository.save(reservation);
     }

@@ -1,13 +1,11 @@
 package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.exception.PaymentRequestException;
 import roomescape.payment.infrastructure.dto.PaymentRequest;
-import roomescape.reservation.domain.Reservation;
 
 @Service
 public class PaymentService {
@@ -25,16 +23,6 @@ public class PaymentService {
 
     public void confirmPayment(final PaymentRequest paymentRequest) {
         paymentClient.requestPayment(paymentRequest);
-    }
-
-    @Transactional
-    public Payment savePayment(Reservation reservation, PaymentRequest paymentRequest) {
-        Payment payment = Payment.createWithoutId(
-            reservation,
-            paymentRequest.paymentKey(),
-            paymentRequest.orderId(),
-            paymentRequest.amount());
-        return paymentRepository.save(payment);
     }
 
     public Payment findByReservationId(Long reservationId) {
