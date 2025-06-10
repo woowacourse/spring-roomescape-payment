@@ -220,11 +220,10 @@ function onReservationButtonClick(event, paymentWidget) {
 async function fetchReservationPayment(paymentData) {
     const reservationPaymentRequest = {
         paymentKey: paymentData.paymentKey,
-        paymentId: paymentData.orderId,
         amount: paymentData.amount,
     }
 
-    const reservationURL = "/payments";
+    const reservationURL = "/payments/" + paymentData.orderId;
     fetch(reservationURL, {
         method: "PATCH",
         headers: {
