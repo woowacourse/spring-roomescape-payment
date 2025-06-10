@@ -48,9 +48,6 @@ class ReservationServiceTest {
     private MemberService memberService;
 
     @Mock
-    private PaymentService paymentService;
-
-    @Mock
     private ReservationTimeService reservationTimeService;
 
     @Mock

@@ -2,6 +2,9 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -21,7 +24,11 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.infrastructure.repository.InvoiceRepository;
 import roomescape.presentation.dto.request.LoginMember;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
+import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.InvoiceResponse;
+import roomescape.presentation.dto.response.PaymentResponse;
+import roomescape.presentation.dto.response.ReservationResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationPayServiceTest {
@@ -33,8 +40,10 @@ public class ReservationPayServiceTest {
     InvoiceRepository invoiceRepository;
 
     @Mock
-    WaitingService waitingService;
+    ReservationService reservationService;
 
+    @Mock
+    PaymentService paymentService;
 
     @InjectMocks
     ReservationPayService reservationPayService;
@@ -68,4 +77,48 @@ public class ReservationPayServiceTest {
                         reservation.getStatus().getName())
         );
     }
+
+    @Test
+    void 사용자가_예약을_생성한다() {
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+        Payment payment = Payment.create("paymentKey", "orderId", 10000);
+
+        ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
+                date,
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                "10000");
+        LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+
+        ReservationResponse reservationResponse = ReservationResponse.from(reservation);
+        PaymentResponse paymentResponse = PaymentResponse.from(payment);
+        Invoice invoice = Invoice.create(reservation, payment);
+
+        when(reservationService.createMemberReservation(any(ReservationWithPaymentRequest.class),
+                any(LoginMember.class)))
+                .thenReturn(reservationResponse);
+        when(reservationService.findReservationById(any())).thenReturn(reservation);
+        when(paymentService.process(any(PaymentProcessRequest.class))).thenReturn(paymentResponse);
+        when(invoiceRepository.save(any(Invoice.class))).thenReturn(invoice);
+
+        InvoiceResponse resultResponse = reservationPayService.createReservationWithPayment(request, loginMember);
+
+        assertAll(
+                () -> assertThat(resultResponse.myReservationResponse().date()).isEqualTo(date),
+                () -> assertThat(resultResponse.paymentResponse().paymentKey()).isEqualTo("paymentKey"),
+                () -> assertThat(resultResponse.paymentResponse().orderId()).isEqualTo("orderId"),
+                () -> assertThat(resultResponse.paymentResponse().totalAmount()).isEqualTo(10000),
+                () -> verify(reservationService).createMemberReservation(any(ReservationWithPaymentRequest.class),
+                        eq(loginMember)),
+                () -> verify(paymentService).process(any(PaymentProcessRequest.class)),
+                () -> verify(invoiceRepository).save(any(Invoice.class))
+        );
+    }
+
 }
