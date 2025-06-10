@@ -21,6 +21,7 @@ public class PaymentService {
     public Payment confirmAndSavePayment(final PaymentsConfirmRequest request) {
         final PaymentsConfirmResponse paymentsConfirmResponse = tossPaymentsClient.confirmPayments(request);
         final Payment payment = new Payment(paymentsConfirmResponse.paymentKey(),
+                paymentsConfirmResponse.orderId(),
                 paymentsConfirmResponse.totalAmount());
         return paymentRepository.save(payment);
     }

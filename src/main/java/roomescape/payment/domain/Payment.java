@@ -18,14 +18,22 @@ public class Payment {
     private PaymentKey paymentKey;
 
     @Embedded
+    private OrderId orderId;
+
+    @Embedded
     private Amount amount;
 
-    public Payment(final String paymentKey, final Long amount) {
+    public Payment(final String paymentKey, final String orderId, final Long amount) {
         this.paymentKey = new PaymentKey(paymentKey);
+        this.orderId = new OrderId(orderId);
         this.amount = new Amount(amount);
     }
 
     protected Payment() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public PaymentKey getPaymentKey() {
@@ -34,6 +42,10 @@ public class Payment {
 
     public Amount getAmount() {
         return amount;
+    }
+
+    public OrderId getOrderId() {
+        return orderId;
     }
 
     @Override

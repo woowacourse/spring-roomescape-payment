@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.global.auth.LoginMember;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.AdminReservationResponse;
 import roomescape.reservation.dto.MyReservationResponse;
-import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.waiting.repository.WaitingRepository;
 
@@ -23,14 +23,14 @@ public class ReservationQueryService {
         this.waitingRepository = waitingRepository;
     }
 
-    public List<ReservationResponse> getReservations() {
+    public List<AdminReservationResponse> findAllReservationsForAdmin() {
         final List<Reservation> reservations = reservationRepository.findAll();
         return reservations.stream()
-                .map(ReservationResponse::new)
+                .map(AdminReservationResponse::new)
                 .toList();
     }
 
-    public List<ReservationResponse> getReservations(
+    public List<AdminReservationResponse> findFilteredReservationsForAdmin(
             final Long memberId,
             final Long themeId,
             final LocalDate dateFrom,
@@ -42,11 +42,11 @@ public class ReservationQueryService {
                 dateFrom,
                 dateTo);
         return reservations.stream()
-                .map(ReservationResponse::new)
+                .map(AdminReservationResponse::new)
                 .toList();
     }
 
-    public List<MyReservationResponse> getMyReservations(final LoginMember loginMember) {
+    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
         final List<MyReservationResponse> reservations = reservationRepository.findAllByMemberIdOrderByDateDesc(
                         loginMember.id()).stream()
                 .map(MyReservationResponse::new)

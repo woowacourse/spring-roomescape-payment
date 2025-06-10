@@ -14,7 +14,7 @@ import roomescape.member.domain.Role;
 public class JwtTokenProvider {
 
     private static final String secretKey = "secret";
-    private static final long validityInMilliseconds = 300000;
+    private static final long validityInMilliseconds = 1000 * 60 * 60;
     private static final String ROLE_CLAIM = "role";
     private static final String NAME_CLAIM = "name";
 

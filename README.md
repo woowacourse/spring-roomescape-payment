@@ -1,13 +1,5 @@
 # 방 탈출 서비스
 
-## 문서
-
-- [기능 요구사항](docs/requirements.md)
-- [페이지 목록](docs/pages.md)
-- API 문서
-    - [API 개요](docs/api/overview.md)
-    - [예약 API](docs/api/reservation.md)
-    - [시간 API](docs/api/time.md)
-    - [테마 API](docs/api/theme.md)
-    - [인증 API](docs/api/auth.md)
-    - [대기 API](docs/api/waiting.md)
+배포 링크: http://43.202.40.166:8080/
+ERD 문서 : https://www.erdcloud.com/d/iigEtehyYKsKmvnr8
+API 문서 : http://43.202.40.166:8080/docs/index.html

@@ -1,0 +1,19 @@
+== 인증(Auth) API 목록
+
+'''
+[[login]]
+=== 로그인 API (POST /login)
+
+operation::auth-api-test/login[snippets='curl-request,http-request,request-fields,http-response,response-headers']
+
+'''
+
+=== 로그아웃 API (POST /logout)
+
+operation::auth-api-test/logout[snippets='curl-request,http-request,http-response,response-headers']
+
+'''
+
+=== 인증 정보 조회 API (GET /login/check)
+
+operation::auth-api-test/login-check[snippets='curl-request,http-request,request-cookies,http-response,response-fields']

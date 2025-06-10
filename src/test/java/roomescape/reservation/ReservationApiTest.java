@@ -31,9 +31,9 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.TestClientConfig;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.client.dto.PaymentsConfirmResponse;
-import roomescape.reservation.dto.CreateReservationWithMemberRequest;
-import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
-import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationResponse;
+import roomescape.reservation.dto.UserReservationCreateRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -57,10 +57,11 @@ public class ReservationApiTest {
 
         private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
         private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
-        private static final CreateReservationWithPaymentRequest REQUEST = new CreateReservationWithPaymentRequest(
+        private static final UserReservationCreateRequest REQUEST = new UserReservationCreateRequest(
                 TOMORROW, 1L, 1L, "payment_key", "order_id", 1000L);
         private static String TOKEN;
-        private static final PaymentsConfirmResponse EXPECTED_RESPONSE = new PaymentsConfirmResponse("aaa", 1000L);
+        private static final PaymentsConfirmResponse EXPECTED_RESPONSE = new PaymentsConfirmResponse("payment_key",
+                "order_id", 1000L);
 
         @Autowired
         private ObjectMapper mapper;
@@ -153,7 +154,7 @@ public class ReservationApiTest {
     class AdminCreateReservationTest {
 
         private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
-        private static final CreateReservationWithMemberRequest REQUEST = new CreateReservationWithMemberRequest(
+        private static final AdminReservationCreateRequest REQUEST = new AdminReservationCreateRequest(
                 TOMORROW, 1L, 1L, 1L);
         private static String TOKEN;
 
@@ -296,13 +297,13 @@ public class ReservationApiTest {
                     .then().log().all()
                     .statusCode(204);
             // then
-            ReservationResponse[] responses = RestAssured.given().log().all()
+            AdminReservationResponse[] responses = RestAssured.given().log().all()
                     .cookie(AUTH_COOKIE_NAME, ADMIN_TOKEN)
                     .when().get("/reservations")
                     .then().log().all()
                     .statusCode(200)
                     .extract()
-                    .as(ReservationResponse[].class);
+                    .as(AdminReservationResponse[].class);
             assertAll(
                     () -> assertThat(responses.length).isEqualTo(3), // 예약이 삭제되지 않고 대기와 교체됨
                     () -> assertThat(responses[2].member()).isEqualTo(responses[1].member()) // 예약자 1에서 예약자 2로 바뀜

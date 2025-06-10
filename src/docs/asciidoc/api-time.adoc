@@ -1,0 +1,27 @@
+== 시간(Time) API 목록
+
+'''
+
+=== 시간 추가 API (POST /times)
+
+operation::reservation-time-api-test/create-time[snippets='curl-request,http-request,request-fields,http-response,response-fields']
+
+'''
+
+=== 시간 목록 조회 API (GET /times)
+
+operation::reservation-time-api-test/find-all-times[snippets='curl-request,http-request,http-response,response-fields',]
+
+
+'''
+
+=== 예약 가능 시간 조회 API (GET /times/availability?date=&themeId=)
+
+operation::reservation-time-api-test/find-all-time-availability[snippets='curl-request,http-request,http-response,response-fields',]
+
+'''
+
+=== 시간 삭제 API (DELETE /times/+{id}+)
+
+operation::reservation-time-api-test/delete-time-by-id[snippets='curl-request,http-request,path-parameters,http-response',]
+

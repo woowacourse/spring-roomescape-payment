@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record SignupRequest(
+        
         @NotBlank(message = "이름을 입력해주세요.")
         @Size(min = 1, max = 5, message = "사용자명은 최소 1글자, 최대 5글자여야합니다.")
         String name,
