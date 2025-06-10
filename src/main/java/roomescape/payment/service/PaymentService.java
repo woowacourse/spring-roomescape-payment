@@ -27,6 +27,7 @@ public class PaymentService {
                 paymentsConfirmResponse.totalAmount());
 
         final Payment payment = new Payment(paymentsConfirmResponse.paymentKey(),
+                paymentsConfirmResponse.orderId(),
                 paymentsConfirmResponse.totalAmount());
         final Payment savedPayment = paymentRepository.save(payment);
         log.info("결제 정보 저장 완료 - paymentId: {}", savedPayment.getId());

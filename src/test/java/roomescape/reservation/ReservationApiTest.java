@@ -84,7 +84,7 @@ public class ReservationApiTest {
                 TOMORROW, 1L, 1L, "payment_key", "order_id", 1000L);
         private static String TOKEN;
 
-        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
+        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", "orderId", 1000L);
 
         @Autowired
         private MockRestServiceServer server;
@@ -318,7 +318,7 @@ public class ReservationApiTest {
         @Test
         void testFindAllMyReservations() throws JsonProcessingException {
             // given
-            PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
+            PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", "orderId", 1000L);
 
             server.reset();
             server.expect(requestTo(BASE_URL + "/confirm"))
