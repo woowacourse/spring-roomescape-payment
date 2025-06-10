@@ -23,6 +23,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -50,6 +51,9 @@ class ReservationServiceIntegrationTest extends BaseTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private PaymentClient paymentClient;
 
     private Member member;
@@ -62,7 +66,7 @@ class ReservationServiceIntegrationTest extends BaseTest {
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(clock, paymentClient, reservationRepository,
-                reservationTimeRepository, themeRepository, memberRepository);
+                reservationTimeRepository, themeRepository, memberRepository, paymentRepository);
         member = memberRepository.save(Member.withDefaultRole("홍길동", "hong@example.com", "password"));
         theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));

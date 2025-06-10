@@ -22,6 +22,7 @@ import roomescape.reservation.dto.PaymentApprovalRequest;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
@@ -39,6 +40,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
         final List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
@@ -69,8 +71,10 @@ public class ReservationService {
         return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, member, payment));
     }
 
-    private void validateAlreadyBookedMember(ReservationRequest request, ReservationTime reservationTime, Theme theme, Member member) {
-        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(request.date(), reservationTime, theme, member)) {
+    private void validateAlreadyBookedMember(ReservationRequest request, ReservationTime reservationTime, Theme theme,
+            Member member) {
+        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(request.date(), reservationTime, theme,
+                member)) {
             throw new IllegalArgumentException("이미 예약한 사용자입니다.");
         }
     }
@@ -80,7 +84,7 @@ public class ReservationService {
         Long lastWaitingRank = reservationRepository.getLastWaitingRank(theme, date, reservationTime).orElse(0L);
         Reservation reservation = Reservation.waiting(date, reservationTime, theme, member, LocalDateTime.now(clock),
                 lastWaitingRank + 1);
-        reservation.pay(payment);
+        payment.setReservation(reservation);
 
         return reservationRepository.save(reservation);
     }
@@ -88,7 +92,7 @@ public class ReservationService {
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
             Theme theme, Member member, Payment payment) {
         Reservation reservation = Reservation.booked(date, reservationTime, theme, member, LocalDateTime.now(clock));
-        reservation.pay(payment);
+        payment.setReservation(reservation);
 
         return reservationRepository.save(reservation);
     }
@@ -128,8 +132,11 @@ public class ReservationService {
 
     public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
         final Member member = Member.from(loginMember);
-        return reservationRepository.findAllByMember(member).stream()
-                .map(MyReservationResponse::new)
+        List<Reservation> reservations = reservationRepository.findAllByMember(member);
+
+        return reservations.stream()
+                .map(reservation -> new MyReservationResponse(reservation,
+                        paymentRepository.findByReservation(reservation)))
                 .toList();
     }
 }
