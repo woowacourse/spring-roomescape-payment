@@ -23,12 +23,12 @@ public class TossPaymentRestClientConfig {
     private int readTimeout;
 
     @Bean
-    public RestClient tossPaymentRestClient() {
+    public RestClient tossPaymentRestClient(RestClient.Builder restClientBuilder) {
         String base64EncodedKey = Base64.getEncoder()
                 .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizationHeader = "Basic " + base64EncodedKey;
 
-        return RestClient.builder()
+        return restClientBuilder
                 .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
                 .defaultHeader("Authorization", authorizationHeader)
                 .defaultHeader("Content-Type", APPLICATION_JSON_VALUE)

@@ -23,8 +23,6 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
     }
 
-    // TODO: 테스트 고민..
-    // restClient를 모킹해야 하는가?
     @Override
     public PaymentConfirmResponse requestPaymentConfirm(String paymentKey, String orderId, Long amount) {
         PaymentConfirmResponse paymentConfirmResponse = restClient.post()
