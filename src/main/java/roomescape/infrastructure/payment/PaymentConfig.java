@@ -1,34 +1,36 @@
 package roomescape.infrastructure.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.infrastructure.payment.toss.TossPaymentClient;
-import roomescape.infrastructure.payment.toss.TossPaymentProperties;
 
 @Configuration
-@EnableConfigurationProperties(value = TossPaymentProperties.class)
 public class PaymentConfig {
 
     @Bean
     public TossPaymentClient tossPaymentClient(
             RestClient.Builder restClientBuilder,
             ObjectMapper objectMapper,
-            TossPaymentProperties properties
+            @Value("${payment.toss.secret-key}") String secretKey,
+            @Value("${payment.toss.timeout.read}") int readTimeOut,
+            @Value("${payment.toss.timeout.connect}") int connectTimeOut,
+            @Value("${payment.toss.base-url}") String baseUrl
     ) {
-        RestClient tossRestClient = createTossRestClient(restClientBuilder, properties);
-        return new TossPaymentClient(tossRestClient, objectMapper, properties.getSecretKey());
+        RestClient tossRestClient = createTossRestClient(restClientBuilder, readTimeOut, connectTimeOut, baseUrl);
+        return new TossPaymentClient(tossRestClient, objectMapper, secretKey);
     }
 
-    private RestClient createTossRestClient(RestClient.Builder restClientBuilder, TossPaymentProperties properties) {
+    private RestClient createTossRestClient(RestClient.Builder restClientBuilder, int readTimeOut, int connectTimeOut,
+                                            String baseUrl) {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(properties.getTimeout().getConnect());
-        factory.setReadTimeout(properties.getTimeout().getRead());
+        factory.setConnectTimeout(connectTimeOut);
+        factory.setReadTimeout(readTimeOut);
         return restClientBuilder
-                .baseUrl(properties.getBaseUrl())
+                .baseUrl(baseUrl)
                 .requestFactory(factory)
                 .build();
     }
