@@ -511,14 +511,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /login HTTP/1.1
-Content-Type: application/json
-Content-Length: 63
+Content-Type: application/json;charset=UTF-8
+Content-Length: 52
 Host: localhost:8080
 
-{
-  "email" : "email1@domain.com",
-  "password" : "password1"
-}</code></pre>
+{"email":"email1@domain.com","password":"password1"}</code></pre>
 </div>
 </div>
 </div>
@@ -564,13 +561,9 @@ Set-Cookie: authToken=accessToken; HttpOnly; SameSite=STRICT</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 143
+Content-Length: 126
 
-{
-  "status" : 400,
-  "message" : "이메일 또는 비밀번호가 올바르지 않습니다.",
-  "timestamp" : "2025-06-08T02:19:41.219567"
-}</code></pre>
+{"status":400,"message":"이메일 또는 비밀번호가 올바르지 않습니다.","timestamp":"2025-06-09T16:44:37.53852"}</code></pre>
 </div>
 </div>
 </div>
@@ -582,7 +575,7 @@ Content-Length: 143
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /login/check HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhMzNmY2E2MSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgxfQ.6X5MwWYOofjlhQvuI9PtLd3XcxYCGbOs-mlUspTfzwt7SQyEdTk6VdqO5XHK5_C-</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJmODA1OGU2OCIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc3fQ.uZld5a1j7H_X1mGP-ty7kNsTa-ntb-Hwx2CHeSkjI41r6mnjWF7_ZXDfmUTVn_32</code></pre>
 </div>
 </div>
 </div>
@@ -592,13 +585,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhMzNmY2E2MSIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 76
+Content-Length: 60
 
-{
-  "id" : "memberId1",
-  "name" : "name",
-  "email" : "email1@domain.com"
-}</code></pre>
+{"id":"memberId1","name":"name","email":"email1@domain.com"}</code></pre>
 </div>
 </div>
 </div>
@@ -649,15 +638,11 @@ Content-Length: 76
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /members HTTP/1.1
-Content-Type: application/json
-Content-Length: 83
+Content-Type: application/json;charset=UTF-8
+Content-Length: 67
 Host: localhost:8080
 
-{
-  "name" : "name1",
-  "email" : "email1@domain.com",
-  "password" : "password1"
-}</code></pre>
+{"name":"name1","email":"email1@domain.com","password":"password1"}</code></pre>
 </div>
 </div>
 </div>
@@ -702,13 +687,9 @@ Host: localhost:8080
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Location: /members
 Content-Type: application/json
-Content-Length: 71
+Content-Length: 55
 
-{
-  "id" : "id1",
-  "name" : "name1",
-  "email" : "email1@domain.com"
-}</code></pre>
+{"id":"id1","name":"name1","email":"email1@domain.com"}</code></pre>
 </div>
 </div>
 </div>
@@ -755,7 +736,7 @@ Content-Length: 71
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /members HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgxfQ.EsCGrT3qitCOPez0cfyDuIPTlG-GRMh25Ekb4C9ookW04gatt2REsyN-6N6phe06</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc3fQ.AexqmV7kVCzayFhXtmToQPwEJK59ahCuqqQcJ_90oqNAbY40mw_jpMOHiGokPi8R</code></pre>
 </div>
 </div>
 </div>
@@ -765,13 +746,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 75
+Content-Length: 57
 
-[ {
-  "id" : "id1",
-  "name" : "name1",
-  "email" : "email1@domain.com"
-} ]</code></pre>
+[{"id":"id1","name":"name1","email":"email1@domain.com"}]</code></pre>
 </div>
 </div>
 </div>
@@ -822,17 +799,12 @@ Content-Length: 75
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /admin/reservations HTTP/1.1
-Content-Type: application/json
-Content-Length: 103
+Content-Type: application/json;charset=UTF-8
+Content-Length: 82
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgxfQ.EsCGrT3qitCOPez0cfyDuIPTlG-GRMh25Ekb4C9ookW04gatt2REsyN-6N6phe06
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc3fQ.AexqmV7kVCzayFhXtmToQPwEJK59ahCuqqQcJ_90oqNAbY40mw_jpMOHiGokPi8R
 
-{
-  "date" : "2025-06-09",
-  "timeId" : "timeId1",
-  "themeId" : "themeId1",
-  "userId" : "memberId1"
-}</code></pre>
+{"date":"2025-06-10","timeId":"timeId1","themeId":"themeId1","userId":"memberId1"}</code></pre>
 </div>
 </div>
 </div>
@@ -882,28 +854,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Location: /reservations/reservationId1
 Content-Type: application/json
-Content-Length: 374
+Content-Length: 269
 
-{
-  "id" : "reservationId1",
-  "user" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  }
-}</code></pre>
+{"id":"reservationId1","user":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}}</code></pre>
 </div>
 </div>
 </div>
@@ -1005,13 +958,9 @@ Content-Length: 374
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json
-Content-Length: 110
+Content-Length: 94
 
-{
-  "status" : 400,
-  "message" : "예약이 존재합니다.",
-  "timestamp" : "2025-06-08T02:19:41.711546"
-}</code></pre>
+{"status":400,"message":"예약이 존재합니다.","timestamp":"2025-06-09T16:44:37.935226"}</code></pre>
 </div>
 </div>
 </div>
@@ -1023,7 +972,7 @@ Content-Length: 110
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations?themeId=themeId1&amp;userId=userId1&amp;dateFrom=2025-01-01&amp;dateTo=2025-01-07 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyYzhjYzM4MyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgxfQ.eh-34QCJ6Hh7wvV9EFXsDIPAZCknoKJzmcgKZMbrDs2tlLlCN90dczaf-c1Wrkdb</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI2ODkzNmM1MSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc3fQ.YSZxXLEQpCCTFlQVTY3B7wQtkStQNY8JTzM4mxCXddmTM3JqAYFhvRA5GxhQzBMG</code></pre>
 </div>
 </div>
 </div>
@@ -1033,28 +982,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyYzhjYzM4MyIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 378
+Content-Length: 271
 
-[ {
-  "id" : "reservationId1",
-  "user" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  }
-} ]</code></pre>
+[{"id":"reservationId1","user":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}}]</code></pre>
 </div>
 </div>
 </div>
@@ -1166,7 +1096,7 @@ Content-Length: 378
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /reservations/me HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI2MGI1MjZiOSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgxfQ.kFWKHSd6KJfj20SAB88q9xQLEonBt5V08IdcQVV-8JTK7kblmYajYWxFO8c4FKXU</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiOTMxY2M4ZiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc3fQ.uuMM1-jRQ7G1kWknPuu7LMgy7qeOcnYXNgWJeYoW5UEowRRMht_JYTR5FpF_0Qu8</code></pre>
 </div>
 </div>
 </div>
@@ -1176,32 +1106,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI2MGI1MjZiOSIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 444
+Content-Length: 315
 
-[ {
-  "id" : "reservationId1",
-  "user" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  },
-  "payment" : {
-    "id" : "paymentId1",
-    "amount" : 1000
-  }
-} ]</code></pre>
+[{"id":"reservationId1","user":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000},"payment":{"id":"paymentId1","amount":1000}}]</code></pre>
 </div>
 </div>
 </div>
@@ -1328,7 +1235,7 @@ Content-Length: 444
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /reservations/1 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgxfQ.EsCGrT3qitCOPez0cfyDuIPTlG-GRMh25Ekb4C9ookW04gatt2REsyN-6N6phe06</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc3fQ.AexqmV7kVCzayFhXtmToQPwEJK59ahCuqqQcJ_90oqNAbY40mw_jpMOHiGokPi8R</code></pre>
 </div>
 </div>
 </div>
@@ -1344,13 +1251,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 104
 
-{
-  "status" : 404,
-  "message" : "존재하지 않는 예약입니다.",
-  "timestamp" : "2025-06-08T02:19:41.616938"
-}</code></pre>
+{"status":404,"message":"존재하지 않는 예약입니다.","timestamp":"2025-06-09T16:44:37.842416"}</code></pre>
 </div>
 </div>
 </div>
@@ -1366,16 +1269,12 @@ Content-Length: 120
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /themes HTTP/1.1
-Content-Type: application/json
-Content-Length: 87
+Content-Type: application/json;charset=UTF-8
+Content-Length: 71
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgyfQ.EWTEpowCRtFocqFhHMpiqNh8jeGSd1YkJlQf8t8hNtS08w6pkdFqQpmtyENpQ9_7
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc4fQ.ojN_df-RYa4SQL46itrDSn3gO7C6hUadbi6Qd8iDqz-9cklJl4JMiDnm27zxcgJU
 
-{
-  "name" : "theme1",
-  "description" : "description1",
-  "thumbnail" : "thumbnail1"
-}</code></pre>
+{"name":"theme1","description":"description1","thumbnail":"thumbnail1"}</code></pre>
 </div>
 </div>
 </div>
@@ -1420,15 +1319,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Location: /themes/themeId1
 Content-Type: application/json
-Content-Length: 126
+Content-Length: 100
 
-{
-  "id" : "themeId1",
-  "name" : "theme1",
-  "description" : "description1",
-  "thumbnail" : "thumbnail1",
-  "price" : 1000
-}</code></pre>
+{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}</code></pre>
 </div>
 </div>
 </div>
@@ -1485,7 +1378,7 @@ Content-Length: 126
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /themes HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjMTg3MDIxYiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgyfQ.hI8qk2e-W7_CTMTyuj7p5s_mJ_uw2VBPnLX-DQLyCQnfA9ADRgjN9VQ2WL1Kboig</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI0MGIxMzdkMSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.bAwcke8kpDnvu65f3yAG_Sym7suled5xlYulcVe5It06hvVQOk9nOklMnwN9PZX2</code></pre>
 </div>
 </div>
 </div>
@@ -1495,15 +1388,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjMTg3MDIxYiIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 130
+Content-Length: 102
 
-[ {
-  "id" : "themeId1",
-  "name" : "theme1",
-  "description" : "description1",
-  "thumbnail" : "thumbnail1",
-  "price" : 1000
-} ]</code></pre>
+[{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}]</code></pre>
 </div>
 </div>
 </div>
@@ -1574,15 +1461,9 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 130
+Content-Length: 102
 
-[ {
-  "id" : "themeId1",
-  "name" : "theme1",
-  "description" : "description1",
-  "thumbnail" : "thumbnail1",
-  "price" : 1000
-} ]</code></pre>
+[{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}]</code></pre>
 </div>
 </div>
 </div>
@@ -1644,7 +1525,7 @@ Content-Length: 130
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /themes/1 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgyfQ.EWTEpowCRtFocqFhHMpiqNh8jeGSd1YkJlQf8t8hNtS08w6pkdFqQpmtyENpQ9_7</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc4fQ.ojN_df-RYa4SQL46itrDSn3gO7C6hUadbi6Qd8iDqz-9cklJl4JMiDnm27zxcgJU</code></pre>
 </div>
 </div>
 </div>
@@ -1660,13 +1541,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 120
+Content-Length: 103
 
-{
-  "status" : 404,
-  "message" : "존재하지 않는 테마입니다.",
-  "timestamp" : "2025-06-08T02:19:42.090998"
-}</code></pre>
+{"status":404,"message":"존재하지 않는 테마입니다.","timestamp":"2025-06-09T16:44:38.12919"}</code></pre>
 </div>
 </div>
 </div>
@@ -1682,14 +1559,12 @@ Content-Length: 120
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /times HTTP/1.1
-Content-Type: application/json
-Content-Length: 25
+Content-Type: application/json;charset=UTF-8
+Content-Length: 19
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgxfQ.EsCGrT3qitCOPez0cfyDuIPTlG-GRMh25Ekb4C9ookW04gatt2REsyN-6N6phe06
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc4fQ.ojN_df-RYa4SQL46itrDSn3gO7C6hUadbi6Qd8iDqz-9cklJl4JMiDnm27zxcgJU
 
-{
-  "startAt" : "09:00"
-}</code></pre>
+{"startAt":"09:00"}</code></pre>
 </div>
 </div>
 </div>
@@ -1724,12 +1599,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Location: /times/timeSlotId1
 Content-Type: application/json
-Content-Length: 52
+Content-Length: 41
 
-{
-  "id" : "timeSlotId1",
-  "startAt" : "09:00:00"
-}</code></pre>
+{"id":"timeSlotId1","startAt":"09:00:00"}</code></pre>
 </div>
 </div>
 </div>
@@ -1771,7 +1643,7 @@ Content-Length: 52
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiNmY0MTQ4YiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgxfQ.T8NE9t9ksB8sfjdc7x8QwLN7cbRPWE3wq7M5fVA-bSWnm11_xj3Qw5vMxwo8N2Gn</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI4MWZiMzRkMCIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.Dq3-EA_pmvm3WycsAYYI4VoyRsL3b6Gi3Y_OJlL5gXtT4q2vV_3Ivw3HPgBEKxfg</code></pre>
 </div>
 </div>
 </div>
@@ -1781,12 +1653,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJiNmY0MTQ4YiIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 56
+Content-Length: 43
 
-[ {
-  "id" : "timeSlotId1",
-  "startAt" : "09:00:00"
-} ]</code></pre>
+[{"id":"timeSlotId1","startAt":"09:00:00"}]</code></pre>
 </div>
 </div>
 </div>
@@ -1833,7 +1702,7 @@ Content-Length: 56
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /times/possible?date=2025-01-01&amp;themeId=themeId1 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyYzYyMTcwMiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgxfQ.AhHy6Y03_3NoT3_GC93k3m3DZQPHCA14CtK5uhB6du3aB4dcqiJWjYkcNogiZn-j</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI2MzIzOTJhYSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.oSUV4nFF9SYAQWNcJ0-FlVGOAAVj_2I099HWMjLSAwaa8VSckv8SDdEE9mFet4e_</code></pre>
 </div>
 </div>
 </div>
@@ -1843,13 +1712,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyYzYyMTcwMiIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 82
+Content-Length: 64
 
-[ {
-  "id" : "timeSlotId1",
-  "startAt" : "09:00:00",
-  "alreadyBooked" : true
-} ]</code></pre>
+[{"id":"timeSlotId1","startAt":"09:00:00","alreadyBooked":true}]</code></pre>
 </div>
 </div>
 </div>
@@ -1901,7 +1766,7 @@ Content-Length: 82
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /times/1 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgxfQ.EsCGrT3qitCOPez0cfyDuIPTlG-GRMh25Ekb4C9ookW04gatt2REsyN-6N6phe06</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc3fQ.AexqmV7kVCzayFhXtmToQPwEJK59ahCuqqQcJ_90oqNAbY40mw_jpMOHiGokPi8R</code></pre>
 </div>
 </div>
 </div>
@@ -1917,13 +1782,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 126
+Content-Length: 110
 
-{
-  "status" : 404,
-  "message" : "존재하지 않는 예약 시간입니다.",
-  "timestamp" : "2025-06-08T02:19:41.81372"
-}</code></pre>
+{"status":404,"message":"존재하지 않는 예약 시간입니다.","timestamp":"2025-06-09T16:44:37.94498"}</code></pre>
 </div>
 </div>
 </div>
@@ -1939,16 +1800,12 @@ Content-Length: 126
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /waitings HTTP/1.1
-Content-Type: application/json
-Content-Length: 77
+Content-Type: application/json;charset=UTF-8
+Content-Length: 61
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI1N2IxNWYzZSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgyfQ.QmKLKHg8K2aVPFa5JPJxIBrnzxoZjfJ82LtRhEdijMRS5_ZGDi53YcLTvs8J81a8
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkMTg2N2JlZiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.3obkte-3lG9_O67Tn5tsgZmi7eSdYyfDLcOb7XXGfyn_sMdrAgcMPFUzJSJPYoLv
 
-{
-  "date" : "2025-06-09",
-  "timeId" : "timeId1",
-  "themeId" : "themeId1"
-}</code></pre>
+{"date":"2025-06-10","timeId":"timeId1","themeId":"themeId1"}</code></pre>
 </div>
 </div>
 </div>
@@ -1993,28 +1850,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI1N2IxNWYzZSIsInJvbGUiOiJVU0VSI
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Location: /waitings/waitingId1
 Content-Type: application/json
-Content-Length: 370
+Content-Length: 265
 
-{
-  "id" : "waitingId1",
-  "user" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  }
-}</code></pre>
+{"id":"waitingId1","user":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}}</code></pre>
 </div>
 </div>
 </div>
@@ -2121,7 +1959,7 @@ Content-Length: 370
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /admin/waitings HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MzE3NjgyfQ.EWTEpowCRtFocqFhHMpiqNh8jeGSd1YkJlQf8t8hNtS08w6pkdFqQpmtyENpQ9_7</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5NDU1OTc4fQ.ojN_df-RYa4SQL46itrDSn3gO7C6hUadbi6Qd8iDqz-9cklJl4JMiDnm27zxcgJU</code></pre>
 </div>
 </div>
 </div>
@@ -2131,28 +1969,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYW1lIiwicm9sZSI6IkFETUlOIiwiZ
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 374
+Content-Length: 267
 
-[ {
-  "id" : "waitingId1",
-  "user" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  }
-} ]</code></pre>
+[{"id":"waitingId1","user":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000}}]</code></pre>
 </div>
 </div>
 </div>
@@ -2264,7 +2083,7 @@ Content-Length: 374
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /waitings/me HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkMzhjZGI1ZCIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgyfQ.rPnjOajYSd70foLfGIGTEzYIufX8heSvIQ5JguNNhLj_5Q5pd88iFGflR1tbWvQJ</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhYTUyZmViNiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.dzTqfOeaL7x1-1XWBjD-XH7ezeKS2_8j_s8ytF0oH5wDzIo3Maso4n_ICVgYMiOt</code></pre>
 </div>
 </div>
 </div>
@@ -2274,29 +2093,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkMzhjZGI1ZCIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 396
+Content-Length: 284
 
-[ {
-  "id" : "waitingId1",
-  "member" : {
-    "id" : "memberId1",
-    "name" : "name",
-    "email" : "email1@domain.com"
-  },
-  "date" : "2025-01-01",
-  "time" : {
-    "id" : "timeSlotId1",
-    "startAt" : "09:00:00"
-  },
-  "theme" : {
-    "id" : "themeId1",
-    "name" : "theme1",
-    "description" : "description1",
-    "thumbnail" : "thumbnail1",
-    "price" : 1000
-  },
-  "aheadCount" : 1
-} ]</code></pre>
+[{"id":"waitingId1","member":{"id":"memberId1","name":"name","email":"email1@domain.com"},"date":"2025-01-01","time":{"id":"timeSlotId1","startAt":"09:00:00"},"theme":{"id":"themeId1","name":"theme1","description":"description1","thumbnail":"thumbnail1","price":1000},"aheadCount":1}]</code></pre>
 </div>
 </div>
 </div>
@@ -2413,7 +2212,7 @@ Content-Length: 396
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /waitings/1 HTTP/1.1
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyZWFiNzIwNCIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MzE3NjgyfQ.gRDVYZxq1LiAKI0FEw3JICuWkTps9T_avhsdunh-LGtq0HfQDXmJxAZinMUYP_Cr</code></pre>
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIwNTYzMTNhMiIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5NDU1OTc4fQ.zx6TIrZbNfz-9g5qISvNLG1Y-G7pSkbCBRXq3zusMJugl5p3d7bk_eyE3pMAIyur</code></pre>
 </div>
 </div>
 </div>
@@ -2429,13 +2228,9 @@ Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyZWFiNzIwNCIsInJvbGUiOiJVU0VSI
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 404 Not Found
 Content-Type: application/json
-Content-Length: 127
+Content-Length: 111
 
-{
-  "status" : 404,
-  "message" : "존재하지 않는 예약 대기입니다.",
-  "timestamp" : "2025-06-08T02:19:42.604148"
-}</code></pre>
+{"status":404,"message":"존재하지 않는 예약 대기입니다.","timestamp":"2025-06-09T16:44:38.541038"}</code></pre>
 </div>
 </div>
 </div>
@@ -2454,10 +2249,10 @@ Content-Length: 127
 Content-Type: application/json
 Content-Length: 81
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZW1iZXJJZDEiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTc0OTMxNzY4MX0.LqkO-SN2gh4enN2AIR8T8fTFf1DQ0sRiFHvpImT9LR9QAGfRYNZEIXJ38GblPpHt
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZW1iZXJJZDEiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTc0OTQ1NTk3N30.eOwS6LR3xssMLTkZBXrzNJK5LsTVBGsiMZfHrmLO_tJyT-MRvAEHwdYWkSeprqNF
 
 {
-  "date" : "2025-06-09",
+  "date" : "2025-06-10",
   "timeId" : "timeSlotId1",
   "themeId" : "themeId1"
 }</code></pre>
@@ -2523,7 +2318,7 @@ Content-Length: 110
 {
   "status" : 400,
   "message" : "예약이 존재합니다.",
-  "timestamp" : "2025-06-08T02:19:41.405941"
+  "timestamp" : "2025-06-09T16:44:37.711905"
 }</code></pre>
 </div>
 </div>
@@ -2538,7 +2333,7 @@ Content-Length: 110
 Content-Type: application/json
 Content-Length: 52
 Host: localhost:8080
-Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZW1iZXJJZDEiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTc0OTMxNzY4MX0.LqkO-SN2gh4enN2AIR8T8fTFf1DQ0sRiFHvpImT9LR9QAGfRYNZEIXJ38GblPpHt
+Cookie: authToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZW1iZXJJZDEiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTc0OTQ1NTk3N30.eOwS6LR3xssMLTkZBXrzNJK5LsTVBGsiMZfHrmLO_tJyT-MRvAEHwdYWkSeprqNF
 
 {
   "paymentKey" : "paymentKey",

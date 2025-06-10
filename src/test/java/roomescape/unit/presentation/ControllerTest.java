@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.service.AuthService;
 import roomescape.business.service.MemberService;
+import roomescape.business.service.PaymentApproveService;
 import roomescape.business.service.PaymentService;
 import roomescape.business.service.ReservationService;
 import roomescape.business.service.ReservationTimeService;
@@ -62,6 +63,9 @@ public abstract class ControllerTest {
 
     @MockitoBean
     MemberService memberService;
+
+    @MockitoBean
+    PaymentApproveService paymentApproveService;
 
     @MockitoBean
     ReservationTimeService reservationTimeService;

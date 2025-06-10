@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.LoginInfo;
+import roomescape.business.service.PaymentApproveService;
 import roomescape.business.service.PaymentService;
 import roomescape.presentation.dto.request.PaymentAndReservationRequest;
 import roomescape.presentation.dto.response.PaymentResponse;
@@ -19,6 +20,7 @@ import roomescape.presentation.dto.response.PaymentResponse;
 @RequiredArgsConstructor
 public class PaymentApiController {
 
+    private final PaymentApproveService paymentApproveService;
     private final PaymentService paymentService;
 
     @PostMapping("/payments")
@@ -33,7 +35,7 @@ public class PaymentApiController {
     @AuthRequired
     public ResponseEntity<Void> approvePayment(@PathVariable("paymentId") String paymentId,
                                                @RequestBody @Valid PaymentApproveRequest request) {
-        paymentService.approvePayment(paymentId, request);
+        paymentApproveService.requestApproveAndCompletePayment(paymentId, request);
         return ResponseEntity.noContent().build();
     }
 }

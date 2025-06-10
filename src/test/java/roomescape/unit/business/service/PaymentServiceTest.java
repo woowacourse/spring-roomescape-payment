@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
@@ -30,9 +28,6 @@ import roomescape.business.service.ReservationService;
 import roomescape.exception.payment.PaymentIntegrityViolationException;
 import roomescape.exception.payment.PaymentNotFoundException;
 import roomescape.infrastructure.PaymentRepository;
-import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveRequest;
-import roomescape.presentation.api.PaymentApproveRequest;
 import roomescape.presentation.dto.request.PaymentAndReservationRequest;
 import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.PaymentResponse;
@@ -43,10 +38,9 @@ class PaymentServiceTest {
     private final PaymentService paymentService;
     private final ReservationService reservationService = mock(ReservationService.class);
     private final PaymentRepository paymentRepository = mock(PaymentRepository.class);
-    private final PaymentClient paymentClient = mock(PaymentClient.class);
 
     public PaymentServiceTest() {
-        this.paymentService = new PaymentService(reservationService, paymentRepository, paymentClient);
+        this.paymentService = new PaymentService(reservationService, paymentRepository);
     }
 
     @Test
@@ -81,42 +75,6 @@ class PaymentServiceTest {
     }
 
     @Test
-    void 결제를_승인하고_예약을_확정한다() {
-        // given
-        String paymentId = "paymentId1";
-        String paymentKey = "paymentKey1";
-        Long amount = 1000L;
-
-        Reservation reservation = Reservation.restore("reservationId1", null, null, null, null);
-        Payment payment = Payment.restore(paymentId, null, amount, PaymentStatus.IN_PROGRESS, reservation);
-
-        given(paymentRepository.findById(Id.create(paymentId))).willReturn(Optional.of(payment));
-
-        // when
-        paymentService.approvePayment(paymentId, new PaymentApproveRequest(paymentKey, amount));
-
-        // then
-        verify(paymentClient).approvePayment(new TossPaymentApproveRequest(paymentKey, paymentId, amount));
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.DONE);
-        assertThat(payment.getPaymentKey()).isEqualTo(paymentKey);
-    }
-
-    @Test
-    @DisplayName("결제가 존재하지 않으면 예외가 발생한다")
-    void 결제가_존재하지_않으면_예외가_발생한다() {
-        // given
-        String paymentId = "paymentId1";
-        given(paymentRepository.findById(Id.create(paymentId))).willReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(
-                () -> paymentService.approvePayment(paymentId, new PaymentApproveRequest(paymentId, 1000L)))
-                .isInstanceOf(PaymentNotFoundException.class);
-
-        verify(paymentClient, never()).approvePayment(any());
-    }
-
-    @Test
     void 결제_금액이_일치하지_않으면_예외가_발생한다() {
         // given
         String paymentId = "paymentId1";
@@ -131,28 +89,21 @@ class PaymentServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> paymentService.approvePayment(paymentId, new PaymentApproveRequest(paymentId, wrongAmount)))
+                () -> paymentService.completePayment(paymentId, paymentKey, wrongAmount))
                 .isInstanceOf(PaymentIntegrityViolationException.class);
-        verify(paymentClient, never()).approvePayment(any());
     }
 
     @Test
-    void 결제_클라이언트에서_예외가_발생하면_예외가_전파된다() {
+    void 결제가_존재하지_않으면_예외가_발생한다() {
         // given
         String paymentId = "paymentId1";
         String paymentKey = "paymentKey1";
         Long amount = 1000L;
-
-        Reservation reservation = Reservation.restore("reservationId1", null, null, null, null);
-        Payment payment = Payment.restore(paymentId, null, amount, PaymentStatus.IN_PROGRESS, reservation);
-
-        given(paymentRepository.findById(Id.create(paymentId))).willReturn(Optional.of(payment));
-        doThrow(new RuntimeException("Payment client error")).when(paymentClient).approvePayment(any());
+        given(paymentRepository.findById(Id.create(paymentId))).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(
-                () -> paymentService.approvePayment(paymentId, new PaymentApproveRequest(paymentKey, amount)))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Payment client error");
+                () -> paymentService.completePayment(paymentId, paymentKey, amount))
+                .isInstanceOf(PaymentNotFoundException.class);
     }
 }
