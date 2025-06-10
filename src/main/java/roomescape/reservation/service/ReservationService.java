@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import roomescape.auth.dto.LoginMember;
@@ -32,6 +33,7 @@ import roomescape.theme.repository.ThemeRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final Clock clock;
@@ -54,6 +56,7 @@ public class ReservationService {
         return reservationTimeRepository.findAllAvailable(date, themeId);
     }
 
+    @Transactional
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
@@ -97,6 +100,7 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
     public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
         final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
@@ -110,6 +114,7 @@ public class ReservationService {
         return new ReservationResponse(newReservation);
     }
 
+    @Transactional
     public void deleteReservation(final Long id) {
         Reservation reservation = reservationRepository.getById(id);
         Long deleteRank = reservation.getReservationStatus().getRank();
