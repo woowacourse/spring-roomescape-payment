@@ -12,7 +12,6 @@ spring:
   sql:
     init:
       mode: embedded
-      schema-locations: classpath:schema.sql
   # JPA settings
   jpa:
     show-sql: true
@@ -27,6 +26,10 @@ spring:
     client:
       connect-timeout: 2000
       read-timeout: 5000
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
 
 security:
   jwt:

@@ -27,6 +27,8 @@ function render(data) {
         const date = item.date;
         const time = item.time;
         let status = item.status;
+        const paymentKey = item.paymentKey;
+        const amount = item.amount;
 
         if (status.includes('대기')) {
             status = status.replace('대기', '번째 예약 대기');
@@ -51,6 +53,8 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         }
     });
 }
