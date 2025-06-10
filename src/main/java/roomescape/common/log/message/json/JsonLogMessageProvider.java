@@ -61,7 +61,7 @@ public class JsonLogMessageProvider implements LogMessageProvider {
         );
     }
 
-    private String formatLogMessage(final String format, final Object logEntry, String defaultMessage) {
+    private String formatLogMessage(final String format, final Object logEntry, final String defaultMessage) {
         try {
             return String.format(
                     format,
