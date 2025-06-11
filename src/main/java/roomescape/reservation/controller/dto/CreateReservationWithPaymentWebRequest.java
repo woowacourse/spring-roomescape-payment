@@ -2,7 +2,7 @@ package roomescape.reservation.controller.dto;
 
 import java.time.LocalDate;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.domain.Reservation;
@@ -29,7 +29,7 @@ public record CreateReservationWithPaymentWebRequest(
                 webRequest.themeId());
     }
 
-    public PaymentHistory toPaymentHistory(Reservation reservation, PaymentStatus status) {
-        return new PaymentHistory(orderId, amount, paymentKey, status, reservation);
+    public Payment toPayment(Reservation reservation, PaymentStatus status) {
+        return new Payment(orderId, amount, paymentKey, status, reservation);
     }
 }

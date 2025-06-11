@@ -17,7 +17,7 @@ import roomescape.reservation.domain.Reservation;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class PaymentHistory {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class PaymentHistory {
     @OneToOne
     private Reservation reservation;
 
-    public PaymentHistory(String orderId, int amount, String paymentKey, PaymentStatus status, Reservation reservation) {
+    public Payment(String orderId, int amount, String paymentKey, PaymentStatus status, Reservation reservation) {
         this(null, orderId, amount, paymentKey, status, reservation);
     }
 

@@ -9,8 +9,8 @@ import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
 import roomescape.member.domain.Member;
 import roomescape.member.service.usecase.MemberQueryUseCase;
-import roomescape.payment.domain.PaymentHistory;
-import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationWait;
@@ -37,7 +37,7 @@ public class ReservationCommandUseCase {
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationProbe reservationProbe;
     private final ReservationWaitingProbe reservationWaitingProbe;
-    private final PaymentHistoryRepository paymentHistoryRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public Reservation create(final CreateReservationServiceRequest createReservationServiceRequest) {
@@ -91,8 +91,8 @@ public class ReservationCommandUseCase {
 
     private void cancelPayment(Reservation reservation) {
         // 결제 취소했다고 가정
-        paymentHistoryRepository.findByReservation(reservation)
-                .ifPresent(PaymentHistory::cancel);
+        paymentRepository.findByReservation(reservation)
+                .ifPresent(Payment::cancel);
     }
 
     private void adjustWaitingIfExists(Reservation reservation) {

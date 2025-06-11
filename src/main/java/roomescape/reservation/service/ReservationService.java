@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
@@ -35,7 +35,7 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
-    private final PaymentHistoryRepository paymentHistoryRepository;
+    private final PaymentRepository paymentRepository;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(reservationQueryUseCase.getAll());
@@ -61,7 +61,7 @@ public class ReservationService {
                 .stream()
                 .map(reservation -> ReservationWithStatusResponse.of(
                         reservation,
-                        paymentHistoryRepository.findByReservation(reservation).orElse(null))
+                        paymentRepository.findByReservation(reservation).orElse(null))
                 ).toList();
     }
 

@@ -5,7 +5,7 @@ import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationWait;
 
@@ -21,24 +21,24 @@ public class ReservationWithStatusResponse {
     private final LocalDate date;
     private final LocalTime time;
     private final String status;
-    private final PaymentHistoryWebResponse paymentHistory;
+    private final PaymentWebResponse payment;
 
-    public static ReservationWithStatusResponse of(Reservation reservation, PaymentHistory paymentHistory) {
+    public static ReservationWithStatusResponse of(Reservation reservation, Payment payment) {
         return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
                 CONFIRMED,
-                makePaymentHistoryWebResponse(paymentHistory)
+                makePaymentWebResponse(payment)
         );
     }
 
-    private static PaymentHistoryWebResponse makePaymentHistoryWebResponse(PaymentHistory paymentHistory) {
-        if (paymentHistory == null) {
-            return new PaymentHistoryWebResponse("", 0);
+    private static PaymentWebResponse makePaymentWebResponse(Payment payment) {
+        if (payment == null) {
+            return new PaymentWebResponse("", 0);
         }
-        return new PaymentHistoryWebResponse(paymentHistory.getOrderId(), paymentHistory.getAmount());
+        return new PaymentWebResponse(payment.getOrderId(), payment.getAmount());
     }
 
     public static ReservationWithStatusResponse of(
@@ -51,7 +51,7 @@ public class ReservationWithStatusResponse {
                 reservationWait.getDate().getValue(),
                 reservationWait.getTime().getStartAt(),
                 String.format(PENDING_STATUS_FORMAT, rank),
-                new PaymentHistoryWebResponse("", 0)
+                new PaymentWebResponse("", 0)
         );
     }
 }

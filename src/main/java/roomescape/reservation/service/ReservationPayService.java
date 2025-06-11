@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.payment.PaymentService;
-import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
-import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.domain.Reservation;
@@ -24,7 +24,7 @@ public class ReservationPayService {
 
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final PaymentService paymentService;
-    private final PaymentHistoryRepository paymentHistoryRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationWebResponse createReservationWithPayment(
             final CreateReservationWithPaymentWebRequest webRequest,
@@ -32,7 +32,7 @@ public class ReservationPayService {
     ) {
         Reservation savedReservation = saveReservation(webRequest, memberInfo);
         confirmPayment(webRequest, savedReservation);
-        savePaymentHistory(webRequest, savedReservation);
+        savePayment(webRequest, savedReservation);
         return ReservationConverter.toDto(savedReservation);
     }
 
@@ -51,10 +51,10 @@ public class ReservationPayService {
         }
     }
 
-    private void savePaymentHistory(CreateReservationWithPaymentWebRequest webRequest, Reservation savedReservation) {
+    private void savePayment(CreateReservationWithPaymentWebRequest webRequest, Reservation savedReservation) {
         try {
-            PaymentHistory paymentHistory = webRequest.toPaymentHistory(savedReservation, PaymentStatus.DONE);
-            paymentHistoryRepository.save(paymentHistory);
+            Payment payment = webRequest.toPayment(savedReservation, PaymentStatus.DONE);
+            paymentRepository.save(payment);
         } catch (IllegalArgumentException | OptimisticLockException e) {
             log.atError().log("결제 내역 DB 저장 실패 - 사용자에게는 정상 응답. "
                             + "paymentKey:{}, orderId:{}, amount:{}, reservationId:{}",
