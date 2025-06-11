@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS toss_payment;
+DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS reservation_wait;
 DROP TABLE IF EXISTS reservation;
 DROP TABLE IF EXISTS reservation_schedule;
@@ -66,7 +66,7 @@ CREATE TABLE reservation_wait
     PRIMARY KEY (id)
 );
 
-CREATE TABLE toss_payment
+CREATE TABLE payment
 (
     id   BIGINT       NOT NULL AUTO_INCREMENT,
     amount BIGINT NOT NULL,
