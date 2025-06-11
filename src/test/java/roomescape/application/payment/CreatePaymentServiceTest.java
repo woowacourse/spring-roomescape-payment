@@ -6,7 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.AbstractServiceIntegrationTest;
-import roomescape.application.payment.dto.CreatePaymentCommand;
+import roomescape.application.payment.command.CreatePaymentService;
+import roomescape.application.payment.command.dto.CreatePaymentCommand;
 import roomescape.domain.payment.repository.PaymentRepository;
 
 class CreatePaymentServiceTest extends AbstractServiceIntegrationTest {

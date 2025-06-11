@@ -1,26 +1,22 @@
 package roomescape.infrastructure.security;
 
 import io.jsonwebtoken.security.Keys;
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties("security.jwt.token")
-public class JwtProperties {
+@Validated
+public record JwtProperties(
+        @NotNull(message = "security.jwt.token.raw-secret-key는 필수입니다.")
+        String rawSecretKey,
+        @NotNull(message = "security.jwt.token.expire-duration는 필수입니다.")
+        Duration expireDuration
+) {
 
-    private final SecretKey secretKey;
-    private final Duration expireDuration;
-
-    public JwtProperties(String secretKey, Duration expireDuration) {
-        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
-        this.expireDuration = expireDuration;
-    }
-
-    public SecretKey getSecretKey() {
-        return secretKey;
-    }
-
-    public Duration getExpireDuration() {
-        return expireDuration;
+    public SecretKey secretKey() {
+        return Keys.hmacShaKeyFor(rawSecretKey.getBytes());
     }
 }

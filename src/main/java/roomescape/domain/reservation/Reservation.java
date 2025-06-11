@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +20,12 @@ import roomescape.domain.member.Member;
 import roomescape.infrastructure.error.exception.ReservationException;
 
 @Entity
+@Table(
+        name = "reservation",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"date", "time_id", "theme_id", "status"})
+        }
+)
 public class Reservation extends BaseEntity {
 
     private static final int MIN_TIME_BEFORE_RESERVATION = 10;
@@ -81,6 +89,10 @@ public class Reservation extends BaseEntity {
 
     public boolean isEqualThemeId(Long themeId) {
         return theme.getId().equals(themeId);
+    }
+
+    public void cancel() {
+        this.status = ReservationStatus.CANCEL;
     }
 
     public Long getId() {

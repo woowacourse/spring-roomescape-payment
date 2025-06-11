@@ -21,7 +21,7 @@ import roomescape.presentation.support.methodresolver.AuthPrincipal;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private static final String RESERVATIONS_URL = "/reservations/%d";
+    private static final String RESERVATIONS_URL_FORMAT = "/reservations/%d";
 
     private final CreateReservationService createReservationService;
     private final ReservationQueryService reservationQueryService;
@@ -38,7 +38,7 @@ public class ReservationController {
             @Valid @RequestBody CreateReservationWithPaymentRequest createReservationWithPaymentRequest) {
         Long memberId = authInfo.memberId();
         Long id = createReservationService.reserve(createReservationWithPaymentRequest.toCreateCommand(memberId));
-        return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id))).build();
+        return ResponseEntity.created(URI.create(RESERVATIONS_URL_FORMAT.formatted(id))).build();
     }
 
     @GetMapping

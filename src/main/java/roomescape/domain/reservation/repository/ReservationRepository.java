@@ -11,50 +11,98 @@ import roomescape.domain.reservation.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    boolean existsByTimeId(@Param("timeId") Long reservationTimeId);
-
-    boolean existsByDateAndTimeIdAndThemeId(@Param("date") LocalDate reservationDate,
-                                            @Param("timeId") Long timeId,
-                                            @Param("themeId") Long themeId);
-
-    @Query("""   
+    @Query("""
             SELECT r
             FROM Reservation r
-            WHERE r.id = :id
+            WHERE r.id = :reservationId
+              AND r.status != 'CANCEL'
             """)
-    @EntityGraph(attributePaths = {"time", "theme"})
-    Optional<Reservation> findByIdWithTimeAndTheme(@Param("id") Long id);
+    Optional<Reservation> findByIdExcludingCanceled(Long reservationId);
 
-    boolean existsByThemeId(@Param("themeId") Long themeId);
+    @Query("""
+            SELECT EXISTS (
+                SELECT 1 FROM Reservation r
+                WHERE r.time.id = :timeId
+                  AND r.status != 'CANCEL'
+            )
+            """)
+    boolean existsByTimeId(@Param("timeId") Long reservationTimeId);
 
-    List<Reservation> findByThemeIdAndDate(@Param("themeId") Long themeId, @Param("date") LocalDate reservationDate);
+    @Query("""
+            SELECT EXISTS (
+                SELECT 1 FROM Reservation r
+                WHERE r.date = :date
+                  AND r.time.id = :timeId
+                  AND r.theme.id = :themeId
+                  AND r.status != 'CANCEL'
+            )
+            """)
+    boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
     @Query("""
             SELECT r
             FROM Reservation r
-            WHERE (:themeId IS NULL OR r.theme.id = :themeId)
+            WHERE r.id = :id
+              AND r.status != 'CANCEL'
+            """)
+    @EntityGraph(attributePaths = {"time", "theme"})
+    Optional<Reservation> findByIdWithTimeAndTheme(Long id);
+
+    @Query("""
+            SELECT EXISTS (
+                SELECT 1 FROM Reservation r
+                WHERE r.theme.id = :themeId
+                  AND r.status != 'CANCEL'
+            )
+            """)
+    boolean existsByThemeId(Long themeId);
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            WHERE r.theme.id = :themeId
+              AND r.date = :date
+              AND r.status != 'CANCEL'
+            """)
+    List<Reservation> findByThemeIdAndDate(Long themeId, LocalDate date);
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            WHERE r.status != 'CANCEL'
+              AND (:themeId IS NULL OR r.theme.id = :themeId)
               AND (:memberId IS NULL OR r.member.id = :memberId)
               AND (:from IS NULL OR r.date >= :from)
               AND (:to IS NULL OR r.date <= :to)
             """)
-    List<Reservation> findByThemeIdAndMemberIdAndDateBetween(@Param("themeId") Long themeId,
-                                                             @Param("memberId") Long memberId,
-                                                             @Param("from") LocalDate from,
-                                                             @Param("to") LocalDate to);
-
-    @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberId(@Param("memberId") Long memberId);
+    List<Reservation> findByThemeIdAndMemberIdAndDateBetween(Long themeId, Long memberId, LocalDate from, LocalDate to);
 
     @Query("""
-            SELECT r FROM Reservation r
-                JOIN FETCH r.member m
-                JOIN FETCH r.time t
-                JOIN FETCH r.theme th
+            SELECT r
+            FROM Reservation r
+            WHERE r.member.id = :memberId
+              AND r.status != 'CANCEL'
             """)
+    @EntityGraph(attributePaths = {"time", "theme"})
+    List<Reservation> findAllByMemberId(Long memberId);
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            WHERE r.status != 'CANCEL'
+            """)
+    @EntityGraph(attributePaths = {"member", "time", "theme"})
     List<Reservation> findAllWithMemberAndTimeAndTheme();
 
-    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(@Param("date") LocalDate date,
-                                                       @Param("timeId") Long timeId,
-                                                       @Param("themeId") Long themeId,
-                                                       @Param("memberId") Long memberId);
+    @Query("""
+            SELECT EXISTS (
+                SELECT 1 FROM Reservation r
+                WHERE r.date = :date
+                  AND r.time.id = :timeId
+                  AND r.theme.id = :themeId
+                  AND r.member.id = :memberId
+                  AND r.status != 'CANCEL'
+            )
+            """)
+    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, Long timeId, Long themeId, Long memberId);
 }

@@ -65,7 +65,7 @@ class DeleteReservationServiceTest extends AbstractServiceIntegrationTest {
         deleteReservationService.cancelById(reservation.getId());
 
         // then
-        assertThat(reservationRepository.findById(reservation.getId())).isNotPresent();
+        assertThat(reservationRepository.findByIdExcludingCanceled(reservation.getId())).isNotPresent();
     }
 
     @Test

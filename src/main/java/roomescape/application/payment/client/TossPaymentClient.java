@@ -1,4 +1,4 @@
-package roomescape.application.payment;
+package roomescape.application.payment.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,29 +17,27 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import roomescape.application.payment.dto.PaymentCommand;
+import roomescape.application.payment.client.dto.PaymentResponse;
+import roomescape.application.payment.command.dto.PaymentCommand;
 import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.TossPaymentException;
 
 @Component
 public class TossPaymentClient {
 
-    private static final String TOSS_PAYMENT_SERVER_URL = "https://api.tosspayments.com/v1/payments";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
-    private static final String CONFIRM_URI = "/confirm";
-    private static final String AUTH_SCHEME = "Basic ";
-
-    private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TossPaymentClient.class);
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final TossPaymentProperties tossPaymentProperties;
 
-    public TossPaymentClient(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public TossPaymentClient(ObjectMapper objectMapper, TossPaymentProperties tossPaymentProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_SERVER_URL)
+                .baseUrl(tossPaymentProperties.baseUrl())
                 .requestFactory(createRequestFactory())
                 .build();
+        this.objectMapper = objectMapper;
+        this.tossPaymentProperties = tossPaymentProperties;
     }
 
     private SimpleClientHttpRequestFactory createRequestFactory() {
@@ -49,25 +47,26 @@ public class TossPaymentClient {
         return requestFactory;
     }
 
-    public void approve(PaymentCommand command) {
+    public PaymentResponse approve(PaymentCommand command) {
         try {
-            restClient.post()
-                    .uri(CONFIRM_URI)
+            return restClient.post()
+                    .uri(tossPaymentProperties.confirmUri())
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
                     .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                    .toBodilessEntity();
+                    .toEntity(PaymentResponse.class)
+                    .getBody();
         } catch (RestClientException e) {
-            log.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
+            LOGGER.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
             throw new TossPaymentException("잠시 후 다시 시도해주세요.");
         }
     }
 
     private String createAuthorizationHeader() {
-        String encoded = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-        return AUTH_SCHEME + encoded;
+        String encoded = Base64.getEncoder().encodeToString(tossPaymentProperties.secretKey().getBytes(StandardCharsets.UTF_8));
+        return tossPaymentProperties.authScheme() + " " + encoded;
     }
 
     private void handle4xxError(HttpRequest httpRequest, ClientHttpResponse clientHttpResponse) {
@@ -75,14 +74,14 @@ public class TossPaymentClient {
             JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
             String code = node.path("code").asText();
             String message = node.path("message").asText();
-            log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
+            LOGGER.warn("결제 승인 실패 - code: {}, message: {}", code, message);
             TossPaymentErrorCode tossPaymentErrorCode = getTossPaymentErrorCode(code);
             throw new TossPaymentException(tossPaymentErrorCode.getKoreanMessage());
         } catch (JsonProcessingException e) {
-            log.warn("토스 응답 처리 중 JSON 파싱 오류", e);
+            LOGGER.error("토스 응답 처리 중 JSON 파싱 오류", e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         } catch (IOException e) {
-            log.error("토스 응답 처리 중 I/O 오류", e);
+            LOGGER.error("토스 응답 처리 중 I/O 오류", e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         }
     }
@@ -91,7 +90,7 @@ public class TossPaymentClient {
         try {
             return TossPaymentErrorCode.fromCode(code);
         } catch (PaymentException e) {
-            log.warn("알 수 없는 결제 오류 코드: {}", code, e);
+            LOGGER.warn("알 수 없는 결제 오류 코드: {}", code, e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         }
     }

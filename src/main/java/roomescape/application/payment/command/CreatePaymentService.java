@@ -1,8 +1,8 @@
-package roomescape.application.payment;
+package roomescape.application.payment.command;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.dto.CreatePaymentCommand;
+import roomescape.application.payment.command.dto.CreatePaymentCommand;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.repository.PaymentRepository;
 

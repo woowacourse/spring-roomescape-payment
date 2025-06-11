@@ -1,0 +1,747 @@
+openapi: "3.1.0"
+info:
+  title: "방탈출 예약 애플리케이션 API Docs"
+  description: "방탈출 예약 애플리케이션 API 문서입니다. [실패 사유](https://github.com/YehyeokBang/spring-roomescape-payment/blob/step2/ApiFail.md)"
+  version: "1.0.0"
+paths:
+  /login:
+    post:
+      summary: "로그인 요청"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /logout:
+    post:
+      summary: "로그아웃 요청"
+      operationId: "logout"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /login/check:
+    get:
+      summary: "로그인한 사용자 이름 조회"
+      operationId: "loginCheck"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LoginCheckResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /members:
+    post:
+      summary: "회원 가입 요청"
+      operationId: "createMember"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: "사용자 목록 조회"
+      operationId: "findAll"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/MemberResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /payments:
+    post:
+      summary: "결제 사전 검증을 위한 요청"
+      operationId: "createPayment"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/reservations:
+    post:
+      summary: "관리자 예약 생성 요청"
+      operationId: "createReservation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAdminReservationRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: "관리자 예약 목록 조회"
+      operationId: "findAll"
+      parameters:
+        - name: "themeId"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "memberId"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "from"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "to"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ReservationResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/reservations/{id}:
+    delete:
+      summary: "관리자 예약 삭제 요청"
+      operationId: "deleteReservation"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reservations-mine:
+    get:
+      summary: "내 예약 목록 조회"
+      operationId: "findMineReservations"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/MyReservationResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /themes:
+    get:
+      summary: "테마 목록 조회"
+      operationId: "findAll"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ThemeResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /themes/rank:
+    get:
+      summary: "인기 테마 조회"
+      operationId: "findRankBetweenDate"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ThemeResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reservations:
+    post:
+      summary: "예약 요청"
+      operationId: "createReservation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationWithPaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: "예약 목록 조회"
+      operationId: "findReservations"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ReservationResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/themes:
+    post:
+      summary: "관리자 테마 생성 요청"
+      operationId: "create"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateThemeRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/themes/{themeId}:
+    delete:
+      summary: "관리자 테마 삭제 요청"
+      operationId: "delete"
+      parameters:
+        - name: "themeId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reservations/wait:
+    post:
+      summary: "예약 대기 요청"
+      operationId: "createWaiting"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWaitingRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reservations/wait/{waitingId}:
+    delete:
+      summary: "예약 대기 취소 요청"
+      operationId: "cancelWaiting"
+      parameters:
+        - name: "waitingId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /times:
+    get:
+      summary: "예약 시간 목록 조회"
+      operationId: "findAll"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ReservationTimeResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /times/available:
+    get:
+      summary: "예약 가능한 시간 목록 조회"
+      operationId: "findAll"
+      parameters:
+        - name: "themeId"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "date"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            format: "date"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AvailableReservationTimeResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/waitings/{id}:
+    delete:
+      summary: "관리자 예약 대기 삭제 요청"
+      operationId: "deleteWaiting"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/waitings:
+    get:
+      summary: "관리자 예약 대기 목록 조회"
+      operationId: "findAll"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WaitingResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/times:
+    post:
+      summary: "관리자 예약 시간 생성 요청"
+      operationId: "create"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationTimeRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/times/{timeId}:
+    delete:
+      summary: "관리자 예약 시간 삭제 요청"
+      operationId: "deleteReservationTime"
+      parameters:
+        - name: "timeId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    ErrorResponse:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+          description: "예외 내용"
+      required:
+        - message
+    LoginRequest:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        password:
+          type: "string"
+    Void:
+      type: "object"
+      properties: { }
+    LoginCheckResponse:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+    SignupRequest:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        password:
+          type: "string"
+        name:
+          type: "string"
+    MemberResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+    CreatePaymentRequest:
+      type: "object"
+      properties:
+        orderId:
+          type: "string"
+        amount:
+          type: "integer"
+          format: "int64"
+    CreateAdminReservationRequest:
+      type: "object"
+      properties:
+        date:
+          type: "string"
+          format: "date"
+        timeId:
+          type: "integer"
+          format: "int64"
+        themeId:
+          type: "integer"
+          format: "int64"
+        memberId:
+          type: "integer"
+          format: "int64"
+    ReservationTimeResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        startAt:
+          type: "string"
+    ThemeResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        thumbnail:
+          type: "string"
+    ReservationResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        member:
+          $ref: "#/components/schemas/MemberResponse"
+        date:
+          type: "string"
+          format: "date"
+        time:
+          $ref: "#/components/schemas/ReservationTimeResponse"
+        theme:
+          $ref: "#/components/schemas/ThemeResponse"
+    MyReservationResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        theme:
+          type: "string"
+        date:
+          type: "string"
+          format: "date"
+        time:
+          type: "string"
+        status:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "RESERVE"
+            - "WAITING"
+        paymentKey:
+          type: "string"
+        amount:
+          type: "integer"
+          format: "int64"
+    CreateReservationWithPaymentRequest:
+      type: "object"
+      properties:
+        date:
+          type: "string"
+          format: "date"
+        timeId:
+          type: "integer"
+          format: "int64"
+        themeId:
+          type: "integer"
+          format: "int64"
+        paymentKey:
+          type: "string"
+        orderId:
+          type: "string"
+        amount:
+          type: "integer"
+          format: "int64"
+        paymentType:
+          type: "string"
+    CreateThemeRequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        thumbnail:
+          type: "string"
+    CreateWaitingRequest:
+      type: "object"
+      properties:
+        date:
+          type: "string"
+          format: "date"
+        theme:
+          type: "integer"
+          format: "int64"
+        time:
+          type: "integer"
+          format: "int64"
+    AvailableReservationTimeResponse:
+      type: "object"
+      properties:
+        timeId:
+          type: "integer"
+          format: "int64"
+        startAt:
+          type: "string"
+        booked:
+          type: "boolean"
+    WaitingResponse:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        theme:
+          type: "string"
+        date:
+          type: "string"
+        startAt:
+          type: "string"
+    CreateReservationTimeRequest:
+      type: "object"
+      properties:
+        startAt:
+          type: "string"
+          format: "partial-time"

@@ -22,7 +22,7 @@ public class DeleteReservationService {
 
     public void cancelById(Long reservationId) {
         Reservation reservation = getReservation(reservationId);
-        reservationRepository.delete(reservation);
+        reservation.cancel();
         publishCancelEvent(reservation);
     }
 

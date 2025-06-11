@@ -1,4 +1,4 @@
-package roomescape.application.payment;
+package roomescape.application.payment.client;
 
 import java.util.EnumSet;
 import java.util.Set;
