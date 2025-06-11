@@ -37,7 +37,7 @@ class TossPaymentsClientTest {
     void testConfirmPayments() throws JsonProcessingException {
         // given
         PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
-        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
+        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", "orderId", 1000L);
         SERVER.expect(requestTo(BASE_URL + "/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)

@@ -1,15 +1,32 @@
 package roomescape.auth;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,14 +35,22 @@ import roomescape.auth.dto.LoginRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql("/test-member-data.sql")
+@ExtendWith(RestDocumentationExtension.class)
 public class AuthApiTest {
 
     @LocalServerPort
     private int port;
 
+    private RequestSpecification spec;
+
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation).operationPreprocessors()
+                        .withRequestDefaults(modifyHeaders().remove("Foo"), prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
+                .build();
     }
 
     public static final String TOKEN_COOKIE_NAME = "token";
@@ -37,9 +62,16 @@ public class AuthApiTest {
         @DisplayName("올바른 이메일과 비밀번호를 입력하면 200을 반환한다")
         @Test
         void testLogin() {
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
                     .contentType(ContentType.JSON)
                     .body(new LoginRequest("aaa@gmail.com", "1234"))
+                    .filter(document(
+                            "login",
+                            requestFields(
+                                    fieldWithPath("email").description("이메일"),
+                                    fieldWithPath("password").description("패스워드")
+                            ))
+                    )
                     .when().post("/login")
                     .then().log().all()
                     .statusCode(200)
@@ -93,8 +125,17 @@ public class AuthApiTest {
                     .extract().cookie(TOKEN_COOKIE_NAME);
             // when
             // then
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
                     .cookie(TOKEN_COOKIE_NAME, token)
+                    .filter(document(
+                            "login/check",
+                            requestCookies(
+                                    cookieWithName(TOKEN_COOKIE_NAME).description("인증 토큰")
+                            ),
+                            responseFields(
+                                    fieldWithPath("name").description("유저 이름")
+                            ))
+                    )
                     .when().get("/login/check")
                     .then().log().all()
                     .statusCode(200)
@@ -142,8 +183,17 @@ public class AuthApiTest {
                     .extract().cookie(TOKEN_COOKIE_NAME);
             // when
             // then
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
                     .cookie(TOKEN_COOKIE_NAME, token)
+                    .filter(document(
+                            "logout",
+                            requestCookies(
+                                    cookieWithName(TOKEN_COOKIE_NAME).description("인증 토큰")
+                            ),
+                            responseHeaders(
+                                    headerWithName("Set-Cookie").description("쿠키 삭제를 위한 빈 값")
+                            ))
+                    )
                     .when().post("/logout")
                     .then().log().all()
                     .statusCode(204)

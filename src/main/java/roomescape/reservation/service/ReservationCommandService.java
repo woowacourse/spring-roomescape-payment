@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import java.time.LocalDate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.dto.PaymentsConfirmRequest;
@@ -25,6 +26,7 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @Service
+@Slf4j
 public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
@@ -50,23 +52,38 @@ public class ReservationCommandService {
     @Transactional
     public ReservationResponse createMyReservationWithPayments(final CreateReservationWithPaymentRequest request,
                                                                final LoginMember loginMember) {
+        log.info("결제 예약 생성 요청 - memberId: {}, themeId: {}, date: {}, timeId: {}", 
+                loginMember.id(), request.themeId(), request.date(), request.timeId());
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("예약자를 찾을 수 없습니다."));
         final Payment payment = paymentService.confirmAndSavePayment(new PaymentsConfirmRequest(request));
-        return createReservation(request.themeId(), request.timeId(), request.date(), member, payment);
+        final ReservationResponse response = createReservation(request.themeId(), request.timeId(), request.date(), member, payment);
+        log.info("결제 예약 생성 완료 - reservationId: {}, memberId: {}", response.id(), member.getId());
+        return response;
     }
 
     public ReservationResponse createReservationByAdmin(final CreateReservationWithMemberRequest request) {
+        log.info("관리자 예약 생성 요청 - memberId: {}, themeId: {}, date: {}, timeId: {}", 
+                request.memberId(), request.themeId(), request.date(), request.timeId());
         final Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new BadRequestException("예약자를 찾을 수 없습니다."));
-        return createReservation(request.themeId(), request.timeId(), request.date(), member, null);
+        final ReservationResponse response = createReservation(request.themeId(), request.timeId(), request.date(), member, null);
+        log.info("관리자 예약 생성 완료 - reservationId: {}, memberId: {}", response.id(), member.getId());
+        return response;
     }
 
     public void cancelReservationById(final long id) {
+        log.info("예약 취소 요청 - reservationId: {}", id);
         waitingRepository.findFirstByReservationIdOrderByCreatedAtAsc(id)
                 .ifPresentOrElse(
-                        (waiting) -> processWaitingToReservation(id, waiting),
-                        () -> reservationRepository.deleteById(id)
+                        (waiting) -> {
+                            processWaitingToReservation(id, waiting);
+                            log.info("예약 취소 및 대기자 예약 처리 완료 - reservationId: {}, waitingId: {}", id, waiting.getId());
+                        },
+                        () -> {
+                            reservationRepository.deleteById(id);
+                            log.info("예약 취소 완료 - reservationId: {}", id);
+                        }
                 );
     }
 

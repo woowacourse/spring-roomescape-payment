@@ -1,6 +1,7 @@
 package roomescape.waiting.service;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.global.auth.LoginMember;
 import roomescape.global.exception.custom.BadRequestException;
@@ -18,6 +19,7 @@ import roomescape.waiting.dto.WaitingSimpleResponse;
 import roomescape.waiting.repository.WaitingRepository;
 
 @Service
+@Slf4j
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
@@ -32,6 +34,8 @@ public class WaitingService {
     }
 
     public WaitingResponse createWaiting(final CreateWaitingRequest request, final LoginMember loginMember) {
+        log.info("예약 대기 생성 요청 - memberId: {}, themeId: {}, date: {}, timeId: {}", 
+                loginMember.id(), request.themeId(), request.date(), request.timeId());
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new BadRequestException("회원 정보를 찾을 수 없습니다."));
         final Reservation reservation = reservationRepository.findFirstByDateAndThemeIdAndTimeId(request.date(),
@@ -40,6 +44,7 @@ public class WaitingService {
         validateWaiting(reservation, member);
         final Waiting waiting = Waiting.register(member, reservation);
         final Waiting savedWaiting = waitingRepository.save(waiting);
+        log.info("예약 대기 생성 완료 - waitingId: {}, memberId: {}", savedWaiting.getId(), member.getId());
         return new WaitingResponse(savedWaiting);
     }
 
@@ -51,6 +56,7 @@ public class WaitingService {
     }
 
     public void deleteMyWaiting(final long waitingId, final LoginMember loginMember) {
+        log.info("예약 대기 삭제 요청 - waitingId: {}, memberId: {}", waitingId, loginMember.id());
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("회원 정보를 찾을 수 없습니다."));
         final Waiting waiting = waitingRepository.findById(waitingId)
@@ -59,10 +65,13 @@ public class WaitingService {
             throw new ForbiddenException("본인의 예약대기만 삭제할 수있습니다.");
         }
         waitingRepository.delete(waiting);
+        log.info("예약 대기 삭제 완료 - waitingId: {}", waitingId);
     }
 
     public void deleteWaitingByAdmin(final long id) {
+        log.info("관리자 예약 대기 삭제 요청 - waitingId: {}", id);
         waitingRepository.deleteById(id);
+        log.info("관리자 예약 대기 삭제 완료 - waitingId: {}", id);
     }
 
     private void validateWaiting(final Reservation reservation, final Member member) {

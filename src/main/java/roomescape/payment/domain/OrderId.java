@@ -1,0 +1,34 @@
+package roomescape.payment.domain;
+
+import jakarta.persistence.Embeddable;
+import java.util.Objects;
+
+@Embeddable
+public class OrderId {
+
+    private String orderId;
+
+    public OrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    protected OrderId() {
+    }
+
+    public String getValue() {
+        return orderId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof OrderId orderId1)) {
+            return false;
+        }
+        return Objects.equals(orderId, orderId1.orderId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(orderId);
+    }
+}

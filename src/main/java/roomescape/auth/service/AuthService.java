@@ -1,5 +1,6 @@
 package roomescape.auth.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.dto.TokenResponse;
@@ -14,6 +15,7 @@ import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 
 @Service
+@Slf4j
 public class AuthService {
 
     private final MemberRepository memberRepository;
@@ -31,6 +33,7 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException("올바르지 않은 로그인 정보입니다."));
         final String token = jwtTokenProvider.createToken(member.getId(), member.getRole(),
                 member.getName().getValue());
+        log.info("로그인 성공 - userId: {}", member.getId()); // 해야할까?
         return new TokenResponse(token);
     }
 

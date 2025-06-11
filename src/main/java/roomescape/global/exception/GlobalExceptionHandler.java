@@ -1,6 +1,7 @@
 package roomescape.global.exception;
 
 import java.net.SocketTimeoutException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import roomescape.global.exception.custom.TossPaymentsException;
 import roomescape.global.exception.custom.UnauthorizedException;
 import roomescape.global.exception.dto.ErrorResponse;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -111,6 +113,7 @@ public class GlobalExceptionHandler {
             }
             cause = cause.getCause();
         }
+        log.error("timeout 에러 발생 - {}", e.getMessage());
         return ResponseEntity.internalServerError().body(new ErrorResponse("알 수 없는 에러가 발생했습니다."));
     }
 
@@ -118,6 +121,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUncaughtException(final RuntimeException e) {
         e.printStackTrace();
+        log.error("알 수 없는 에러 발생 - {}", e.getMessage());
         return new ErrorResponse("알 수 없는 에러가 발생했습니다.");
     }
 }
