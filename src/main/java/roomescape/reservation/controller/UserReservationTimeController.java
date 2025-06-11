@@ -14,7 +14,7 @@ import roomescape.reservation.application.UserReservationTimeService;
 import roomescape.reservation.application.dto.response.ReservationTimeServiceResponse;
 import roomescape.reservation.controller.dto.response.ReservationTimeResponse;
 
-@Tag(name = "Time", description = "시간 도메인 API")
+@Tag(name = "User", description = "사용자 도메인 API")
 @RestController
 @RequestMapping("/times")
 @RequiredArgsConstructor

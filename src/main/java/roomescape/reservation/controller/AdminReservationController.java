@@ -21,7 +21,7 @@ import roomescape.reservation.controller.dto.request.ReservationSearchRequest;
 import roomescape.reservation.controller.dto.response.ReservationResponse;
 import roomescape.reservation.model.entity.vo.ReservationStatus;
 
-@Tag(name = "Reservation", description = "예약 도메인 API")
+@Tag(name = "Admin", description = "관리자 도메인 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/reservations")

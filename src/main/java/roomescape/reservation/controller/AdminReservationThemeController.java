@@ -16,7 +16,7 @@ import roomescape.reservation.application.dto.response.ReservationThemeServiceRe
 import roomescape.reservation.controller.dto.request.CreateReservationThemeRequest;
 import roomescape.reservation.controller.dto.response.ReservationThemeResponse;
 
-@Tag(name = "Theme", description = "테마 도메인 API")
+@Tag(name = "Admin", description = "관리자 도메인 API")
 @RestController
 @RequestMapping("/admin/themes")
 @RequiredArgsConstructor

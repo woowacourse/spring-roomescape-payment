@@ -16,7 +16,7 @@ import roomescape.auth.web.resolver.AuthenticationPrincipal;
 import roomescape.reservation.application.UserReservationWaitingService;
 import roomescape.reservation.controller.dto.request.UserCreateReservationWaitingRequest;
 
-@Tag(name = "Waiting", description = "대기 도메인 API")
+@Tag(name = "User", description = "사용자 도메인 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservations/waiting")

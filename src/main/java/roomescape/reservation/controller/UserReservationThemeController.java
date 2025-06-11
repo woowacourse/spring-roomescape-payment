@@ -13,7 +13,7 @@ import roomescape.reservation.application.UserReservationThemeService;
 import roomescape.reservation.application.dto.response.ReservationThemeServiceResponse;
 import roomescape.reservation.controller.dto.response.ReservationThemeResponse;
 
-@Tag(name = "Theme", description = "테마 도메인 API")
+@Tag(name = "User", description = "사용자 도메인 API")
 @RestController
 @RequestMapping("/themes")
 @RequiredArgsConstructor

@@ -12,7 +12,7 @@ import roomescape.member.application.AdminMemberService;
 import roomescape.member.application.dto.response.MemberServiceResponse;
 import roomescape.member.controller.dto.MemberResponse;
 
-@Tag(name = "admin", description = "관리자 도메인 API")
+@Tag(name = "Admin", description = "관리자 도메인 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/members")
