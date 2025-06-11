@@ -3,7 +3,6 @@ package roomescape.reservation.service.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.dto.WaitingInfoDataResponse;
@@ -23,9 +22,33 @@ public record MyReservationsResponse(
         PaymentResponse payment
 ) {
 
+    private enum ReservationResponseStatus {
+        WAITING("대기"),
+        CONFIRMED("예약"),
+        DONE("완료"),
+        ;
+
+        private final String description;
+
+        ReservationResponseStatus(String description) {
+            this.description = description;
+        }
+
+        public static ReservationResponseStatus from(Reservation reservation) {
+            if (reservation.isBefore(LocalDateTime.now())) {
+                return DONE;
+            }
+            return CONFIRMED;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
     public static MyReservationsResponse from(ReservationWithPayment response) {
         Reservation reservation = response.reservation();
-        ReservationStatus reservationStatus = getSavedReservationStatus(reservation);
+        ReservationResponseStatus reservationStatus = getSavedReservationStatus(reservation);
         return new MyReservationsResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
@@ -37,11 +60,8 @@ public record MyReservationsResponse(
         );
     }
 
-    private static ReservationStatus getSavedReservationStatus(Reservation reservation) {
-        if (reservation.isBefore(LocalDateTime.now())) {
-            return ReservationStatus.DONE;
-        }
-        return ReservationStatus.CONFIRMED;
+    private static ReservationResponseStatus getSavedReservationStatus(Reservation reservation) {
+        return ReservationResponseStatus.from(reservation);
     }
 
     public static MyReservationsResponse from(WaitingInfoDataResponse waitingInfoDataResponse) {
@@ -51,7 +71,7 @@ public record MyReservationsResponse(
                 waiting.getTheme().getName(),
                 waiting.getDate(),
                 waiting.getTime().getStartAt(),
-                ReservationStatus.WAITING.getDescription(),
+                ReservationResponseStatus.WAITING.getDescription(),
                 waitingInfoDataResponse.rank().value(),
                 null
         );
