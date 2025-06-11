@@ -97,7 +97,7 @@ class ReservationControllerTest extends BaseTest {
     void 예약_목록_조회_성공() throws Exception {
         // given
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
+        Reservation reservation = Reservation.booked(
                 LocalDate.now().plusDays(1),
                 time,
                 theme,
@@ -116,7 +116,7 @@ class ReservationControllerTest extends BaseTest {
     void 예약_취소_성공() throws Exception {
         // given
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
+        Reservation reservation = Reservation.booked(
                 LocalDate.now().plusDays(1),
                 time,
                 theme,

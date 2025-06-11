@@ -3,10 +3,12 @@ package roomescape.config;
 import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 @Configuration
+@Profile("test")
 public class MockClientConfiguration {
 
     private MockRestServiceServer mockRestServiceServer;

@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'java'
 }
 
@@ -10,6 +11,10 @@ version = '0.0.1-SNAPSHOT'
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+}
+
+configurations {
+    asciidoctorExt
 }
 
 repositories {
@@ -42,8 +47,89 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // Spring Restdocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.5.RELEASE'
+
+    // Jackson
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+}
+
+// === Restdocs 설정 ===
+def generatedSnippets = file("${buildDir}/generated-snippets")
+def persistentSnippets = file("${projectDir}/src/docs/snippets")
+def indexAdocPath = file("${projectDir}/src/docs/asciidoc/index.adoc")
+def asciidocOutputDir = file("${buildDir}/docs/asciidoc")
+def staticDocsDir = file("${projectDir}/src/main/resources/static/docs")
+
+tasks.register("deleteSnippets", Delete) {
+    delete generatedSnippets
+    delete persistentSnippets
 }
 
 test {
     useJUnitPlatform()
+    dependsOn "deleteSnippets"
+    outputs.dir generatedSnippets
+}
+
+tasks.register("copySnippets", Copy) {
+    dependsOn test
+    from generatedSnippets
+    into persistentSnippets
+}
+
+tasks.register("generateIndexAdoc") {
+    dependsOn copySnippets
+    doLast {
+        indexAdocPath.parentFile.mkdirs()
+
+        def snippetDirs = persistentSnippets.listFiles().findAll { it.isDirectory() }
+        def content = """= 방탈출 서비스 API 문서
+:toc: left
+:source-highlighter: highlightjs
+:snippets: ${persistentSnippets}
+
+"""
+
+        snippetDirs.sort { it.name }.each { dir ->
+            content += "== ${dir.name}\n\n"
+            def includes = []
+            dir.eachFile { file ->
+                if (file.name.endsWith(".adoc")) {
+                    def relativePath = persistentSnippets.toPath().relativize(file.toPath()).toString()
+                    includes << "include::{snippets}/${relativePath}[]"
+                }
+            }
+            content += includes.sort().join('\n') + "\n\n"
+        }
+
+        indexAdocPath.text = content
+    }
+}
+
+asciidoctor {
+    dependsOn generateIndexAdoc
+    inputs.dir persistentSnippets
+    configurations 'asciidoctorExt'
+    sources {
+        include 'index.adoc'
+    }
+    baseDirFollowsSourceDir()
+}
+
+tasks.register("cleanDocs", Delete) {
+    delete staticDocsDir
+}
+
+tasks.register('copyDocs', Copy) {
+    dependsOn cleanDocs
+    dependsOn asciidoctor
+    from asciidocOutputDir
+    into staticDocsDir
+}
+
+build {
+    dependsOn copyDocs
 }

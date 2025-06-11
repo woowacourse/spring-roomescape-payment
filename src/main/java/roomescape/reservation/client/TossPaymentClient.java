@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import lombok.RequiredArgsConstructor;
-import roomescape.reservation.service.PaymentApprovalRequest;
+import roomescape.reservation.dto.PaymentApprovalRequest;
 
 @Component
 @RequiredArgsConstructor

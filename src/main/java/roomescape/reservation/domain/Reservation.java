@@ -70,7 +70,7 @@ public class Reservation {
         validateFutureOrPresent(currentDateTime);
     }
 
-    public static Reservation of(
+    public static Reservation booked(
             final LocalDate date,
             final ReservationTime reservationTime,
             final Theme theme,

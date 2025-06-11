@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 
 public record MyReservationResponse(
@@ -12,16 +13,20 @@ public record MyReservationResponse(
         String theme,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
 
-    public MyReservationResponse(final Reservation reservation) {
+    public MyReservationResponse(final Reservation reservation, final Payment payment) {
         this(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                convertToReservationStatusMessage(reservation)
+                convertToReservationStatusMessage(reservation),
+                payment != null ? payment.getPaymentKey() : null,
+                payment != null ? payment.getAmount() : null
         );
     }
 
