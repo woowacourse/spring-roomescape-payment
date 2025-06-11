@@ -11,11 +11,11 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.controller.AuthenticationPrincipal;
-import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.domain.auth.TokenBody;
 import roomescape.domain.auth.dto.LoginMember;
 import roomescape.exception.custom.reason.auth.AuthNotExistsCookieException;
 import roomescape.exception.custom.reason.auth.AuthNotValidTokenException;
+import roomescape.infrastructure.auth.JwtProvider;
 
 @AllArgsConstructor
 public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArgumentResolver {

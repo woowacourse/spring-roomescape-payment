@@ -1,6 +1,8 @@
 package roomescape.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,9 @@ import roomescape.domain.member.MemberService;
 import roomescape.domain.member.dto.MemberRequest;
 import roomescape.domain.member.dto.MemberResponse;
 
+@Tag(
+        name = "멤버 정보 컨트롤러"
+)
 @RestController
 @RequestMapping("/members")
 @AllArgsConstructor
@@ -22,6 +27,9 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(
+            description = "멤버를 생성(회원가입)"
+    )
     @PostMapping
     public ResponseEntity<Void> createMember(
             @RequestBody @Valid MemberRequest request
@@ -30,6 +38,9 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(
+            description = "멤버들을 모두 조회한다."
+    )
     @GetMapping
     public ResponseEntity<List<MemberResponse>> readAllMember() {
         final List<MemberResponse> response = memberService.readAllMember();

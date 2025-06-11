@@ -7,7 +7,6 @@ import io.restassured.http.ContentType;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class MemberApiTest {
+@Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+class MemberApiTest {
 
     private static final Map<String, Object> MEMBER_BODY = new HashMap<>();
 
@@ -37,12 +38,6 @@ public class MemberApiTest {
         MEMBER_BODY.put("email", "admin@email.com");
         MEMBER_BODY.put("password", "password");
         MEMBER_BODY.put("name", "어드민");
-    }
-
-    @BeforeEach
-    void setUp() {
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
     @DisplayName("post 요청을 보내면 201 created를 응답한다.")

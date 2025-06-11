@@ -2,6 +2,7 @@ package roomescape.domain.reservation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import roomescape.domain.reservation.dto.MineReservationResponse;
 import roomescape.domain.reservation.dto.ReservationPaymentRequest;
 import roomescape.domain.reservation.dto.ReservationRequest;
 import roomescape.domain.reservation.dto.ReservationResponse;
+import roomescape.domain.reservation.dto.payment.PaymentRequest;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
@@ -33,6 +35,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
     private final PaymentManager paymentManager;
     private final ReservationTimeManager timeManager;
 
@@ -52,7 +55,12 @@ public class ReservationService {
                 ReservationStatus.PENDING, currentTimestamp);
         final Reservation savedReservation = reservationRepository.save(notSavedReservation);
 
-        paymentManager.confirmPayment(request.paymentRequest());
+        final PaymentRequest paymentRequest = request.paymentRequest();
+        paymentManager.confirmPayment(paymentRequest);
+        final ReservationPayment reservationPayment =
+                new ReservationPayment(paymentRequest.paymentKey(), paymentRequest.amount(), savedReservation);
+        reservationPaymentRepository.save(reservationPayment);
+
         return ReservationResponse.from(savedReservation);
     }
 
@@ -92,9 +100,15 @@ public class ReservationService {
 
     public List<MineReservationResponse> readAllMine(final LoginMember loginMember) {
         final Member member = getMemberByEmail(loginMember.email());
-        return reservationRepository.findAllWaitingRankByMember(member).stream()
-                .map(MineReservationResponse::from)
-                .toList();
+        return Stream.concat(
+                reservationRepository.findAllWaitingRankByMember(member)
+                        .stream()
+                        .map(MineReservationResponse::from),
+
+                reservationPaymentRepository.findAllByMember(member)
+                        .stream()
+                        .map(MineReservationResponse::from)
+        ).toList();
     }
 
     public List<ReservationResponse> readAll() {

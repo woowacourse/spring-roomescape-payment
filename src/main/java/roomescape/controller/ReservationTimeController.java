@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +21,9 @@ import roomescape.domain.reservationtime.dto.AvailableReservationTimeResponse;
 import roomescape.domain.reservationtime.dto.ReservationTimeRequest;
 import roomescape.domain.reservationtime.dto.ReservationTimeResponse;
 
+@Tag(
+        name = "시간 컨트롤러"
+)
 @RestController
 @RequestMapping("/times")
 @AllArgsConstructor
@@ -26,6 +31,9 @@ public class ReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
 
+    @Operation(
+            description = "예약 시간을 생성한다."
+    )
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(
             @RequestBody @Valid final ReservationTimeRequest request
@@ -34,12 +42,18 @@ public class ReservationTimeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(
+            description = "예약을 시간을 모두 조회한다."
+    )
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> findAll() {
         final List<ReservationTimeResponse> response = reservationTimeService.findAll();
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            description = "PENDING 상태인 예약은 체크하여 시간을 모두 조회한다."
+    )
     @GetMapping("/available-time")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAllAvailableTimes(
             @RequestParam("themeId") final Long themeId,
@@ -50,6 +64,9 @@ public class ReservationTimeController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            description = "예약 시간을 삭제한다. 사용중이라면 삭제가 불가능하다."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(
             @PathVariable("id") final Long id

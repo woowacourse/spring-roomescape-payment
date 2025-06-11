@@ -1,8 +1,8 @@
 package roomescape.domain.reservationtime.dto;
 
 import java.time.LocalTime;
-import roomescape.exception.custom.reason.ResponseInvalidException;
 import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.exception.custom.reason.ResponseInvalidException;
 
 public record ReservationTimeResponse(
         Long id,

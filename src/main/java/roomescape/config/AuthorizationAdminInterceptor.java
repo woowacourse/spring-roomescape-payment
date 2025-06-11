@@ -8,11 +8,11 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.infrastructure.auth.JwtProvider;
 import roomescape.domain.auth.TokenBody;
+import roomescape.domain.member.MemberRole;
 import roomescape.exception.custom.reason.auth.AuthNotExistsCookieException;
 import roomescape.exception.custom.reason.auth.AuthNotValidTokenException;
-import roomescape.domain.member.MemberRole;
+import roomescape.infrastructure.auth.JwtProvider;
 
 @AllArgsConstructor
 public class AuthorizationAdminInterceptor implements HandlerInterceptor {
