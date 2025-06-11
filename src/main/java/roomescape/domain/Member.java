@@ -65,7 +65,6 @@ public class Member {
                 ", name='" + name + '\'' +
                 ", role=" + role +
                 ", email='" + email + '\'' +
-                ", password='" + MARKED_PASSWORD_CHAR.repeat(password.length()) + '\'' +
                 '}';
     }
 }
