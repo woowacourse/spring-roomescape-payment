@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.approval.domain.ApprovalType;
 import roomescape.approval.domain.Payment;
 import roomescape.approval.infrastructure.ApprovalRepositoryAdapter;
-import roomescape.approval.infrastructure.toss.client.FakeTossPaymentClient;
+import roomescape.approval.infrastructure.toss.client.TestTossPaymentClientConfig;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
@@ -41,7 +41,7 @@ import roomescape.theme.infrastructure.ThemeRepositoryAdapter;
         MemberRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
         ReservationTimeRepositoryAdapter.class,
-        FakeTossPaymentClient.class
+        TestTossPaymentClientConfig.class
 })
 class TossPaymentCommandServiceTest {
     @Autowired
