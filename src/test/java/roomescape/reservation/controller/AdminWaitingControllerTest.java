@@ -31,7 +31,7 @@ class AdminWaitingControllerTest {
 
     @DisplayName("모든 예약대기 목록을 읽어온다.")
     @Test
-    void readAllWaiting() {
+    void getAllWaiting() {
         String tokenValue = getAdminLoginTokenValue();
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
@@ -58,7 +58,7 @@ class AdminWaitingControllerTest {
 
     @DisplayName("일반 사용자는 모든 예약대기 목록을 읽어올 수 없다.")
     @Test
-    void readAllWaitingByMember() {
+    void getAllWaitingByNormalMember() {
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(Map.of(

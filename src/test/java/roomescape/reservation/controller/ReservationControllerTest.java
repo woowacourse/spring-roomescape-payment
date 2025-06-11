@@ -32,7 +32,7 @@ class ReservationControllerTest {
 
     @DisplayName("어드민 페이지로 접근할 수 있다.")
     @Test
-    void accessAdminPage() {
+    void getAdminPage() {
         String tokenValue = getAdminLoginTokenValue();
 
         RestAssured.given().log().all()
@@ -44,7 +44,7 @@ class ReservationControllerTest {
 
     @DisplayName("어드민이 예약 관리 페이지에 접근한다.")
     @Test
-    void accessAdminReservationPage() {
+    void getAdminReservationPage() {
         String tokenValue = getAdminLoginTokenValue();
 
         RestAssured.given().log().all()

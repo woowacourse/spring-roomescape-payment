@@ -22,12 +22,12 @@ class PaymentTest {
     @DisplayName("결제 정보가 존재하지 않으면 결제를 생성할 수 없다.")
     @MethodSource
     @ParameterizedTest
-    void createWithNonExistsInfo(String paymentKey, String orderId, Long amount, Reservation reservation) {
+    void createPaymentWithNonExistsInfo(String paymentKey, String orderId, Long amount, Reservation reservation) {
         assertThatThrownBy(() -> new Payment(paymentKey, orderId, amount, reservation))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private static Stream<Arguments> createWithNonExistsInfo() {
+    private static Stream<Arguments> createPaymentWithNonExistsInfo() {
         Reservation reservation = new Reservation(
                 new Member("하루", "haru@haru.com", "12341234", Role.ADMIN),
                 LocalDate.now(),

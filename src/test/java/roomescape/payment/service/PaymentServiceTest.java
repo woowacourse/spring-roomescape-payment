@@ -125,7 +125,7 @@ class PaymentServiceTest {
 
     @DisplayName("존재하지 않는 예약 번호로 결제 정보를 삭제할 수 없다.")
     @Test
-    void deletePaymentWithNonExistsReservation1() {
+    void deletePaymentWithNonExistsReservation() {
         // given
         Member member = memberRepository.save(new Member("피케이", "pk@woowa.com", "12341234", Role.ADMIN));
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.now()));

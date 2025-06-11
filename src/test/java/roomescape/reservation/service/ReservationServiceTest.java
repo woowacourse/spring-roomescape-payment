@@ -296,7 +296,8 @@ class ReservationServiceTest {
         reservationRepository.save(new Reservation(member, date, reservationTime1, theme));
 
         // when
-        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, theme.idValue());
+        List<BookedReservationTimeResponse> responses
+                = reservationService.getSortedAvailableTimes(date, theme.idValue());
 
         // then
         List<Boolean> alreadyBookeds = responses.stream()

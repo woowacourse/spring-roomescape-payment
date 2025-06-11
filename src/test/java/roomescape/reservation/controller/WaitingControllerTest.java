@@ -29,7 +29,7 @@ class WaitingControllerTest {
 
     @DisplayName("예약 대기를 추가한다.")
     @Test
-    void createReservationWaiting() {
+    void postReservationWaiting() {
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
