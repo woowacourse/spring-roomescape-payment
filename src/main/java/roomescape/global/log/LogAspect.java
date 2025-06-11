@@ -72,8 +72,15 @@ public class LogAspect {
     }
 
     private String formatLogMap(Map<String, Object> map) {
-        StringBuilder sb = new StringBuilder("\n");
-        map.forEach((key, value) -> sb.append("  ").append(key).append(" = ").append(value).append("\n"));
+        String lineSeparator = System.lineSeparator();
+        StringBuilder sb = new StringBuilder(lineSeparator);
+        map.forEach((key, value) ->
+                sb.append("  ")
+                        .append(key)
+                        .append(" = ")
+                        .append(value)
+                        .append(lineSeparator)
+        );
         return sb.toString();
     }
 }
