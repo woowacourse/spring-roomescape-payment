@@ -113,32 +113,7 @@ public class ReservationService {
                 memberInfo.id()
         );
 
-        return createReservationWithPayment(request, memberInfo);
-    }
-
-    @Transactional
-    public ReservationWebResponse createReservationWithPayment(
-            final CreateReservationWithPaymentWebRequest request,
-            final MemberInfo memberInfo
-    ) {
-        final Payment payment = paymentService.create(
-                new CreatePaymentServiceRequest(
-                        request.paymentConfirmWebRequest().paymentKey(),
-                        request.paymentConfirmWebRequest().orderId(),
-                        request.paymentConfirmWebRequest().amount()
-                )
-        );
-        final Reservation reservation = reservationCommandUseCase.create(
-                new CreateReservationServiceRequest(
-                        memberInfo.id(),
-                        request.createReservationWebRequest().date(),
-                        request.createReservationWebRequest().timeId(),
-                        request.createReservationWebRequest().themeId()
-                )
-        );
-        reservationPaymentCommandUseCase.save(reservation, payment);
-
-        return ReservationConverter.toDto(reservation);
+        return reservationPaymentCommandUseCase.createReservationWithPayment(request, memberInfo);
     }
 
     public ReservationWaitWebResponse createReservationWait(
