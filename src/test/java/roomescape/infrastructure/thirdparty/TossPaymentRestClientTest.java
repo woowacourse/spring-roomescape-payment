@@ -11,20 +11,26 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
+import org.springframework.web.client.RestTemplate;
 import roomescape.application.exception.PaymentException;
+import roomescape.infrastructure.config.RestTemplateConfig;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 @RestClientTest(TossPaymentRestClient.class)
+@Import(RestTemplateConfig.class)
 @TestPropertySource(properties = {
         "toss.payment.api.base-url=http://localhost:8080",
         "toss.payment.api.key=test_sk_key"
@@ -35,10 +41,17 @@ class TossPaymentRestClientTest {
     private TossPaymentRestClient tossPaymentRestClient;
 
     @Autowired
-    private MockRestServiceServer mockServer;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private RestTemplate restTemplate;
+
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setUp() {
+        mockServer = MockRestServiceServer.bindTo(restTemplate).build();
+    }
 
     @Test
     @DisplayName("결제 승인 요청 성공시 응답을 반환한다")
@@ -52,12 +65,7 @@ class TossPaymentRestClientTest {
                 }
                 """;
 
-        mockServer.expect(requestTo("http://localhost:8080/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header("Authorization", "Basic dGVzdF9za19rZXk6"))
-                .andExpect(header("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().json(objectMapper.writeValueAsString(request)))
-                .andRespond(withSuccess(successResponse, MediaType.APPLICATION_JSON));
+        mockConfirmEndpoint(request, withSuccess(successResponse, MediaType.APPLICATION_JSON));
 
         ResponseEntity<String> paymentResponse = tossPaymentRestClient.getPaymentResponse(request);
 
@@ -77,13 +85,10 @@ class TossPaymentRestClientTest {
                 }
                 """;
 
-        mockServer.expect(requestTo("http://localhost:8080/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header("Authorization", "Basic dGVzdF9za19rZXk6"))
-                .andExpect(content().json(objectMapper.writeValueAsString(request)))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorResponse));
+        mockConfirmEndpoint(request, withStatus(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse)
+        );
 
         assertThatThrownBy(() -> tossPaymentRestClient.getPaymentResponse(request))
                 .isInstanceOf(PaymentException.class)
@@ -104,13 +109,10 @@ class TossPaymentRestClientTest {
                 }
                 """;
 
-        mockServer.expect(requestTo("http://localhost:8080/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header("Authorization", "Basic dGVzdF9za19rZXk6"))
-                .andExpect(content().json(objectMapper.writeValueAsString(request)))
-                .andRespond(withServerError()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorResponse));
+        mockConfirmEndpoint(request, withServerError()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorResponse)
+        );
 
         assertThatThrownBy(() -> tossPaymentRestClient.getPaymentResponse(request))
                 .isInstanceOf(PaymentException.class)
@@ -118,5 +120,14 @@ class TossPaymentRestClientTest {
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
 
         mockServer.verify();
+    }
+
+    private void mockConfirmEndpoint(PaymentProcessRequest request, ResponseCreator responseCreator) throws Exception {
+        mockServer.expect(requestTo("http://localhost:8080/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("Authorization", "Basic dGVzdF9za19rZXk6"))
+                .andExpect(header("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().json(objectMapper.writeValueAsString(request)))
+                .andRespond(responseCreator);
     }
 } 

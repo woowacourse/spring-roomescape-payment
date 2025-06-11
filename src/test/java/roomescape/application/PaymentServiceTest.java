@@ -8,8 +8,6 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,8 +19,8 @@ import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
 import roomescape.infrastructure.thirdparty.TossPaymentRestClient;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
+import roomescape.presentation.dto.response.PaymentResponse;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTest {
 
@@ -41,11 +39,12 @@ public class PaymentServiceTest {
     @Test
     void 결제를_진행한다() throws JsonProcessingException {
         PaymentProcessRequest paymentProcessRequest = new PaymentProcessRequest("test", "test", "1000");
-        Payment payment = Payment.create("test", "test");
+        Payment payment = Payment.create("test", "test", 1000);
         String paymentString = """
                 {
                     "paymentKey": "test",
-                    "orderId": "test"
+                    "orderId": "test",
+                    "totalAmount": 1000
                 }
                 """;
         ResponseEntity<String> responseEntity = new ResponseEntity<>(paymentString, HttpStatus.OK);
@@ -56,8 +55,8 @@ public class PaymentServiceTest {
         when(tossPaymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
         when(paymentRepository.save(payment)).thenReturn(payment);
 
-        Payment resultPayment = paymentService.process(paymentProcessRequest);
-        assertThat(resultPayment.getPaymentKey()).isEqualTo(payment.getPaymentKey());
+        PaymentResponse paymentResponse = paymentService.process(paymentProcessRequest);
+        assertThat(paymentResponse.paymentKey()).isEqualTo(payment.getPaymentKey());
         verify(tossPaymentRestClient, times(1)).getPaymentResponse(paymentProcessRequest);
     }
 }
