@@ -124,7 +124,7 @@ class ThemeServiceTest {
             // given
             final Long id = 1L;
             final Theme theme = themeWithId(1L, new Theme("로키", "로키로키", "http://www.google.com"));
-            given(themeRepository.findById(id))
+            given(themeRepository.findByIdForUpdate(id))
                     .willReturn(Optional.of(theme));
             given(reservationService.existsByTheme(theme))
                     .willReturn(false);
@@ -141,7 +141,7 @@ class ThemeServiceTest {
         void deleteById2() {
             // given
             final Long id = 1L;
-            given(themeRepository.findById(id))
+            given(themeRepository.findByIdForUpdate(id))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -156,7 +156,7 @@ class ThemeServiceTest {
             // given
             final Long id = 1L;
             final Theme theme = themeWithId(id, new Theme("로키", "로키로키", "http://www.google.com"));
-            given(themeRepository.findById(id))
+            given(themeRepository.findByIdForUpdate(id))
                     .willReturn(Optional.of(theme));
             given(reservationService.existsByTheme(theme))
                     .willReturn(true);

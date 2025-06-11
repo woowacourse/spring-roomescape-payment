@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'nextstep'
@@ -35,8 +36,26 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 test {
     useJUnitPlatform()
+}
+
+asciidoctor {
+    sourceDir 'src/docs/asciidoc'
+    attributes  \
+         'snippets': file('build/generated-snippets')
+}
+
+task copyRestDocs(type: Copy) {
+    dependsOn 'asciidoctor'
+    from("${buildDir}/docs/asciidoc")
+    into("src/main/resources/static/docs")
+}
+
+// test 끝나면 자동 실행
+tasks.named('test') {
+    finalizedBy 'copyRestDocs'
 }

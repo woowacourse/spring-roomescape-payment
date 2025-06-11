@@ -57,7 +57,7 @@ class WaitingServiceTest {
         Long waitingId = 1L;
         Waiting waiting = waitingWithId(waitingId, new Waiting(schedule, member, LocalDateTime.now()));
 
-        given(waitingRepository.findById(waitingId))
+        given(waitingRepository.findByIdForUpdate(waitingId))
                 .willReturn(Optional.of(waiting));
 
         // when & then
@@ -73,7 +73,7 @@ class WaitingServiceTest {
         Long waitingId = 1L;
         Waiting waiting = waitingWithId(waitingId, new Waiting(schedule, member, LocalDateTime.now()));
 
-        given(waitingRepository.findById(waitingId))
+        given(waitingRepository.findByIdForUpdate(waitingId))
                 .willReturn(Optional.of(waiting));
 
         // when & then

@@ -5,17 +5,26 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.JwtProvider;
 import roomescape.auth.TokenBody;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.member.MemberRole;
+import roomescape.reservationpayment.dto.ReservationPaymentResponse;
+import roomescape.reservationtime.dto.ReservationTimeResponse;
+import roomescape.schedule.dto.ScheduleResponse;
+import roomescape.theme.dto.ThemeResponse;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +33,17 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookingController.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 class BookingControllerTest {
 
     @Autowired
@@ -69,9 +84,22 @@ class BookingControllerTest {
         given(jwtProvider.isValidToken(any())).willReturn(true);
         given(jwtProvider.extractBody(any())).willReturn(new TokenBody(claims));
 
+        ScheduleResponse scheduleResponse1 = new ScheduleResponse(
+                1L,
+                LocalDate.now().plusDays(1),
+                new ReservationTimeResponse(1L, LocalTime.of(10, 0)),
+                new ThemeResponse(1L, "듄", "사막 행성에서 살아남기", "timothee.jpg"));
+        ScheduleResponse scheduleResponse2 = new ScheduleResponse(
+                2L,
+                LocalDate.now().plusDays(2),
+                new ReservationTimeResponse(1L, LocalTime.of(10, 0)),
+                new ThemeResponse(1L, "위키드", "감동적인 이야기", "galinda.jpg"));
+
+        ReservationPaymentResponse paymentResponse = new ReservationPaymentResponse("pid-12345", 15000L);
+
         List<BookingResponse> responses = List.of(
-                new BookingResponse(1L, null, "예약"),
-                new BookingResponse(2L, null, "1번째 예약대기")
+                new BookingResponse(1L, scheduleResponse1, "예약", paymentResponse),
+                new BookingResponse(2L, scheduleResponse2, "1번째 예약대기", null)
         );
 
         given(bookingService.readAllByMember(any(LoginMember.class))).willReturn(responses);
@@ -83,7 +111,28 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].status").value("예약"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"));
+                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"))
+                .andDo(document("read-bookings-of-member",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 ID"),
+                                fieldWithPath("[].status").description("예약 상태"),
+                                fieldWithPath("[].schedule").description("예약 스케줄 정보"),
+                                fieldWithPath("[].schedule.id").description("스케줄 ID"),
+                                fieldWithPath("[].schedule.date").description("예약 날짜"),
+                                fieldWithPath("[].schedule.time").description("예약 시간 정보"),
+                                fieldWithPath("[].schedule.time.id").description("시간 ID"),
+                                fieldWithPath("[].schedule.time.startAt").description("시작 시간"),
+                                fieldWithPath("[].schedule.theme").description("예약 테마 정보"),
+                                fieldWithPath("[].schedule.theme.id").description("테마 ID"),
+                                fieldWithPath("[].schedule.theme.name").description("테마 이름"),
+                                fieldWithPath("[].schedule.theme.description").description("테마 설명"),
+                                fieldWithPath("[].schedule.theme.thumbnail").description("테마 썸네일 이미지 파일명"),
+                                fieldWithPath("[].payment").description("결제 정보").optional(),
+                                fieldWithPath("[].payment.paymentKey").description("결제 키").optional(),
+                                fieldWithPath("[].payment.amount").description("결제 금액").optional()
+                        )));
     }
 
     @Test
@@ -121,6 +170,9 @@ class BookingControllerTest {
         // when & then
         mockMvc.perform(get("/bookings")
                         .cookie(new Cookie("token", "invalid")))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andDo(document("read-bookings-of-member-unauthorized",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 }

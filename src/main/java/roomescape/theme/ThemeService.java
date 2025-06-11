@@ -1,6 +1,7 @@
 package roomescape.theme;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.ReservationService;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ThemeService {
 
     private static final int BETWEEN_DAY_START = 7;
@@ -33,6 +35,9 @@ public class ThemeService {
         );
 
         final Theme theme = themeRepository.save(notSavedTheme);
+        log.info("EVENT: THEME_CREATED, id={}. name={}",
+                theme.getId(),
+                theme.getName());
         return ThemeResponse.from(theme);
     }
 
@@ -61,11 +66,20 @@ public class ThemeService {
 
     @Transactional
     public void deleteById(final Long id) {
-        final Theme theme = getById(id);
+        final Theme theme = getByIdForUpdate(id);
         if (reservationService.existsByTheme(theme)) {
             throw new ThemeUsedException();
         }
 
         themeRepository.delete(theme);
+        log.info("EVENT: THEME_DELETED, id={}. name={}",
+                theme.getId(),
+                theme.getName());
     }
+
+    private Theme getByIdForUpdate(final Long id) {
+        return themeRepository.findByIdForUpdate(id)
+                .orElseThrow(ThemeNotFoundException::new);
+    }
+
 }

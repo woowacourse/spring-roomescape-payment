@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.external.tosspayment;
 
 import java.util.Optional;
 

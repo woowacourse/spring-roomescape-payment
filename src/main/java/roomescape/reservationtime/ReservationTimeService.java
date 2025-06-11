@@ -1,6 +1,7 @@
 package roomescape.reservationtime;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.ReservationService;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -32,6 +34,9 @@ public class ReservationTimeService {
 
         final ReservationTime reservationTime = new ReservationTime(request.startAt());
         final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
+        log.info("EVENT: RESERVATION_TIME_CREATED, id={}, startAt={}",
+                savedReservationTime.getId(),
+                savedReservationTime.getStartAt());
         return ReservationTimeResponse.from(savedReservationTime);
     }
 
@@ -69,19 +74,25 @@ public class ReservationTimeService {
 
     @Transactional
     public void deleteById(final Long id) {
-        final ReservationTime reservationTime = reservationTimeRepository.findById(id)
-                .orElseThrow(ReservationTimeNotFoundException::new);
-
+        final ReservationTime reservationTime = getByIdForUpdate(id);
         if (reservationService.existsByReservationTime(reservationTime)) {
             throw new ReservationTimeUsedException();
         }
 
         reservationTimeRepository.delete(reservationTime);
+        log.info("EVENT: RESERVATION_TIME_DELETED, id={}, startAt={}",
+                reservationTime.getId(),
+                reservationTime.getStartAt());
+    }
+
+    private ReservationTime getByIdForUpdate(final Long id) {
+        return reservationTimeRepository.findByIdForUpdate(id)
+                .orElseThrow(ReservationTimeNotFoundException::new);
     }
 
     private void validateDuplication(final ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            throw new ReservationTimeConflictException();
+            throw new ReservationTimeConflictException(request.startAt());
         }
     }
 }

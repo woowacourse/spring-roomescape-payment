@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeConflictException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeNotFoundException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeUsedException;
@@ -166,7 +167,7 @@ public class ReservationTimeServiceTest {
                     .willReturn(theme);
             given(reservationService.getAllByThemeAndDate(theme, targetDate))
                     .willReturn(List.of(
-                            new Reservation(null, savedSchedule))
+                            new Reservation(null, savedSchedule, ReservationStatus.PENDING))
                     );
 
             // when
@@ -210,7 +211,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById1() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.of(reservationTime));
             given(reservationService.existsByReservationTime(reservationTime))
                     .willReturn(false);
@@ -227,7 +228,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById2() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -241,7 +242,7 @@ public class ReservationTimeServiceTest {
         void deleteTimeById3() {
             // given
             final ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
-            given(reservationTimeRepository.findById(reservationTime.getId()))
+            given(reservationTimeRepository.findByIdForUpdate(reservationTime.getId()))
                     .willReturn(Optional.of(reservationTime));
             given(reservationService.existsByReservationTime(reservationTime))
                     .willReturn(true);

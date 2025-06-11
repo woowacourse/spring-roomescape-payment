@@ -1,6 +1,7 @@
 package roomescape.booking.reservation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
@@ -15,14 +16,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-
-    @Transactional
-    public void create(final Reservation reservation) {
-        reservationRepository.save(reservation);
-    }
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> getAll() {
@@ -31,9 +28,9 @@ public class ReservationService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public Reservation getById(final Long id) {
-        return reservationRepository.findById(id)
+    @Transactional
+    public Reservation getByIdForUpdate(final Long id) {
+        return reservationRepository.findByIdForUpdate(id)
                 .orElseThrow(ReservationNotFoundException::new);
     }
 
@@ -74,6 +71,23 @@ public class ReservationService {
 
     @Transactional
     public void deleteById(final Long id) {
+        Reservation reservation = getByIdForUpdate(id);
+        validateReservationStatusForDeletion(reservation);
+
         reservationRepository.deleteById(id);
+
+        log.info("EVENT: RESERVATION_DELETED, id={}, memberId={}, themeName={}, date={}, time={}",
+                id,
+                reservation.getMember().getId(),
+                reservation.getSchedule().getTheme().getName(),
+                reservation.getSchedule().getDate(),
+                reservation.getSchedule().getReservationTime().getStartAt());
+    }
+
+    private void validateReservationStatusForDeletion(final Reservation reservation) {
+        if (reservation.getReservationStatus() == ReservationStatus.CONFIRMED) {
+            log.warn("EVENT: RESERVATION_DELETED_FAILED - CONFIRMED_RESERVATION");
+            throw new IllegalArgumentException("예약이 이미 확정되어 취소할 수 없습니다.");
+        }
     }
 }

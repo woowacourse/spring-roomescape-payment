@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.external.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.RestClientConfiguration;
 import roomescape.exception.custom.reason.payment.PaymentException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossErrorResponse;
+import roomescape.external.tosspayment.TossPaymentClient;
+import roomescape.external.tosspayment.dto.PaymentConfirmRequest;
+import roomescape.external.tosspayment.dto.TossErrorResponse;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;

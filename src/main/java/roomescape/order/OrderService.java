@@ -2,6 +2,7 @@ package roomescape.order;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.Member;
@@ -12,6 +13,7 @@ import roomescape.schedule.ScheduleService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final ScheduleService scheduleService;
@@ -26,7 +28,10 @@ public class OrderService {
                 orderCreateRequest.themeId()
         );
         final Member member = memberService.getByEmail(loginMember.email());
-        final Order order = new Order(orderCreateRequest.id(), orderCreateRequest.amount(), PaymentStatus.WAITING, member, schedule);
-        orderRepository.save(order);
+        final Order order = new Order(orderCreateRequest.id(), orderCreateRequest.amount(), member, schedule);
+        Order savedOrder = orderRepository.save(order);
+        log.info("EVENT: ORDER_CREATED, memberId={}, amount={}",
+                savedOrder.getMember().getId(),
+                savedOrder.getAmount());
     }
 }

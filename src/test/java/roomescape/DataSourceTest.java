@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.booking.reservation.dto.ReservationResponse;
-import roomescape.payment.TossPaymentClient;
+import roomescape.external.tosspayment.TossPaymentClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -87,6 +87,7 @@ public class DataSourceTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM ORDERS");
+        jdbcTemplate.update("DELETE FROM RESERVATION_PAYMENT");
         jdbcTemplate.update("DELETE FROM RESERVATION");
         jdbcTemplate.update("DELETE FROM SCHEDULE");
         jdbcTemplate.update("DELETE FROM RESERVATION_TIME");
@@ -134,10 +135,10 @@ public class DataSourceTest {
         assertThat(reservations.size()).isEqualTo(count);
     }
 
-    @DisplayName("reservation 삽입, 삭제 검증")
+    @DisplayName("reservation 삽입, 삭제 검증 - 결제 완료된 예약은 삭제할 수 없음")
     @Test
     void 육단계() {
-        // given & when
+        // given
         givenCreateTheme();
         givenCreateReservationTime();
         givenCreateSchedule();
@@ -146,18 +147,15 @@ public class DataSourceTest {
         givenOrder(cookie);
         givenCreateReservation(cookie);
 
-        // then
+        // when
         Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
         assertThat(count).isEqualTo(1);
 
-        // given & when & then
+        // then
         RestAssured.given().port(port).log().all()
                 .when().delete("/reservations/1")
                 .then().log().all()
-                .statusCode(204);
-
-        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-        assertThat(countAfterDelete).isEqualTo(0);
+                .statusCode(400);
     }
 
     private void givenCreateReservationTime() {

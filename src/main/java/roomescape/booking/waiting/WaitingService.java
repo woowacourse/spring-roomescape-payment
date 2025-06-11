@@ -1,6 +1,7 @@
 package roomescape.booking.waiting;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
@@ -26,15 +28,27 @@ public class WaitingService {
 
     @Transactional
     public void deleteById(final Long id, LoginMember member) {
-        Waiting waiting = getById(id);
+        Waiting waiting = getByIdForUpdate(id);
         validateAuthorization(member, waiting);
         waitingRepository.delete(waiting);
+        log.info("EVENT: WAITING_DELETED_BY_MEMBER, id={}, memberId={}, themeId={}, date={}, time={}",
+                waiting.getId(),
+                waiting.getMember().getId(),
+                waiting.getSchedule().getId(),
+                waiting.getSchedule().getDate(),
+                waiting.getSchedule().getReservationTime().getStartAt());
     }
 
     @Transactional
     public void deleteByIdForAdmin(final Long id) {
-        Waiting waiting = getById(id);
+        Waiting waiting = getByIdForUpdate(id);
         waitingRepository.delete(waiting);
+        log.info("EVENT: WAITING_DELETED_BY_ADMIN, id={}, memberId={}, themeId={}, date={}, time={}",
+                waiting.getId(),
+                waiting.getMember().getId(),
+                waiting.getSchedule().getId(),
+                waiting.getSchedule().getDate(),
+                waiting.getSchedule().getReservationTime().getStartAt());
     }
 
     @Transactional(readOnly = true)
@@ -50,6 +64,12 @@ public class WaitingService {
     @Transactional
     public void delete(final Waiting waiting) {
         waitingRepository.delete(waiting);
+        log.info("EVENT: WAITING_DELETED, id={}, memberId={}, themeId={}, date={}, time={}",
+                waiting.getId(),
+                waiting.getMember().getId(),
+                waiting.getSchedule().getId(),
+                waiting.getSchedule().getDate(),
+                waiting.getSchedule().getReservationTime().getStartAt());
     }
 
     @Transactional(readOnly = true)
@@ -69,8 +89,8 @@ public class WaitingService {
         }
     }
 
-    private Waiting getById(final Long id) {
-        return waitingRepository.findById(id)
+    private Waiting getByIdForUpdate(final Long id) {
+        return waitingRepository.findByIdForUpdate(id)
                 .orElseThrow(WaitingNotFoundException::new);
     }
 }

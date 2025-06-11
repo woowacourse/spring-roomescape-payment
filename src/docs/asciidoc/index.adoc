@@ -1,0 +1,167 @@
+= 사용자 예약 페이지에 사용하는 API 문서
+:toc: left
+:toclevels: 2
+
+== 예약 API
+
+=== 예약 생성
+
+==== HTTP Request
+include::{snippets}/create-reservation/http-request.adoc[]
+
+==== Request Fields
+include::{snippets}/create-reservation/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/create-reservation/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/create-reservation/response-fields.adoc[]
+
+==== cURL Example
+include::{snippets}/create-reservation/curl-request.adoc[]
+
+=== 예약 생성 실패 - 인증 실패
+
+인증되지 않은 사용자가 예약을 시도하는 경우
+
+==== HTTP request
+include::{snippets}/create-reservation-unauthorized/http-request.adoc[]
+==== Request Fields
+include::{snippets}/create-reservation-unauthorized/request-fields.adoc[]
+==== HTTP response
+include::{snippets}/create-reservation-unauthorized/http-response.adoc[]
+==== cURL Example
+include::{snippets}/create-reservation-unauthorized/curl-request.adoc[]
+
+=== 예약 삭제
+
+==== HTTP request
+include::{snippets}/delete-reservation/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-reservation/http-response.adoc[]
+==== cURL Example
+include::{snippets}/delete-reservation/curl-request.adoc[]
+
+
+== 예약 시간 API
+
+=== 예약 시간 생성
+
+==== HTTP request
+include::{snippets}/create-time/http-request.adoc[]
+==== Request Fields
+include::{snippets}/create-time/request-fields.adoc[]
+==== HTTP response
+include::{snippets}/create-time/http-response.adoc[]
+==== Response Fields
+include::{snippets}/create-time/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/create-time/curl-request.adoc[]
+
+=== 모든 예약 시간 조회
+
+==== HTTP request
+include::{snippets}/read-times/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-times/http-response.adoc[]
+==== Response Fields
+include::{snippets}/read-times/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/read-times/curl-request.adoc[]
+
+=== 예약 가능한 시간 조회
+
+날짜, 시간에 대해 예약 가능 여부를 포함한 시간들을 응답하는 api
+
+==== HTTP request
+include::{snippets}/read-available-times/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-available-times/http-response.adoc[]
+==== Response Fields
+include::{snippets}/read-available-times/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/read-available-times/curl-request.adoc[]
+
+=== 예약 시간 삭제
+
+==== HTTP request
+include::{snippets}/delete-time/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-time/http-response.adoc[]
+==== cURL Example
+include::{snippets}/delete-time/curl-request.adoc[]
+
+== 테마 API
+
+=== 테마 생성
+
+==== HTTP request
+include::{snippets}/create-theme/http-request.adoc[]
+==== Request Fields
+include::{snippets}/create-theme/request-fields.adoc[]
+==== HTTP response
+include::{snippets}/create-theme/http-response.adoc[]
+==== Response Fields
+include::{snippets}/create-theme/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/create-theme/curl-request.adoc[]
+
+=== 모든 테마 조회
+
+==== HTTP request
+include::{snippets}/read-themes/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-themes/http-response.adoc[]
+==== Response Fields
+include::{snippets}/read-themes/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/read-themes/curl-request.adoc[]
+
+=== 인기 테마 조회
+
+최근 일주일간 예약 수가 가장 많은 상위 10개의 테마 조회
+
+==== HTTP request
+include::{snippets}/read-popular-themes/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-popular-themes/http-response.adoc[]
+==== Response Fields
+include::{snippets}/read-popular-themes/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/read-popular-themes/curl-request.adoc[]
+
+=== 테마 삭제
+
+==== HTTP request
+include::{snippets}/delete-theme/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-theme/http-response.adoc[]
+==== cURL Example
+include::{snippets}/delete-theme/curl-request.adoc[]
+
+== 예약 및 대기 API
+
+=== 예약 및 대기 조회
+
+특정 회원의 예약 목록과 대기 목록을 모두 조회
+
+==== HTTP request
+include::{snippets}/read-bookings-of-member/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-bookings-of-member/http-response.adoc[]
+==== Response Fields
+include::{snippets}/read-bookings-of-member/response-fields.adoc[]
+==== cURL Example
+include::{snippets}/read-bookings-of-member/curl-request.adoc[]
+
+=== 예약 및 대기 조회 실패 - 인증 실패
+
+인증되지 않은 사용자가 예약 및 대기를 조회하려는 경우
+
+==== HTTP request
+include::{snippets}/read-bookings-of-member-unauthorized/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-bookings-of-member-unauthorized/http-response.adoc[]
+==== cURL Example
+include::{snippets}/read-bookings-of-member-unauthorized/curl-request.adoc[]

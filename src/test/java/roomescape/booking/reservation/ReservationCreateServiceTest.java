@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
-import roomescape.booking.reservation.dto.ReservationPaymentRequest;
+import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
@@ -19,9 +19,8 @@ import roomescape.member.MemberRole;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.order.PaymentStatus;
-import roomescape.payment.TossPaymentAdapter;
-import roomescape.payment.dto.TossPaymentConfirmCommand;
+import roomescape.reservationpayment.ReservationPaymentService;
+import roomescape.reservationpayment.dto.ReservationPaymentRequest;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -49,9 +48,7 @@ public class ReservationCreateServiceTest {
     @Mock
     private OrderReader orderReader;
     @Mock
-    private TossPaymentAdapter paymentAdapter;
-    @Mock
-    private TossPaymentConfirmCommandFactory paymentConfirmCommandFactory;
+    private ReservationPaymentService reservationPaymentService;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -59,7 +56,7 @@ public class ReservationCreateServiceTest {
     @DisplayName("예약 생성")
     class Create {
 
-        private ReservationPaymentRequest request;
+        private ReservationRequest request;
         private LoginMember loginMember;
         private Member member;
         private Schedule schedule;
@@ -67,7 +64,7 @@ public class ReservationCreateServiceTest {
 
         @BeforeEach
         void setUp() {
-            request = new ReservationPaymentRequest(
+            request = new ReservationRequest(
                     LocalDate.now().plusDays(1),
                     1L,
                     1L,
@@ -80,14 +77,14 @@ public class ReservationCreateServiceTest {
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member(loginMember.email(), "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
         }
 
-        @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태는 CONFIRMED, 주문의 결제 상태가 SUCCESS로 변경되고, response 값을 반환한다.")
+        @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태가 CONFIRMED이 되고, response 값을 반환한다.")
         @Test
         void create1() {
             // given
-            Order order = new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule);
+            Order order = new Order(request.orderId(), request.amount(), member, schedule);
             given(orderReader.getById(request.orderId()))
                     .willReturn(order);
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
@@ -97,10 +94,8 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
-            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
-                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when
             final ReservationResponse response = reservationCreateService.create(request, loginMember);
@@ -108,7 +103,6 @@ public class ReservationCreateServiceTest {
             // then
             assertAll(
                     () -> assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED),
-                    () -> assertThat(order.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS),
                     () -> assertThat(response).isEqualTo(ReservationResponse.from(reservation))
             );
         }
@@ -118,7 +112,7 @@ public class ReservationCreateServiceTest {
         void create2() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                    .willReturn(new Order(request.orderId(), request.amount(), member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
@@ -137,16 +131,15 @@ public class ReservationCreateServiceTest {
         void create3() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                    .willReturn(new Order(request.orderId(), request.amount(), member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
-            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
-            given(reservationRepository.save(new Reservation(member, schedule)))
+            ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(request.orderId(), request.amount(), request.paymentKey(), reservation);
+            doThrow(new PaymentException("결제에 실패하였습니다.")).when(reservationPaymentService).confirmPayment(reservationPaymentRequest);
+            given(reservationRepository.save(new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
-            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
-                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when & then
             assertThatThrownBy(() -> reservationCreateService.create(request, loginMember))
@@ -170,7 +163,7 @@ public class ReservationCreateServiceTest {
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member("user@example.com", "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
         }
 
         @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
@@ -184,7 +177,7 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, ReservationStatus.PENDING)))
                     .willReturn(reservation);
 
             // when

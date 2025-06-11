@@ -1,6 +1,7 @@
 package roomescape.booking.waiting;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -8,7 +9,7 @@ import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.waiting.dto.WaitingRequest;
 import roomescape.booking.waiting.dto.WaitingResponse;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsScheduleException;
-import roomescape.exception.custom.reason.schedule.PastScheduleException;
+import roomescape.exception.custom.reason.waiting.WaitingPastScheduleException;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.schedule.Schedule;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WaitingCreateService {
 
     private final WaitingRepository waitingRepository;
@@ -38,19 +40,26 @@ public class WaitingCreateService {
     private Waiting saveWaiting(final LoginMember loginMember, final Schedule schedule) {
         final Member member = memberService.getByEmail(loginMember.email());
         final Waiting waiting = new Waiting(schedule, member, LocalDateTime.now());
-        return waitingRepository.save(waiting);
+        Waiting savedWaiting = waitingRepository.save(waiting);
+        log.info("EVENT: WAITING_CREATED, id={}, memberId={}, themeId={}, date={}, time={}",
+                savedWaiting.getId(),
+                savedWaiting.getMember().getId(),
+                savedWaiting.getSchedule().getId(),
+                savedWaiting.getSchedule().getDate(),
+                savedWaiting.getSchedule().getReservationTime().getStartAt());
+        return savedWaiting;
     }
 
     private void validatePast(final Schedule schedule) {
         if (schedule.isPast()) {
-            throw new PastScheduleException();
+            throw new WaitingPastScheduleException(schedule.getDate(), schedule.getReservationTime().getStartAt());
         }
     }
 
     private void validateExistsReservationAboutSchedule(final Schedule schedule) {
         boolean isReservationExist = reservationService.existsBySchedule(schedule);
         if (!isReservationExist) {
-            throw new ReservationNotExistsScheduleException();
+            throw new ReservationNotExistsScheduleException(schedule.getDate(), schedule.getReservationTime().getStartAt());
         }
     }
 }

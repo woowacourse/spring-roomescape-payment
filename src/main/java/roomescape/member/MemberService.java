@@ -1,6 +1,7 @@
 package roomescape.member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.member.MemberEmailConflictException;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -21,7 +23,8 @@ public class MemberService {
         validateDuplication(request);
 
         final Member notSavedMember = new Member(request.email(), request.password(), request.name(), MemberRole.MEMBER);
-        memberRepository.save(notSavedMember);
+        Member member = memberRepository.save(notSavedMember);
+        log.info("EVENT: MEMBER_SIGNED_UP, id={}", member.getId());
     }
 
     @Transactional(readOnly = true)

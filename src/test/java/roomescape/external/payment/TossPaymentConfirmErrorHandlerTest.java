@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.external.payment;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import roomescape.exception.custom.reason.payment.PaymentException;
+import roomescape.external.tosspayment.TossPaymentConfirmErrorHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

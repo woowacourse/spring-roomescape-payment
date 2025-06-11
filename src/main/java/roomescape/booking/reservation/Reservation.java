@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.Member;
-import roomescape.order.Order;
 import roomescape.schedule.Schedule;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -31,14 +30,8 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    @OneToOne(fetch = LAZY)
-    private Order order;
-
-    public Reservation(final Member member, final Schedule schedule) {
-        this.member = member;
-        this.schedule = schedule;
-        this.reservationStatus = ReservationStatus.CONFIRMED;
-    }
+    @Column(nullable = true)
+    private String orderId;
 
     public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus) {
         this.member = member;
@@ -46,11 +39,11 @@ public class Reservation {
         this.reservationStatus = reservationStatus;
     }
 
-    public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus, final Order order) {
+    public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus, final String orderId) {
         this.member = member;
         this.schedule = schedule;
         this.reservationStatus = reservationStatus;
-        this.order = order;
+        this.orderId = orderId;
     }
 
     public void markStatusAsConfirmed() {

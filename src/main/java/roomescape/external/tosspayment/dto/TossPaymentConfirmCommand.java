@@ -1,4 +1,4 @@
-package roomescape.payment.dto;
+package roomescape.external.tosspayment.dto;
 
 public record TossPaymentConfirmCommand(
         String orderId,

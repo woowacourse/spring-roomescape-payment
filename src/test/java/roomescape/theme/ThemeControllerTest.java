@@ -5,11 +5,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.JwtProvider;
 import roomescape.auth.TokenBody;
@@ -27,10 +30,15 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ThemeController.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 class ThemeControllerTest {
 
     @Autowired
@@ -83,7 +91,21 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("테마명"))
                 .andExpect(jsonPath("$.description").value("테마 설명"))
-                .andExpect(jsonPath("$.thumbnail").value("abc"));
+                .andExpect(jsonPath("$.thumbnail").value("abc"))
+                .andDo(document("create-theme",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 이미지 파일명")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("테마 ID"),
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test
@@ -91,8 +113,8 @@ class ThemeControllerTest {
     void readAll() throws Exception {
         // given
         List<ThemeResponse> responses = List.of(
-                new ThemeResponse(1L, "테마1", "설명1", "abc"),
-                new ThemeResponse(2L, "테마2", "설명2", "abc")
+                new ThemeResponse(1L, "듄2", "사막 행성에서 살아남기", "timothee.jpg"),
+                new ThemeResponse(2L, "위키드", "감동적인 이야기", "galinda.jpg")
         );
         given(themeService.getAll()).willReturn(responses);
 
@@ -100,9 +122,18 @@ class ThemeControllerTest {
         mockMvc.perform(get("/themes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("테마1"))
+                .andExpect(jsonPath("$[0].name").value("듄2"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("테마2"));
+                .andExpect(jsonPath("$[1].name").value("위키드"))
+                .andDo(document("read-themes",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 ID"),
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test
@@ -135,7 +166,16 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("인기테마1"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("인기테마2"));
+                .andExpect(jsonPath("$[1].name").value("인기테마2"))
+                .andDo(document("read-popular-themes",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 ID"),
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 이미지 파일명")
+                        )));
     }
 
     @Test
@@ -143,7 +183,10 @@ class ThemeControllerTest {
     void deleteById() throws Exception {
         // when & then
         mockMvc.perform(delete("/themes/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-theme",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
 
         verify(themeService).deleteById(1L);
     }

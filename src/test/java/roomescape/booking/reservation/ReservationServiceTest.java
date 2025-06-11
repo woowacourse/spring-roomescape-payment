@@ -1,5 +1,6 @@
 package roomescape.booking.reservation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,11 @@ import roomescape.theme.Theme;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static roomescape.util.TestFactory.*;
 
@@ -59,7 +63,7 @@ public class ReservationServiceTest {
             Schedule schedule = new Schedule(date, reservationTime, theme);
             Member member = memberWithId(1L, new Member("boogie", "password", "boogie", MemberRole.MEMBER));
 
-            Reservation reservation = new Reservation(member, schedule);
+            Reservation reservation = new Reservation(member, schedule, ReservationStatus.PENDING);
             given(reservationRepository.findAll())
                     .willReturn(List.of(reservationWithId(1L, reservation)));
 
@@ -69,7 +73,6 @@ public class ReservationServiceTest {
             // then
             assertThat(actual).hasSize(1);
         }
-
     }
 
     @Nested
@@ -111,8 +114,8 @@ public class ReservationServiceTest {
             Schedule schedule2 = new Schedule(LocalDate.of(2024, 6, 14), reservationTime, theme);
             given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(request.memberId(), request.themeId(), request.from(), request.to()))
                     .willReturn(List.of(
-                            reservationWithId(1L, new Reservation(member, schedule1)),
-                            reservationWithId(1L, new Reservation(member, schedule2))
+                            reservationWithId(1L, new Reservation(member, schedule1, ReservationStatus.PENDING)),
+                            reservationWithId(1L, new Reservation(member, schedule2, ReservationStatus.PENDING))
                     ));
 
             // when
@@ -121,6 +124,46 @@ public class ReservationServiceTest {
 
             // then
             assertThat(responses).hasSize(2);
+        }
+    }
+
+    @DisplayName("예약 삭제")
+    @Nested
+    class DeleteReservation {
+
+        @Test
+        @DisplayName("예약이 확정 상태가 아닌 경우 삭제할 수 있다")
+        void deleteReservation1() {
+            // given
+            LocalDate date = LocalDate.of(2024, 1, 1);
+            ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
+            Theme theme = themeWithId(1L, new Theme("야당", "야당당", "123"));
+            Schedule schedule = new Schedule(date, reservationTime, theme);
+            Member member = memberWithId(1L, new Member("boogie", "password", "boogie", MemberRole.MEMBER));
+
+            Reservation reservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
+            // when
+            given(reservationRepository.findByIdForUpdate(any()))
+                    .willReturn(Optional.of(reservation));
+
+            // then
+            Assertions.assertDoesNotThrow(() -> reservationService.deleteById(reservation.getId()));
+        }
+
+        @Test
+        @DisplayName("예약이 확정 상태일 때 삭제하려는 경우 예외를 발생시킨다.")
+        void deleteReservation2() {
+            // given
+            Reservation reservation = new Reservation(null, null, ReservationStatus.CONFIRMED);
+
+            // when
+            given(reservationRepository.findByIdForUpdate(any()))
+                    .willReturn(Optional.of(reservation));
+
+            // then
+            assertThatThrownBy(() -> reservationService.deleteById(reservation.getId()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("예약이 이미 확정되어 취소할 수 없습니다.");
         }
     }
 }

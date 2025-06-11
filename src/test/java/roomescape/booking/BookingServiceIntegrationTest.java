@@ -71,9 +71,9 @@ class BookingServiceIntegrationTest {
     void changeFirstWaitingToReservation() {
         // given
         waitingRepository.save(new Waiting(schedule, member, LocalDateTime.now()));
-        Reservation reservation = reservationRepository.save(new Reservation(member, schedule, ReservationStatus.CONFIRMED));
+        Reservation reservation = reservationRepository.save(new Reservation(member, schedule, ReservationStatus.PENDING));
 
-        // whenR
+        // when
         bookingService.deleteReservationById(reservation.getId());
 
         // then

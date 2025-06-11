@@ -7,7 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.booking.dto.PromotingReservationRequest;
 import roomescape.booking.reservation.Reservation;
+import roomescape.booking.reservation.ReservationCreateService;
 import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
@@ -32,6 +34,8 @@ class BookingServiceTest {
     @Mock
     private ReservationService reservationService;
     @Mock
+    private ReservationCreateService reservationCreateService;
+    @Mock
     private WaitingService waitingService;
     @InjectMocks
     private BookingService bookingService;
@@ -52,8 +56,8 @@ class BookingServiceTest {
     void changeFirstWaitingToReservation() {
         // given
         Waiting firstWaiting = waitingWithId(1L, new Waiting(schedule, member, LocalDateTime.now()));
-        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule));
-        given(reservationService.getById(1L)).willReturn(reservation);
+        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule, ReservationStatus.PENDING));
+        given(reservationService.getByIdForUpdate(1L)).willReturn(reservation);
         given(waitingService.existsBySchedule(schedule)).willReturn(true);
         given(waitingService.findFirstWaitingOfSchedule(schedule)).willReturn(firstWaiting);
 
@@ -61,7 +65,6 @@ class BookingServiceTest {
         bookingService.deleteReservationById(1L);
 
         // then
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
+        then(reservationCreateService).should().promote(PromotingReservationRequest.from(firstWaiting));
     }
 }
