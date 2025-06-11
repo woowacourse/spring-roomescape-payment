@@ -16,5 +16,4 @@ public class ApprovalCommandServiceProvider {
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 승인 방식입니다: " + approval.getType()));
     }
-
 }

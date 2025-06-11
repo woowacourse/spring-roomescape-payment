@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.theme.exception.InvalidPriceException;
 
 @Entity
 @Getter
@@ -35,6 +36,13 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        validatePrice(price);
         this.price = price;
+    }
+
+    private void validatePrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidPriceException();
+        }
     }
 }
