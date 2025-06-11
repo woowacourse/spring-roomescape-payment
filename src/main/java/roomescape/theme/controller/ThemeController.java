@@ -6,17 +6,10 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.theme.service.ThemeService;
 import roomescape.theme.service.dto.request.ThemeRequest;
 import roomescape.theme.service.dto.response.ThemeResponse;
-import roomescape.waiting.controller.WaitingController;
 
 import java.net.URI;
 import java.util.List;
@@ -26,7 +19,7 @@ import java.util.List;
 @Tag(name = "테마 컨트롤러", description = "테마 관련 API 모음")
 public class ThemeController {
 
-    private static final Logger log = LoggerFactory.getLogger(WaitingController.class);
+    private static final Logger log = LoggerFactory.getLogger(ThemeController.class);
 
     private final ThemeService themeService;
 
