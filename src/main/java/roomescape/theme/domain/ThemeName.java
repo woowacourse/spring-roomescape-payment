@@ -19,11 +19,9 @@ public record ThemeName(
     public ThemeName(final String name) {
         this.name = Objects.requireNonNull(name, "name은 null일 수 없습니다.");
         if (name.isBlank()) {
-            log.warn("[VALIDATION-FAIL] 테마 이름 공백");
             throw new BadRequestException("name은 공백일 수 없습니다.");
         }
         if (name.length() > MAX_NAME_LENGTH) {
-            log.warn("[VALIDATION-FAIL] 테마 이름 길이 초과");
             throw new BadRequestException("name은 " + MAX_NAME_LENGTH + "자 이내여야 합니다.");
         }
     }

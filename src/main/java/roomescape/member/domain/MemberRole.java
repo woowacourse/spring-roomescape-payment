@@ -21,10 +21,7 @@ public enum MemberRole {
         return Arrays.stream(values())
                 .filter(role -> role.types.contains(roleName))
                 .findFirst()
-                .orElseThrow(() -> {
-                    log.warn("[ROLE-MAP] 존재하지 않는 권한 요청: {}", roleName);
-                    return new AccessDeniedException("존재하지 않는 권한입니다.");
-                });
+                .orElseThrow(() -> new AccessDeniedException("존재하지 않는 권한입니다."));
     }
 
     public String getPrimaryType() {

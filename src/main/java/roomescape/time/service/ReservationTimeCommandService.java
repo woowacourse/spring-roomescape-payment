@@ -27,7 +27,6 @@ public class ReservationTimeCommandService {
     @Transactional
     public ReservationTime createReservationTime(LocalTime time) {
         if (reservationTimeRepository.existsByStartAt(time)) {
-            log.warn("[CREATE-TIME-FAIL] 이미 존재하는 시간 - time: {}", time);
             throw new BadRequestException("이미 존재하는 시간입니다.");
         }
         return reservationTimeRepository.save(new ReservationTime(null, time));
@@ -36,7 +35,6 @@ public class ReservationTimeCommandService {
     @Transactional
     public void deleteTimeById(final Long timeId) {
         if (reservationQueryService.existsReservationInTime(timeId)) {
-            log.warn("[DELETE-TIME-FAIL] 예약 존재로 삭제 불가 - timeId: {}", timeId);
             throw new BadRequestException("해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(timeId);

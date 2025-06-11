@@ -37,8 +37,6 @@ public class ReservationDateTime {
         LocalDateTime now = LocalDateTime.now(clock);
 
         if (reservationDateTime.isBefore(now)) {
-            log.warn("[INVALID-RESERVATION] 과거 예약 시도 - 예약시간: {}, 현재시간: {}",
-                    reservationDateTime, now);
             throw new BadRequestException("현재 시간 이후로만 예약할 수 있습니다.");
         }
     }

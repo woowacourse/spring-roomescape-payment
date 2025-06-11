@@ -31,20 +31,11 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            log.warn("[AUTH-FAIL] 세션 없음 - 로그인 필요. 요청 URI: {}, IP: {}, Method: {}",
-                    request.getRequestURI(),
-                    request.getRemoteAddr(),
-                    request.getMethod());
             throw new AuthenticationException("로그인이 필요합니다.");
         }
 
         SessionMember sessionMember = (SessionMember) session.getAttribute("LOGIN_MEMBER");
         if (sessionMember == null) {
-            log.warn("[AUTH-FAIL] 로그인 정보 없음 - 로그인 필요. 요청 URI: {}, sessionId: {}, IP: {}, Method: {}",
-                    request.getRequestURI(),
-                    session.getId(),
-                    request.getRemoteAddr(),
-                    request.getMethod());
             throw new AuthenticationException("로그인이 필요합니다.");
         }
         return sessionMember;

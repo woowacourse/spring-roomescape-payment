@@ -24,17 +24,14 @@ public record MemberEmail(
         this.email = Objects.requireNonNull(email, "email은 null이 아니어야 합니다.");
 
         if (email.isBlank()) {
-            log.warn("[VALIDATION-FAIL] 이메일 공백");
             throw new BadRequestException("email은 공백일 수 없습니다.");
         }
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            log.warn("[VALIDATION-FAIL] 이메일 형식 오류");
             throw new BadRequestException("올바른 이메일 형식이 아닙니다: " + email);
         }
 
         if (email.length() > MAXIMUM_EMAIL_LENGTH) {
-            log.warn("[VALIDATION-FAIL] 이메일 길이 초과");
             throw new BadRequestException("email은 40자 이하여야 합니다.");
         }
     }

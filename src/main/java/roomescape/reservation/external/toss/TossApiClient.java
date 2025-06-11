@@ -2,7 +2,6 @@ package roomescape.reservation.external.toss;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -34,9 +33,6 @@ public class TossApiClient {
                     .body(TossPaymentResponse.class);
         }
         catch (RestClientResponseException e) {
-            log.warn("[TOSS-ERROR] 외부 API 응답 오류 - 상태코드: {}, 응답내용: {}",
-                    e.getStatusCode(), e.getResponseBodyAsString(), e);
-
             TossErrorResponse tossErrorResponse = parseErrorResponse(e.getResponseBodyAsString());
 
             throw new ExternalApiException(new ErrorCode(

@@ -19,7 +19,6 @@ public record ThemeThumbnail(
     public ThemeThumbnail(final String thumbnail) {
         this.thumbnail = Objects.requireNonNull(thumbnail, "thumbnail은 null일 수 없습니다.");
         if (thumbnail.length() > MAX_THUMBNAIL_LENGTH) {
-            log.warn("[VALIDATION-FAIL] 테마 썸네일 길이 초과");
             throw new BadRequestException("thumbnail은 " + MAX_THUMBNAIL_LENGTH + "자 이내여야 합니다.");
         }
     }

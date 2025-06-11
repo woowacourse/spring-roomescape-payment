@@ -27,7 +27,6 @@ public record MemberPassword(
     public MemberPassword(final String password) {
         this.password = Objects.requireNonNull(password, "비밀번호가 유효하지 않습니다.");
         if (password.isBlank() || password.length() > MAXIMUM_PASSWORD_LENGTH) {
-            log.warn("[VALIDATION-FAIL] 비밀번호 공백 또는 길이 초과");
             throw new BadRequestException("비밀번호가 유효하지 않습니다.");
         }
         validatePasswordPattern(password);
@@ -37,16 +36,6 @@ public record MemberPassword(
         long digitCount = DIGIT_PATTERN.matcher(password).results().count();
         long specialCharCount = SPECIAL_CHAR_PATTERN.matcher(password).results().count();
         long letterCount = LETTER_PATTERN.matcher(password).results().count();
-
-        if (digitCount < MINIMUM_DIGIT_COUNT) {
-            log.warn("[VALIDATION-FAIL] 비밀번호 숫자 개수 부족");
-        }
-        if (specialCharCount < MINIMUM_SPECIAL_CHAR_COUNT) {
-            log.warn("[VALIDATION-FAIL] 비밀번호 특수문자 개수 부족");
-        }
-        if (letterCount < MINIMUM_LETTER_COUNT) {
-            log.warn("[VALIDATION-FAIL] 비밀번호 문자 개수 부족");
-        }
 
         if (digitCount < MINIMUM_DIGIT_COUNT
                 || specialCharCount < MINIMUM_SPECIAL_CHAR_COUNT

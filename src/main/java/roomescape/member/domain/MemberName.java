@@ -19,11 +19,9 @@ public record MemberName(
     public MemberName(final String name) {
         this.name = Objects.requireNonNull(name, "name은 null일 수 없습니다.");
         if (name.isBlank()) {
-            log.warn("[VALIDATION-FAIL] 이름 공백");
             throw new BadRequestException("사용자 이름은 공백일 수 없습니다.");
         }
         if (name.length() > MAXIMUM_NAME_LENGTH) {
-            log.warn("[VALIDATION-FAIL] 이름 길이 초과");
             throw new BadRequestException("사용자 이름은 5자 이하여야 합니다.");
         }
     }
