@@ -39,7 +39,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     ) {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         Cookie accessTokenCookie = getAcceccTokenCookie(request);
-        returjwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
+        return jwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
     }
 
     private Cookie getAcceccTokenCookie(HttpServletRequest request) {
