@@ -133,7 +133,7 @@ public class ReservationService {
     @Transactional
     public void deleteById(Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
-        approvalService.deleteByReservation(reservation);
+        reservation.ifPresent(approvalService::deleteByReservation);
         reservationRepository.deleteById(id);
         publishDeleteEvent(reservation);
     }

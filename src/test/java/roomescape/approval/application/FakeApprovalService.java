@@ -3,7 +3,6 @@ package roomescape.approval.application;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import roomescape.approval.domain.Approval;
 import roomescape.approval.domain.Onsite;
 import roomescape.reservation.domain.Reservation;
@@ -18,7 +17,7 @@ public class FakeApprovalService extends ApprovalService {
     }
 
     @Override
-    public void deleteByReservation(Optional<Reservation> reservation) {
+    public void deleteByReservation(Reservation reservation) {
     }
 
     @Override

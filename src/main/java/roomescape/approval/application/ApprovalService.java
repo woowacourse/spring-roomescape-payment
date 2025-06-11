@@ -1,7 +1,6 @@
 package roomescape.approval.application;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +24,8 @@ public class ApprovalService {
     }
 
     @Transactional
-    public void deleteByReservation(Optional<Reservation> reservation) {
-        reservation.ifPresent(approvalRepository::deleteByReservation);
+    public void deleteByReservation(Reservation reservation) {
+        approvalRepository.deleteByReservation(reservation);
     }
 
     public List<Approval> findAllByReservationIn(List<Reservation> reservations) {
