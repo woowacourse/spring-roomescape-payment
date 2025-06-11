@@ -6,14 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -36,6 +39,9 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private List<Payment> payments;
 
     public Reservation(
             final Long id,
@@ -88,4 +94,5 @@ public class Reservation {
     public LocalTime getStartAt() {
         return time.getStartAt();
     }
+
 }

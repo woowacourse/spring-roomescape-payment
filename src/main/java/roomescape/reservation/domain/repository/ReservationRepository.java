@@ -30,6 +30,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByMemberIdWithAssociations(@Param("memberId") Long memberId);
 
     @Query("""
+            SELECT r
+            FROM Reservation r
+            JOIN FETCH r.payments p
+            JOIN FETCH r.theme
+            JOIN FETCH r.time
+            WHERE r.member.id = :memberId
+            AND p.paymentStatus = 'SUCCESS'
+            """)
+    List<Reservation> findByMemberIdWithSuccessPayments(@Param("memberId") Long memberId);
+
+    @Query("""
             SELECT r FROM Reservation r
             JOIN FETCH r.time
             WHERE r.date = :date AND r.theme.id = :themeId

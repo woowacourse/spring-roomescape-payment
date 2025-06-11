@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MyHistoryResponse;
@@ -82,15 +81,12 @@ public class ReservationQueryService {
     public List<MyHistoryResponse> findMyReservation(final Long memberId) {
         final List<MyHistoryResponse> responses = new ArrayList<>();
 
-        final List<Reservation> reservations = reservationRepository.findByMemberIdWithAssociations(memberId);
+        final List<Reservation> reservations = reservationRepository.findByMemberIdWithSuccessPayments(memberId);
 
-        reservations.forEach(reservation -> {
-            Payment payment = paymentRepository.findByReservationIdAndPaymentStatus(
-                            reservation.getId(), PaymentStatus.SUCCESS)
-                    .orElseThrow(() -> new NotFoundException("결제 정보가 존재하지 않습니다."));
-
-            responses.add(MyHistoryResponse.ofReservation(reservation, payment));
-        });
+        reservations.forEach(reservation -> reservation.getPayments().stream()
+                .filter(Payment::isSuccess)
+                .findFirst()
+                .ifPresent(payment -> responses.add(MyHistoryResponse.ofReservation(reservation, payment))));
 
         final List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
         waitingWithRanks.forEach(w -> responses.add(MyHistoryResponse.ofWaiting(w.waiting(), w.rank())));

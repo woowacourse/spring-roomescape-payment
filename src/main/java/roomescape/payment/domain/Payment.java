@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
@@ -28,6 +29,7 @@ public class Payment {
 
     private BigDecimal amount;
 
+    @JoinColumn(name = "reservation_id")
     @ManyToOne
     private Reservation reservation;
 
@@ -77,5 +79,9 @@ public class Payment {
 
     public void removeReservation() {
         this.reservation = null;
+    }
+
+    public boolean isSuccess() {
+        return this.paymentStatus == PaymentStatus.SUCCESS;
     }
 }
