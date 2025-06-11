@@ -32,7 +32,6 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(LoginFailException.class)
     public ResponseEntity<String> handleLoginFailException(final LoginFailException e) {
-        log.warn("[로그인 실패]: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
