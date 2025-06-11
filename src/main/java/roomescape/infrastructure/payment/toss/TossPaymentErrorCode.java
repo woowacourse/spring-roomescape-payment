@@ -1,10 +1,7 @@
 package roomescape.infrastructure.payment.toss;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import java.util.Arrays;
 import org.springframework.http.HttpStatus;
@@ -56,43 +53,40 @@ public enum TossPaymentErrorCode implements ErrorCode {
             BAD_REQUEST, "아직 승인되지 않은 주문번호입니다."),
     EXCEED_MAX_MONTHLY_PAYMENT_AMOUNT(
             BAD_REQUEST, "당월 결제 가능금액인 1,000,000원을 초과 하셨습니다."),
-
-    UNAUTHORIZED_KEY(
-            UNAUTHORIZED, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
-
     REJECT_ACCOUNT_PAYMENT(
-            FORBIDDEN, "잔액부족으로 결제에 실패했습니다."),
+            BAD_REQUEST, "잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_PAYMENT(
-            FORBIDDEN, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
+            BAD_REQUEST, "한도초과 혹은 잔액부족으로 결제에 실패했습니다."),
     REJECT_CARD_COMPANY(
-            FORBIDDEN, "결제 승인이 거절되었습니다."),
-    FORBIDDEN_REQUEST(
-            FORBIDDEN, "허용되지 않은 요청입니다."),
+            BAD_REQUEST, "결제 승인이 거절되었습니다."),
     REJECT_TOSSPAY_INVALID_ACCOUNT(
-            FORBIDDEN, "선택하신 출금 계좌가 출금이체 등록이 되어 있지 않아요. 계좌를 다시 등록해 주세요."),
+            BAD_REQUEST, "선택하신 출금 계좌가 출금이체 등록이 되어 있지 않아요. 계좌를 다시 등록해 주세요."),
     EXCEED_MAX_AUTH_COUNT(
-            FORBIDDEN, "최대 인증 횟수를 초과했습니다. 카드사로 문의해주세요."),
+            BAD_REQUEST, "최대 인증 횟수를 초과했습니다. 카드사로 문의해주세요."),
     EXCEED_MAX_ONE_DAY_AMOUNT(
-            FORBIDDEN, "일일 한도를 초과했습니다."),
+            BAD_REQUEST, "일일 한도를 초과했습니다."),
     NOT_AVAILABLE_BANK(
-            FORBIDDEN, "은행 서비스 시간이 아닙니다."),
+            BAD_REQUEST, "은행 서비스 시간이 아닙니다."),
     INVALID_PASSWORD(
-            FORBIDDEN, "결제 비밀번호가 일치하지 않습니다."),
-    INCORRECT_BASIC_AUTH_FORMAT(
-            FORBIDDEN, "잘못된 요청입니다. ':' 를 포함해 인코딩해주세요."),
+            BAD_REQUEST, "결제 비밀번호가 일치하지 않습니다."),
     FDS_ERROR(
-            FORBIDDEN, "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다."),
+            BAD_REQUEST, "[토스페이먼츠] 위험거래가 감지되어 결제가 제한됩니다. 발송된 문자에 포함된 링크를 통해 본인인증 후 결제가 가능합니다."),
 
-    NOT_FOUND_PAYMENT(NOT_FOUND, "존재하지 않는 결제 정보 입니다."),
-    NOT_FOUND_PAYMENT_SESSION(NOT_FOUND, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
 
+    NOT_FOUND_PAYMENT_SESSION(INTERNAL_SERVER_ERROR, "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
+    NOT_FOUND_PAYMENT(INTERNAL_SERVER_ERROR, "존재하지 않는 결제 정보 입니다."),
+    INCORRECT_BASIC_AUTH_FORMAT(
+            INTERNAL_SERVER_ERROR, "잘못된 요청입니다. ':' 를 포함해 인코딩해주세요."),
+    UNAUTHORIZED_KEY(
+            INTERNAL_SERVER_ERROR, "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."),
+    FORBIDDEN_REQUEST(
+            INTERNAL_SERVER_ERROR, "허용되지 않은 요청입니다."),
     FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING(
             INTERNAL_SERVER_ERROR, "결제가 완료되지 않았어요. 다시 시도해주세요."),
     FAILED_INTERNAL_SYSTEM_PROCESSING(
             INTERNAL_SERVER_ERROR, "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."),
     UNKNOWN_PAYMENT_ERROR(
             INTERNAL_SERVER_ERROR, "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."),
-
     UNKNOWN(
             INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다.");
 

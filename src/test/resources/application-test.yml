@@ -1,10 +1,12 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  config:
+    import: classpath:application-secrets-test.yml
+
   datasource:
-    url: jdbc:h2:mem:database-test
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+
   jpa:
     show-sql: true
     properties:
@@ -18,7 +20,6 @@ spring:
       mode: always
       data-locations: classpath:testData.sql
 
-payment:
-  toss:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-    base-url: https://api.tosspayments.com/
+logging:
+  level:
+    root: off

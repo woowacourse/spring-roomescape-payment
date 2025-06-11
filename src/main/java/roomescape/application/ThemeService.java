@@ -3,29 +3,33 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThemeService {
 
     private static final int MAX_THEME_FETCH_COUNT = 5;
 
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservationRepository;
     private final ThemeRepository themeRepository;
 
     @Transactional
     public Theme saveTheme(final String name, final String description, final String thumbnail) {
-        Theme theme = Theme.register(name, description, thumbnail);
-        return themeRepository.save(theme);
+        Theme theme = themeRepository.save(Theme.register(name, description, thumbnail));
+        log.info("테마 저장 성공 - id: {}", theme.getId());
+
+        return theme;
     }
 
     @Transactional(readOnly = true)
@@ -47,6 +51,8 @@ public class ThemeService {
         validateThemeExists(id);
 
         themeRepository.deleteById(id);
+
+        log.info("테마 삭제 성공 - id: {}", id);
     }
 
     private void validateThemeNotInUse(long id) {

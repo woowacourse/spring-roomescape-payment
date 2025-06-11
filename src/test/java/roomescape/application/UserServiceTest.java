@@ -1,92 +1,156 @@
 package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_1;
+import static roomescape.fixture.ReservedFixture.CREATE_RESERVED_OF;
+import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
+import static roomescape.fixture.ThemeFixture.CREATE_THEME_2;
+import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
+import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_2;
+import static roomescape.fixture.UserFixture.CREATE_USER_1;
+import static roomescape.fixture.WaitingFixture.CREATE_WAITING_OF;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
+import roomescape.domain.reservation.waiting.WaitingRepository;
+import roomescape.domain.reservation.waiting.WaitingWithRank;
+import roomescape.domain.theme.Theme;
+import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
+import roomescape.presentation.response.UserReservationRecordsResponse;
 
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class UserServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
 
-    @Autowired
-    private UserService service;
+    @Mock
+    UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Mock
+    ReservedRepository reservationRepository;
 
-    @Test
-    @DisplayName("새로운 사용자를 등록할 수 있다.")
-    void saveUser() {
-        // given
-        var email = "new@email.com";
-        var password = "password123";
-        var name = "새사용자";
+    @Mock
+    WaitingRepository waitingRepository;
 
-        // when
-        User created = service.saveUser(email, password, name);
+    @Mock
+    PendingPaymentRepository pendingPaymentRepository;
 
-        // then
-        var users = userRepository.findAll();
-        assertThat(users).contains(created);
+    @InjectMocks
+    UserService userService;
+
+    @Nested
+    @DisplayName("사용자를 저장한다.")
+    class SaveUser {
+
+        @Test
+        @DisplayName("이미 등록된 이메일이 존재하면 예외를 던진다.")
+        void saveUser_WhenEmailExists() {
+            // given
+            User user = CREATE_USER_1();
+
+            when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+
+            // when & then
+            assertAll(() -> assertThatThrownBy(
+                            () -> userService.saveUser(user.getEmail(), user.getPassword(), user.getName())).isInstanceOf(
+                            AlreadyExistedException.class).hasMessage("이미 해당 이메일로 가입된 사용자가 있습니다."),
+                    () -> verify(userRepository).existsByEmail(user.getEmail()));
+        }
+
+        @Test
+        @DisplayName("사용자를 정상적으로 저장한다.")
+        void saveUser() {
+            // given
+            User user = CREATE_USER_1();
+
+            when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
+            when(userRepository.save(User.register(user.getName(), user.getEmail(), user.getPassword()))).thenReturn(
+                    user);
+
+            // when
+            User savedUser = userService.saveUser(user.getEmail(), user.getPassword(), user.getName());
+
+            // then
+            assertAll(() -> assertThat(savedUser).isEqualTo(user),
+                    () -> verify(userRepository).existsByEmail(user.getEmail()),
+                    () -> verify(userRepository).save(any(User.class)));
+        }
     }
 
-    @Test
-    @DisplayName("이미 존재하는 이메일로 사용자 등록 시 예외가 발생한다.")
-    void saveUser_WhenEmailAlreadyExists() {
-        // given
-        var existingEmail = "user1@email.com";
-        var password = "password123";
-        var name = "새사용자";
+    @Nested
+    @DisplayName("사용자의 예약 및 대기 기록 목록을 조회한다.")
+    class FindTotalRecordByUserId {
 
-        // when & then
-        assertThatThrownBy(() -> service.saveUser(existingEmail, password, name))
-                .isInstanceOf(AlreadyExistedException.class)
-                .hasMessage("이미 해당 이메일로 가입된 사용자가 있습니다.");
-    }
+        @Test
+        @DisplayName("사용자가 존재하지 않으면 예외를 던진다.")
+        void findTotalRecordByUserId_WhenUserNotExists_ThenThrowException() {
+            // given
+            Long userId = 99L;
 
-    @Test
-    @DisplayName("모든 사용자를 조회할 수 있다.")
-    void findAllUsers() {
-        // when
-        var users = service.findAllUsers();
+            when(userRepository.existsById(userId)).thenReturn(false);
 
-        // then
-        assertThat(users).hasSize(3);
-    }
+            // when & then
+            assertAll(() -> assertThatThrownBy(() -> userService.findTotalRecordByUserId(userId)).isInstanceOf(
+                            NotFoundException.class).hasMessage("존재하지 않는 사용자입니다."),
+                    () -> verify(userRepository).existsById(userId));
+        }
 
-    @Test
-    @DisplayName("사용자의 전체 기록을 조회할 수 있다.")
-    void findTotalRecordByUserId() {
-        // given
-        var userId = 1L;
+        @Test
+        @DisplayName("사용자의 예약 및 대기 기록 목록을 정상적으로 조회한다.")
+        void findTotalRecordByUserId() {
+            // given
+            Long userId = 1L;
+            User user = CREATE_USER_1();
+            Theme theme1 = CREATE_THEME_1();
+            Theme theme2 = CREATE_THEME_2();
+            TimeSlot timeSlot1 = CREATE_TIME_SLOT_1();
+            TimeSlot timeSlot2 = CREATE_TIME_SLOT_2();
+            Payment payment = CREATE_PAYMENT_1();
+            LocalDate date = LocalDate.now().plusDays(1);
 
-        // when
-        var records = service.findTotalRecordByUserId(userId);
+            List<Reserved> reservations = List.of(CREATE_RESERVED_OF(1L, user, date, timeSlot1, theme1, payment));
 
-        // then
-        assertThat(records).hasSize(1);
-    }
+            List<WaitingWithRank> waitings = List.of(
+                    new WaitingWithRank(CREATE_WAITING_OF(1L, user, date, timeSlot2, theme2), 2));
 
-    @Test
-    @DisplayName("존재하지 않는 사용자의 전체 기록 조회 시 예외가 발생한다.")
-    void findTotalRecordByUserId_WhenUserNotFound() {
-        // given
-        var invalidUserId = 1000000L;
+            List<UserReservationRecordsResponse> expectedResponses = new ArrayList<>();
+            expectedResponses.addAll(UserReservationRecordsResponse.fromReserves(reservations));
+            expectedResponses.addAll(UserReservationRecordsResponse.fromWaitingsWithRank(waitings));
 
-        // when & then
-        assertThatThrownBy(() -> service.findTotalRecordByUserId(invalidUserId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 사용자입니다.");
+            when(userRepository.existsById(userId)).thenReturn(true);
+            when(reservationRepository.findByUserId(userId)).thenReturn(reservations);
+            when(waitingRepository.findWaitingWithRankByUserId(userId)).thenReturn(waitings);
+            when(pendingPaymentRepository.findByUserId(userId)).thenReturn(List.of());
+
+            // when
+            List<UserReservationRecordsResponse> actualResponses = userService.findTotalRecordByUserId(userId);
+
+            // then
+            assertAll(() -> assertThat(actualResponses).hasSize(expectedResponses.size()),
+                    () -> assertThat(actualResponses).containsExactlyInAnyOrderElementsOf(expectedResponses),
+                    () -> verify(userRepository).existsById(userId),
+                    () -> verify(reservationRepository).findByUserId(userId),
+                    () -> verify(waitingRepository).findWaitingWithRankByUserId(userId),
+                    () -> verify(pendingPaymentRepository).findByUserId(userId));
+        }
     }
 }

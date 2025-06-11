@@ -2,99 +2,163 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static roomescape.fixture.UserFixture.CREATE_USER_1;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.auth.AuthenticationTokenHandler;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
 import roomescape.exception.AuthenticationException;
 
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class AuthenticationServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class AuthenticationServiceTest {
 
-    @Autowired
-    private AuthenticationService service;
+    @Mock
+    AuthenticationTokenHandler tokenHandler;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Mock
+    UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationTokenHandler tokenHandler;
+    @InjectMocks
+    AuthenticationService authenticationService;
 
-    @Test
-    @DisplayName("올바른 이메일과 비밀번호로 토큰을 발급받을 수 있다.")
-    void issueToken() {
-        // given
-        var email = "admin@email.com";
-        var password = "password";
+    @Nested
+    @DisplayName("토큰을 발급한다.")
+    class IssueToken {
 
-        // when
-        var token = service.issueToken(email, password);
+        @Test
+        @DisplayName("이메일이 틀린 경우 예외를 던진다.")
+        void issueToken_WhenEmailInvalid_ThenThrowException() {
+            // given
+            String email = "invalid@email.com";
+            String password = "password";
 
-        // then
-        assertThat(tokenHandler.isValidToken(token)).isTrue();
-        var userId = tokenHandler.extractId(token);
-        var user = userRepository.findById(userId).orElseThrow();
-        assertThat(user.getEmail()).isEqualTo(email);
+            when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> authenticationService.issueToken(email, password))
+                            .isInstanceOf(AuthenticationException.class)
+                            .hasMessage("이메일이 틀렸습니다."),
+                    () -> verify(userRepository).findByEmail(email)
+            );
+        }
+
+        @Test
+        @DisplayName("비밀번호가 틀린 경우 예외를 던진다.")
+        void issueToken_WhenPasswordInvalid_ThenThrowException() {
+            // given
+            User user = CREATE_USER_1();
+            String email = user.getEmail();
+            String password = "invalidPassword";
+
+            when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> authenticationService.issueToken(email, password))
+                            .isInstanceOf(AuthenticationException.class)
+                            .hasMessage("비밀번호가 틀렸습니다."),
+                    () -> verify(userRepository).findByEmail(email)
+            );
+        }
+
+        @Test
+        @DisplayName("토큰을 정상적으로 발급한다.")
+        void issueToken() {
+            // given
+            User user = CREATE_USER_1();
+            String email = user.getEmail();
+            String password = user.getPassword();
+
+            when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+            AuthenticationInfo authenticationInfo = new AuthenticationInfo(user.getId(), user.getRole());
+
+            when(tokenHandler.createToken(authenticationInfo)).thenReturn("createdToken");
+
+            // when
+            assertAll(
+                    () -> assertThat(authenticationService.issueToken(email, password)).isEqualTo("createdToken"),
+                    () -> verify(userRepository).findByEmail(anyString()),
+                    () -> verify(tokenHandler).createToken(authenticationInfo)
+            );
+        }
     }
 
-    @Test
-    @DisplayName("존재하지 않는 이메일로 토큰 발급 시 예외가 발생한다.")
-    void issueToken_WhenEmailNotFound() {
-        // given
-        var wrongEmail = "wrong@email.com";
-        var password = "password";
+    @Nested
+    @DisplayName("토큰의 사용자를 조회한다.")
+    class GetUserByToken {
 
-        // when & then
-        assertThatThrownBy(() -> service.issueToken(wrongEmail, password))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("이메일이 틀렸습니다.");
-    }
+        @Test
+        @DisplayName("토큰이 유효하지 않으면 예외를 던진다.")
+        void getUserByToken_WhenInvalidToken_thenThrowException() {
+            // given
+            String token = "invalidToken";
 
-    @Test
-    @DisplayName("잘못된 비밀번호로 토큰 발급 시 예외가 발생한다.")
-    void issueToken_WhenPasswordWrong() {
-        // given
-        var email = "admin@email.com";
-        var wrongPassword = "wrongpassword";
+            when(tokenHandler.isValidToken(anyString())).thenReturn(false);
 
-        // when & then
-        assertThatThrownBy(() -> service.issueToken(email, wrongPassword))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("비밀번호가 틀렸습니다.");
-    }
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> authenticationService.getUserByToken(token))
+                            .isInstanceOf(AuthenticationException.class)
+                            .hasMessage("토큰이 만료되었거나 유효하지 않습니다."),
+                    () -> verify(tokenHandler).isValidToken(token)
+            );
+        }
 
-    @Test
-    @DisplayName("토큰으로 사용자 정보를 조회할 수 있다.")
-    void getUserByToken() {
-        // given
-        var email = "admin@email.com";
-        var password = "password";
-        var token = service.issueToken(email, password);
+        @Test
+        @DisplayName("해당하는 ID의 사용자가 존재하지 않으면 예외를 던진다.")
+        void getUserByToken_WhenUserNotExist_ThenThrowException() {
+            // given
+            String token = "validToken";
 
-        // when
-        User user = service.getUserByToken(token);
+            when(tokenHandler.isValidToken(token)).thenReturn(true);
+            when(tokenHandler.extractId(token)).thenReturn(1L);
+            when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // then
-        assertThat(user.getEmail()).isEqualTo(email);
-    }
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> authenticationService.getUserByToken(token))
+                            .isInstanceOf(AuthenticationException.class)
+                            .hasMessage("사용자 정보가 없습니다. 다시 로그인 해주세요."),
+                    () -> verify(tokenHandler).extractId(anyString())
+            );
+        }
 
-    @Test
-    @DisplayName("유효하지 않은 토큰으로 사용자 조회 시 예외가 발생한다.")
-    void getUserByToken_WhenTokenInvalid() {
-        // given
-        var invalidToken = "invalid-token";
+        @Test
+        @DisplayName("토큰의 사용자를 정상적으로 조회한다.")
+        void getUserByToken() {
+            // given
+            String token = "validToken";
+            User user = CREATE_USER_1();
 
-        // when & then
-        assertThatThrownBy(() -> service.getUserByToken(invalidToken))
-                .isInstanceOf(AuthenticationException.class)
-                .hasMessage("토큰이 만료되었거나 유효하지 않습니다.");
+            when(tokenHandler.isValidToken(token)).thenReturn(true);
+            when(tokenHandler.extractId(token)).thenReturn(1L);
+            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+            // when
+            User tokenUser = authenticationService.getUserByToken(token);
+
+            // then
+            assertAll(
+                    () -> assertThat(tokenUser).isEqualTo(user),
+                    () -> verify(tokenHandler).extractId(anyString()),
+                    () -> verify(userRepository).findById(anyLong())
+            );
+        }
     }
 }

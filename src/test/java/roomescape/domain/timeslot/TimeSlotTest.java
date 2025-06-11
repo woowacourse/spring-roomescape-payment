@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class TimeSlotTest {
 
@@ -32,7 +32,7 @@ class TimeSlotTest {
     void validateStartAt_WhenNull(LocalTime startAt) {
         // when & then
         assertThatThrownBy(() -> TimeSlot.register(startAt))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("시간은 null일 수 없습니다.");
     }
 

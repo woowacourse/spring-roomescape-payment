@@ -4,28 +4,31 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.timeslot.AvailableTimeSlot;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TimeSlotService {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservationRepository;
     private final TimeSlotRepository timeSlotRepository;
 
     @Transactional
     public TimeSlot saveTimeSlot(final LocalTime startAt) {
-        TimeSlot timeSlot = TimeSlot.register(startAt);
+        TimeSlot timeSlot = timeSlotRepository.save(TimeSlot.register(startAt));
+        log.info("시간 저장 성공 - id: {}", timeSlot.getId());
 
-        return timeSlotRepository.save(timeSlot);
+        return timeSlot;
     }
 
     @Transactional(readOnly = true)
@@ -49,6 +52,7 @@ public class TimeSlotService {
         validateTimeSlotExists(id);
 
         timeSlotRepository.deleteById(id);
+        log.info("시간 삭제 성공 - id: {}", id);
     }
 
     private void validateTimSlotNotInUse(long id) {
@@ -68,10 +72,10 @@ public class TimeSlotService {
     }
 
     private List<TimeSlot> findReservedTimeSlots(LocalDate date, long themeId) {
-        List<Reservation> reservations = reservationRepository.findByDateAndThemeId(date, themeId);
+        List<Reserved> reservations = reservationRepository.findByDateAndThemeId(date, themeId);
 
         return reservations.stream()
-                .map(Reservation::getTimeSlot)
+                .map(Reserved::getTimeSlot)
                 .toList();
     }
 }

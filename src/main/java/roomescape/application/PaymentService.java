@@ -1,27 +1,53 @@
 package roomescape.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.event.PaymentRequestedEvent;
 import roomescape.application.request.PaymentInfo;
-import roomescape.application.response.PaymentResponse;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
-import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Payment savePayment(final PaymentInfo paymentInfo) {
-        PaymentResponse response = paymentClient.confirmPayment(paymentInfo);
-        Payment payment = Payment.register(response.paymentKey(), response.orderId(), response.orderName(),
-                response.amount());
+    public void requestPayment(final Reserved reserved, final PaymentInfo paymentInfo) {
 
-        return paymentRepository.save(payment);
+        Payment payment = paymentRepository.save(
+                Payment.register(
+                        paymentInfo.paymentKey(),
+                        paymentInfo.orderId(),
+                        paymentInfo.orderName(),
+                        paymentInfo.amount()
+                )
+        );
+        reserved.registerPayment(payment);
+
+        eventPublisher.publishEvent(new PaymentRequestedEvent(this, payment.getId(), paymentInfo));
+    }
+
+    @Transactional
+    public void completePayment(Long paymentId) {
+        getPaymentById(paymentId).completePayment();
+    }
+
+    @Transactional
+    public void rejectPayment(Long paymentId) {
+        getPaymentById(paymentId).rejectPayment();
+    }
+
+    public Payment getPaymentById(Long paymentId) {
+        return paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 결제 정보입니다."));
     }
 }

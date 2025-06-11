@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class UserTest {
 
@@ -22,7 +23,7 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("이름은 null이거나 공백일 수 없습니다.");
     }
 
@@ -50,7 +51,7 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("이메일은 null이거나 공백일 수 없습니다.");
     }
 
@@ -64,7 +65,7 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("비밀번호는 null이거나 공백일 수 없습니다.");
     }
 

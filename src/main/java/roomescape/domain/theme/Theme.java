@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,10 +37,12 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
 
-    private Theme(final Long id,
-                  final String name,
-                  final String description,
-                  final String thumbnail) {
+    private Theme(
+            final Long id,
+            final String name,
+            final String description,
+            final String thumbnail
+    ) {
 
         validateName(name);
         validateDescription(description);
@@ -51,10 +54,12 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
-    public static Theme ofExisting(final long id,
-                                   final String name,
-                                   final String description,
-                                   final String thumbnail) {
+    public static Theme ofExisting(
+            final long id,
+            final String name,
+            final String description,
+            final String thumbnail
+    ) {
         return new Theme(id, name, description, thumbnail);
     }
 
@@ -64,7 +69,7 @@ public class Theme {
 
     private void validateName(final String name) {
         if (name == null || name.isBlank()) {
-            throw new BusinessRuleViolationException("테마 이름은 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("테마 이름은 null이거나 공백일 수 없습니다.");
 
         }
         if (name.length() > NAME_MAX_LENGTH) {
@@ -74,7 +79,7 @@ public class Theme {
 
     private void validateDescription(final String description) {
         if (description == null || description.isBlank()) {
-            throw new BusinessRuleViolationException("테마 설명은 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("테마 설명은 null이거나 공백일 수 없습니다.");
         }
         if (description.length() > DESCRIPTION_MAX_LENGTH) {
             throw new BusinessRuleViolationException(String.format("설명은 %d자를 넘길 수 없습니다.", DESCRIPTION_MAX_LENGTH));
@@ -83,7 +88,7 @@ public class Theme {
 
     private void validateThumbnail(final String thumbnail) {
         if (thumbnail == null || thumbnail.isBlank()) {
-            throw new BusinessRuleViolationException("썸네일은 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("썸네일은 null이거나 공백일 수 없습니다.");
         }
     }
 }

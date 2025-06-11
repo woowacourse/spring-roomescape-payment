@@ -1,0 +1,15 @@
+=== 인증 - 로그인
+include::{snippets}/login/http-request.adoc[]
+operation::login[snippets="http-request,request-fields,http-response,response-cookies"]
+
+=== 인증 - 이메일이 맞지 않을 경우
+operation::login-wrong-email[snippets="http-request,http-response,response-fields"]
+
+=== 인증 - 비밀번호가 맞지 않을 경우
+operation::login-wrong-password[snippets="http-request,http-response,response-fields"]
+
+=== 인증 - 사용자 정보
+operation::login-check[snippets="http-request,request-cookies,http-response,response-fields"]
+
+=== 인증 - 로그아웃
+operation::logout[snippets="http-request,request-cookies,http-response,response-cookies"]

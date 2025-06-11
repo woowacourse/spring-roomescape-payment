@@ -183,6 +183,8 @@ function onReservationButtonClick(event, paymentWidget) {
 
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
+
+        const orderName= "테스트 방탈출 예약 결제 1건";
         /*
         [1단계] - orderIdPrefix 를 자신만의 prefix로 변경
         */
@@ -191,11 +193,11 @@ function onReservationButtonClick(event, paymentWidget) {
         const orderIdPrefix = "ROOM_ESCAPE_";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
-            orderName: "테스트 방탈출 예약 결제 1건",
+            orderName: orderName,
             amount: 1000,
         }).then(function (data) {
             console.debug(data);
-            fetchReservationPayment(data, reservationData);
+            fetchReservationPayment(data, reservationData, orderName);
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
@@ -206,7 +208,7 @@ function onReservationButtonClick(event, paymentWidget) {
     }
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
+async function fetchReservationPayment(paymentData, reservationData, orderName) {
     /*
     [1단계]
         - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -221,6 +223,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         orderId: paymentData.orderId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
+        orderName: orderName
     }
 
     const reservationURL = "/reservations";

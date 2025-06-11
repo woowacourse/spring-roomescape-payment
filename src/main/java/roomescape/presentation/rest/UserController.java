@@ -13,7 +13,7 @@ import roomescape.application.UserService;
 import roomescape.domain.user.User;
 import roomescape.presentation.auth.Authenticated;
 import roomescape.presentation.request.SignupRequest;
-import roomescape.presentation.response.UserReservedRecordsResponse;
+import roomescape.presentation.response.UserReservationRecordsResponse;
 import roomescape.presentation.response.UserResponse;
 
 @RestController
@@ -27,9 +27,7 @@ public class UserController {
 
     @PostMapping("/users")
     @ResponseStatus(CREATED)
-    public UserResponse createUser(
-            @RequestBody @Valid final SignupRequest request
-    ) {
+    public UserResponse createUser(@RequestBody @Valid final SignupRequest request) {
         User user = userService.saveUser(request.email(), request.password(), request.name());
 
         return UserResponse.fromUser(user);
@@ -43,9 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/users/reservations")
-    public List<UserReservedRecordsResponse> readAllRecordByUser(
-            @Authenticated final User user
-    ) {
+    public List<UserReservationRecordsResponse> readAllRecordByUser(@Authenticated final User user) {
         return userService.findTotalRecordByUserId(user.getId());
     }
 }

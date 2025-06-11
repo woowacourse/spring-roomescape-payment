@@ -10,11 +10,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import roomescape.domain.reservation.waiting.Waiting;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class WaitingTest {
 
@@ -30,7 +32,7 @@ class WaitingTest {
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, pastDate, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("이전 날짜로 예약 대기 신청할 수 없습니다.");
+                .hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
 
     @ParameterizedTest
@@ -44,7 +46,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("사용자 정보는 null일 수 없습니다.");
     }
 
@@ -59,7 +61,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("예약 날짜는 null일 수 없습니다.");
     }
 
@@ -74,7 +76,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("시간 정보는 null일 수 없습니다.");
     }
 
@@ -89,7 +91,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("테마 정보는 null일 수 없습니다.");
     }
 

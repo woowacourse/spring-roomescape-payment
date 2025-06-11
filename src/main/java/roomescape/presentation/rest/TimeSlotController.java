@@ -59,7 +59,7 @@ public class TimeSlotController {
 
     @DeleteMapping("/admin/times/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteTimeSlotById(
+    public void deleteTimeSlot(
             @PathVariable("id") final long id
     ) {
         timeSlotService.removeById(id);

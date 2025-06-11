@@ -1,0 +1,38 @@
+spring:
+  config:
+    import: classpath:application-secrets-dev.yml
+
+  datasource:
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
+security:
+  jwt:
+    token:
+      secret-key: ${security.jwt.token.secretKey}
+      expire-length: ${security.jwt.token.expireLength}
+
+payment:
+  toss:
+    secret-key: ${payment.toss.secret-key}
+    base-url: ${payment.toss.base-url}
+
+logging:
+  level:
+    root: debug
+  file:
+    path: logs/
