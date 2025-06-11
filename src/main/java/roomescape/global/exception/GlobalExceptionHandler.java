@@ -53,13 +53,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPaymentException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPaymentException(InvalidPaymentException e) {
-        LOGGER.warn("[InvalidPaymentException] {}", e.getMessage());
+        LOGGER.warn("InvalidPaymentException 발생 {}", e.getMessage());
         return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(PaymentServerException.class)
     public ResponseEntity<ErrorResponse> handlePaymentServerException(PaymentServerException e) {
-        LOGGER.error("[PaymentServerException] {}", e.getMessage(), e);
+        LOGGER.error("PaymentServerException 발생 {}", e.getMessage(), e);
         return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getMessage()));
     }
 
