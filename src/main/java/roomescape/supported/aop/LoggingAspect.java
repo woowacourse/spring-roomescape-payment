@@ -1,4 +1,4 @@
-package roomescape.aop;
+package roomescape.supported.aop;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;

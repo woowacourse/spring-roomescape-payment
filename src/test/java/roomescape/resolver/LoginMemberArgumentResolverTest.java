@@ -20,7 +20,7 @@ import roomescape.domain.auth.dto.AccessTokenContent;
 import roomescape.domain.auth.request.LoginRequest;
 import roomescape.domain.member.domain.Role;
 import roomescape.exception.UnauthorizedException;
-import roomescape.mvc.resolver.LoginMemberArgumentResolver;
+import roomescape.supported.resolver.LoginMemberArgumentResolver;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 

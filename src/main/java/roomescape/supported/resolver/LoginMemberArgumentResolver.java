@@ -1,4 +1,4 @@
-package roomescape.mvc.resolver;
+package roomescape.supported.resolver;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     ) {
         HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         Cookie accessTokenCookie = getAcceccTokenCookie(request);
-        return jwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
+        returjwtTokenProvider.parseAccessToken(accessTokenCookie.getValue());
     }
 
     private Cookie getAcceccTokenCookie(HttpServletRequest request) {

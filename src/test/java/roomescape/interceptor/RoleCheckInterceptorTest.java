@@ -17,7 +17,7 @@ import roomescape.domain.auth.dto.AccessTokenContent;
 import roomescape.domain.member.domain.Role;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.UnauthorizedException;
-import roomescape.mvc.interceptor.RoleCheckInterceptor;
+import roomescape.supported.interceptor.RoleCheckInterceptor;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 

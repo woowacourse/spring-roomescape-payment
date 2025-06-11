@@ -1,4 +1,4 @@
-package roomescape.mvc.advice;
+package roomescape.supported.advice;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
-import roomescape.aop.LoggingAspect;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ExternalApiConnectionException;
 import roomescape.exception.ForbiddenException;
@@ -24,6 +23,7 @@ import roomescape.exception.LoginFailException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
 import roomescape.exception.UnauthorizedException;
+import roomescape.supported.aop.LoggingAspect;
 
 
 @RestControllerAdvice
