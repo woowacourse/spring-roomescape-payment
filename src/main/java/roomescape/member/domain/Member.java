@@ -17,7 +17,7 @@ import roomescape.common.utils.Validator;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")

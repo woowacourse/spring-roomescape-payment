@@ -16,7 +16,7 @@ import roomescape.time.domain.ReservationTime;
 
 @Embeddable
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode
