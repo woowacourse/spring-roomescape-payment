@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.approval.domain.ApprovalType;
 import roomescape.approval.domain.Onsite;
 import roomescape.approval.infrastructure.ApprovalRepositoryAdapter;
 import roomescape.fixture.MemberFixture;
@@ -60,7 +61,7 @@ class OnSiteCommandServiceTest {
     @Test
     void supports() {
         // when
-        boolean result = onSiteCommandService.supports(Onsite.class);
+        boolean result = onSiteCommandService.supports(ApprovalType.ONSITE);
 
         // then
         assertThat(result).isTrue();
@@ -70,7 +71,7 @@ class OnSiteCommandServiceTest {
     @Test
     void notSupports() {
         // when
-        boolean result = onSiteCommandService.supports(Object.class);
+        boolean result = onSiteCommandService.supports(ApprovalType.PAYMENT);
 
         // then
         assertThat(result).isFalse();

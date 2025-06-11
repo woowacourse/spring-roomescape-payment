@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.approval.domain.AdminApproval;
+import roomescape.approval.domain.ApprovalType;
 import roomescape.approval.infrastructure.ApprovalRepositoryAdapter;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
@@ -60,7 +61,7 @@ class AdminApprovalCommandServiceTest {
     @Test
     void supports() {
         // when
-        boolean result = adminApprovalCommandService.supports(AdminApproval.class);
+        boolean result = adminApprovalCommandService.supports(ApprovalType.ADMIN_APPROVAL);
 
         // then
         assertThat(result).isTrue();
@@ -70,7 +71,7 @@ class AdminApprovalCommandServiceTest {
     @Test
     void notSupports() {
         // when
-        boolean result = adminApprovalCommandService.supports(Object.class);
+        boolean result = adminApprovalCommandService.supports(ApprovalType.ONSITE);
 
         // then
         assertThat(result).isFalse();

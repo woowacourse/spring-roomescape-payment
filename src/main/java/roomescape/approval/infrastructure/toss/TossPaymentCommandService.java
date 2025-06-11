@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.approval.application.command.ApprovalCommandService;
+import roomescape.approval.domain.ApprovalType;
 import roomescape.approval.domain.Payment;
 import roomescape.approval.domain.repository.ApprovalRepository;
 import roomescape.approval.infrastructure.toss.client.TossPaymentClient;
@@ -17,8 +18,8 @@ public class TossPaymentCommandService implements ApprovalCommandService<Payment
     private final ApprovalRepository approvalRepository;
 
     @Override
-    public boolean supports(Class<?> approvalClass) {
-        return Payment.class.equals(approvalClass);
+    public boolean supports(ApprovalType type) {
+        return type == ApprovalType.PAYMENT;
     }
 
     @Override

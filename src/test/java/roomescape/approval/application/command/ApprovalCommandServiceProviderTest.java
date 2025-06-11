@@ -65,9 +65,9 @@ class ApprovalCommandServiceProviderTest {
         Reservation reservation = new Reservation(member, spec);
         AdminApproval adminApproval = new AdminApproval(reservation, member);
 
-        lenient().when(adminApprovalCommandService.supports(AdminApproval.class)).thenReturn(true);
-        lenient().when(onSiteCommandService.supports(AdminApproval.class)).thenReturn(false);
-        lenient().when(tossPaymentCommandService.supports(AdminApproval.class)).thenReturn(false);
+        lenient().when(adminApprovalCommandService.supports(adminApproval.getType())).thenReturn(true);
+        lenient().when(onSiteCommandService.supports(adminApproval.getType())).thenReturn(false);
+        lenient().when(tossPaymentCommandService.supports(adminApproval.getType())).thenReturn(false);
 
         // when
         ApprovalCommandService<AdminApproval> service = approvalCommandServiceProvider.findService(adminApproval);
@@ -87,9 +87,9 @@ class ApprovalCommandServiceProviderTest {
         Reservation reservation = new Reservation(member, spec);
         Onsite onsite = new Onsite(reservation, BigDecimal.valueOf(10000));
 
-        lenient().when(adminApprovalCommandService.supports(Onsite.class)).thenReturn(false);
-        lenient().when(onSiteCommandService.supports(Onsite.class)).thenReturn(true);
-        lenient().when(tossPaymentCommandService.supports(Onsite.class)).thenReturn(false);
+        lenient().when(adminApprovalCommandService.supports(onsite.getType())).thenReturn(false);
+        lenient().when(onSiteCommandService.supports(onsite.getType())).thenReturn(true);
+        lenient().when(tossPaymentCommandService.supports(onsite.getType())).thenReturn(false);
 
         // when
         ApprovalCommandService<Onsite> service = approvalCommandServiceProvider.findService(onsite);
@@ -109,9 +109,9 @@ class ApprovalCommandServiceProviderTest {
         Reservation reservation = new Reservation(member, spec);
         Payment payment = new Payment(reservation, "orderId", "paymentKey", BigDecimal.valueOf(10000));
 
-        lenient().when(adminApprovalCommandService.supports(Payment.class)).thenReturn(false);
-        lenient().when(onSiteCommandService.supports(Payment.class)).thenReturn(false);
-        lenient().when(tossPaymentCommandService.supports(Payment.class)).thenReturn(true);
+        lenient().when(adminApprovalCommandService.supports(payment.getType())).thenReturn(false);
+        lenient().when(onSiteCommandService.supports(payment.getType())).thenReturn(false);
+        lenient().when(tossPaymentCommandService.supports(payment.getType())).thenReturn(true);
 
         // when
         ApprovalCommandService<Payment> service = approvalCommandServiceProvider.findService(payment);
@@ -137,9 +137,9 @@ class ApprovalCommandServiceProviderTest {
             }
         };
 
-        lenient().when(adminApprovalCommandService.supports(mockApproval.getClass())).thenReturn(false);
-        lenient().when(onSiteCommandService.supports(mockApproval.getClass())).thenReturn(false);
-        lenient().when(tossPaymentCommandService.supports(mockApproval.getClass())).thenReturn(false);
+        lenient().when(adminApprovalCommandService.supports(mockApproval.getType())).thenReturn(false);
+        lenient().when(onSiteCommandService.supports(mockApproval.getType())).thenReturn(false);
+        lenient().when(tossPaymentCommandService.supports(mockApproval.getType())).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> approvalCommandServiceProvider.findService(mockApproval))

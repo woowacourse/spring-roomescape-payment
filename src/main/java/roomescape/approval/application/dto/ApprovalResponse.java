@@ -24,6 +24,6 @@ public record ApprovalResponse(String type, String paymentKey, BigDecimal amount
             return new ApprovalResponse("관리자 승인: " + adminApproval.getMember().getName().getValue(), null, null);
         }
 
-        throw new IllegalArgumentException("지원하지 않는 승인 방식입니다: " + approval.getClass());
+        throw new IllegalArgumentException("지원하지 않는 승인 방식입니다: " + approval.getType());
     }
 }

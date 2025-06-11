@@ -12,9 +12,9 @@ public class ApprovalCommandServiceProvider {
 
     public <T extends Approval> ApprovalCommandService<T> findService(T approval) {
         return (ApprovalCommandService<T>) approvalCommandServices.stream()
-                .filter(service -> service.supports(approval.getClass()))
+                .filter(service -> service.supports(approval.getType()))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 승인 방식입니다: " + approval.getClass()));
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 승인 방식입니다: " + approval.getType()));
     }
 
 }

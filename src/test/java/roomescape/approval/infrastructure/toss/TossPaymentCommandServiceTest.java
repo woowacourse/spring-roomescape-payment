@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.approval.domain.ApprovalType;
 import roomescape.approval.domain.Payment;
 import roomescape.approval.infrastructure.ApprovalRepositoryAdapter;
 import roomescape.approval.infrastructure.toss.client.FakeTossPaymentClient;
@@ -62,7 +63,7 @@ class TossPaymentCommandServiceTest {
     @Test
     void supports() {
         // when
-        boolean result = tossPaymentCommandService.supports(Payment.class);
+        boolean result = tossPaymentCommandService.supports(ApprovalType.PAYMENT);
 
         // then
         assertThat(result).isTrue();
@@ -72,7 +73,7 @@ class TossPaymentCommandServiceTest {
     @Test
     void notSupports() {
         // when
-        boolean result = tossPaymentCommandService.supports(Object.class);
+        boolean result = tossPaymentCommandService.supports(ApprovalType.ONSITE);
 
         // then
         assertThat(result).isFalse();
