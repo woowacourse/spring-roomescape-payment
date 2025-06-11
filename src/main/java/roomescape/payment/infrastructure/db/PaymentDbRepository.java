@@ -1,6 +1,6 @@
 package roomescape.payment.infrastructure.db;
 
-import java.util.Optional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.payment.infrastructure.db.dao.PaymentJpaRepository;
@@ -19,7 +19,7 @@ public class PaymentDbRepository implements PaymentRepository {
     }
 
     @Override
-    public Optional<Payment> findByReservationId(final Long reservationId) {
-        return paymentJpaRepository.findByReservationId(reservationId);
+    public List<Payment> findAllByReservationIdIn(final List<Long> reservationIds) {
+        return paymentJpaRepository.findAllByReservationIdIn(reservationIds);
     }
 }

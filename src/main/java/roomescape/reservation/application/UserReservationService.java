@@ -3,6 +3,9 @@ package roomescape.reservation.application;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,26 +71,49 @@ public class UserReservationService {
     private List<UserReservationWithPaymentInfoResponse> getReservationWithPaymentInfoResponse(
             final List<Reservation> reservations) {
 
-        List<UserReservationWithPaymentInfoResponse> userReservationWithPaymentInfo = new ArrayList<>();
+        final List<Long> reservationIds = getReservationIds(reservations);
+        final List<Payment> payments = paymentRepository.findAllByReservationIdIn(reservationIds);
+
+        return getResponse(reservations, payments);
+    }
+
+    private List<Long> getReservationIds(final List<Reservation> reservations) {
+        return reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+    }
+
+    private List<UserReservationWithPaymentInfoResponse> getResponse(
+            final List<Reservation> reservations, final List<Payment> payments) {
+
+        final Map<Long, Payment> reservationIdToPayment = getReservationIdToPayment(payments);
+
+        final List<UserReservationWithPaymentInfoResponse> userReservationWithPaymentInfo = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            Payment payment = getPaymentBy(reservation.getId());
-            UserReservationWithPaymentInfoResponse userReservationWithPaymentInfoResponse = new UserReservationWithPaymentInfoResponse(
-                    reservation.getId(),
-                    reservation.getDate(),
-                    reservation.getTime().getStartAt(),
-                    reservation.getTheme().getName(),
-                    reservation.getStatus().name(),
-                    payment.getPaymentKey(),
-                    payment.getAmount()
-            );
-            userReservationWithPaymentInfo.add(userReservationWithPaymentInfoResponse);
+            final Payment payment = reservationIdToPayment.get(reservation.getId());
+            final UserReservationWithPaymentInfoResponse response = toResponse(reservation, payment);
+            userReservationWithPaymentInfo.add(response);
         }
         return userReservationWithPaymentInfo;
     }
 
-    private Payment getPaymentBy(final Long reservationId) {
-        return paymentRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
+    private Map<Long, Payment> getReservationIdToPayment(final List<Payment> payments) {
+        return payments.stream()
+                .collect(Collectors.toMap(Payment::getReservationId, Function.identity()));
+    }
+
+    private UserReservationWithPaymentInfoResponse toResponse(
+            final Reservation reservation, final Payment payment) {
+
+        return new UserReservationWithPaymentInfoResponse(
+                reservation.getId(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                reservation.getTheme().getName(),
+                reservation.getStatus().name(),
+                payment.getPaymentKey(),
+                payment.getAmount()
+        );
     }
 
     @Transactional

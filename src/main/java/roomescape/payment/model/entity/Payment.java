@@ -51,4 +51,9 @@ public class Payment {
     public Long getAmount() {
         return amount;
     }
+
+    public Long getReservationId() {
+        return reservationId;
+    }
+
 }
