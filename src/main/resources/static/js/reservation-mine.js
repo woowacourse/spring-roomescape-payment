@@ -56,7 +56,8 @@ function render(data) {
         row.insertCell(1).textContent = date;
         row.insertCell(2).textContent = time;
         row.insertCell(3).textContent = status;
-        row.insertCell(4).textContent = '';
+        row.insertCell(5).textContent = item.paymentKey;
+        row.insertCell(6).textContent = item.amount;
     });
 }
 

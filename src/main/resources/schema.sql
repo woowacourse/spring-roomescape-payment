@@ -18,7 +18,7 @@ CREATE TABLE member
 CREATE TABLE reservation_time
 (
     id   BIGINT       NOT NULL AUTO_INCREMENT,
-    start_at VARCHAR(255) NOT NULL,
+    start_at TIME NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -36,7 +36,7 @@ CREATE TABLE reservation_schedule
     id   BIGINT       NOT NULL AUTO_INCREMENT,
     time_id BIGINT,
     theme_id BIGINT,
-    date VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
     FOREIGN KEY (theme_id) REFERENCES theme (id),
     PRIMARY KEY (id)

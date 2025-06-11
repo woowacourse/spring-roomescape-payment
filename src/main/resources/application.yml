@@ -20,3 +20,8 @@ api:
     payment:
       uri:
         confirm: https://api.tosspayments.com/v1/payments/confirm
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG

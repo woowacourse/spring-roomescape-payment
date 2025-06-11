@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.ClockConfig;
+import roomescape.common.PaymentApiClientConfig;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
@@ -30,6 +31,10 @@ import roomescape.reservation.controller.ReservationService;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.domain.Amount;
+import roomescape.reservation.domain.OrderId;
+import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.domain.PaymentKey;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.schedule.domain.ReservationDate;
@@ -42,7 +47,7 @@ import roomescape.time.repository.ReservationTimeRepository;
 
 @Transactional
 @SpringBootTest
-@Import(ClockConfig.class)
+@Import({ClockConfig.class, PaymentApiClientConfig.class})
 class ReservationServiceTest {
 
     @Autowired
@@ -228,7 +233,12 @@ class ReservationServiceTest {
         ReservationTime time = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
         ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_오늘(time, theme);
-        Reservation reservation = reservationDbFixture.예약_생성(schedule, member);
+        PaymentInfo paymentInfo = new PaymentInfo(
+                new OrderId("testId"),
+                new Amount(1000L),
+                new PaymentKey("testKey")
+        );
+        Reservation reservation = reservationDbFixture.예약_생성(schedule, member, paymentInfo);
 
         // when
         List<MyReservationResponse> all = service.findAllMyReservation(member.getId());
