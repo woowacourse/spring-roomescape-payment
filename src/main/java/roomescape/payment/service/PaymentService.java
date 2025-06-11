@@ -1,22 +1,12 @@
 package roomescape.payment.service;
 
-import org.springframework.stereotype.Service;
-import roomescape.payment.TossRestClient;
-import roomescape.payment.domain.TossPayment;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentResponseDto;
+import roomescape.reservation.domain.Reservation;
 
-@Service
-public class PaymentService {
+public interface PaymentService {
 
-    private final TossRestClient tossRestClient;
+    PaymentResponseDto approve(PaymentRequestDto request, Reservation reservation);
 
-    public PaymentService(TossRestClient tossRestClient) {
-        this.tossRestClient = tossRestClient;
-    }
-
-    public PaymentResponseDto approve(PaymentRequestDto request) {
-        TossPayment payment = tossRestClient.confirmPayment(request);
-        return PaymentResponseDto.of(payment);
-    }
+    void cancelPaymentByReservation(Reservation reservation);
 }

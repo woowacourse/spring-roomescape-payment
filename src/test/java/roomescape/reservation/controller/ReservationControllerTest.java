@@ -1,7 +1,6 @@
 package roomescape.reservation.controller;
 
 import io.restassured.RestAssured;
-import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +14,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.fixture.ReservationFixture;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.ReservationService;
 import roomescape.reservationtime.ReservationTimeTestDataConfig;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.ThemeTestDataConfig;
@@ -26,6 +27,8 @@ import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.fixture.WaitingFixture;
 import roomescape.waiting.repository.WaitingRepository;
+
+import java.time.LocalDate;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = {
         ReservationTimeTestDataConfig.class,
@@ -39,6 +42,9 @@ class ReservationControllerTest {
 
     @Autowired
     private WaitingRepository waitingRepository;
+
+    @Autowired
+    private ReservationService reservationService;
 
     private static ReservationTime savedReservationTime;
     private static Theme savedTheme;
@@ -99,8 +105,9 @@ class ReservationControllerTest {
                     .when().delete("/reservations/" + savedReservation.getId())
                     .then().log().all()
                     .statusCode(HttpStatus.NO_CONTENT.value());
+            Reservation reservation = reservationRepository.findById(savedReservation.getId()).get();
 
-            Assertions.assertThat(reservationRepository.findAll()).hasSize(1);
+            Assertions.assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELLED);
             Assertions.assertThat(waitingRepository.findAll()).hasSize(0);
             Assertions.assertThat(savedWaiting.getDate()).isEqualTo(savedReservation.getDate());
         }

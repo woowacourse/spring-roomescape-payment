@@ -1,6 +1,5 @@
 package roomescape.admin.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.AdminReservationRequestDto;
@@ -13,6 +12,8 @@ import roomescape.user.domain.User;
 import roomescape.user.service.UserService;
 import roomescape.waiting.domain.dto.WaitingResponseDto;
 import roomescape.waiting.service.WaitingService;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,7 +54,6 @@ public class AdminService {
     }
 
     private static ReservationRequestDto convertAdminReservationRequestDtoToReservationRequestDto(
-            // TODO 2025. 5. 28. 16:59: dto 필드 추가로 인한 컴파일 오류 수정 필요
             AdminReservationRequestDto adminReservationRequestDto) {
         return new ReservationRequestDto(adminReservationRequestDto.date(),
                 adminReservationRequestDto.timeId(),

@@ -1,23 +1,21 @@
 package roomescape.payment.exception;
 
-import org.springframework.http.HttpStatus;
+import lombok.Getter;
+import org.springframework.http.HttpStatusCode;
 
-public class InvalidPaymentException extends RuntimeException {
-
-    private final HttpStatus status;
+@Getter
+public class InvalidPaymentException extends PaymentException {
 
     private static final String DEFAULT_MESSAGE = "유효하지 않는 결제 요청입니다.";
 
-    public InvalidPaymentException(String message, HttpStatus status) {
-        super(message);
-        this.status = status;
+    private final HttpStatusCode statusCode;
+
+    public InvalidPaymentException(String message, HttpStatusCode statusCode) {
+        super(message, statusCode);
+        this.statusCode = statusCode;
     }
 
-    public InvalidPaymentException(HttpStatus status) {
-        this(DEFAULT_MESSAGE, status);
-    }
-
-    public HttpStatus getStatus() {
-        return status;
+    public InvalidPaymentException(HttpStatusCode statusCode) {
+        this(DEFAULT_MESSAGE, statusCode);
     }
 }

@@ -1,35 +1,43 @@
 package roomescape.waiting.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
+import jakarta.persistence.Table;
+import lombok.Getter;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.user.domain.User;
 
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Getter
 @Entity
+@Table(name = "waiting")
 public class Waiting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "reservation_time_id")
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime time;
 
     @ManyToOne
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
     protected Waiting() {
@@ -50,23 +58,15 @@ public class Waiting {
         return this.member.equals(compare);
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Waiting waiting = (Waiting) object;
+        return Objects.equals(id, waiting.id) && Objects.equals(date, waiting.date) && Objects.equals(time, waiting.time) && Objects.equals(theme, waiting.theme) && Objects.equals(member, waiting.member);
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public ReservationTime getTime() {
-        return time;
-    }
-
-    public Theme getTheme() {
-        return theme;
-    }
-
-    public User getMember() {
-        return member;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, date, time, theme, member);
     }
 }

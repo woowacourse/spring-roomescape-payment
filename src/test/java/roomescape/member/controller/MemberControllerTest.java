@@ -1,11 +1,8 @@
 package roomescape.member.controller;
 
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +19,12 @@ import roomescape.theme.ThemeTestDataConfig;
 import roomescape.user.MemberTestDataConfig;
 import roomescape.user.domain.User;
 
+import java.time.LocalDate;
+
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes =
-        {MemberTestDataConfig.class, ThemeTestDataConfig.class, ReservationTimeTestDataConfig.class,})
+        {MemberTestDataConfig.class, ThemeTestDataConfig.class, ReservationTimeTestDataConfig.class})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class MemberControllerTest {
 
@@ -32,12 +33,12 @@ class MemberControllerTest {
     @Autowired
     private ThemeTestDataConfig themeTestDataConfig;
 
-    private static LocalDate date;
-    private static User memberStatic;
-    private static TokenResponseDto memberTokenResponseDto;
+    private LocalDate date;
+    private User memberStatic;
+    private TokenResponseDto memberTokenResponseDto;
 
-    @BeforeAll
-    public static void setUp(@Autowired AuthService authService,
+    @BeforeEach
+    public void setUp(@Autowired AuthService authService,
                              @Autowired MemberTestDataConfig memberTestDataConfig
     ) {
         date = LocalDate.now().plusDays(1);

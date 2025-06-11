@@ -1,4 +1,4 @@
-package roomescape.global.config.interceptor;
+package roomescape.global.interceptor;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
