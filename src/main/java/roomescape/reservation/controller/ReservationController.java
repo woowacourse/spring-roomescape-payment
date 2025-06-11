@@ -49,7 +49,7 @@ public class ReservationController {
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.executeReservation(request, userInfo.id());
+        ReservationResponse dto = reservationFacadeService.reserveWithPayment(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
