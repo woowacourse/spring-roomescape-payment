@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PrePaymentValidRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
@@ -16,6 +17,7 @@ import roomescape.reservation.domain.Reservation;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public Payment pend(final PaymentConfirmRequest request, final Reservation reservation) {
@@ -56,5 +58,9 @@ public class PaymentService {
         if (!prePaymentValidRequest.amount().equals(paymentConfirmRequest.amount())) {
             throw new BadRequestException("결제 금액이 일치하지 않습니다.");
         }
+    }
+
+    public void requestPaymentConfirm(final PaymentRequest paymentRequest) {
+        paymentClient.requestPaymentConfirm(paymentRequest);
     }
 }

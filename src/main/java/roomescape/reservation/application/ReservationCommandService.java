@@ -4,14 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
@@ -44,8 +42,6 @@ public class ReservationCommandService {
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
-    @Autowired
-    private PaymentClient paymentClient;
 
     public ReservationResponse reserveWithPayment(
             final MemberReservationRequest request,
@@ -85,7 +81,7 @@ public class ReservationCommandService {
 
     private void requestPaymentConfirm(PaymentRequest paymentRequest, Payment payment) {
         try {
-            paymentClient.requestPaymentConfirm(paymentRequest);
+            paymentService.requestPaymentConfirm(paymentRequest);
             paymentService.success(payment);
         } catch (PaymentException e) {
             paymentService.fail(payment);
