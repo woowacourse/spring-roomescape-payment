@@ -28,7 +28,13 @@ public class LogAspect {
 
     @Around("allControllers()")
     public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            log.warn("RequestAttributes not available, proceeding without logging");
+            return joinPoint.proceed();
+        }
+        HttpServletRequest request = requestAttributes.getRequest();
+
         String uri = request.getRequestURI();
         String method = request.getMethod();
         String controller = joinPoint.getSignature().getDeclaringType().getSimpleName();
