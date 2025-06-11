@@ -1,7 +1,6 @@
 package roomescape.integration;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -11,33 +10,20 @@ import static roomescape.integration.helper.RestAssuredRequestUtils.sendDeleteWi
 import static roomescape.integration.helper.RestAssuredRequestUtils.sendGetWithFilter;
 import static roomescape.integration.helper.RestAssuredRequestUtils.sendPost;
 import static roomescape.integration.helper.RestAssuredRequestUtils.sendPostWithFilter;
+import static roomescape.integration.helper.RestDocsFieldSnippets.TimeSlot.TIME_SLOT_REQUEST_FIELDS;
+import static roomescape.integration.helper.RestDocsFieldSnippets.TimeSlot.TIME_SLOT_RESPONSE_FIELDS;
+import static roomescape.integration.helper.RestDocsFieldSnippets.TimeSlot.TIME_SLOT_RESPONSE_LIST_FIELDS;
 
 import io.restassured.filter.Filter;
 import io.restassured.response.Response;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.restdocs.payload.FieldDescriptor;
 
 class TimeSlotIntegrationTest extends IntegrationTest {
 
     private static final String DOCS_BASE_DIR = "time-slot";
-
-    private static final List<FieldDescriptor> TIME_SLOT_REQUEST_FIELDS = List.of(
-            fieldWithPath("startAt").description("시작 시간 (HH:mm:ss)")
-    );
-
-    private static final List<FieldDescriptor> TIME_SLOT_RESPONSES_FIELDS = List.of(
-            fieldWithPath("[].id").description("시간 ID"),
-            fieldWithPath("[].startAt").description("시작 시간 (HH:mm:ss)")
-    );
-
-    private static final List<FieldDescriptor> TIME_SLOT_RESPONSE_FIELDS = List.of(
-            fieldWithPath("id").description("시간 ID"),
-            fieldWithPath("startAt").description("시작 시간 (HH:mm:ss)")
-    );
 
     @Nested
     @DisplayName("예약 시간 API")
@@ -47,7 +33,7 @@ class TimeSlotIntegrationTest extends IntegrationTest {
         @DisplayName("예약 시간 목록 조회 API")
         void getTimeSlots() {
             Filter filter = createDocumentFilter(DOCS_BASE_DIR, "find-all",
-                    responseFields(TIME_SLOT_RESPONSES_FIELDS)
+                    responseFields(TIME_SLOT_RESPONSE_LIST_FIELDS)
             );
 
             sendGetWithFilter("/times", spec, filter)
@@ -57,9 +43,7 @@ class TimeSlotIntegrationTest extends IntegrationTest {
         @Test
         @DisplayName("예약 시간 생성 API")
         void createTimeSlot() {
-            Map<String, String> body = Map.of(
-                    "startAt", "10:30"
-            );
+            Map<String, String> body = Map.of("startAt", "10:30");
 
             Filter filter = createDocumentFilter(DOCS_BASE_DIR, "create",
                     requestFields(TIME_SLOT_REQUEST_FIELDS),
