@@ -1,5 +1,6 @@
 package roomescape.reservation.application.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -11,12 +12,15 @@ import roomescape.approval.domain.Approval;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.WaitingWithRank;
 
+@Schema(description = "내 예약 및 대기 응답 정보")
 public record MyReservationResponse(
         Long id,
         String theme,
         LocalDate date,
         LocalTime time,
+        @Schema(description = "상태 (예약 / 대기)")
         String status,
+        @Schema(description = "승인 정보 (nullable) (결제/관리자 승인 등, 대기일 경우 null)", nullable = true)
         ApprovalResponse approval
 ) {
     public static final String RESERVED = "예약";
