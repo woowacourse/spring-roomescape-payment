@@ -1,5 +1,6 @@
 package roomescape.waiting.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@LogExecution
+@RequiredArgsConstructor
 public class WaitingService {
 
     private static final long MAX_WAITING_COUNT = 10;
@@ -30,15 +31,8 @@ public class WaitingService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public WaitingService(WaitingRepository waitingRepository, MemberRepository memberRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, ReservationRepository reservationRepository) {
-        this.waitingRepository = waitingRepository;
-        this.memberRepository = memberRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.reservationRepository = reservationRepository;
-    }
-
     @Transactional
+    @LogExecution
     public WaitingResponse createWaiting(WaitingRequest request, LoginMember loginMember) {
         Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다"));
@@ -81,6 +75,7 @@ public class WaitingService {
     }
 
     @Transactional
+    @LogExecution
     public void cancelWaiting(Long waitingId) {
         Waiting waiting = waitingRepository.findById(waitingId)
                 .orElseThrow(() -> new IllegalArgumentException("대기 정보를 찾을 수 없습니다."));

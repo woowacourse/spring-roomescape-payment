@@ -1,13 +1,14 @@
 package roomescape.theme.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Entity
+@Getter
+@EqualsAndHashCode(of = "id")
+@RequiredArgsConstructor
 public class Theme {
 
     private static int MAX_NAME = 255;
@@ -33,10 +34,6 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
-    protected Theme() {
-
-    }
-
     public static Theme createWithoutId(final String name, final String description, final String thumbnail) {
         validate(name, description, thumbnail);
         return new Theme(null, name, description, thumbnail);
@@ -52,36 +49,6 @@ public class Theme {
         if (thumbnail == null || thumbnail.isBlank() || thumbnail.length() > MAX_THUMBNAIL) {
             throw new IllegalArgumentException("썸네일 URI는 1글자 이상, 255글자 이하여야합니다.");
         }
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Theme theme)) {
-            return false;
-        }
-        return Objects.equals(getId(), theme.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
     }
 
     public long getCurrentPrice() {

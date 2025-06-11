@@ -1,5 +1,6 @@
 package roomescape.reservationTime.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.reservationTime.dto.request.ReservationTimeRequest;
@@ -12,18 +13,16 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(ReservationTimeController.RESERVATION_TIME_BASE_URL)
-public class ReservationTimeController {
+public class ReservationTimeController implements ReservationTimeControllerDocs {
 
     public static final String RESERVATION_TIME_BASE_URL = "/times";
     private static final String SLASH = "/";
 
     private final ReservationTimeService reservationTimeService;
 
-    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
-        this.reservationTimeService = reservationTimeService;
-    }
-
+    @Override
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody final ReservationTimeRequest request) {
@@ -33,12 +32,14 @@ public class ReservationTimeController {
         return ResponseEntity.created(locationUri).body(response);
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTimeResponse> response = reservationTimeService.getReservationTimes();
         return ResponseEntity.ok(response);
     }
 
+    @Override
     @GetMapping(consumes = {"application/json"})
     public ResponseEntity<List<TimeConditionResponse>> getReservationTimes(
             final TimeConditionRequest request) {
@@ -46,6 +47,7 @@ public class ReservationTimeController {
         return ResponseEntity.ok().body(responses);
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationTimeById(@PathVariable("id") final Long id) {
         reservationTimeService.deleteReservationTimeById(id);

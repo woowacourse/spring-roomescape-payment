@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-@LogExecution
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final DateTime dateTime;
@@ -35,16 +36,8 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(final DateTime dateTime, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
-        this.dateTime = dateTime;
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
-        this.waitingRepository = waitingRepository;
-    }
-
     @Transactional
+    @LogExecution
     public ReservationResponse createPendingReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
@@ -97,6 +90,7 @@ public class ReservationService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteReservationById(final Long id) {
         Reservation reservation = findReservation(id);
 
@@ -118,6 +112,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
     }
 
+    @LogExecution
     private void approveWaiting(final List<Waiting> waitings) {
         Waiting firstWaiting = waitings.get(0);
 

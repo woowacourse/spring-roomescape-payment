@@ -1,5 +1,6 @@
 package roomescape.theme.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -15,7 +16,7 @@ import roomescape.theme.dto.response.ThemeResponse;
 import java.util.List;
 
 @Service
-@LogExecution
+@RequiredArgsConstructor
 public class ThemeService {
 
     private static final int POPULAR_THEME_COUNT = 10;
@@ -26,15 +27,8 @@ public class ThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ThemeService(final DateTime dateTime,
-                        final ThemeRepository themeRepository,
-                        final ReservationRepository reservationRepository) {
-        this.dateTime = dateTime;
-        this.themeRepository = themeRepository;
-        this.reservationRepository = reservationRepository;
-    }
-
     @Transactional
+    @LogExecution
     public ThemeResponse createTheme(final ThemeRequest request) {
         Theme theme = Theme.createWithoutId(request.name(), request.description(), request.thumbnail());
         Theme save = themeRepository.save(theme);
@@ -43,6 +37,7 @@ public class ThemeService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteThemeById(final Long id) {
         if (reservationRepository.existsByThemeId(id)) {
             throw new IllegalArgumentException("예약한 기록이 존재하여 삭제할 수 없습니다.");

@@ -1,6 +1,7 @@
 package roomescape.payment.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.logging.LogExecution;
 import roomescape.payment.domain.Payment;
@@ -11,23 +12,19 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
-@LogExecution
 public class PaymentTransactionService {
 
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
-
-    public PaymentTransactionService(final ReservationRepository reservationRepository, final PaymentRepository paymentRepository) {
-        this.reservationRepository = reservationRepository;
-        this.paymentRepository = paymentRepository;
-    }
 
     public Payment savePayment(final TossPaymentResponse response) {
         Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, response.paymentKey());
         return paymentRepository.save(payment);
     }
 
+    @LogExecution
     public void confirmReservation(long reservationId, Payment payment) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다. id : " + reservationId));
         reservation.changePendingToPaid(payment);

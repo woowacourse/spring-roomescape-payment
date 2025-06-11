@@ -1,19 +1,18 @@
 package roomescape.theme.infrastructure;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.ReservationPeriod;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
+@RequiredArgsConstructor
 public class ThemeRepositoryImpl implements ThemeRepository {
     private final JpaThemeRepository jpaThemeRepository;
-
-    public ThemeRepositoryImpl(JpaThemeRepository jpaThemeRepository) {
-        this.jpaThemeRepository = jpaThemeRepository;
-    }
 
     @Override
     public Theme save(Theme theme) {

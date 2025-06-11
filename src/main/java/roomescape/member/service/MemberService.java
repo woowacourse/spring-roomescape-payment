@@ -1,5 +1,6 @@
 package roomescape.member.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -13,16 +14,13 @@ import roomescape.member.dto.response.SignupResponse;
 import java.util.List;
 
 @Service
-@LogExecution
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
-
     @Transactional
+    @LogExecution
     public SignupResponse createUser(SignupRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 가입된 이메일입니다");

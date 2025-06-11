@@ -1,11 +1,9 @@
 package roomescape.member.presentation;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.dto.request.LoginMember;
@@ -14,16 +12,13 @@ import roomescape.member.dto.response.LoginCheckResponse;
 import roomescape.member.service.LoginService;
 
 @RestController
-public class LoginController {
+@RequiredArgsConstructor
+public class LoginController implements LoginControllerDocs {
 
     private final TokenCookieManager tokenCookieManager;
     private final LoginService loginService;
 
-    public LoginController(final TokenCookieManager tokenCookieManager, final LoginService loginService) {
-        this.tokenCookieManager = tokenCookieManager;
-        this.loginService = loginService;
-    }
-
+    @Override
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         String token = loginService.loginAndReturnToken(request);
@@ -31,6 +26,7 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
+    @Override
     @GetMapping("/login/check")
     public ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember loginMember) {
         String memberName = loginService.findMemberName(loginMember.id());
@@ -38,6 +34,7 @@ public class LoginController {
         return ResponseEntity.ok().body(loginCheckResponse);
     }
 
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         tokenCookieManager.deleteTokenCookie(response);

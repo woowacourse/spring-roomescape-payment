@@ -22,7 +22,7 @@ public record MyReservationAndWaitingResponse(
         String status,
         @Schema(description = "결제 키", example = "payment_key_1234")
         String paymentKey,
-        @Schema(description = "결제 금액", example = "10000")
+        @Schema(description = "결제 금액", example = "1000")
         Long amount) {
 
     public static MyReservationAndWaitingResponse from(Reservation reservation) {

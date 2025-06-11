@@ -1,11 +1,18 @@
 package roomescape.reservationTime.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
+@Getter
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationTime {
 
     @Id
@@ -18,10 +25,6 @@ public class ReservationTime {
     private ReservationTime(final Long id, final LocalTime startAt) {
         this.id = id;
         this.startAt = startAt;
-    }
-
-    protected ReservationTime() {
-
     }
 
     public static ReservationTime createWithoutId(final LocalTime startAt) {
@@ -38,33 +41,5 @@ public class ReservationTime {
 
     public boolean isBeforeTime(final LocalTime time) {
         return startAt.isBefore(time);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ReservationTime that)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalTime getStartAt() {
-        return startAt;
-    }
-
-    @Override
-    public String toString() {
-        return "ReservationTime{" +
-                "id=" + id +
-                ", startAt=" + startAt +
-                '}';
     }
 }

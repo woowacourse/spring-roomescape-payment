@@ -1,5 +1,6 @@
 package roomescape.reservationTime.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.logging.LogExecution;
@@ -15,19 +16,14 @@ import roomescape.reservationTime.dto.response.TimeConditionResponse;
 import java.util.List;
 
 @Service
-@LogExecution
+@RequiredArgsConstructor
 public class ReservationTimeService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
 
-    public ReservationTimeService(final ReservationRepository reservationRepository,
-                                  final ReservationTimeRepository reservationTimeRepository) {
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-    }
-
     @Transactional
+    @LogExecution
     public ReservationTimeResponse createReservationTime(final ReservationTimeRequest request) {
         ReservationTime reservationTime = ReservationTime.createWithoutId(request.startAt());
         ReservationTime save = reservationTimeRepository.save(reservationTime);
@@ -36,6 +32,7 @@ public class ReservationTimeService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteReservationTimeById(final Long id) {
         if (reservationRepository.existsByTimeId(id)) {
             throw new IllegalArgumentException("삭제할 수 없는 예약 시간입니다.");
