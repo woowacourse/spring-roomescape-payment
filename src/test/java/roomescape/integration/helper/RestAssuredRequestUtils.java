@@ -5,6 +5,7 @@ import io.restassured.filter.Filter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.Map;
 
 public class RestAssuredRequestUtils {
 
@@ -76,6 +77,15 @@ public class RestAssuredRequestUtils {
                 .cookie("token", token)
                 .when().get(uri);
     }
+
+    public static Response sendGetWithTokenAndFilterAndQueryParams(String uri, RequestSpecification spec, String token, Filter filter, Map<String, String> queryParams) {
+        return RestAssured.given(spec).log().all()
+                .filters(filter)
+                .cookie("token", token)
+                .queryParams(queryParams)
+                .when().get(uri);
+    }
+
 
     public static Response sendPostWithTokenAndFilter(String uri, Object body, RequestSpecification spec, String token, Filter filter) {
         return RestAssured.given(spec).log().all()
