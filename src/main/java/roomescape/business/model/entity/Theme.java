@@ -24,18 +24,23 @@ public class Theme {
     private final Id id;
     @Embedded
     private ThemeName name;
+
     private String description;
+
     private String thumbnail;
+
+    private Long price;
 
     protected Theme() {
         id = Id.issue();
     }
 
     public static Theme create(final String name, final String description, final String thumbnail) {
-        return new Theme(Id.issue(), new ThemeName(name), description, thumbnail);
+        return new Theme(Id.issue(), new ThemeName(name), description, thumbnail, 5000L);
     }
 
-    public static Theme restore(final String id, final String name, final String description, final String thumbnail) {
-        return new Theme(Id.create(id), new ThemeName(name), description, thumbnail);
+    public static Theme restore(final String id, final String name, final String description, final String thumbnail,
+                                final Long price) {
+        return new Theme(Id.create(id), new ThemeName(name), description, thumbnail, price);
     }
 }

@@ -31,7 +31,7 @@ public class WaitingApiController {
     public ResponseEntity<WaitingResponse> createReservation(@RequestBody @Valid WaitingRequest request,
                                                              LoginInfo loginInfo) {
         WaitingResponse response = waitingService.createWaiting(loginInfo, request);
-        return ResponseEntity.created(URI.create("/reservations")).body(response);
+        return ResponseEntity.created(URI.create("/waitings/" + response.id())).body(response);
     }
 
     @GetMapping("/admin/waitings")
@@ -43,7 +43,6 @@ public class WaitingApiController {
 
     @DeleteMapping("/waitings/{id}")
     @AuthRequired
-    @Role(UserRole.ADMIN)
     public ResponseEntity<Void> deleteWaiting(@PathVariable String id) {
         waitingService.deleteWaitingById(id);
         return ResponseEntity.noContent().build();

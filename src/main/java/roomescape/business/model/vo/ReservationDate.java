@@ -1,13 +1,11 @@
 package roomescape.business.model.vo;
 
-import static roomescape.exception.ErrorCode.RESERVATION_DATE_PAST;
-import static roomescape.exception.ErrorCode.RESERVATION_DATE_TOO_FAR_IN_FUTURE;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.PastDateReservationException;
+import roomescape.exception.reservation.TooFarDateReservationException;
 
 @Embeddable
 public record ReservationDate(
@@ -28,14 +26,14 @@ public record ReservationDate(
 
     private static void validateNotPast(final LocalDate date) {
         if (date.isBefore(LocalDate.now())) {
-            throw new InvalidCreateArgumentException(RESERVATION_DATE_PAST);
+            throw new PastDateReservationException();
         }
     }
 
     private static void validateInterval(final LocalDate date) {
         long minusDays = ChronoUnit.DAYS.between(LocalDate.now(), date);
         if (minusDays > INTERVAL_FROM_NOW) {
-            throw new InvalidCreateArgumentException(RESERVATION_DATE_TOO_FAR_IN_FUTURE, INTERVAL_FROM_NOW);
+            throw new TooFarDateReservationException(INTERVAL_FROM_NOW);
         }
     }
 }

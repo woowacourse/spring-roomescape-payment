@@ -1,7 +1,6 @@
 package roomescape.infrastructure.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +15,22 @@ public class PaymentConfig {
     public TossPaymentClient tossPaymentClient(
             RestClient.Builder restClientBuilder,
             ObjectMapper objectMapper,
-            @Value("${payment.secret-key}") String secretKey
+            @Value("${payment.toss.secret-key}") String secretKey,
+            @Value("${payment.toss.timeout.read}") int readTimeOut,
+            @Value("${payment.toss.timeout.connect}") int connectTimeOut,
+            @Value("${payment.toss.base-url}") String baseUrl
     ) {
-        return new TossPaymentClient(createTossRestClient(restClientBuilder), objectMapper, secretKey);
+        RestClient tossRestClient = createTossRestClient(restClientBuilder, readTimeOut, connectTimeOut, baseUrl);
+        return new TossPaymentClient(tossRestClient, objectMapper, secretKey);
     }
 
-    private RestClient createTossRestClient(RestClient.Builder restClientBuilder) {
+    private RestClient createTossRestClient(RestClient.Builder restClientBuilder, int readTimeOut, int connectTimeOut,
+                                            String baseUrl) {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofSeconds(3));
-        factory.setReadTimeout(Duration.ofSeconds(30));
+        factory.setConnectTimeout(connectTimeOut);
+        factory.setReadTimeout(readTimeOut);
         return restClientBuilder
-                .baseUrl("https://api.tosspayments.com/")
+                .baseUrl(baseUrl)
                 .requestFactory(factory)
                 .build();
     }

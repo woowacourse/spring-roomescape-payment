@@ -10,8 +10,10 @@ import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.business.NotFoundException;
+import roomescape.exception.member.MemberNotFoundException;
+import roomescape.exception.reservation.ThemeNotFoundException;
+import roomescape.exception.reservation.TimeSlotNotFoundException;
+import roomescape.exception.reservation.WaitingNotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
@@ -34,11 +36,11 @@ public class WaitingService {
 
     public WaitingResponse createWaiting(LoginInfo loginInfo, WaitingRequest request) {
         Member member = memberRepository.findById(Id.create(loginInfo.id()))
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
+                .orElseThrow(MemberNotFoundException::new);
         TimeSlot time = reservationTimeRepository.findById(Id.create(request.timeId()))
-                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_TIME_NOT_EXIST));
+                .orElseThrow(TimeSlotNotFoundException::new);
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
-                .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_NOT_EXIST));
+                .orElseThrow(ThemeNotFoundException::new);
 
         Waiting waiting = Waiting.create(member, request.date(), time, theme);
         waitingRepository.save(waiting);
@@ -56,14 +58,14 @@ public class WaitingService {
     @Transactional
     public void deleteWaitingById(String id) {
         Waiting waiting = waitingRepository.findById(Id.create(id))
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_EXIST));
+                .orElseThrow(WaitingNotFoundException::new);
         waitingRepository.delete(waiting);
     }
 
 
     public List<WaitingWithRankResponse> getMyWaitings(String userId) {
         Member member = memberRepository.findById(Id.create(userId))
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
+                .orElseThrow(MemberNotFoundException::new);
         return waitingRepository.findByUserIdWithRank(member.getId());
     }
 }

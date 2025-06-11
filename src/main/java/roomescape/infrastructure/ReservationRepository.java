@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.vo.Id;
+import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Id> {
 
@@ -28,4 +29,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Id> {
     boolean existsByThemeId(Id themeId);
 
     boolean existsByDate_ValueAndTimeSlot_StartAtAndThemeId(LocalDate date, LocalTime time, Id themeId);
+
+    @Query("""
+                SELECT new roomescape.presentation.dto.response.ReservationWithPaymentResponse(r, p)
+                FROM Reservation r
+                JOIN FETCH Payment p ON r.id = p.reservation.id
+                JOIN FETCH r.theme
+                JOIN FETCH r.member
+                JOIN FETCH r.timeSlot
+                WHERE r.member.id.id = :memberId
+            """)
+    List<ReservationWithPaymentResponse> findByMemberIdWithPayment(String memberId);
 }

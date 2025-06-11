@@ -13,25 +13,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ------  결제위젯 초기화 ------
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-    // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 200000;
-    const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-    const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: paymentAmount},
-        {variantKey: "DEFAULT"}
-    );
-
-
     document.getElementById('theme-slots').addEventListener('click', event => {
         if (event.target.classList.contains('theme-slot')) {
             document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
             event.target.classList.add('active');
             checkDateAndTheme();
+            const selectedThemeElement = document.querySelector('.theme-slot.active');
+            const selectedThemePrice = selectedThemeElement.getAttribute('data-theme-price');
+
+            // ------  결제위젯 초기화 ------
+            // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
+            // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
+            const paymentAmount = selectedThemePrice;
+            const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+            const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
+            paymentWidget.renderPaymentMethods(
+                "#payment-method",
+                {value: paymentAmount},
+                {variantKey: "DEFAULT"}
+            );
+
+            function onReservationButtonClickWithPaymentWidget(event) {
+                onReservationButtonClick(event, paymentWidget);
+            }
+
+            document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
+            document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
         }
+
     });
 
     document.getElementById('time-slots').addEventListener('click', event => {
@@ -41,13 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             checkDateAndThemeAndTime();
         }
     });
-
-    document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-    document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
-
-    function onReservationButtonClickWithPaymentWidget(event) {
-        onReservationButtonClick(event, paymentWidget);
-    }
 });
 
 function renderTheme(themes) {
@@ -56,8 +58,17 @@ function renderTheme(themes) {
     themes.forEach(theme => {
         const name = theme.name;
         const themeId = theme.id;
-        themeSlots.appendChild(createSlot('theme', name, themeId));
+        themeSlots.appendChild(createThemeSlot('theme', name, themeId, theme.price));
     });
+}
+
+function createThemeSlot(type, text, id, price) {
+    const div = document.createElement('div');
+    div.className = type + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
+    div.textContent = text + " (" + price + "원)";
+    div.setAttribute('data-' + type + '-id', id);
+    div.setAttribute('data-' + type + '-price', price)
+    return div;
 }
 
 function createSlot(type, text, id, booked) {
@@ -67,9 +78,6 @@ function createSlot(type, text, id, booked) {
     div.setAttribute('data-' + type + '-id', id);
     if (type === 'time') {
         div.setAttribute('data-time-booked', booked);
-        // if (booked) {
-        //     div.classList.add('disabled');
-        // } -> 삭제됨
     }
     return div;
 }
@@ -165,11 +173,7 @@ function onReservationButtonClick(event, paymentWidget) {
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
 
     if (selectedDate && selectedThemeId && selectedTimeId) {
-        const reservationData = {
-            date: selectedDate,
-            themeId: selectedThemeId,
-            timeId: selectedTimeId,
-        };
+        const reservationData = {};
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
         /*
@@ -179,38 +183,49 @@ function onReservationButtonClick(event, paymentWidget) {
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
         const orderIdPrefix = "WTEST";
-        paymentWidget.requestPayment({
-            orderId: orderIdPrefix + generateRandomString(),
-            orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 200000,
-        }).then(function (data) {
-            console.debug(data);
-            fetchReservationPayment(data, reservationData);
-        }).catch(function (error) {
-            // TOSS 에러 처리: 에러 목록을 확인하세요
-            // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-            alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
-        });
+        const paymentData = {
+            date: selectedDate,
+            themeId: selectedThemeId,
+            timeId: selectedTimeId,
+        }
+        fetch('/payments', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentData),
+        }).then(response => {
+            return response.json();  // 👈 JSON으로 변환
+        }).then(response => {
+            console.log(response);
+            paymentWidget.requestPayment({
+                orderId: response.id,
+                orderName: "테스트 방탈출 예약 결제 1건",
+                amount: response.amount,
+            }).then(function (data) {
+                console.log(data);
+                console.debug(data);
+                fetchReservationPayment(data, reservationData);
+            }).catch(function (error) {
+                // TOSS 에러 처리: 에러 목록을 확인하세요
+                // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
+                alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+            });
+        }).catch(error => alert(error.message))
     } else {
         alert("Please select a date, theme, and time before making a reservation.");
     }
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
+async function fetchReservationPayment(paymentData) {
     const reservationPaymentRequest = {
-        date: reservationData.date,
-        themeId: reservationData.themeId,
-        timeId: reservationData.timeId,
-        reservationStatus: reservationData.reservationStatus,
         paymentKey: paymentData.paymentKey,
-        orderId: paymentData.orderId,
         amount: paymentData.amount,
-        paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
+    const reservationURL = "/payments/" + paymentData.orderId;
     fetch(reservationURL, {
-        method: "POST",
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json",
         },
@@ -222,10 +237,8 @@ async function fetchReservationPayment(paymentData, reservationData) {
                 window.alert(errorBody.message);
             });
         } else {
-            response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
-            });
+            console.log("예약 결제 성공");
+            window.location.reload();
         }
     }).catch(error => {
         console.error(error.message);

@@ -1,46 +1,41 @@
 package roomescape.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.exception.auth.AuthenticationException;
-import roomescape.exception.auth.AuthorizationException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(RootBusinessException.class)
-    public ResponseEntity<ErrorResponse> handle(RootBusinessException e) {
-        logger.warn("Handled RootException: {}", e.getMessage(), e);
-        return ErrorResponse.plainResponse(HttpStatus.BAD_REQUEST, e.code()).toResponseEntity();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handle(MethodArgumentNotValidException e) {
+        log.warn("Exception: message={}", e.getMessage());
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handle(AuthenticationException e) {
-        logger.warn("Handled AuthenticatedException: {}", e.detailMessage(), e);
-        return ErrorResponse.securedResponse(HttpStatus.UNAUTHORIZED, e.clientMessage()).toResponseEntity();
+    @ExceptionHandler(SeparatedMessageException.class)
+    public ResponseEntity<ErrorResponse> handle(SeparatedMessageException e) {
+        log.warn("Exception: message={}", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getStatus(), e.getClientMessage());
+        return ResponseEntity.status(e.getStatus()).body(response);
     }
 
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<ErrorResponse> handle(AuthorizationException e) {
-        logger.warn("Handled AuthorizationException: {}", e.detailMessage(), e);
-        return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.clientMessage()).toResponseEntity();
-    }
-
-    @ExceptionHandler(ExternalApiErrorException.class)
-    public ResponseEntity<ErrorResponse> handle(ExternalApiErrorException e) {
-        logger.warn("Handled ExternalApiErrorException: {}", e.getMessage());
-        return ErrorResponse.securedResponse().toResponseEntity();
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handle(ApplicationException e) {
+        log.warn("Exception: message={}", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getStatus(), e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
-        logger.error("Handled Exception: {}", e.getMessage(), e);
-        return ErrorResponse.securedResponse().toResponseEntity();
+        log.error("Exception: message={}", e.getMessage(), e);
+        ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생하였습니다. 관리자에게 문의해주세요");
+        return ResponseEntity.internalServerError().body(response);
     }
 }

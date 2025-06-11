@@ -1,13 +1,12 @@
 package roomescape.auth;
 
 import static org.springframework.boot.web.server.Cookie.SameSite;
-import static roomescape.exception.SecurityErrorCode.TOKEN_NOT_EXIST;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.AuthenticationRequiredException;
 
 public record AuthToken(
         String value
@@ -25,7 +24,7 @@ public record AuthToken(
             }
         }
 
-        throw new AuthenticationException(TOKEN_NOT_EXIST);
+        throw new AuthenticationRequiredException();
     }
 
     public HttpHeaders toHttpHeaders() {

@@ -1,8 +1,5 @@
 package roomescape.business.service;
 
-import static roomescape.exception.ErrorCode.RESERVED_THEME;
-import static roomescape.exception.ErrorCode.THEME_NOT_EXIST;
-
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
-import roomescape.exception.business.NotFoundException;
-import roomescape.exception.business.RelatedEntityExistException;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.ThemeNotFoundException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.presentation.dto.request.ThemeCreateRequest;
@@ -59,10 +56,10 @@ public class ThemeService {
     public void delete(final String themeIdValue) {
         Id themeId = Id.create(themeIdValue);
         if (reservationRepository.existsByThemeId(themeId)) {
-            throw new RelatedEntityExistException(RESERVED_THEME);
+            throw new ReservationExistsException();
         }
         if (!themeRepository.existsById(themeId)) {
-            throw new NotFoundException(THEME_NOT_EXIST);
+            throw new ThemeNotFoundException();
         }
         themeRepository.deleteById(themeId);
     }

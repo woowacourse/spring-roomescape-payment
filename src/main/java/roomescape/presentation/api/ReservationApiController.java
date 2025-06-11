@@ -19,8 +19,8 @@ import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationService;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
-import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
+import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,21 +28,13 @@ public class ReservationApiController {
 
     private final ReservationService reservationService;
 
-    @PostMapping("/reservations")
-    @AuthRequired
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationRequest request,
-                                                                 LoginInfo loginInfo) {
-        ReservationResponse response = reservationService.addAndGet(loginInfo, request);
-        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
-    }
-
     @PostMapping("/admin/reservations")
     @AuthRequired
     @Role(UserRole.ADMIN)
     public ResponseEntity<ReservationResponse> adminCreateReservation(
             @RequestBody @Valid AdminReservationRequest request) {
         ReservationResponse response = reservationService.addAndGetWithoutPayment(request);
-        return ResponseEntity.created(URI.create("/reservations" + response.id())).body(response);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping("/reservations")
@@ -53,7 +45,7 @@ public class ReservationApiController {
 
     @GetMapping("/reservations/me")
     @AuthRequired
-    public List<ReservationResponse> getMyReservations(LoginInfo loginInfo) {
+    public List<ReservationWithPaymentResponse> getMyReservations(LoginInfo loginInfo) {
         return reservationService.getMyReservations(loginInfo.id());
     }
 
