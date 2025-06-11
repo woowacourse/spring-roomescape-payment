@@ -21,7 +21,7 @@ import roomescape.member.domain.MemberRole;
 public class JwtProvider {
 
     private static final String ROLE = "role";
-    private static final int VALIDITY_IN_MILLISECONDS = 1000;
+    private static final int VALIDITY_IN_MILLISECONDS = 1_000;
 
     private final JwtProperties jwtProperties;
 

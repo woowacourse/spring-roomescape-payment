@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
@@ -79,7 +78,7 @@ class ReservationRepositoryTest {
         reservationSlotRepository.save(reservationSlot2);
 
         // when
-        List<Reservation> filteredReservations = reservationRepository.findFirstByCriteria(null, null,
+        List<Reservation> filteredReservations = reservationRepository.findConfirmedByCriteria(null, null,
                 null, null);
 
         assertThat(filteredReservations.size()).isEqualTo(2);
@@ -97,7 +96,7 @@ class ReservationRepositoryTest {
         reservationSlotRepository.save(reservationSlot2);
 
         // when
-        List<Reservation> filteredReservations = reservationRepository.findFirstByCriteria(theme.getId(), FUTURE_DATE,
+        List<Reservation> filteredReservations = reservationRepository.findConfirmedByCriteria(theme.getId(), FUTURE_DATE,
                 FUTURE_DATE.plusDays(1), member.getId());
 
         assertThat(filteredReservations.size()).isEqualTo(1);

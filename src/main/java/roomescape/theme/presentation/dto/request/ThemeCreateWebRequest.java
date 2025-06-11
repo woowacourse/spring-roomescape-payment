@@ -1,11 +1,12 @@
 package roomescape.theme.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.theme.domain.Theme;
 
 public record ThemeCreateWebRequest(
-        String name,
-        String description,
-        String thumbnail
+        @Schema(description = "생성할 테마의 이름") String name,
+        @Schema(description = "생성할 테마의 설명") String description,
+        @Schema(description = "생성할 테마의 썸네일 Url") String thumbnail
 ) {
     public ThemeCreateWebRequest {
         if (name == null) {

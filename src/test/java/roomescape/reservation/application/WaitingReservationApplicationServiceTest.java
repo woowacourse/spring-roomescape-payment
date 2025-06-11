@@ -1,6 +1,9 @@
 package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static roomescape.fixture.TestFixture.FUTURE_DATE;
 
 import java.time.LocalDateTime;
@@ -20,19 +23,30 @@ import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentDataService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.infrastructure.PaymentRepository;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.reservation.application.dto.request.WaitingConfirmRequest;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.exception.ConfirmedReservationAlreadyExistsException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
+import roomescape.reservationslot.domain.ReservationSlot;
 import roomescape.reservationslot.infrastructure.ReservationSlotRepository;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 import roomescape.reservationtime.application.ReservationTimeDataService;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.infrastructure.ReservationTimeRepository;
 import roomescape.theme.application.ThemeDataService;
+import roomescape.theme.domain.Theme;
 import roomescape.theme.infrastructure.ThemeRepository;
 
 @DataJpaTest
@@ -58,6 +72,9 @@ class WaitingReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @MockitoBean
     private PaymentClient paymentClient;
 
@@ -69,6 +86,8 @@ class WaitingReservationApplicationServiceTest {
 
     private ReservationSlotDataService reservationSlotDataService;
 
+    private ConfirmedReservationApplicationService confirmedReservationApplicationService;
+
     @BeforeEach
     void setUp() {
         reservationSlotDataService = new ReservationSlotDataService(reservationSlotRepository);
@@ -77,12 +96,13 @@ class WaitingReservationApplicationServiceTest {
         ThemeDataService themeDataService = new ThemeDataService(themeRepository);
         ReservationTimeDataService reservationTimeDataService = new ReservationTimeDataService(
                 reservationTimeRepository, reservationSlotDataService);
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        PaymentApplicationService paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         waitingReservationApplicationService = new WaitingReservationApplicationService(
-                reservationSlotDataService, memberDataService, reservationDataService);
-        PaymentService paymentService = new PaymentService(paymentClient);
-        ConfirmedReservationApplicationService confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
+                reservationSlotDataService, memberDataService, reservationDataService, paymentApplicationService);
+        confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService, reservationTimeDataService, themeDataService, memberDataService,
-                reservationDataService, paymentService);
+                reservationDataService, paymentApplicationService);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
@@ -165,5 +185,67 @@ class WaitingReservationApplicationServiceTest {
         // Then
         List<WaitingWebResponse> all = waitingReservationApplicationService.findAll();
         assertThat(all).isEmpty();
+    }
+
+    @Test
+    void confirm_whenFirstWaiting_successfullyConfirm() {
+        // Given
+        Reservation confirmedReservation = reservationRepository.findById(reservationId).get();
+        ReservationSlot reservationSlot = confirmedReservation.getReservationSlot();
+        Member member = memberRepository.findById(memberId2).get();
+        Reservation reservation = reservationSlot.addReservation(member, LocalDateTime.now().plusMinutes(1));
+        reservationRepository.save(reservation);
+        confirmedReservationApplicationService.cancel(reservationId);
+        when(paymentClient.approvePayment(any())).thenAnswer(invocation -> {
+            PaymentApproveRequest req = invocation.getArgument(0);
+            return new PaymentApproveResponse(req.paymentKey(), req.orderId(), req.amount());
+        });
+
+        // When
+        waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L));
+
+        // Then
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(reservationSlot.getReservations()).hasSize(1);
+            softAssertions.assertThat(reservationSlot.isConfirmedReservationExist()).isTrue();
+        });
+    }
+
+    @Test
+    void confirm_whenConfirmedReservationExists_shouldThrowException() {
+        // Given
+        Reservation confirmedReservation = reservationRepository.findById(reservationId).get();
+        ReservationSlot reservationSlot = confirmedReservation.getReservationSlot();
+        Member member = memberRepository.findById(memberId2).get();
+        Reservation reservation = reservationSlot.addReservation(member, LocalDateTime.now().plusMinutes(1));
+        reservationRepository.save(reservation);
+        when(paymentClient.approvePayment(any())).thenAnswer(invocation -> {
+            PaymentApproveRequest req = invocation.getArgument(0);
+            return new PaymentApproveResponse(req.paymentKey(), req.orderId(), req.amount());
+        });
+
+        // When & Then
+        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L)))
+                .isInstanceOf(ConfirmedReservationAlreadyExistsException.class)
+                .hasMessage("이미 예약이 존재하여 진행할 수 없습니다.");
+    }
+
+    @Test
+    void confirm_whenWaitingNotExists_shouldThrowException() {
+        // Given
+        ReservationTime reservationTime = reservationTimeRepository.findById(timeId).get();
+        Theme theme = new Theme("name", "description", "thumbnail");
+        themeRepository.save(theme);
+        ReservationSlot reservationSlot = new ReservationSlot(FUTURE_DATE, reservationTime, theme);
+        reservationSlotRepository.save(reservationSlot);
+        when(paymentClient.approvePayment(any())).thenAnswer(invocation -> {
+            PaymentApproveRequest req = invocation.getArgument(0);
+            return new PaymentApproveResponse(req.paymentKey(), req.orderId(), req.amount());
+        });
+
+        // When & Then
+        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L)))
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessage("예약이 존재하지 않습니다.");
     }
 }

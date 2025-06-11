@@ -86,79 +86,101 @@ VALUES
     ('2025-05-11', 2, 5);  -- ID: 19 (12:00)
 
 -- 예약 데이터 (Reservation) - 수정된 ReservationSlot ID에 맞게 조정
-INSERT INTO reservations(reservation_slot_id, member_id, created_at)
+INSERT INTO reservations(reservation_slot_id, member_id, status, created_at)
 VALUES
     -- ReservationSlot ID 1 (논리, 5/10, 08:00) - Alice(현재), Bob(대기), Carol(대기)
-    (1, 3, '2025-05-09 10:00:00'),   -- Alice
-    (1, 4, '2025-05-09 10:30:00'),   -- Bob
-    (1, 5, '2025-05-09 11:00:00'),   -- Carol
+    (1, 3, 'CONFIRMED', '2025-05-09 10:00:00'),   -- Alice
+    (1, 4, 'WAITING', '2025-05-09 10:30:00'),   -- Bob
+    (1, 5, 'WAITING', '2025-05-09 11:00:00'),   -- Carol
 
     -- ReservationSlot ID 2 (논리, 5/10, 12:00) - Dave(현재), Eve(대기)
-    (2, 6, '2025-05-09 11:30:00'),   -- Dave
-    (2, 7, '2025-05-09 12:00:00'),   -- Eve
+    (2, 6, 'CONFIRMED', '2025-05-09 11:30:00'),   -- Dave
+    (2, 7, 'WAITING', '2025-05-09 12:00:00'),   -- Eve
 
     -- ReservationSlot ID 3 (논리, 5/10, 14:00) - Frank(현재)
-    (3, 8, '2025-05-09 12:30:00'),   -- Frank
+    (3, 8, 'CONFIRMED', '2025-05-09 12:30:00'),   -- Frank
 
     -- ReservationSlot ID 4 (논리, 5/10, 16:00) - Grace(현재), Heidi(대기)
-    (4, 9, '2025-05-09 13:00:00'),   -- Grace
-    (4, 10, '2025-05-09 13:30:00'),  -- Heidi
+    (4, 9, 'CONFIRMED', '2025-05-09 13:00:00'),   -- Grace
+    (4, 10, 'WAITING', '2025-05-09 13:30:00'),  -- Heidi
 
     -- ReservationSlot ID 5 (논리, 5/10, 18:00) - Ivan(현재), Judy(대기), Mallory(대기)
-    (5, 11, '2025-05-09 14:00:00'),  -- Ivan
-    (5, 12, '2025-05-09 14:30:00'),  -- Judy
-    (5, 13, '2025-05-09 15:00:00'),  -- Mallory
+    (5, 11, 'CONFIRMED', '2025-05-09 14:00:00'),  -- Ivan
+    (5, 12, 'WAITING', '2025-05-09 14:30:00'),  -- Judy
+    (5, 13, 'WAITING', '2025-05-09 15:00:00'),  -- Mallory
 
     -- ReservationSlot ID 6 (로맨스, 5/10, 08:00) - Niaj(현재), Olivia(대기)
-    (6, 14, '2025-05-09 15:30:00'),  -- Niaj
-    (6, 15, '2025-05-09 16:00:00'),  -- Olivia
+    (6, 14, 'CONFIRMED', '2025-05-09 15:30:00'),  -- Niaj
+    (6, 15, 'WAITING', '2025-05-09 16:00:00'),  -- Olivia
 
     -- ReservationSlot ID 7 (로맨스, 5/10, 12:00) - Peggy(현재)
-    (7, 16, '2025-05-09 16:30:00'),  -- Peggy
+    (7, 16, 'CONFIRMED', '2025-05-09 16:30:00'),  -- Peggy
 
     -- ReservationSlot ID 8 (로맨스, 5/10, 14:00) - Rupert(현재), Sybil(대기)
-    (8, 17, '2025-05-09 17:00:00'),  -- Rupert
-    (8, 18, '2025-05-09 17:30:00'),  -- Sybil
+    (8, 17, 'CONFIRMED', '2025-05-09 17:00:00'),  -- Rupert
+    (8, 18, 'WAITING', '2025-05-09 17:30:00'),  -- Sybil
 
     -- ReservationSlot ID 9 (로맨스, 5/10, 16:00) - Trent(현재), Uma(대기)
-    (9, 19, '2025-05-09 18:00:00'),  -- Trent
-    (9, 20, '2025-05-09 18:30:00'),  -- Uma
+    (9, 19, 'CONFIRMED', '2025-05-09 18:00:00'),  -- Trent
+    (9, 20, 'WAITING', '2025-05-09 18:30:00'),  -- Uma
 
     -- ReservationSlot ID 10 (로맨스, 5/10, 18:00) - Victor(현재)
-    (10, 21, '2025-05-09 19:00:00'), -- Victor
+    (10, 21, 'CONFIRMED', '2025-05-09 19:00:00'), -- Victor
 
     -- ReservationSlot ID 11 (모험, 5/10, 08:00) - Wendy(현재), Xander(대기)
-    (11, 22, '2025-05-09 19:30:00'), -- Wendy
-    (11, 23, '2025-05-09 20:00:00'), -- Xander
+    (11, 22, 'CONFIRMED', '2025-05-09 19:30:00'), -- Wendy
+    (11, 23, 'WAITING', '2025-05-09 20:00:00'), -- Xander
 
     -- ReservationSlot ID 12 (모험, 5/10, 12:00) - Yvonne(현재), Zack(대기)
-    (12, 24, '2025-05-09 20:30:00'), -- Yvonne
-    (12, 25, '2025-05-09 21:00:00'), -- Zack
+    (12, 24, 'CONFIRMED', '2025-05-09 20:30:00'), -- Yvonne
+    (12, 25, 'WAITING', '2025-05-09 21:00:00'), -- Zack
 
     -- ReservationSlot ID 13 (모험, 5/10, 14:00) - Amy(현재)
-    (13, 26, '2025-05-09 21:30:00'), -- Amy
+    (13, 26, 'CONFIRMED', '2025-05-09 21:30:00'), -- Amy
 
     -- ReservationSlot ID 14 (모험, 5/10, 16:00) - Brian(현재), Chloe(대기)
-    (14, 27, '2025-05-09 22:00:00'), -- Brian
-    (14, 28, '2025-05-09 22:30:00'), -- Chloe
+    (14, 27, 'CONFIRMED', '2025-05-09 22:00:00'), -- Brian
+    (14, 28, 'WAITING', '2025-05-09 22:30:00'), -- Chloe
 
     -- 5월 11일 예약들
     -- ReservationSlot ID 15 (SF, 5/11, 08:00) - Daniel(현재), Alice(대기)
-    (15, 29, '2025-05-10 10:00:00'), -- Daniel
-    (15, 3, '2025-05-10 10:30:00'),  -- Alice (다른 예약)
+    (15, 29, 'CONFIRMED', '2025-05-10 10:00:00'), -- Daniel
+    (15, 3, 'WAITING', '2025-05-10 10:30:00'),  -- Alice (다른 예약)
 
     -- ReservationSlot ID 16 (SF, 5/11, 12:00) - Bob(현재), Carol(대기)
-    (16, 4, '2025-05-10 11:00:00'),  -- Bob
-    (16, 5, '2025-05-10 11:30:00'),  -- Carol
+    (16, 4, 'CONFIRMED', '2025-05-10 11:00:00'),  -- Bob
+    (16, 5, 'WAITING', '2025-05-10 11:30:00'),  -- Carol
 
     -- ReservationSlot ID 17 (SF, 5/11, 14:00) - Dave(현재), Eve(대기), Frank(대기)
-    (17, 6, '2025-05-10 12:00:00'),  -- Dave
-    (17, 7, '2025-05-10 12:30:00'),  -- Eve
-    (17, 8, '2025-05-10 13:00:00'),  -- Frank
+    (17, 6, 'CONFIRMED', '2025-05-10 12:00:00'),  -- Dave
+    (17, 7, 'WAITING', '2025-05-10 12:30:00'),  -- Eve
+    (17, 8, 'WAITING', '2025-05-10 13:00:00'),  -- Frank
 
     -- ReservationSlot ID 18 (감성, 5/11, 08:00) - Grace(현재)
-    (18, 9, '2025-05-10 13:30:00'),  -- Grace
+    (18, 9, 'CONFIRMED', '2025-05-10 13:30:00'),  -- Grace
 
     -- ReservationSlot ID 19 (감성, 5/11, 12:00) - Heidi(현재), Ivan(대기)
-    (19, 10, '2025-05-10 14:00:00'), -- Heidi
-    (19, 11, '2025-05-10 14:30:00'); -- Ivan
+    (19, 10, 'CONFIRMED', '2025-05-10 14:00:00'), -- Heidi
+    (19, 11, 'WAITING', '2025-05-10 14:30:00'); -- Ivan
+
+INSERT INTO payments(payment_key, order_id, amount, product_type, product_id, created_at)
+VALUES
+    ('tgen_20250519100000Secret001', 'RESERVATION_ORDER_MC410Secret001', '1000', 'RESERVATION', 1, '2025-05-09 10:00:00'),
+    ('tgen_20250509113000Secret002', 'RESERVATION_ORDER_MC410Secret002', '1000', 'RESERVATION', 4, '2025-05-09 11:30:00'),
+    ('tgen_20250509123000Secret003', 'RESERVATION_ORDER_MC410Secret003', '1000', 'RESERVATION', 6, '2025-05-09 12:30:00'),
+    ('tgen_20250509130000Secret004', 'RESERVATION_ORDER_MC410Secret004', '1000', 'RESERVATION', 7, '2025-05-09 13:00:00'),
+    ('tgen_20250509140000Secret005', 'RESERVATION_ORDER_MC410Secret005', '1000', 'RESERVATION', 9, '2025-05-09 14:00:00'),
+    ('tgen_20250509153000Secret006', 'RESERVATION_ORDER_MC410Secret006', '1000', 'RESERVATION', 12, '2025-05-09 15:30:00'),
+    ('tgen_20250509163000Secret007', 'RESERVATION_ORDER_MC410Secret007', '1000', 'RESERVATION', 14, '2025-05-09 16:30:00'),
+    ('tgen_20250509170000Secret008', 'RESERVATION_ORDER_MC410Secret008', '1000', 'RESERVATION', 15, '2025-05-09 17:00:00'),
+    ('tgen_20250509180000Secret009', 'RESERVATION_ORDER_MC410Secret009', '1000', 'RESERVATION', 17, '2025-05-09 18:00:00'),
+    ('tgen_20250509190000Secret010', 'RESERVATION_ORDER_MC410Secret010', '1000', 'RESERVATION', 19, '2025-05-09 19:00:00'),
+    ('tgen_20250509193000Secret011', 'RESERVATION_ORDER_MC410Secret011', '1000', 'RESERVATION', 20, '2025-05-09 19:30:00'),
+    ('tgen_20250509203000Secret012', 'RESERVATION_ORDER_MC410Secret012', '1000', 'RESERVATION', 22, '2025-05-09 20:30:00'),
+    ('tgen_20250509213000Secret013', 'RESERVATION_ORDER_MC410Secret013', '1000', 'RESERVATION', 24, '2025-05-09 21:30:00'),
+    ('tgen_20250509220000Secret014', 'RESERVATION_ORDER_MC410Secret014', '1000', 'RESERVATION', 25, '2025-05-09 22:00:00'),
+    ('tgen_20250510100000Secret015', 'RESERVATION_ORDER_MC410Secret015', '1000', 'RESERVATION', 27, '2025-05-10 10:00:00'),
+    ('tgen_20250510110000Secret016', 'RESERVATION_ORDER_MC410Secret016', '1000', 'RESERVATION', 29, '2025-05-10 11:00:00'),
+    ('tgen_20250510120000Secret017', 'RESERVATION_ORDER_MC410Secret017', '1000', 'RESERVATION', 31, '2025-05-10 12:00:00'),
+    ('tgen_20250510133000Secret018', 'RESERVATION_ORDER_MC410Secret018', '1000', 'RESERVATION', 34, '2025-05-10 13:30:00'),
+    ('tgen_20250510140000Secret019', 'RESERVATION_ORDER_MC410Secret019', '1000', 'RESERVATION', 35, '2025-05-10 14:00:00')

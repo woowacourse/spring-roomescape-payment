@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
-import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 
 @Service
 public class ReservationDataService {
@@ -22,20 +21,17 @@ public class ReservationDataService {
         return reservationRepository.save(reservation);
     }
 
-    public List<MyReservationResponse> findMyReservations(final Long memberId) {
-        return reservationRepository.findByMemberId(memberId)
-                .stream()
-                .map(MyReservationResponse::from)
-                .toList();
+    public List<Reservation> findMemberReservations(final Long memberId) {
+        return reservationRepository.findByMemberId(memberId);
     }
 
     public List<Reservation> findAllWaitingReservations() {
         return reservationRepository.findAllWaitingReservations();
     }
 
-    public List<Reservation> findFirstByCriteria(final Long themeId, final Long memberId,
-                                                 final LocalDate startDate, final LocalDate endDate) {
-        return reservationRepository.findFirstByCriteria(themeId, startDate, endDate, memberId);
+    public List<Reservation> findConfirmedByCriteria(final Long themeId, final Long memberId,
+                                                     final LocalDate startDate, final LocalDate endDate) {
+        return reservationRepository.findConfirmedByCriteria(themeId, startDate, endDate, memberId);
     }
 
     public Reservation getByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {

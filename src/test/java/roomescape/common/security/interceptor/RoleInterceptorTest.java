@@ -23,7 +23,7 @@ import roomescape.member.domain.MemberRole;
 class RoleInterceptorTest {
 
     private static final String SECRET_KEY = "test-secret-key";
-    private static final long VALIDITY_IN_MILLISECONDS = 1000L;
+    private static final long VALIDITY_IN_MILLISECONDS = 1_000L;
     private static final String ADMIN_PATH = "/admin/path";
 
     private RoleInterceptor roleInterceptor;

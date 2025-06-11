@@ -23,13 +23,21 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentDataService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.ProductType;
+import roomescape.payment.infrastructure.PaymentRepository;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
+import roomescape.reservationslot.domain.ReservationSlot;
 import roomescape.reservationslot.exception.ReservationSlotDuplicatedException;
 import roomescape.reservationslot.infrastructure.ReservationSlotRepository;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
@@ -65,6 +73,9 @@ class ConfirmedReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @MockitoBean
     private PaymentClient paymentClient;
 
@@ -84,14 +95,15 @@ class ConfirmedReservationApplicationServiceTest {
         ThemeDataService themeDataService = new ThemeDataService(themeRepository);
         ReservationTimeDataService reservationTimeDataService = new ReservationTimeDataService(
                 reservationTimeRepository, reservationSlotDataService);
-        PaymentService paymentService = new PaymentService(paymentClient);
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        PaymentApplicationService paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService,
                 reservationTimeDataService, themeDataService,
                 memberDataService, reservationDataService,
-                paymentService);
+                paymentApplicationService);
         waitingReservationApplicationService = new WaitingReservationApplicationService(reservationSlotDataService,
-                memberDataService, reservationDataService);
+                memberDataService, reservationDataService, paymentApplicationService);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
@@ -226,22 +238,47 @@ class ConfirmedReservationApplicationServiceTest {
     }
 
     @Test
+    void cancel_whenWaitingExists_hasToUpdateFirstWaitingToPaymentPending() {
+        // Given
+        ReservationSlot reservationSlot = reservationRepository.findById(reservationId).get().getReservationSlot();
+        Member member = new Member("phree", "phree@gmail.com", "password", MemberRole.REGULAR);
+        memberRepository.save(member);
+        Reservation reservation = reservationSlot.addReservation(member, LocalDateTime.now().plusMinutes(1));
+        reservationRepository.save(reservation);
+
+        // When
+        confirmedReservationApplicationService.cancel(reservationId);
+
+        // Then
+        List<ConfirmedReservationWebResponse> result = confirmedReservationApplicationService.findByCriteria(
+                new ConfirmedReservationByCriteriaWebRequest(themeId, member.getId(), FUTURE_DATE, FUTURE_DATE.plusDays(1)));
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result).hasSize(0);
+            softAssertions.assertThat(reservationSlot.getReservations().stream().findFirst().get().getStatus()).isEqualTo(ReservationStatus.PAYMENT_PENDING);
+        });
+    }
+
+    @Test
     void findMyReservations_shouldReturnMemberReservations() {
         // given
         Long themeId2 = themeRepository.save(new Theme("논리", "논리 게임 with Danny", "image.png")).getId();
         Long memberId2 = memberRepository.save(new Member("free", "free@gmail.com", "password", MemberRole.REGULAR))
                 .getId();
-        confirmedReservationApplicationService.create(
+        ConfirmedReservationWebResponse confirmedReservationWebResponse = confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId2, memberId2,
                         afterOneHour));
+        paymentRepository.save(new Payment("test_payment_key", "RESERVATION_test_order_id", 1_000L, ProductType.RESERVATION, confirmedReservationWebResponse.id(), afterOneHour));
 
         // when
-        List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId);
+        List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId2);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(result).hasSize(1);
-                    softAssertions.assertThat(result.getFirst().theme()).isEqualTo("추리");
+                    softAssertions.assertThat(result.getFirst().theme()).isEqualTo("논리");
+                    softAssertions.assertThat(result.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
+                    softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("test_payment_key");
+                    softAssertions.assertThat(result.getFirst().amount()).isEqualTo(1_000L);
                 }
         );
     }

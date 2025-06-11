@@ -2,13 +2,15 @@ package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static roomescape.fixture.IntegrationFixture.ADMIN_EMAIL;
 import static roomescape.fixture.IntegrationFixture.FUTURE_DATE_TEXT;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.REGULAR2_EMAIL;
 import static roomescape.fixture.IntegrationFixture.REGULAR_EMAIL;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
-import static roomescape.fixture.IntegrationFixture.createReservation;
+import static roomescape.fixture.IntegrationFixture.createRegularReservation;
 import static roomescape.fixture.IntegrationFixture.createReservationTime;
 import static roomescape.fixture.IntegrationFixture.createTheme;
 import static roomescape.fixture.IntegrationFixture.loginAndGetAuthToken;
@@ -33,6 +35,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
 import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -55,6 +60,10 @@ class RegularMemberE2ETest {
     void setUp() {
         RestAssured.port = port;
         REGULAR_TOKEN = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
+        when(paymentClient.approvePayment(any())).thenAnswer(invocation -> {
+            PaymentApproveRequest req = invocation.getArgument(0);
+            return new PaymentApproveResponse(req.paymentKey(), req.orderId(), req.amount());
+        });
     }
 
     @Test
@@ -88,7 +97,7 @@ class RegularMemberE2ETest {
     void 예약을_생성할_수_있다() {
         createReservationTime();
         createTheme("추리");
-        createReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
         String adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
         RestAssured.given().log().all()
@@ -125,8 +134,8 @@ class RegularMemberE2ETest {
 
     @Test
     void 내_예약을_조회할_수_있다() {
-        예약_대기를_생성할_수_있다();
-        String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
+        예약을_생성할_수_있다();
+        String user2Token = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
 
         List<MyReservationResponse> responses = RestAssured.given().log().all()
                 .cookie(TOKEN, user2Token)
@@ -139,7 +148,9 @@ class RegularMemberE2ETest {
 
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(responses.size()).isEqualTo(1);
-            softAssertions.assertThat(responses.getFirst().isReserved()).isFalse();
+            softAssertions.assertThat(responses.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
+            softAssertions.assertThat(responses.getFirst().paymentKey()).isEqualTo("test_payment_key");
+            softAssertions.assertThat(responses.getFirst().amount()).isEqualTo(1_000L);
         });
     }
 
@@ -147,7 +158,7 @@ class RegularMemberE2ETest {
     void 대기_중인_예약을_삭제할_수_있다() {
         createReservationTime();
         createTheme("추리");
-        createReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
         Map<String, Object> reservation = new HashMap<>();

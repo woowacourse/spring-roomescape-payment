@@ -1,16 +1,20 @@
 package roomescape.reservation.application;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentApplicationService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ReservationCreateWebRequest;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
 import roomescape.reservationslot.domain.ReservationSlot;
@@ -28,28 +32,27 @@ public class ConfirmedReservationApplicationService {
     private final ThemeDataService themeDataService;
     private final MemberDataService memberDataService;
     private final ReservationDataService reservationDataService;
-    private final PaymentService paymentService;
+    private final PaymentApplicationService paymentApplicationService;
 
     public ConfirmedReservationApplicationService(final ReservationSlotDataService reservationSlotDataService,
                                                   final ReservationTimeDataService reservationTimeDataService,
                                                   final ThemeDataService themeDataService,
                                                   final MemberDataService memberDataService,
                                                   final ReservationDataService slotReservationDataService,
-                                                  PaymentService paymentService) {
+                                                  PaymentApplicationService paymentApplicationService) {
         this.reservationSlotDataService = reservationSlotDataService;
         this.reservationTimeDataService = reservationTimeDataService;
         this.themeDataService = themeDataService;
         this.memberDataService = memberDataService;
         this.reservationDataService = slotReservationDataService;
-        this.paymentService = paymentService;
+        this.paymentApplicationService = paymentApplicationService;
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
         reservationSlotDataService.validateReservationSlotNotExists(request.date(), request.timeId(),
                 request.themeId());
 
-        ReservationSlot slot = createReservationSlot(
-                new ReservationCreateWebRequest(request.date(), request.timeId(), request.themeId()));
+        ReservationSlot slot = createReservationSlot(new ReservationCreateWebRequest(request.date(), request.timeId(), request.themeId()));
         Member member = memberDataService.getById(request.memberId());
         slot.addReservation(member, request.now());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
@@ -60,13 +63,13 @@ public class ConfirmedReservationApplicationService {
     @Transactional
     public ConfirmedReservationWebResponse createWithPayment(final ConfirmedReservationCreateRequest confirmedReservationCreateRequest, final PaymentApproveRequest paymentApproveRequest) {
         ConfirmedReservationWebResponse confirmedReservationWebResponse = create(confirmedReservationCreateRequest);
-        paymentService.approvePayment(paymentApproveRequest);
+        paymentApplicationService.approveReservationPayment(paymentApproveRequest, confirmedReservationWebResponse.id());
         return confirmedReservationWebResponse;
     }
 
     public List<ConfirmedReservationWebResponse> findByCriteria(
             final ConfirmedReservationByCriteriaWebRequest request) {
-        List<Reservation> reservations = reservationDataService.findFirstByCriteria(request.themeId(),
+        List<Reservation> reservations = reservationDataService.findConfirmedByCriteria(request.themeId(),
                 request.memberId(), request.startDate(), request.endDate());
         return reservations
                 .stream()
@@ -77,13 +80,35 @@ public class ConfirmedReservationApplicationService {
 
     public List<MyReservationResponse> findMyReservations(final Long memberId) {
         memberDataService.validateExists(memberId);
-        return reservationDataService.findMyReservations(memberId);
+        List<Reservation> reservations = reservationDataService.findMemberReservations(memberId);
+        return reservations.stream()
+                .map(reservation -> {
+                    ReservationSlot reservationSlot = reservation.getReservationSlot();
+                    Payment payment = paymentApplicationService.findPaymentOfReservation(reservation.getId());
+                    return generateMyReservationResponses(reservation, reservationSlot, payment);
+                })
+                .toList();
     }
 
+    private MyReservationResponse generateMyReservationResponses(Reservation reservation, ReservationSlot reservationSlot, Payment payment) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
+                    reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
+                    payment.getPaymentKey(), payment.getAmount(), reservationSlot.findRank(reservation));
+        }
+        return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
+                reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
+                null, null, reservationSlot.findRank(reservation));
+    }
+
+    @Transactional
     public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
-        cleanupEmptyReservationSlot(reservation.getReservationSlot().getId());
         reservationDataService.deleteById(reservationId);
+        ReservationSlot reservationSlot = reservation.getReservationSlot();
+        cleanupEmptyReservationSlot(reservationSlot.getId());
+        reservationSlot.getReservations().remove(reservation);
+        updateFirstWaitingToPaymentPending(reservationSlot);
     }
 
     private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {
@@ -96,5 +121,10 @@ public class ConfirmedReservationApplicationService {
         if (reservationSlotDataService.hasSingleReservation(slotId)) {
             reservationSlotDataService.deleteById(slotId);
         }
+    }
+
+    private void updateFirstWaitingToPaymentPending(ReservationSlot reservationSlot) {
+        Optional<Reservation> firstWaiting = reservationSlot.getReservations().stream().findFirst();
+        firstWaiting.ifPresent(Reservation::toPaymentPending);
     }
 }

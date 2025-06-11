@@ -16,6 +16,7 @@ import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.exception.ReservationDuplicatedException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservationslot.exception.InvalidReservationSlotException;
@@ -100,7 +101,7 @@ class ReservationSlotTest {
         // given
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
-        Reservation reservation = new Reservation(member1, reservationSlot);
+        Reservation reservation = new Reservation(member1, reservationSlot, ReservationStatus.WAITING);
 
         // when & then
         assertThatThrownBy(() -> reservationSlot.findRank(reservation))
@@ -125,5 +126,45 @@ class ReservationSlotTest {
         assertThatThrownBy(reservationSlot::findConfirmedReservation)
                 .isInstanceOf(ReservationNotFoundException.class)
                 .hasMessageContaining("예약이 존재하지 않습니다.");
+    }
+
+    @Test
+    void findPaymentPendingReservation_whenValidParameters_returnReservation() {
+        // given
+        Member member2 = new Member("phree", "phree@gmail.com", "password", MemberRole.REGULAR);
+        Reservation confirmedReservation = reservationSlot.addReservation(member, NOW_DATETIME);
+        Reservation waitingReservation = reservationSlot.addReservation(member2, NOW_DATETIME);
+        reservationSlot.getReservations().remove(confirmedReservation);
+        waitingReservation.toPaymentPending();
+
+        // when & then
+        assertThat(reservationSlot.findPaymentPendingReservation()).isEqualTo(waitingReservation);
+    }
+
+    @Test
+    void findPaymentPendingReservation_whenReservationsNotExist_throwsException() {
+        // given
+
+        // when & then
+        assertThatThrownBy(reservationSlot::findPaymentPendingReservation)
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessageContaining("예약이 존재하지 않습니다.");
+    }
+
+    @Test
+    void checkIfConfirmedReservationExists_whenConfirmedReservationExist_returnTrue() {
+        // given
+        reservationSlot.addReservation(member, NOW_DATETIME);
+
+        // when & then
+        assertThat(reservationSlot.isConfirmedReservationExist()).isTrue();
+    }
+
+    @Test
+    void checkIfConfirmedReservationExists_whenConfirmedReservationNotExist_returnFalse() {
+        // given
+
+        // when & then
+        assertThat(reservationSlot.isConfirmedReservationExist()).isFalse();
     }
 }
