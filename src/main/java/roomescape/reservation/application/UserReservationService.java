@@ -39,10 +39,14 @@ public class UserReservationService {
     @Transactional
     public ReservationServiceResponse create(CreateReservationServiceRequest request) {
         Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
-        log.info("결제 승인 요청");
+        log.info("결제 승인 요청 - memberId: {}, schedule: {}, amount: {}",
+                request.memberId(), request.toSchedule(), request.toPaymentInfo().amount());
+
         TossPaymentsResponse tossPaymentsResponse = paymentClient.requestConfirm(request.toPaymentInfo());
         paymentOperation.savePayment(tossPaymentsResponse.toEntity(savedReservation.getId()));
-        log.info("결제 승인 완료");
+
+        log.info("결제 승인 완료 - memberId: {}, orderId: {}, amount: {}",
+                request.memberId(), tossPaymentsResponse.orderId(), tossPaymentsResponse.totalAmount());
         return ReservationServiceResponse.from(savedReservation);
     }
 
