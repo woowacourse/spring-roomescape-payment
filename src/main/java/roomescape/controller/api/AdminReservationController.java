@@ -2,6 +2,7 @@ package roomescape.controller.api;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,14 +23,11 @@ import roomescape.service.ReservationService;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
-
-    public AdminReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> reservationFilter(
@@ -59,7 +57,7 @@ public class AdminReservationController {
         List<ReservationResponse> waitings = reservationService.findAllWaitings();
 
         log.debug("대기 목록 조회 완료: {}건", waitings.size());
-        return ResponseEntity.ok(waitings);
+        return ResponseEntity.ok().body(waitings);
     }
 
     @DeleteMapping("/waitings/{id}")

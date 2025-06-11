@@ -3,6 +3,7 @@ package roomescape.controller.api;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,14 +24,11 @@ import roomescape.service.ReservationService;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/reservations")
 public class MemberReservationController {
 
     private final ReservationService reservationService;
-
-    public MemberReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(

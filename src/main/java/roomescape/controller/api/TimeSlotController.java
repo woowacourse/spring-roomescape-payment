@@ -2,6 +2,7 @@ package roomescape.controller.api;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import roomescape.service.TimeSlotService;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/times")
 public class TimeSlotController {
 
@@ -26,17 +28,13 @@ public class TimeSlotController {
 
     private final TimeSlotService reservationTimeService;
 
-    public TimeSlotController(final TimeSlotService reservationTimeService) {
-        this.reservationTimeService = reservationTimeService;
-    }
-
     @GetMapping
     public ResponseEntity<List<TimeSlotResponse>> getTimeSlots() {
         log.info("예약 시간 전체 조회 요청 수신");
         List<TimeSlotResponse> response = reservationTimeService.getTimeSlots();
 
         log.info("예약 시간 전체 조회 완료: {}건", response.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping(consumes = {"application/json"})

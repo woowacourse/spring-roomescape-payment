@@ -47,6 +47,7 @@ public class AdminLoginController {
         Admin admin = loginService.findByAdminId(info.id());
 
         log.debug("관리자 로그인 확인 완료: adminName={}", admin.name());
-        return ResponseEntity.ok().body(new LoginCheckResponse(admin.name()));
+        LoginCheckResponse response = new LoginCheckResponse(admin.name());
+        return ResponseEntity.ok().body(response);
     }
 }

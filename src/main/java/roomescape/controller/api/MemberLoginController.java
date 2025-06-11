@@ -48,6 +48,7 @@ public class MemberLoginController {
         Member member = loginService.findByMemberId(info.id());
 
         log.debug("회원 로그인 확인 완료: memberName={}", member.getName());
-        return ResponseEntity.ok().body(new LoginCheckResponse(member.getName()));
+        LoginCheckResponse response = new LoginCheckResponse(member.getName());
+        return ResponseEntity.ok().body(response);
     }
 }

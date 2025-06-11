@@ -1,6 +1,7 @@
 package roomescape.controller.api;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,14 +14,11 @@ import roomescape.service.ReservationService;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
-
-    public ReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations() {
@@ -28,7 +26,7 @@ public class ReservationController {
         List<ReservationResponse> response = reservationService.getReservations();
 
         log.info("전체 예약 목록 조회 완료: 총 {}건", response.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/{id}")

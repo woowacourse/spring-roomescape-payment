@@ -2,6 +2,7 @@ package roomescape.controller.api;
 
 import java.net.URI;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,16 +19,13 @@ import roomescape.service.ThemeService;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/themes")
 public class ThemeController {
 
     public static final String GET_ADMIN_THEME = "/admin/theme";
 
     private final ThemeService themeService;
-
-    public ThemeController(final ThemeService themeService) {
-        this.themeService = themeService;
-    }
 
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> getThemes() {
