@@ -36,68 +36,19 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi userTheme() {
+    public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
-                .group("사용자-테마")
-                .pathsToMatch("/themes/**")
+                .group("관리자용 API")
+                .pathsToMatch("/admin/**")
                 .build();
     }
 
     @Bean
-    public GroupedOpenApi adminTheme() {
+    public GroupedOpenApi userApis() {
         return GroupedOpenApi.builder()
-                .group("관리자-테마")
-                .pathsToMatch("/admin/themes/**")
+                .group("사용자 API")
+                .pathsToMatch("/**")
+                .pathsToExclude("/admin/**", "/login/**", "/logout", "/members")
                 .build();
     }
-
-    @Bean
-    public GroupedOpenApi userTime() {
-        return GroupedOpenApi.builder()
-                .group("사용자-예약시간")
-                .pathsToMatch("/times/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi adminTime() {
-        return GroupedOpenApi.builder()
-                .group("관리자-예약시간")
-                .pathsToMatch("/admin/times/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi userReservation() {
-        return GroupedOpenApi.builder()
-                .group("사용자-예약")
-                .pathsToMatch("/reservations/**", "/payments/prepay")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi adminReservation() {
-        return GroupedOpenApi.builder()
-                .group("관리자-예약")
-                .pathsToMatch("/admin/reservations/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi userWaiting() {
-        return GroupedOpenApi.builder()
-                .group("사용자-예약대기")
-                .pathsToMatch("/waitings/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi adminWaiting() {
-        return GroupedOpenApi.builder()
-                .group("관리자-예약대기")
-                .pathsToMatch("/admin/waitings/**")
-                .build();
-    }
-
-
 }
