@@ -12,9 +12,11 @@ public record ThemeResponse(
         @Schema(description = "테마 설명", example = "기본 테마입니다.")
         String description,
         @Schema(description = "테마 썸네일", example = "https://example.com/thumbnail.jpg")
-        String thumbnail) {
+        String thumbnail,
+        @Schema(description = "테마 가격", example = "1000")
+        long amount) {
     public static ThemeResponse from(Theme findTheme) {
         return new ThemeResponse(findTheme.getId(), findTheme.getName(), findTheme.getDescription(),
-                findTheme.getThumbnail());
+                findTheme.getThumbnail(), findTheme.getCurrentPrice());
     }
 }

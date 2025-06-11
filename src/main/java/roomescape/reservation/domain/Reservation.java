@@ -145,4 +145,6 @@ public class Reservation {
     public ReservationStatus getReservationStatus() {
         return reservationStatus;
     }
+
+    public long getAmount(){return theme.getCurrentPrice();}
 }

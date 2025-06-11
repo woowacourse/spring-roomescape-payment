@@ -11,6 +11,7 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
+import roomescape.theme.dto.response.ThemeResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -45,7 +46,8 @@ public class ReservationController {
             @Login final LoginMember loginMember
     ) {
         ReservationResponse response = reservationService.createPendingReservation(request, loginMember.id());
-        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
+        ThemeResponse themeResponse = response.theme();
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), themeResponse.amount(), request.paymentKey());
         paymentService.confirmAndSavePayment(tossPaymentConfirmRequest, response.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());

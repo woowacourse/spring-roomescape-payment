@@ -50,18 +50,11 @@ public class ReservationService {
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
 
-        validateRequestAmount(request.amount(), theme);
         checkDuplicateReservation(request.date(), time.getStartAt(), request.themeId());
 
         Reservation reservation = Reservation.createPendingWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
         Reservation saveReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(saveReservation);
-    }
-
-    private void validateRequestAmount(final long amount, final Theme theme) {
-        if(amount != theme.getCurrentPrice()){
-            throw new IllegalArgumentException("요청된 가격이 올바르지 않습니다.");
-        }
     }
 
     private void checkDuplicateReservation(final LocalDate date, final LocalTime startAt, final long themeId){
