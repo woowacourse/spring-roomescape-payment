@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.payment;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
@@ -20,7 +20,6 @@ import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 import roomescape.dto.response.PaymentSuccessResponse;
 import roomescape.global.exception.payment.PaymentException;
-import roomescape.service.payment.PaymentApproveClient;
 
 @ActiveProfiles("test")
 @SpringBootTest

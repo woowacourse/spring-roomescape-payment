@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,7 +23,6 @@ import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.domain.reservationitem.ReservationTimeRepository;
 import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
 import roomescape.global.exception.roomescape.RoomEscapeException;
-import roomescape.service.reservation.ReservationItemService;
 
 @ActiveProfiles("test")
 @SpringBootTest
