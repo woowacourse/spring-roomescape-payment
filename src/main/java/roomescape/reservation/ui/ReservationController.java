@@ -47,10 +47,10 @@ public class ReservationController {
 
     @Operation(summary = "내 예약 조회", description = "현재 로그인 된 멤버의 승인 된 예약을 모두 조회합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getAll(
+    public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getApprovedReservations(
             @Parameter(hidden = true) @LoginMemberId Long memberId
     ) {
-        List<MyReservationResponse> response = reservationService.findAllByMemberId(memberId);
+        List<MyReservationResponse> response = reservationService.findApprovedReservationsByMemberId(memberId);
         ApiResponse<List<MyReservationResponse>> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.ok().body(apiResponse);
     }

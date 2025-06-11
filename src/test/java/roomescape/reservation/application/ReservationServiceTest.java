@@ -78,7 +78,7 @@ class ReservationServiceTest {
 
     @DisplayName("회원 ID로 예약과 대기를 조회한다")
     @Test
-    void findAllByMemberId() {
+    void findApprovedReservationsByMemberId() {
         // given
         // 회원 생성 및 저장
         Member member = MemberFixture.createMember("에드", "ed@example.com", "password123");
@@ -112,7 +112,7 @@ class ReservationServiceTest {
         Waiting savedWaiting = waitingRepository.save(waiting);
 
         // when
-        List<MyReservationResponse> responses = reservationService.findAllByMemberId(memberId);
+        List<MyReservationResponse> responses = reservationService.findApprovedReservationsByMemberId(memberId);
 
         // then
         assertThat(responses).hasSize(2);

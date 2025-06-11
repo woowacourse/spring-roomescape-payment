@@ -50,8 +50,8 @@ public class ReservationService {
     private final ApplicationEventPublisher eventPublisher;
     private final ApprovalService approvalService;
 
-    public List<MyReservationResponse> findAllByMemberId(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+    public List<MyReservationResponse> findApprovedReservationsByMemberId(Long memberId) {
+        List<Reservation> reservations = reservationRepository.findApprovedReservationsByMemberId(memberId);
         List<Approval> approvals = approvalService.findAllByReservationIn(reservations);
         List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(memberId);
 

@@ -108,7 +108,7 @@ class ReservationRepositoryTest {
 
     @DisplayName("회원 ID로 예약을 조회한다")
     @Test
-    void findAllByMemberId() {
+    void findApprovedReservationsByMemberId() {
         // given
         // 회원 생성 및 저장
         Member member = MemberFixture.createMember("에드", "ed@example.com", "password123");
@@ -149,7 +149,7 @@ class ReservationRepositoryTest {
         onsite2.approveReservation();
 
         // when
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(member.getId());
+        List<Reservation> reservations = reservationRepository.findApprovedReservationsByMemberId(member.getId());
 
         // then
         assertThat(reservations).hasSize(2);

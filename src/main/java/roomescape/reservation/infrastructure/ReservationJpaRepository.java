@@ -43,7 +43,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             AND r.reservationState = roomescape.reservation.domain.ReservationState.APPROVED
             
             """)
-    List<Reservation> findAllByMemberId(Long memberId);
+    List<Reservation> findApprovedReservationsByMemberId(Long memberId);
 
     @Query("""
             SELECT r FROM Reservation r
