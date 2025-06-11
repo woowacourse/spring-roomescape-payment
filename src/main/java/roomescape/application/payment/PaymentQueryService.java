@@ -78,7 +78,7 @@ public class PaymentQueryService {
             }
 
             log.error("지원하지 않는 결제 유형 - paymentType: {}", payment.getPaymentType());
-            throw new PaymentException("존재하지 않는 결제입니다");
+            throw new PaymentException("지원하지 않는 결제입니다");
         };
     }
 }
