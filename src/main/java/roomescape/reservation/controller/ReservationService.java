@@ -14,6 +14,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.PaymentServiceDecider;
+import roomescape.reservation.service.PaymentServiceDeciderImpl;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.dto.PaymentRequest;
@@ -59,7 +60,7 @@ public class ReservationService {
         );
         Member member = memberQueryService.getById(memberId);
         Reservation reservation = reservationCommandService.createReservation(schedule, member);
-        PaymentService paymentService = paymentServiceDecider.decide(PaymentType.TOSS); // PG사 여러개라면 타입 받아와야
+        PaymentService<PaymentRequest> paymentService = paymentServiceDecider.decide(PaymentType.TOSS); // PG사 여러개라면 타입 받아와야
         paymentService.createPayment(paymentRequest, reservation);
         return ReservationResponse.from(reservation);
     }

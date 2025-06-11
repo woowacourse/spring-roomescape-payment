@@ -79,8 +79,10 @@ class ReservationServiceTest {
 
     @Autowired
     private ThemeDbFixture themeDbFixture;
+
     @Autowired
     private ReservationScheduleRepository reservationScheduleRepository;
+
     @Autowired
     private ReservationScheduleDbFixture reservationScheduleDbFixture;
 

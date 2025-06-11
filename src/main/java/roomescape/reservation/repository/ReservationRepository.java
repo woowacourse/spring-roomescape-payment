@@ -12,8 +12,6 @@ import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 public interface ReservationRepository extends JpaRepository<Reservation, Long>,
         JpaSpecificationExecutor<Reservation> {
 
-    List<Reservation> findAllByMember_Id(final Long memberId);
-
     boolean existsByScheduleId(Long scheduleId);
 
     Optional<Reservation> findByScheduleId(Long scheduleId);
@@ -33,7 +31,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     )
     FROM Reservation r
     JOIN r.schedule s
-    LEFT JOIN TossPayment p ON p.reservation = r
+    LEFT JOIN Payment p ON p.reservation = r
     WHERE r.member.id = :memberId
 """)
     List<MyReservationWithTossPayment> findAllWithPaymentByMemberId(@Param("memberId") Long memberId);

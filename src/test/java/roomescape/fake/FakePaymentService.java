@@ -5,7 +5,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.dto.PaymentRequest;
 
-public class FakePaymentService implements PaymentService {
+public class FakePaymentService implements PaymentService<PaymentRequest> {
 
     @Override
     public void createPayment(final PaymentRequest request, final Reservation reservation) {
