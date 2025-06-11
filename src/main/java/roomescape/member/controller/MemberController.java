@@ -1,5 +1,10 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +25,15 @@ import roomescape.member.service.MemberService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/members")
+@Tag(name = "멤버", description = "멤버 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "멤버 생성")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
     @PostMapping
     public ResponseEntity<MemberResponse> createMember(
             @RequestBody @Valid MemberCreateRequest request
@@ -32,12 +42,21 @@ public class MemberController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "모든 멤버 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
+    @SecurityRequirements(value = {})
     @GetMapping
     public ResponseEntity<List<MemberResponse>> getAllMembers() {
         List<MemberResponse> responses = memberService.getAllMembers();
         return ResponseEntity.ok().body(responses);
     }
 
+    @Operation(summary = "멤버 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", useReturnTypeSchema = true),
+    })
     @DeleteMapping("/{id}")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<Void> deleteMember(

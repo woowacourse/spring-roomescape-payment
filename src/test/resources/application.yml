@@ -23,3 +23,8 @@ security:
 toss:
   confirm:
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+server:
+  url:
+    local: http://localhost:8080
+    prod: http://ec2-13-124-167-44.ap-northeast-2.compute.amazonaws.com:8080

@@ -3,6 +3,7 @@ package roomescape.payment.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ServerException;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
@@ -34,6 +35,8 @@ public class PaymentService {
                     response.type()
             );
             return paymentRepository.save(payment);
+        } catch (BadRequestException | ServerException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServerException("결제 승인 중 문제가 발생했습니다.");
         }

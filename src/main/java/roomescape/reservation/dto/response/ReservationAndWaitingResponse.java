@@ -10,7 +10,9 @@ public record ReservationAndWaitingResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
     public static ReservationAndWaitingResponse from(Reservation reservation) {
         return new ReservationAndWaitingResponse(
@@ -18,7 +20,9 @@ public record ReservationAndWaitingResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                "예약"
+                "예약",
+                reservation.getPayment() != null ? reservation.getPayment().getPaymentKey() : null,
+                reservation.getPayment() != null ? reservation.getPayment().getAmount() : null
         );
     }
 
@@ -28,7 +32,9 @@ public record ReservationAndWaitingResponse(
                 waiting.getTheme().getName(),
                 waiting.getDate(),
                 waiting.getTime().getStartAt(),
-                String.format("%d번째 예약대기", position + 1)
+                String.format("%d번째 예약대기", position + 1),
+                null,
+                null
         );
     }
 }
