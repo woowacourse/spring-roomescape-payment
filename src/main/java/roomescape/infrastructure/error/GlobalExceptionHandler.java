@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -131,5 +133,15 @@ public class GlobalExceptionHandler {
         String className = stackTrace[0].getClassName();
         String methodName = stackTrace[0].getMethodName();
         return new ExceptionLog(className, methodName, ex.getMessage(), ex);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiFailResponse> handleUniqueViolation(DataIntegrityViolationException ex) {
+        if (ex.getMessage().contains("reservations_unique")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiFailResponse("이미 해당 시간대에 예약이 존재합니다."));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiFailResponse("잘못된 데이터 입력입니다."));
     }
 }
