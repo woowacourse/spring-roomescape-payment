@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.CreatePaymentUseCase;
+import roomescape.application.payment.CreatePaymentService;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.ReservationWithPaymentResult;
 import roomescape.domain.payment.AdminPayment;
@@ -19,14 +19,14 @@ import roomescape.domain.reservation.repository.ReservationPaymentRepository;
 public class RegisterReservationByAdminUseCase {
 
     private final CreateReservationService createReservationService;
-    private final CreatePaymentUseCase createPaymentUseCase;
+    private final CreatePaymentService createPaymentService;
     private final AdminPaymentRepository adminPaymentRepository;
     private final ReservationPaymentRepository reservationPaymentRepository;
 
     @Transactional
     public ReservationWithPaymentResult execute(final CreateReservationCommand command, final Long adminId) {
         final Long reservationId = createReservationService.reserve(command);
-        final Long paymentId = createPaymentUseCase.execute(PaymentType.ADMIN);
+        final Long paymentId = createPaymentService.register(PaymentType.ADMIN);
         reservationPaymentRepository.save(new ReservationPayment(reservationId, paymentId));
 
         // TODO 서비스로 분리

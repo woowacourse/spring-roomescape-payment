@@ -8,11 +8,11 @@ import roomescape.domain.payment.repository.PaymentRepository;
 
 @RequiredArgsConstructor
 @Service
-public class CreatePaymentUseCase {
+public class CreatePaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    public Long execute(final PaymentType type) {
+    public Long register(final PaymentType type) {
         return paymentRepository.save(new Payment(type)).getId();
     }
 }
