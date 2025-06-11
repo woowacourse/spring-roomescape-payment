@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.Builder;
 import roomescape.common.exception.PaymentException;
@@ -13,7 +13,7 @@ import roomescape.payment.service.PaymentErrorHandler;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 import roomescape.payment.service.dto.PaymentConfirmResponse;
 
-@Service
+@Component
 public class PaymentRestClient {
 
     private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
