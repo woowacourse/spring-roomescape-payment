@@ -9,10 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.Role;
-import roomescape.domain.*;
-import roomescape.domain.repository.*;
+import roomescape.domain.Member;
+import roomescape.domain.PaymentInfo;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
+import roomescape.domain.Waiting;
+import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+import roomescape.domain.repository.ThemeRepository;
+import roomescape.domain.repository.WaitingRepository;
 import roomescape.infrastructure.JwtTokenProvider;
 import roomescape.service.PaymentClient;
 
@@ -25,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ReservationApiTest {
@@ -39,7 +50,7 @@ public class ReservationApiTest {
     private ThemeRepository themeRepository;
 
     @Autowired
-    private ReservationTimeRepository timeRepository;
+    private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -64,7 +75,7 @@ public class ReservationApiTest {
                 new Member(null, "name1", "email1@domain.com", "password1", Role.MEMBER)
         );
         String token = tokenProvider.createToken(savedMember.getId().toString(), savedMember.getRole());
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("date", "2026-08-05");
@@ -75,7 +86,7 @@ public class ReservationApiTest {
         reservation.put("orderId", "1");
         reservation.put("amount", 1000);
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("1", 1000, "orderId");
         BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
 
         RestAssured.given().log().all()
@@ -95,7 +106,7 @@ public class ReservationApiTest {
         Member member = memberRepository.save(
                 new Member(null, "name1", "email1@domain.com", "password1", Role.MEMBER)
         );
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
         Reservation reservation = reservationRepository.save(
                 Reservation.createWithoutId(member, LocalDate.of(2025, 1, 1), time, theme));
@@ -118,7 +129,7 @@ public class ReservationApiTest {
                 new Member(null, "name2", "email2@domain.com", "password2", Role.MEMBER)
         );
 
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
 
         Reservation reservation = reservationRepository.save(

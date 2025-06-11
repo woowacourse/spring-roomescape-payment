@@ -1,6 +1,10 @@
 package roomescape.unit.fake;
 
-import roomescape.domain.*;
+import roomescape.domain.Member;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
+import roomescape.domain.Waiting;
+import roomescape.domain.WaitingWithRank;
 import roomescape.domain.repository.WaitingRepository;
 
 import java.time.LocalDate;

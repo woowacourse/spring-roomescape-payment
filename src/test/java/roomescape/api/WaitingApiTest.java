@@ -1,18 +1,12 @@
 package roomescape.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.Role;
 import roomescape.domain.Member;
 import roomescape.domain.ReservationTime;
@@ -25,6 +19,15 @@ import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
 import roomescape.infrastructure.JwtTokenProvider;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class WaitingApiTest {
@@ -36,7 +39,7 @@ public class WaitingApiTest {
     private ThemeRepository themeRepository;
 
     @Autowired
-    private ReservationTimeRepository timeRepository;
+    private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -54,7 +57,7 @@ public class WaitingApiTest {
         );
 
         String token = tokenProvider.createToken(savedMember.getId().toString(), savedMember.getRole());
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
         Map<String, Object> waiting = new HashMap<>();
         waiting.put("date", "2026-08-05");
@@ -78,7 +81,7 @@ public class WaitingApiTest {
         Member member = memberRepository.save(
                 new Member(null, "name1", "email1@domain.com", "password1", Role.MEMBER)
         );
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
         Waiting waiting = waitingRepository.save(
                 Waiting.createWithoutId(member, LocalDate.of(2025, 1, 1), time, theme));
@@ -97,7 +100,7 @@ public class WaitingApiTest {
         Member savedMember = memberRepository.save(
                 new Member(null, "name1", "email1@domain.com", "password1", Role.MEMBER)
         );
-        ReservationTime time = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(9, 0)));
         Theme theme = themeRepository.save(Theme.createWithoutId("theme1", "desc", "thumb1"));
         waitingRepository.save(
                 Waiting.createWithoutId(savedMember, LocalDate.of(2025, 1, 1), time, theme));

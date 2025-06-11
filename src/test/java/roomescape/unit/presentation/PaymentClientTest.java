@@ -31,15 +31,15 @@ public class PaymentClientTest {
             .baseUrl("https://api.tosspayments.com")
             .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()));
 
-    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
-    private PaymentClient clientController = new PaymentClient(testBuilder.build(), MAPPER);
+    private final PaymentClient clientController = new PaymentClient(testBuilder.build(), MAPPER);
 
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {
         //given
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("1", 1000, "orderId");
         String paymentInfoJson = MAPPER.writeValueAsString(paymentInfo);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
@@ -47,7 +47,7 @@ public class PaymentClientTest {
                 .andRespond(withSuccess(paymentInfoJson, MediaType.APPLICATION_JSON));
 
         //when
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
+        PaymentRequest paymentRequest = new PaymentRequest("1", 1000, "10");
         PaymentInfo result = clientController.postPaymentInfo(paymentRequest);
 
         assertThat(paymentInfo).isEqualTo(result);
@@ -67,7 +67,7 @@ public class PaymentClientTest {
                         .body(errorJson));
 
         //when
-        PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
+        PaymentRequest paymentRequest = new PaymentRequest("1", 1000, "10");
         assertThatThrownBy(() -> clientController.postPaymentInfo(paymentRequest))
                 .isInstanceOf(FilteredPaymentException.class)
                 .hasMessage("결제가 실패했습니다. 고객센터로 문의해 주세요.");

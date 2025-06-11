@@ -11,18 +11,35 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.auth.Role;
-import roomescape.domain.*;
-import roomescape.domain.repository.*;
+import roomescape.domain.Member;
+import roomescape.domain.Payment;
+import roomescape.domain.PaymentInfo;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
+import roomescape.domain.repository.MemberRepository;
+import roomescape.domain.repository.PaymentRepository;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+import roomescape.domain.repository.ThemeRepository;
+import roomescape.domain.repository.WaitingRepository;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.request.ReservationCreateRequest;
+import roomescape.dto.response.MyReservationsResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationTimeResponse;
-import roomescape.dto.response.ReservationWithStatusResponse;
+import roomescape.dto.response.ReservationWithPaymentResponse;
 import roomescape.exception.ExistedReservationException;
 import roomescape.exception.ReservationNotFoundException;
 import roomescape.service.PaymentClient;
 import roomescape.service.ReservationService;
-import roomescape.unit.fake.*;
+import roomescape.unit.fake.FakeMemberRepository;
+import roomescape.unit.fake.FakePaymentRepository;
+import roomescape.unit.fake.FakeReservationRepository;
+import roomescape.unit.fake.FakeReservationTimeRepository;
+import roomescape.unit.fake.FakeThemeRepository;
+import roomescape.unit.fake.FakeWaitingRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -50,6 +67,9 @@ class ReservationServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private ReservationService reservationService;
 
     @MockitoBean
@@ -75,15 +95,15 @@ class ReservationServiceTest {
         Member member = memberRepository.save(new Member(null, "포라", "email1@domain.com", "password1", Role.MEMBER));
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1), savedReservationTime.getId(), savedTheme.getId(), "1", "normal", "1", 1000);
+                LocalDate.now().plusDays(1), savedReservationTime.getId(), savedTheme.getId(), "paymentKey", "normal", "1", 1000);
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", 1000, "order_id");
         given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
 
-        ReservationResponse actualResponse = reservationService.createReservationForMember(member.getId(), request);
+        ReservationWithPaymentResponse actualResponse = reservationService.createReservationForMember(member.getId(), request);
 
-        ReservationResponse response = new ReservationResponse(actualResponse.id(), member.getName(), request.date(),
-                new ReservationTimeResponse(savedReservationTime.getId(), reservationTime.getStartAt()), theme.getName());
+        ReservationWithPaymentResponse response = new ReservationWithPaymentResponse(actualResponse.id(), member.getName(), request.date(),
+                new ReservationTimeResponse(savedReservationTime.getId(), reservationTime.getStartAt()), theme.getName(), "paymentKey", 1000);
 
         // when & then
         assertThat(response).isEqualTo(actualResponse);
@@ -102,11 +122,11 @@ class ReservationServiceTest {
         Member savedMember2 = memberRepository.save(new Member(null, "아마", "email2@domain.com", "password2", Role.MEMBER));
         Reservation reservation1 = Reservation.of(null, savedMember1, LocalDate.of(2025, 7, 25),
                 savedReservationTime1, savedTheme1);
-        Reservation savedReservation1 = reservationRepository.save(reservation1);
+        reservationRepository.save(reservation1);
 
         Reservation reservation2 = Reservation.of(null, savedMember2, LocalDate.of(2025, 7, 26),
                 savedReservationTime1, savedTheme1);
-        Reservation savedReservation2 = reservationRepository.save(reservation2);
+        reservationRepository.save(reservation2);
         // when
         List<ReservationResponse> all = reservationService.findReservations(
                 new ReservationCondition(
@@ -137,10 +157,17 @@ class ReservationServiceTest {
         Reservation reservation1 = Reservation.of(null, member1, LocalDate.of(2025, 7, 25),
                 reservationTime1, theme1);
 
-        reservationRepository.save(reservation1);
+        Reservation savedReservation = reservationRepository.save(reservation1);
+
+        Payment payment = new Payment(
+                new PaymentRequest("paymentKey", 1000, "orderId"),
+                savedReservation
+        );
+
+        paymentRepository.save(payment);
 
         // when
-        List<ReservationWithStatusResponse> memberReservations = reservationService.findBookingHistory(1L);
+        List<MyReservationsResponse> memberReservations = reservationService.findBookingHistory(1L);
 
         // then
         assertThat(memberReservations.size()).isEqualTo(1);
@@ -252,6 +279,11 @@ class ReservationServiceTest {
         }
 
         @Bean
+        public PaymentRepository paymentRepository() {
+            return new FakePaymentRepository();
+        }
+
+        @Bean
         public ReservationService reservationService(PaymentClient paymentClient) {
             return new ReservationService(
                     reservationRepository(),
@@ -259,6 +291,7 @@ class ReservationServiceTest {
                     themeRepository(),
                     memberRepository(),
                     waitingRepository(),
+                    paymentRepository(),
                     paymentClient
             );
         }

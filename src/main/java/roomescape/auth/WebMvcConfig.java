@@ -1,13 +1,15 @@
 package roomescape.auth;
 
-import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.auth.interceptor.AdminApiAuthorizationInterceptor;
 import roomescape.auth.interceptor.AdminPageAuthorizationInterceptor;
+import roomescape.auth.interceptor.LoggingInterceptor;
 import roomescape.infrastructure.JwtTokenProvider;
+
+import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -30,6 +32,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(new AdminApiAuthorizationInterceptor(jwtTokenProvider, authorizationExtractor))
                 .addPathPatterns("/api/admin/**");
+
+        registry.addInterceptor(new LoggingInterceptor())
+                .addPathPatterns("/**");
     }
 
     @Override

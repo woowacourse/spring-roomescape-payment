@@ -6,10 +6,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import roomescape.exception.ArgumentNullException;
 import roomescape.exception.PastDateTimeReservationException;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Waiting {
