@@ -2,20 +2,18 @@ package roomescape.global.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@Slf4j
 public class LogInterceptor implements HandlerInterceptor {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestURI = request.getRequestURI();
-        LOGGER.info("[API REQUEST] {}", requestURI);
+        log.info("[API REQUEST] {}", requestURI);
 
         return true;
     }
@@ -26,9 +24,9 @@ public class LogInterceptor implements HandlerInterceptor {
         int status = response.getStatus();
 
         if (status >= 400 && status < 500) {
-            LOGGER.warn("[API RESPONSE - CLIENT ERROR] {}: {}", requestURI, status);
+            log.warn("[API RESPONSE - CLIENT ERROR] {}: {}", requestURI, status);
         } else if (status >= 500) {
-            LOGGER.error("[API RESPONSE - SERVER ERROR] {}: {}", requestURI, status);
+            log.error("[API RESPONSE - SERVER ERROR] {}: {}", requestURI, status);
         }
     }
 }
