@@ -26,4 +26,13 @@ public class ApiResponse<T> {
     public static ApiResponse<?> createError(String message) {
         return new ApiResponse<>(false, null, message);
     }
+
+    @Override
+    public String toString() {
+        return "ApiResponse{" +
+                "success=" + success +
+                ", data=" + data +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

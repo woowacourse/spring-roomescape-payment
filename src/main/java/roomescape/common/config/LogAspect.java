@@ -18,16 +18,16 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class LogAspect {
 
-    @Pointcut("execution(* roomescape.reservation.ui..*Controller.*(..))")
-    public void reservationControllers() {
+    @Pointcut("execution(* roomescape..ui..*Controller.*(..))")
+    public void allControllers() {
     }
 
     @Pointcut("execution(* roomescape.reservation.application..*Service.*(..))")
     public void reservationServices() {
     }
 
-    @Around("reservationControllers()")
-    public Object logReservationApi(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("allControllers()")
+    public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String uri = request.getRequestURI();
         String method = request.getMethod();
@@ -39,10 +39,11 @@ public class LogAspect {
         try {
             log.info(">> [{} {}] {}.{} | params: {}", method, uri, controller, action, params);
             Object result = joinPoint.proceed();
+            log.info("<< [{} {}] {}.{} | response: {}", method, uri, controller, action, result);
             return result;
         } finally {
             long end = System.currentTimeMillis();
-            log.info("<< [{} {}] {}.{} | duration: {}ms", method, uri, controller, action, end - start);
+            log.info("-- [{} {}] {}.{} | duration: {}ms", method, uri, controller, action, end - start);
         }
     }
 
