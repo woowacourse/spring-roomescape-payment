@@ -20,7 +20,7 @@ class TossPaymentValidatorTest {
     private TossPaymentValidator tossPaymentValidator;
 
     @Test
-    void 정상_결제_생성_테스트() {
+    void 정상_주문번호과_금액_검증_테스트() {
         // given
         final TossPaymentValidationCommand command = new TossPaymentValidationCommand("orderId", 10000L);
 

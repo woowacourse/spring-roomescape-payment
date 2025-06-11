@@ -18,11 +18,11 @@ import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
 import roomescape.domain.payment.AdminPayment;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentType;
 import roomescape.domain.payment.TossPayment;
 import roomescape.domain.payment.repository.AdminPaymentRepository;
 import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.payment.repository.TossPaymentRepository;
-import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationPayment;
 import roomescape.domain.reservation.ReservationStatus;
@@ -179,7 +179,7 @@ class ReservationQueryServiceTest {
         final Payment payment3 = paymentRepository.save(new Payment(PaymentType.TOSS));
         final Payment payment4 = paymentRepository.save(new Payment(PaymentType.ADMIN));
 
-        final TossPayment tossPayment1 = TossPayment.init(payment1.getId(),"paymentKey1", "orderId1", 10000L);
+        final TossPayment tossPayment1 = TossPayment.init(payment1.getId(), "paymentKey1", "orderId1", 10000L);
         tossPayment1.approve();
         tossPaymentRepository.save(tossPayment1);
 
