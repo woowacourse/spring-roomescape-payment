@@ -110,7 +110,7 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void createForAdmin_shouldExecuteReservationReservation() {
+    void createForAdmin_shouldReserveWithPayment() {
         ReservationResponse response = reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
@@ -125,7 +125,7 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void executeReservationForAdmin_shouldThrowException_whenTimeNotFound() {
+    void reserveWithPaymentForAdmin_shouldThrowException_whenTimeNotFound() {
         assertThatThrownBy(() -> reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, 999L, theme.getId()),
                 member.getId()))
@@ -134,7 +134,7 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void createWaiting_shouldExecuteReservationWaiting() {
+    void createWaiting_shouldReserveWithPaymentWaiting() {
         ReservationResponse response = reservationFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
@@ -149,13 +149,13 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void executeReservation_shouldThrowException_whenReservationExists() {
+    void reserveWithPaymentExists() {
         reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
 
-        assertThatThrownBy(() -> reservationFacadeService.executeReservation(
+        assertThatThrownBy(() -> reservationFacadeService.reserveWithPayment(
                 new ReservationCreateRequest(
                         new ReservationRequest(futureDate, time.getId(), theme.getId()),
                         new PaymentRequest(
@@ -231,7 +231,7 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void executeReservation_shouldCreateReservationWithPayment() {
+    void reserveWithPaymentWithPayment() {
         PaymentResponse mockResponse = new PaymentResponse(
                 "test_payment_key",
                 "test_order_id",
@@ -242,7 +242,7 @@ class ReservationFacadeServiceTest {
         );
         when(tossApiClient.authPayment(any())).thenReturn(mockResponse);
 
-        ReservationResponse response = reservationFacadeService.executeReservation(
+        ReservationResponse response = reservationFacadeService.reserveWithPayment(
                 new ReservationCreateRequest(
                         new ReservationRequest(futureDate, time.getId(), theme.getId()),
                         new PaymentRequest(
@@ -263,12 +263,12 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
-    void executeReservation_shouldThrowException_whenPaymentFails() {
+    void reserveWithPayment_shouldThrowException_whenPaymentFails() {
         when(tossApiClient.authPayment(any())).thenThrow(
                 new TossPaymentClientException("카드 사용이 거절되었습니다. 카드사 문의가 필요합니다.")
         );
 
-        assertThatThrownBy(() -> reservationFacadeService.executeReservation(
+        assertThatThrownBy(() -> reservationFacadeService.reserveWithPayment(
                 new ReservationCreateRequest(
                         new ReservationRequest(futureDate, time.getId(), theme.getId()),
                         new PaymentRequest(

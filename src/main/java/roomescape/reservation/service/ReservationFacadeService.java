@@ -82,8 +82,7 @@ public class ReservationFacadeService {
         return createWaiting(request, memberId);
     }
 
-    public ReservationResponse executeReservation(final ReservationCreateRequest request, final Long memberId) {
-        reservationService.checkIfReservationExists(request.reservation());
+    public ReservationResponse reserveWithPayment(final ReservationCreateRequest request, final Long memberId) {
         Reservation reservation = reservationCreatorService.createReservation(request.reservation(), memberId);
         paymentService.createPaymentWithRequest(reservation, request.payment());
         PaymentResponse paymentResponse = paymentApiClient.authPayment(request.payment());
