@@ -9,6 +9,8 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.PaymentRequest;
 
+import java.util.List;
+
 @Service
 public class PaymentService {
 
@@ -44,7 +46,11 @@ public class PaymentService {
     public Payment findByReservationId(final Long id) {
         return paymentRepository.findByReservationId(id)
                 .orElseThrow(() -> new PaymentNotFoundException("요청한 reservation_id에 해당하는 결제가 없습니다. "));
+    }
 
+    @Transactional
+    public List<Payment> findAllByReservationIds(final List<Long> reservationIds) {
+        return paymentRepository.findAllByReservationIds(reservationIds);
     }
 
     @Transactional

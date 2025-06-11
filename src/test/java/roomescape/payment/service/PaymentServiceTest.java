@@ -20,7 +20,6 @@ import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.PaymentNotFoundException;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
@@ -121,7 +120,7 @@ class PaymentServiceTest {
                 "2025-05-28T20:48:23+09:00"
         );
 
-        paymentService.updatePaymentWithConfirm(response, reservation);
+        paymentService.updatePaymentWithConfirm(response);
 
         Payment updatedPayment = paymentRepository.findByPaymentKey("test_payment_key").orElseThrow();
         assertAll(
@@ -142,7 +141,7 @@ class PaymentServiceTest {
                 "2025-05-28T20:48:23+09:00"
         );
 
-        assertThatThrownBy(() -> paymentService.updatePaymentWithConfirm(response, reservation))
+        assertThatThrownBy(() -> paymentService.updatePaymentWithConfirm(response))
                 .isInstanceOf(PaymentNotFoundException.class)
                 .hasMessageContaining("요청한 paymentKey에 해당하는 결제가 없습니다.");
     }

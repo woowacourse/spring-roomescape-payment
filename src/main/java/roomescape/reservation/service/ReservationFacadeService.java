@@ -60,15 +60,35 @@ public class ReservationFacadeService {
     public List<MyReservationResponse> findMyReservations(final UserInfo userInfo) {
         List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
-        List<MyReservationResponse> myReservationResponses = new ArrayList<>();
+        
+        List<Payment> payments = findPayments(myReservations);
+        
         return Stream.concat(
-                myReservations.stream()
-                        .map(reservation ->
-                                MyReservationResponse.from(reservation,
-                                        paymentService.findByReservationId(reservation.getId()))
-                        ),
+                createReservationResponses(myReservations, payments),
                 waitingWithRanks.stream().map(MyReservationResponse::from)
         ).collect(Collectors.toList());
+    }
+
+    private List<Payment> findPayments(List<Reservation> reservations) {
+        List<Long> reservationIds = reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        
+        if (reservationIds.isEmpty()) {
+            return List.of();
+        }
+        return paymentService.findAllByReservationIds(reservationIds);
+    }
+
+    private Stream<MyReservationResponse> createReservationResponses(List<Reservation> reservations, List<Payment> payments) {
+        return reservations.stream()
+                .map(reservation -> {
+                    Payment payment = payments.stream()
+                            .filter(p -> p.getReservation().getId().equals(reservation.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    return MyReservationResponse.from(reservation, payment);
+                });
     }
 
     @Transactional
