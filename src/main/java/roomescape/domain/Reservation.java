@@ -9,13 +9,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import roomescape.domain.member.Member;
 import roomescape.exception.InvalidRequestException;
 
-@Table(name = "reservation")
+@Table(
+        name = "reservation",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_reservation_date_time_theme",
+                columnNames = {"date", "time_id", "theme_id"}
+        )
+)
 @Entity
 public class Reservation {
 
