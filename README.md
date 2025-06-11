@@ -16,6 +16,9 @@
 - 선택한 날짜와 시간에 예약이 존재하는 경우 예약 대기를 할 수 있습니다
   - 1번 째 예약 대기 때 예약이 취소되면 자동 승인됩니다
 
+# ☑️ERD
+![roomescape-erd](images/roomescape-erd.png)
+
 # 📌 View API
 
 | HTTP Method 	 |   Role    	   |    Endpoint       	    | Response 	 |  Description                        	  |

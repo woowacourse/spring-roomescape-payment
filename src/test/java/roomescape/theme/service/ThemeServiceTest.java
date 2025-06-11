@@ -15,8 +15,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -110,7 +110,7 @@ class ThemeServiceTest {
     void deleteThemeWhenUsing() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
+        Long themeId = savedTheme.idValue();
 
         LocalTime time = LocalTime.of(8, 0);
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));

@@ -4,37 +4,30 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import roomescape.reservation.controller.api.ReservationTimeApi;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.service.ReservationTimeService;
 
-@RequestMapping("/times")
+@RequiredArgsConstructor
 @RestController
-public class ReservationTimeController {
+public class ReservationTimeController implements ReservationTimeApi {
 
     private final ReservationTimeService reservationTimeService;
 
-    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
-        this.reservationTimeService = reservationTimeService;
-    }
-
-    @GetMapping
+    @Override
     public ResponseEntity<List<ReservationTimeResponse>> readAllReservationTimes() {
         List<ReservationTimeResponse> responses = reservationTimeService.getAll();
 
         return ResponseEntity.ok(responses);
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody final ReservationTimeRequest request) {
         ReservationTimeResponse response = reservationTimeService.create(request);
 
@@ -42,8 +35,8 @@ public class ReservationTimeController {
                 .body(response);
     }
 
-    @DeleteMapping("/{timeId}")
-    public ResponseEntity<Void> delete(@PathVariable("timeId") final Long timeId) {
+    @Override
+    public ResponseEntity<Void> delete(final Long timeId) {
         reservationTimeService.delete(timeId);
 
         return ResponseEntity.noContent().build();

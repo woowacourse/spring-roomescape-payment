@@ -8,24 +8,25 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.ReservationTimeId;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.domain.WaitingId;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationTimeId;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.domain.WaitingId;
 import roomescape.reservation.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class WaitingService {
 

@@ -4,28 +4,23 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import roomescape.member.controller.api.MemberApi;
 import roomescape.member.dto.MemberCreateRequest;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.service.MemberService;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/members")
-public class MemberController {
+public class MemberController implements MemberApi {
 
     private final MemberService memberService;
 
-    public MemberController(final MemberService memberService) {
-        this.memberService = memberService;
-    }
-
-    @PostMapping
+    @Override
     public ResponseEntity<Void> create(
             @RequestBody @Valid final MemberCreateRequest request
     ) {
@@ -35,7 +30,7 @@ public class MemberController {
                 .build();
     }
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<MemberResponse>> findAll() {
         final List<MemberResponse> responses = memberService.findAll();
 

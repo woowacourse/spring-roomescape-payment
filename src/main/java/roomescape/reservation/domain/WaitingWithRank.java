@@ -3,6 +3,9 @@ package roomescape.reservation.domain;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import lombok.Getter;
+
+@Getter
 public class WaitingWithRank {
 
     private final Waiting waiting;
@@ -13,8 +16,8 @@ public class WaitingWithRank {
         this.rank = rank;
     }
 
-    public Long getId() {
-        return waiting.getId();
+    public Long waitingIdValue() {
+        return waiting.idValue();
     }
 
     public String themeName() {
@@ -27,9 +30,5 @@ public class WaitingWithRank {
 
     public LocalTime startTime() {
         return waiting.startTime();
-    }
-
-    public Long getRank() {
-        return rank;
     }
 }

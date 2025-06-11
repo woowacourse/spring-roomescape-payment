@@ -1,10 +1,17 @@
 package roomescape.theme.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 public class Theme {
 
@@ -21,8 +28,6 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
 
-    protected Theme() {}
-
     public Theme(
             final Long id,
             final String name,
@@ -33,7 +38,6 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-        validateTheme();
     }
 
     public Theme(
@@ -44,65 +48,23 @@ public class Theme {
         this(null, name, description, thumbnail);
     }
 
-    private Theme(final Builder builder) {
-        this(builder.id, builder.name, builder.description, builder.thumbnail);
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public void validateTheme() {
-        if (name == null || description == null || thumbnail == null) {
-            throw new IllegalArgumentException("Theme field cannot be null");
-        }
-    }
-
-    public Long getId() {
+    public Long idValue() {
         return id.getValue();
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Theme theme)) {
+            return false;
+        }
+        return Objects.equals(getId(), theme.getId());
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public static class Builder {
-
-        private Long id;
-        private String name;
-        private String description;
-        private String thumbnail;
-
-        public Builder id(final Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder name(final String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder description(final String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder thumbnail(final String thumbnail) {
-            this.thumbnail = thumbnail;
-            return this;
-        }
-
-        public Theme build() {
-            return new Theme(this);
-        }
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 }

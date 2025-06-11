@@ -15,8 +15,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -98,7 +98,7 @@ class ReservationTimeServiceTest {
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
 
         // when
-        reservationTimeService.delete(reservationTime.getId());
+        reservationTimeService.delete(reservationTime.idValue());
 
         // then
         assertThat(reservationTimeRepository.existsByStartAt(LocalTime.of(8, 0))).isFalse();
@@ -120,7 +120,7 @@ class ReservationTimeServiceTest {
         Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
 
         reservationRepository.save(new Reservation(member, LocalDate.now(), reservationTime, theme));
-        Long timeId = reservationTime.getId();
+        Long timeId = reservationTime.idValue();
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.delete(timeId))

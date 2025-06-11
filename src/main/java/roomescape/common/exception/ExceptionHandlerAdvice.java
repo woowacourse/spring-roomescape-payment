@@ -5,6 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.AuthenticationException;
+import roomescape.common.exception.business.EntityNotFoundException;
+import roomescape.common.exception.business.LoginFailException;
+import roomescape.common.exception.business.PaymentBadRequestException;
+
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 

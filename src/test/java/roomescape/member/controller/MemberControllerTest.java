@@ -22,7 +22,7 @@ class MemberControllerTest {
 
     @DisplayName("사용자가입 요청이 들어오면 사용자를 생성한다.")
     @Test
-    void createMember() {
+    void postMembers() {
         Map<String, String> memberCreateParams = Map.of("email", "if@woowa.com", "password", "12341234", "name", "이프");
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -34,7 +34,7 @@ class MemberControllerTest {
 
     @DisplayName("모든 사용자 목록을 조회한다.")
     @Test
-    void findAllMember() {
+    void getAllMember() {
         Map<String, String> memberCreateParams = Map.of("email", "if@woowa.com", "password", "12341234", "name", "이프");
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

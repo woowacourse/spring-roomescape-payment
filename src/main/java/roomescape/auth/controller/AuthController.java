@@ -4,28 +4,25 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import roomescape.auth.controller.api.AuthApi;
 import roomescape.auth.dto.LoginCheckResponse;
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.dto.LoginResponse;
 import roomescape.auth.service.AuthService;
 
+@RequiredArgsConstructor
 @RestController
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final AuthService authService;
 
-    public AuthController(final AuthService authService) {
-        this.authService = authService;
-    }
-
-    @PostMapping("/login")
+    @Override
     public ResponseEntity<Void> createToken(@RequestBody @Valid final LoginRequest request) {
         LoginResponse loginResponse = authService.login(request);
         String tokenValue = loginResponse.tokenValue();
@@ -39,7 +36,7 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/login/check")
+    @Override
     public ResponseEntity<LoginCheckResponse> checkLogin(final LoginMember member) {
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -48,7 +45,7 @@ public class AuthController {
         return ResponseEntity.ok(new LoginCheckResponse(member.name()));
     }
 
-    @PostMapping("/logout")
+    @Override
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("token", "")
                 .path("/")

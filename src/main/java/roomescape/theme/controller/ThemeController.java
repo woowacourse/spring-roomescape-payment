@@ -4,44 +4,37 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import roomescape.theme.controller.api.ThemeApi;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 
-@RequestMapping("/themes")
+@RequiredArgsConstructor
 @RestController
-public class ThemeController {
+public class ThemeController implements ThemeApi {
 
     private final ThemeService themeService;
 
-    public ThemeController(final ThemeService themeService) {
-        this.themeService = themeService;
-    }
-
-    @GetMapping
+    @Override
     public ResponseEntity<List<ThemeResponse>> readAllThemes() {
         List<ThemeResponse> responses = themeService.getAll();
 
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/popular")
+    @Override
     public ResponseEntity<List<ThemeResponse>> readPopularThemes() {
         List<ThemeResponse> responses = themeService.getPopularThemes();
 
         return ResponseEntity.ok(responses);
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<ThemeResponse> create(@Valid @RequestBody final ThemeRequest request) {
         ThemeResponse response = themeService.create(request);
 
@@ -49,8 +42,8 @@ public class ThemeController {
                 .body(response);
     }
 
-    @DeleteMapping("/{themeId}")
-    public ResponseEntity<Void> delete(@PathVariable("themeId") final Long themeId) {
+    @Override
+    public ResponseEntity<Void> delete(final Long themeId) {
         themeService.delete(themeId);
 
         return ResponseEntity.noContent().build();

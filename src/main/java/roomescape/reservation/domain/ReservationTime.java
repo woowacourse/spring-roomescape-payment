@@ -1,12 +1,18 @@
 package roomescape.reservation.domain;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 public class ReservationTime {
 
@@ -16,8 +22,6 @@ public class ReservationTime {
 
     @Column(nullable = false, unique = true)
     private LocalTime startAt;
-
-    protected ReservationTime() {}
 
     public ReservationTime(final Long id, final LocalTime startAt) {
         validateNull(startAt);
@@ -35,11 +39,23 @@ public class ReservationTime {
         }
     }
 
-    public Long getId() {
+    public Long idValue() {
         return id.getValue();
     }
 
-    public LocalTime getStartAt() {
-        return startAt;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ReservationTime that)) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 }

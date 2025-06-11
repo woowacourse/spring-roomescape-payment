@@ -87,3 +87,37 @@ values (NEXT VALUE FOR WAITING_ID_SEQUENCE, CURRENT_DATE - 2, 3, 3, 1, DATEADD('
 -- 로키 예약 대기 목록
 insert into waiting (id, date, time_id, theme_id, member_id, created_at)
 values (NEXT VALUE FOR WAITING_ID_SEQUENCE, CURRENT_DATE - 2, 1, 1, 3, DATEADD('DAY', -3, CURRENT_TIMESTAMP));
+
+-- 임시 결제 정보 목록
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_1', 'ORD_1', 1000, 1);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_2', 'ORD_2', 1000, 2);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_3', 'ORD_3', 1000, 3);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_4', 'ORD_4', 1000, 4);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_5', 'ORD_5', 1000, 5);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_6', 'ORD_6', 1000, 6);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_7', 'ORD_7', 1000, 7);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_8', 'ORD_8', 1000, 8);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_9', 'ORD_9', 1000, 9);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_10', 'ORD_10', 1000, 10);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_11', 'ORD_11', 1000, 11);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_12', 'ORD_12', 1000, 12);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_13', 'ORD_13', 1000, 13);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_14', 'ORD_14', 1000, 14);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_15', 'ORD_15', 1000, 15);
+insert into payment (id, payment_key, order_id, amount, reservation_id)
+values (NEXT VALUE FOR PAYMENT_ID_SEQUENCE, 'PAY_16', 'ORD_16', 1000, 16);

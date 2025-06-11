@@ -1,18 +1,25 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import roomescape.reservation.domain.Reservation;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 public class Payment {
 
     private static final String NON_EXISTS_ERROR_MESSAGE = "%s값이 존재하지 않습니다.";
 
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
     private PaymentId paymentId;
 
     @Column(nullable = false)
@@ -27,9 +34,6 @@ public class Payment {
     @OneToOne
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
-
-    protected Payment() {
-    }
 
     public Payment(
             final Long id,
@@ -73,25 +77,5 @@ public class Payment {
         if (reservation == null) {
             throw new IllegalArgumentException(NON_EXISTS_ERROR_MESSAGE.formatted("reservation"));
         }
-    }
-
-    public PaymentId getPaymentId() {
-        return paymentId;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public Long getAmount() {
-        return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
     }
 }

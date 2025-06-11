@@ -23,12 +23,13 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
 
 import roomescape.auth.dto.LoginMember;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
@@ -115,7 +116,7 @@ class ReservationServiceTest {
         LocalDate date = nextDay();
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
+                new ReservationCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(member));
 
         // when
         ReservationResponse result = reservationService.create(requestDto);
@@ -140,7 +141,7 @@ class ReservationServiceTest {
         LocalDate date = nextDay();
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
+                new ReservationCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(member));
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1_000L);
 
         server.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
@@ -175,7 +176,7 @@ class ReservationServiceTest {
         waitingRepository.save(new Waiting(date, member, time, theme));
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
+                new ReservationCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -194,7 +195,7 @@ class ReservationServiceTest {
         );
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, pastTime.getId(), theme.getId(), LoginMember.of(member));
+                new ReservationCreateRequest(date, pastTime.idValue(), theme.idValue(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -210,7 +211,7 @@ class ReservationServiceTest {
         LocalDate date = nextDay();
         Long notExistId = 0L;
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, notExistId, theme.getId(), LoginMember.of(member));
+                new ReservationCreateRequest(date, notExistId, theme.idValue(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -226,7 +227,7 @@ class ReservationServiceTest {
         Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         Long notExistId = 0L;
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, time.getId(), notExistId, LoginMember.of(member));
+                new ReservationCreateRequest(date, time.idValue(), notExistId, LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -242,7 +243,8 @@ class ReservationServiceTest {
         Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
         Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
-        Long reservationId = reservation.getId();
+        paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, reservation));
+        Long reservationId = reservation.idValue();
 
         // when & then
         assertThatCode(() -> reservationService.delete(reservationId))
@@ -260,10 +262,11 @@ class ReservationServiceTest {
 
         LocalDate date = nextDay();
         Reservation reservation1 = reservationRepository.save(new Reservation(member1, date, time, theme));
+        paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, reservation1));
         waitingRepository.save(new Waiting(date, member2, time, theme));
 
         // when
-        reservationService.delete(reservation1.getId());
+        reservationService.delete(reservation1.idValue());
 
         // then
         assertAll(() -> {
@@ -293,7 +296,8 @@ class ReservationServiceTest {
         reservationRepository.save(new Reservation(member, date, reservationTime1, theme));
 
         // when
-        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, theme.getId());
+        List<BookedReservationTimeResponse> responses
+                = reservationService.getSortedAvailableTimes(date, theme.idValue());
 
         // then
         List<Boolean> alreadyBookeds = responses.stream()

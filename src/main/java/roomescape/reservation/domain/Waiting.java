@@ -14,9 +14,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 public class Waiting {
 
@@ -42,8 +47,6 @@ public class Waiting {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    protected Waiting() {}
-
     public Waiting(
             final Long id,
             final LocalDate date,
@@ -67,36 +70,16 @@ public class Waiting {
         this(null, date, member, time, theme);
     }
 
-    public Long getId() {
+    public Long idValue() {
         return id.getValue();
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public ReservationTime getTime() {
-        return time;
     }
 
     public LocalTime startTime() {
         return time.getStartAt();
     }
 
-    public Theme getTheme() {
-        return theme;
-    }
-
     public String themeName() {
         return theme.getName();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 
     @Override

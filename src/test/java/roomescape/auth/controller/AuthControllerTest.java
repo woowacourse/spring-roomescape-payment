@@ -23,7 +23,7 @@ class AuthControllerTest {
 
     @DisplayName("로그인 요청을 보내면 응답 쿠키에 토큰이 담겨 로그인을 성공한다.")
     @Test
-    void login() {
+    void postLogin() {
         Map<String, String> loginParams = Map.of("email", "admin@woowa.com", "password", "12341234");
 
         RestAssured.given().log().all()
@@ -37,7 +37,7 @@ class AuthControllerTest {
 
     @DisplayName("존재하지 않는 사용자로 로그인 요청을 보내면 로그인할 수 없다.")
     @Test
-    void loginWithInvalidMember() {
+    void postLoginWithInvalidMember() {
         Map<String, String> invalidLoginParams = Map.of("email", "invalid@woowa.com", "password", "12341234");
 
         RestAssured.given().log().all()
@@ -50,7 +50,7 @@ class AuthControllerTest {
 
     @DisplayName("로그인 이후 로그인 상태를 확인한다.")
     @Test
-    void loginCheck() {
+    void getLoginCheck() {
         Map<String, String> loginParams = Map.of("email", "admin@woowa.com", "password", "12341234");
         String tokenValue = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -70,7 +70,7 @@ class AuthControllerTest {
 
     @DisplayName("로그아웃 요청을 보내면 쿠키의 토큰 값을 지운다.")
     @Test
-    void logout() {
+    void postLogout() {
         Map<String, String> loginParams = Map.of("email", "admin@woowa.com", "password", "12341234");
         String tokenValue = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

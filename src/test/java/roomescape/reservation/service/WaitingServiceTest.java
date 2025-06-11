@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import roomescape.auth.dto.LoginMember;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.business.AlreadyInUseException;
+import roomescape.common.exception.business.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.MemberResponse;
@@ -64,7 +64,7 @@ class WaitingServiceTest {
         reservationRepository.save(new Reservation(reservationMember, date, time, theme));
 
         WaitingCreateRequest request =
-                new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(waitingMember));
+                new WaitingCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(waitingMember));
 
         // when
         WaitingResponse result = waitingService.createWaiting(request);
@@ -93,7 +93,7 @@ class WaitingServiceTest {
         reservationRepository.save(new Reservation(reservationMember, date, time, theme));
 
         WaitingCreateRequest request =
-                new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(waitingMember));
+                new WaitingCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(waitingMember));
         waitingService.createWaiting(request);
 
         // when & then
@@ -111,7 +111,7 @@ class WaitingServiceTest {
         Member member = memberRepository.save(new Member("로키", "roky@posty.com", "12341234", Role.ADMIN));
 
         WaitingCreateRequest request =
-                new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
+                new WaitingCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> waitingService.createWaiting(request))
@@ -129,7 +129,7 @@ class WaitingServiceTest {
         reservationRepository.save(new Reservation(member, date, time, theme));
 
         WaitingCreateRequest request =
-                new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
+                new WaitingCreateRequest(date, time.idValue(), theme.idValue(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> waitingService.createWaiting(request))
@@ -147,7 +147,7 @@ class WaitingServiceTest {
         Waiting waiting = waitingRepository.save(new Waiting(date, member, time, theme));
 
         // when & then
-        assertThatCode(() -> waitingService.deleteWaiting(waiting.getId()))
+        assertThatCode(() -> waitingService.deleteWaiting(waiting.idValue()))
                 .doesNotThrowAnyException();
     }
 

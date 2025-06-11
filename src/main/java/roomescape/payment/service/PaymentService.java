@@ -17,9 +17,9 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.PaymentBadRequestException;
-import roomescape.common.exception.PaymentServerException;
+import roomescape.common.exception.business.EntityNotFoundException;
+import roomescape.common.exception.business.PaymentBadRequestException;
+import roomescape.common.exception.business.PaymentServerException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.TossPaymentErrorResponse;
@@ -29,6 +29,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.repository.ReservationRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class PaymentService {
 
@@ -93,5 +94,18 @@ public class PaymentService {
                 paymentRequest.amount(),
                 reservation
         ));
+    }
+
+    public Payment getPaymentByReservation(final ReservationId reservationId) {
+        return paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약 결제 정보입니다."));
+    }
+
+    @Transactional
+    public void deleteByReservationId(final ReservationId reservationId) {
+        if (!paymentRepository.existsByReservationId(reservationId)) {
+            throw new EntityNotFoundException("존재하지 않는 결제 정보입니다.");
+        }
+        paymentRepository.deleteByReservationId(reservationId);
     }
 }

@@ -3,34 +3,27 @@ package roomescape.reservation.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import roomescape.auth.annotation.RequiredAdmin;
+import lombok.RequiredArgsConstructor;
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.service.AuthService;
+import roomescape.reservation.controller.api.AdminReservationApi;
 import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
-@RequestMapping("/admin/reservations")
+@RequiredArgsConstructor
 @RestController
-public class AdminReservationController {
+public class AdminReservationController implements AdminReservationApi {
 
     private final AuthService authService;
     private final ReservationService reservationService;
 
-    public AdminReservationController(final AuthService authService, final ReservationService reservationService) {
-        this.authService = authService;
-        this.reservationService = reservationService;
-    }
-
-    @RequiredAdmin
-    @PostMapping
+    @Override
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody final AdminReservationRequest request
     ) {
