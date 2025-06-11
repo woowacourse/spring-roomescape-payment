@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.domain.Role;
-import roomescape.dto.business.AccessTokenContent;
+import roomescape.domain.auth.dto.AccessTokenContent;
+import roomescape.domain.member.domain.Role;
 import roomescape.exception.UnauthorizedException;
 
 @Component

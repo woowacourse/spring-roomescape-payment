@@ -23,17 +23,11 @@ function render(data) {
     TODO: [4단계] 예약 대기 관리 기능
           예약 대기 목록 조회 response 명세에 맞춰 값 설정
      */
-    const id = item.id;
-    const name = item.member.name;
-    const theme = item.theme.name;
-    const date = item.date;
-    const startAt = item.time.startAt;
-
-    row.insertCell(0).textContent = id;            // 예약 대기 id
-    row.insertCell(1).textContent = name;          // 예약자명
-    row.insertCell(2).textContent = theme;         // 테마명
-    row.insertCell(3).textContent = date;          // 예약 날짜
-    row.insertCell(4).textContent = startAt;       // 시작 시간
+    row.insertCell(0).textContent = item.id;            // 예약 대기 id
+    row.insertCell(1).textContent = item.memberName;    // 예약자명
+    row.insertCell(2).textContent = item.themeName;     // 테마명
+    row.insertCell(3).textContent = item.date;          // 예약 날짜
+    row.insertCell(4).textContent = item.startAt;       // 시작 시간
 
     const actionCell = row.insertCell(row.cells.length);
 

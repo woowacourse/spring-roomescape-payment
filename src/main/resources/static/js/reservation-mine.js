@@ -24,15 +24,13 @@ function render(data) {
                   response 명세에 맞춰 값 설정
              */
 
-            const theme = item.theme.name;
-            const date = item.date;
-            const time = item.time.startAt;
-
-            row.insertCell(0).textContent = theme;
-            row.insertCell(1).textContent = date;
-            row.insertCell(2).textContent = time;
+            row.insertCell(0).textContent = item.themeName;
+            row.insertCell(1).textContent = item.date;
+            row.insertCell(2).textContent = item.startAt;
             row.insertCell(3).textContent = '예약';
-            row.insertCell(4).textContent = '';
+            row.insertCell(4).textContent = item.paymentKey;
+            row.insertCell(5).textContent = item.amount;
+            row.insertCell(6).textContent = '';
     });
 
     const waitingWithRanks = data.waitingWithRankResponses;
@@ -42,22 +40,24 @@ function render(data) {
         /*
         TODO: [2단계] 내 예약 목록 조회 기능
               response 명세에 맞춰 값 설정
-         */
+        */
 
-        const theme = item.theme.name;
-        const date = item.date;
-        const time = item.time.startAt;
-        const rank = item.rank;
-
-        row.insertCell(0).textContent = theme;
-        row.insertCell(1).textContent = date;
-        row.insertCell(2).textContent = time;
-        row.insertCell(3).textContent = rank + '번째 대기';
+        /*
+        TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+              예약 완료 상태일 때 결제 정보를 함께 보여주기
+              결제 정보 필드명은 자신의 response 에 맞게 변경하기
+        */
+        row.insertCell(0).textContent = item.themeName;
+        row.insertCell(1).textContent = item.date;
+        row.insertCell(2).textContent = item.startAt;
+        row.insertCell(3).textContent = item.rank + '번째 대기';
+        row.insertCell(4).textContent = item.paymentKey;
+        row.insertCell(5).textContent = item.amount;
 
         /*
         TODO: [3단계] 예약 대기 기능 - 예약 대기 취소 기능 구현 후 활성화
          */
-         const cancelCell = row.insertCell(4);
+         const cancelCell = row.insertCell(6);
          const cancelButton = document.createElement('button');
          cancelButton.textContent = '취소';
          cancelButton.className = 'btn btn-danger';
