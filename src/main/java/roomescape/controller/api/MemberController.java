@@ -1,21 +1,22 @@
 package roomescape.controller.api;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.auth.SignUpRequestDto;
 import roomescape.dto.member.MemberResponseDto;
 import roomescape.dto.member.MemberSignupResponseDto;
+import roomescape.global.Loggable;
 import roomescape.service.command.MemberCommandService;
 import roomescape.service.query.MemberQueryService;
 
+import java.util.List;
+
+@Tag(name = "회원 관리 API")
 @RestController
 @RequestMapping("/members")
 public class MemberController {
@@ -28,6 +29,8 @@ public class MemberController {
         this.memberCommandService = memberCommandService;
     }
 
+    @Operation(summary = "모든 회원 조회")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<MemberResponseDto> getMembers(
@@ -36,6 +39,9 @@ public class MemberController {
         return memberQueryService.findAllMembers();
     }
 
+    @Loggable
+    @Operation(summary = "회원 가입")
+    @ApiResponse(responseCode = "200", description = "가입 성공")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public MemberSignupResponseDto signup(

@@ -1,12 +1,13 @@
 package roomescape.exception;
 
-import roomescape.client.PaymentErrorResponse;
+import roomescape.infrastructure.PaymentErrorResponse;
 
 public class PaymentConfirmServerException extends RuntimeException {
 
     private final PaymentErrorResponse paymentErrorResponse;
 
     public PaymentConfirmServerException(PaymentErrorResponse paymentErrorResponse) {
+        super(paymentErrorResponse.getMessage());
         this.paymentErrorResponse = paymentErrorResponse;
     }
 

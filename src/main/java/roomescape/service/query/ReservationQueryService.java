@@ -1,7 +1,5 @@
 package roomescape.service.query;
 
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
@@ -9,10 +7,14 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWaitingRank;
 import roomescape.domain.reservation.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.payment.PaymentResponseDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,11 +22,13 @@ public class ReservationQueryService {
 
     private final JpaReservationRepository reservationRepository;
     private final JpaReservationWaitingTicketRepository waitingTicketRepository;
+    private final PaymentQueryService paymentQueryService;
 
     public ReservationQueryService(JpaReservationRepository reservationRepository,
-                                   JpaReservationWaitingTicketRepository waitingTicketRepository) {
+                                   JpaReservationWaitingTicketRepository waitingTicketRepository, final PaymentQueryService paymentQueryService) {
         this.reservationRepository = reservationRepository;
         this.waitingTicketRepository = waitingTicketRepository;
+        this.paymentQueryService = paymentQueryService;
     }
 
     public List<ReservationResponseDto> findAllReservations() {
@@ -66,11 +70,12 @@ public class ReservationQueryService {
                         reservation, rank
                 );
             }
-            return new MyReservationResponseDto(reservation);
+            PaymentResponseDto payment = paymentQueryService.findByReservationId(reservation.getId());
+            return new MyReservationResponseDto(payment, reservation);
         }).toList();
     }
 
-    private final ReservationWaitingRank calculateWaitingRank(Reservation reservationWaiting) {
+    private ReservationWaitingRank calculateWaitingRank(Reservation reservationWaiting) {
         ReservationWaitingTicket reservationWaitingTicket = waitingTicketRepository.findByReservationId(
                 reservationWaiting.getId()).get();
         return waitingTicketRepository.countReservationWaitingsByThemeIdAndDateAndTimeIdAndCreatedAt(

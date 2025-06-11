@@ -16,7 +16,8 @@ VALUES ('테마 A', '테마 A입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6e
 INSERT INTO member (name, email, password, role)
 VALUES ('가이온', 'jumdo12', 'jumdo12', 'ADMIN'),
        ('모다', 'moda14', 'moda14', 'USER'),
-       ('대니', 'danny00', 'danny00', 'USER')
+       ('대니', 'danny00', 'danny00', 'USER'),
+       ('모루', 'moru@example.com', 'moru00', 'USER')
        ;
 
 INSERT INTO reservation (date, time_id, theme_id, member_id, status)

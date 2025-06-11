@@ -1,6 +1,8 @@
 package roomescape.dto.reservation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import roomescape.service.dto.PaymentConfirmDto;
+
 import java.time.LocalDate;
 
 public record MemberReservationCreateRequestDto

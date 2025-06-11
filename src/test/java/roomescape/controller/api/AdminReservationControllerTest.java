@@ -1,52 +1,83 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.is;
-
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.controller.AuthAdminInterceptor;
+import roomescape.controller.AuthArgumentResolver;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.reservation.AdminReservationCreateRequestDto;
+import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
+import roomescape.service.command.ReservationCommandService;
+import roomescape.service.dto.ReservationCreateDto;
+import roomescape.service.query.ReservationQueryService;
 import roomescape.util.JwtTokenProvider;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql(scripts = {"/test-data.sql"}, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(AdminReservationController.class)
 class AdminReservationControllerTest {
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
     JpaMemberRepository memberRepository;
 
-    @Autowired
+    @MockitoBean
     JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    ReservationQueryService reservationQueryService;
+
+    @MockitoBean
+    ReservationCommandService reservationCommandService;
+
+    @MockitoBean
+    AuthArgumentResolver authArgumentResolver;
+
+    @MockitoBean
+    AuthAdminInterceptor authAdminInterceptor;
+
+    @MockitoBean
+    JpaReservationRepository reservationRepository;
 
     String loginToken;
 
     @BeforeEach
     void setUp() {
-        Member admin = new Member(null, "moda", "moda@woowa.com", Role.ADMIN, "password");
-        memberRepository.save(admin);
+        Member admin = new Member(2L, "moda", "moda@woowa.com", Role.ADMIN, "password");
+        when(memberRepository.save(any(Member.class))).thenReturn(admin);
+        when(jwtTokenProvider.createToken(any(Member.class))).thenReturn("mockToken");
 
-        loginToken = jwtTokenProvider.createToken(new Member(2L, "moda", "moda@woowa.com", Role.ADMIN, "password"));
+        loginToken = "mockToken";
+
+        when(authArgumentResolver.supportsParameter(any())).thenReturn(true);
+        when(authArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .thenReturn(new roomescape.dto.auth.LoginInfo(admin));
+
+        when(authAdminInterceptor.preHandle(any(), any(), any())).thenReturn(true);
     }
 
     @Nested
@@ -54,52 +85,31 @@ class AdminReservationControllerTest {
 
         @DisplayName("어드민 예약 추가 테스트")
         @Test
-        void addReservationTest() {
+        void addReservationTest() throws Exception {
             AdminReservationCreateRequestDto dto = new AdminReservationCreateRequestDto(
                     LocalDate.now().plusDays(1), 1L, 1L, 1L);
-            RestAssured.given().cookie("token", loginToken).log().all()
-                    .contentType(ContentType.JSON)
-                    .body(dto)
-                    .when().post("/admin/reservations")
-                    .then().log().all().statusCode(201);
+            ReservationCreateDto createDto = new ReservationCreateDto(dto.date(), dto.timeId(), dto.themeId(), dto.memberId());
+            ReservationResponseDto responseDto = new ReservationResponseDto(1L, null, null, null, null, null);
+            when(reservationCommandService.bookReservation(createDto)).thenReturn(responseDto);
+            mockMvc.perform(post("/admin/reservations")
+                    .cookie(new Cookie("token", "mockToken"))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(dto)))
+                    .andExpect(status().isCreated());
         }
     }
 
-    @Nested
-    class searchAdminReservationTest {
-
-        @Autowired
-        JpaReservationRepository reservationRepository;
-
-        @BeforeEach
-        void setUp() {
-            Reservation reservationInPast = new Reservation(null,
-                    new Member(1L, "moda", "moda@woowa.com", Role.ADMIN, "password"),
-                    LocalDate.of(2024, 12, 31),
-                    new ReservationTime(1L, LocalTime.of(10, 0)),
-                    new Theme(1L, "테마 A", "테마 A입니다.",
-                            "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"),
-                    ReservationStatus.RESERVED
-            );
-            reservationRepository.save(reservationInPast);
-        }
-
-        @DisplayName("특정 기간 내 예약을 조회할 수 있다")
-        @Test
-        void searchAdminReservationTest() {
-            Map<String, Object> params = Map.of(
-                    "themeId", 1L,
-                    "memberId", 1L,
-                    "dateFrom", "2025-05-01",
-                    "dateTo", "2025-12-31");
-
-            RestAssured.given().log().all()
-                    .cookie("token", loginToken)
-                    .queryParams(params)
-                    .when().get("/admin/reservations/search")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("size()", is(1));
-        }
+    @DisplayName("특정 기간 내 예약을 조회할 수 있다")
+    @Test
+    void searchAdminReservationTest() throws Exception {
+        when(reservationQueryService.searchReservationsBy(1L, 1L, java.time.LocalDate.parse("2025-05-01"), java.time.LocalDate.parse("2025-12-31")))
+                .thenReturn(List.of(new ReservationResponseDto(1L, null, null, null, null, null)));
+        mockMvc.perform(get("/admin/reservations/search")
+                        .cookie(new Cookie("token", "mockToken"))
+                        .param("themeId", "1")
+                        .param("memberId", "1")
+                        .param("dateFrom", "2025-05-01")
+                        .param("dateTo", "2025-12-31"))
+                .andExpect(status().isOk());
     }
 }

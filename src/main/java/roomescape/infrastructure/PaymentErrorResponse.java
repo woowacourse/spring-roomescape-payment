@@ -1,4 +1,4 @@
-package roomescape.client;
+package roomescape.infrastructure;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -13,7 +13,7 @@ public abstract class PaymentErrorResponse implements ErrorResponse {
 
     @Override
     public HttpStatusCode getStatusCode() {
-        return getStatusCode();
+        return this.httpStatusCode;
     }
 
     @Override
