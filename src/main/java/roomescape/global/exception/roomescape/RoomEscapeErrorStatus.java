@@ -37,7 +37,11 @@ public enum RoomEscapeErrorStatus {
      */
     NON_EXIST_RESERVATION_ITEM(HttpStatus.NOT_FOUND, "존재하지 않는 예약 항목입니다."),
     INVALID_RESERVATION_ITEM(HttpStatus.BAD_REQUEST, "예약시간은 과거일 수 없습니다."),
-    ;
+
+    /**
+     * Payment Error Status
+     */
+    NON_EXIST_PAYMENT(HttpStatus.BAD_REQUEST, "존재하지 않는 결재 내역입니다.");
 
     RoomEscapeErrorStatus(HttpStatus httpStatus, String errorMessage) {
         this.httpStatus = httpStatus;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.docs.reservation.ReservationThemeControllerDocs;
 import roomescape.dto.request.ReservationThemeRequest;
 import roomescape.dto.response.ReservationThemeResponse;
 import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
@@ -21,7 +22,7 @@ import roomescape.service.reservation.ReservationThemeService;
 @RequiredArgsConstructor
 @RequestMapping("/themes")
 @RestController
-public class ReservationThemeController {
+public class ReservationThemeController implements ReservationThemeControllerDocs {
 
     private final ReservationThemeService reservationThemeService;
 
@@ -35,7 +36,7 @@ public class ReservationThemeController {
         return ResponseEntity.status(HttpStatus.OK).body(reservationThemeService.findPopularThemes());
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ReservationThemeResponse> reservationThemeAdd(
             @RequestBody ReservationThemeRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationThemeService.addReservationTheme(request));

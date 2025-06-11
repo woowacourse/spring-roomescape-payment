@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.docs.reservation.ReservationControllerDocs;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.ReservationResponse;
@@ -21,7 +22,7 @@ import roomescape.service.reservation.ReservingService;
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationControllerDocs {
 
     private final ReservationService reservationService;
     private final ReservingService reservingService;

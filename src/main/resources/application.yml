@@ -6,15 +6,64 @@ spring:
     url: jdbc:h2:mem:database
     username: sa
   jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+    show-sql: false
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: default
+  aop:
+    auto: true
+
+springdoc:
+  packages-to-scan: roomescape
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  cache:
+    disabled: true
+  api-docs:
+    path: /api-docs/json
+    groups:
+      enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger/api-docs.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+toss:
+  payments:
+    base-url: https://api.tosspayments.com
+    widget-secret-key: ${TOSS_SECRET_KEY}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  sql:
+    init:
+      mode: never
+  jpa:
     properties:
       hibernate:
         show_sql: true
         format_sql: true
     show-sql: true
     hibernate:
-      ddl-auto: create
-    defer-datasource-initialization: true
+      ddl-auto: create-drop
 toss:
   payments:
-    base-url: https://api.tosspayments.com
-    widget-secret-key: test_sk_nRQoOaPz8LK6ZxMR2BZNry47BMw6
+    base-url: http://localhost:8080
+    widget-secret-key: test-toss-secret-key

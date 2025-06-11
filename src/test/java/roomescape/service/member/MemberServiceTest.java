@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -22,8 +23,8 @@ import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
 import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.repository.impl.MemberRepositoryImpl;
 import roomescape.repository.jpa.MemberJpaRepository;
-import roomescape.service.member.MemberService;
 
+@ActiveProfiles("test")
 @Import(JpaConfig.class)
 @DataJpaTest
 class MemberServiceTest {
@@ -81,7 +82,6 @@ class MemberServiceTest {
 
         //then
         assertThat(expected).hasSize(1);
-
     }
 
     @DisplayName("사용자의 id로 사용자를 조회한다")

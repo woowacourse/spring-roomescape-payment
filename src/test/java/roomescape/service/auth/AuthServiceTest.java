@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,7 +23,6 @@ import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
 import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.repository.impl.MemberRepositoryImpl;
 import roomescape.repository.jpa.MemberJpaRepository;
-import roomescape.service.auth.AuthService;
 import roomescape.service.member.MemberService;
 
 @Import(JpaConfig.class)

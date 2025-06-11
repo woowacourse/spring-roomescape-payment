@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.request.ReservationThemeRequest;
@@ -25,10 +26,8 @@ import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
 import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
-import roomescape.service.reservation.ReservationService;
-import roomescape.service.reservation.ReservationThemeService;
-import roomescape.service.reservation.ReservationTimeService;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationTimeServiceTest {

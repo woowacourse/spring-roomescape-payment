@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.docs.member.MemberControllerDocs;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.MemberResponse;
@@ -17,7 +18,7 @@ import roomescape.service.reservation.ReservationService;
 
 @RequiredArgsConstructor
 @RestController
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
     private final ReservationService reservationService;

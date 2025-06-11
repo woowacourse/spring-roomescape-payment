@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.payment;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
@@ -13,14 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestClientException;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 import roomescape.dto.response.PaymentSuccessResponse;
 import roomescape.global.exception.payment.PaymentException;
-import roomescape.service.payment.PaymentApproveClient;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @EnableWireMock
 @TestPropertySource(properties = {
@@ -51,6 +52,7 @@ class PaymentApproveClientTest {
 
         // then
         assertThat(response.paymentKey()).isEqualTo(PAYMENT_KEY);
+        assertThat(response.totalAmount()).isEqualTo(AMOUNT);
     }
 
     @Test

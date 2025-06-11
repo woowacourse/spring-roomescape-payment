@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import roomescape.controller.docs.auth.LoginControllerDocs;
 import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.LoginResponse;
 import roomescape.service.auth.AuthService;
@@ -16,7 +17,7 @@ import roomescape.service.member.MemberService;
 
 @RequiredArgsConstructor
 @Controller
-public class LoginController {
+public class LoginController implements LoginControllerDocs {
 
     private static final String SESSION_KEY = "id";
     private static final int SESSION_TIMEOUT_SECOND = 60 * 60;
