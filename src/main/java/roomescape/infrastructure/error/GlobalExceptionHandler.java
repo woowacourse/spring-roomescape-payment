@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
             PaymentException.class
     })
     public ResponseEntity<ApiFailResponse> handleErrorLevelDomainExceptions(final RuntimeException e) {
-        log.warn("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        log.error("{}: {}", e.getClass().getSimpleName(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiFailResponse(e.getMessage()));
     }
