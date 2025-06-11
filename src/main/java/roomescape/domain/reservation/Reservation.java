@@ -21,9 +21,9 @@ import roomescape.infrastructure.error.exception.ReservationException;
 
 @Entity
 @Table(
-        name = "reservations",
+        name = "reservation",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"date", "time_id", "theme_id"})
+                @UniqueConstraint(columnNames = {"date", "time_id", "theme_id", "status"})
         }
 )
 public class Reservation extends BaseEntity {
