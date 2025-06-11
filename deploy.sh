@@ -38,4 +38,4 @@ echo "🚀 애플리케이션 실행 중..."
 nohup java -jar $JAR_NAME > ../nohup.out 2>&1 &
 
 echo "✅ 배포 완료!"
-echo "📄 로그 확인: tail -f "$APP_NAME"/build/nohup.out"
+echo "📄 로그 확인: tail -f /home/ubuntu/"$APP_NAME"/build/nohup.out"
