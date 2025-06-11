@@ -6,5 +6,4 @@ import roomescape.reservation.model.vo.PaymentInfo;
 public interface PaymentClient {
 
     TossPaymentsResponse requestConfirm(final PaymentInfo paymentInfo);
-
 }
