@@ -20,7 +20,6 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingWithRank;
 import roomescape.reservation.exception.WaitingNotFoundException;
 import roomescape.reservation.fixture.TestFixture;
@@ -62,7 +61,8 @@ class WaitingServiceTest {
 
     @BeforeEach
     void setUp() {
-        waitingService = new WaitingService(waitingRepository);
+        waitingService = new WaitingService(waitingRepository, reservationTimeRepository,
+                memberRepository, themeRepository);
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
         time = reservationTimeRepository.save(time2);
@@ -76,13 +76,13 @@ class WaitingServiceTest {
         Waiting waiting = Waiting.createUpcomingReservationWithUnassignedId(member, 1, info);
         waitingRepository.save(waiting);
 
-        List<ReservationResponse> result = waitingService.findWaitings();
+        List<Waiting> result = waitingService.findWaitings();
         assertThat(result).hasSize(1);
     }
 
     @Test
     void findWaitings_shouldReturnEmptyList_whenNoWaitings() {
-        List<ReservationResponse> result = waitingService.findWaitings();
+        List<Waiting> result = waitingService.findWaitings();
         assertThat(result).isEmpty();
     }
 

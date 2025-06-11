@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.reservation.exception.InvalidReservationException;
@@ -46,7 +47,7 @@ public class Reservation {
     }
 
     private static void validateDateTime(ReservationInfo reservationInfo) {
-        if (LocalDateTime.of(reservationInfo.getDate(), reservationInfo.getTime().getStartAt())
+        if (LocalDateTime.of(reservationInfo.getDate(), reservationInfo.getStartAt())
                 .isBefore(LocalDateTime.now())) {
             throw new InvalidReservationException("예약 시간이 현재 시간보다 이전일 수 없습니다.");
         }
@@ -82,6 +83,14 @@ public class Reservation {
 
     public Long getThemeId() {
         return info.getIdOfTheme();
+    }
+
+    public LocalTime getStartAt() {
+        return info.getStartAt();
+    }
+
+    public String getThemeName() {
+        return info.getThemeName();
     }
 
     @Override

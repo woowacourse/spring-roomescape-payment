@@ -9,21 +9,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.infrastructure.dto.reqeust.PaymentCommand;
-import roomescape.payment.infrastructure.dto.reqeust.TossPaymentRequest;
-import roomescape.payment.infrastructure.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.exception.TossServerErrorCode;
+import roomescape.payment.infrastructure.dto.reqeust.PaymentCommand;
+import roomescape.payment.infrastructure.dto.reqeust.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.response.PaymentResponse;
 import roomescape.reservation.dto.response.FailureResponse;
 
 @Component
 public class TossApiClient implements PaymentClient {
 
+    public static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments/confirm";
     private static final String SECRET_KEY_SUFFIX = ":";
     private static final String AUTHORIZATION_HEADER = "Basic ";
-    public static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments/confirm";
-
     private final RestClient restClient;
     private final String secretKey;
 

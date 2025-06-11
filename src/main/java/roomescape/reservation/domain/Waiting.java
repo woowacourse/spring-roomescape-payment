@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.reservation.exception.InvalidReservationException;
@@ -94,6 +95,14 @@ public class Waiting {
 
     public Long getMemberId() {
         return member.getId();
+    }
+
+    public String getThemeName() {
+        return info.getThemeName();
+    }
+
+    public LocalTime getStartAt() {
+        return info.getStartAt();
     }
 
     @Override

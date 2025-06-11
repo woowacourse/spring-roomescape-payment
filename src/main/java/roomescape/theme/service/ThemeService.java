@@ -2,6 +2,7 @@ package roomescape.theme.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,9 @@ import roomescape.reservationtime.exception.ReservationTimeInUseException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.request.ThemeCreateRequest;
 import roomescape.theme.dto.response.ThemeResponse;
-import roomescape.theme.exception.ThemeNotFoundException;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 public class ThemeService {
 
@@ -37,6 +38,7 @@ public class ThemeService {
 
     public void delete(Long id) {
         if (reservationRepository.existsByThemeId(id)) {
+            log.info("해당 테마에 대한 예약 존재로 인한 테마 삭제 실패 themeId = {}", id);
             throw new ReservationTimeInUseException("해당 테마에 대한 예약이 존재하여 삭제할 수 없습니다.");
         }
         themeRepository.deleteById(id);
@@ -55,10 +57,5 @@ public class ThemeService {
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();
-    }
-
-    public Theme findTheme(final Long request) {
-        return themeRepository.findById(request)
-                .orElseThrow(() -> new ThemeNotFoundException("요청한 id와 일치하는 테마 정보가 없습니다."));
     }
 }

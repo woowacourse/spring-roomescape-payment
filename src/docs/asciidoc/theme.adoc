@@ -1,0 +1,13 @@
+== Theme API
+
+=== 테마 조회
+operation::theme-controller-docs-test/get-themes[snippets='curl-request,http-request,http-response']
+
+=== 인기 테마 조회
+operation::theme-controller-docs-test/get-popular-themes[snippets='curl-request,http-request,http-response']
+
+=== 테마 생성
+operation::theme-controller-docs-test/create-theme[snippets='curl-request,http-request,http-response']
+
+=== 테마 삭제
+operation::theme-controller-docs-test/delete-theme[snippets='curl-request,http-request,http-response']

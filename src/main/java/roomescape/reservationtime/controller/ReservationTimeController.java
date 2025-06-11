@@ -2,6 +2,7 @@ package roomescape.reservationtime.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.response.ReservationTimeResponse;
 import roomescape.reservationtime.service.ReservationTimeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
@@ -47,7 +49,9 @@ public class ReservationTimeController {
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody ReservationTimeCreateRequest request
     ) {
+        log.info("예약 시간 생성 시도 startAt = {}", request.startAt());
         ReservationTimeResponse dto = reservationTimeService.create(request);
+        log.info("예약 시간 생성 성공 startAt = {}", request.startAt());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -56,7 +60,9 @@ public class ReservationTimeController {
     public ResponseEntity<Void> deleteReservationTimes(
             @PathVariable("id") Long id
     ) {
+        log.info("예약 시간 삭제 시도 themeId = {}", id);
         reservationTimeService.delete(id);
+        log.info("예약 시간 삭제 성공 themeId = {}", id);
         return ResponseEntity.noContent().build();
     }
 }

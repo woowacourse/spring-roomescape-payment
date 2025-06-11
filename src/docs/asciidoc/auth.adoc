@@ -1,0 +1,10 @@
+== Auth API
+
+=== 로그인
+operation::auth-controller-docs-test/login[snippets='curl-request,http-request,http-response']
+
+=== 로그인 확인
+operation::auth-controller-docs-test/check-login[snippets='curl-request,http-request,http-response']
+
+=== 로그아웃
+operation::auth-controller-docs-test/logout[snippets='curl-request,http-request,http-response']

@@ -11,10 +11,6 @@ public record ReservationRequest(
         Long themeId
 ) {
 
-    public static ReservationRequest from(final ReservationInfo info) {
-        return new ReservationRequest(info.getDate(), info.getIdOfTime(), info.getIdOfTheme());
-    }
-
     public ReservationRequest {
         if (date == null) {
             throw new IllegalArgumentException("날짜는 반드시 입력해야합니다.");
@@ -25,6 +21,10 @@ public record ReservationRequest(
         if (themeId == null) {
             throw new IllegalArgumentException("themeId는 반드시 입력해야합니다.");
         }
+    }
+
+    public static ReservationRequest from(final ReservationInfo info) {
+        return new ReservationRequest(info.getDate(), info.getIdOfTime(), info.getIdOfTheme());
     }
 
 }

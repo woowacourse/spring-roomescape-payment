@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -51,6 +52,14 @@ public class ReservationInfo {
 
     public Long getIdOfTime() {
         return time.getId();
+    }
+
+    public LocalTime getStartAt() {
+        return time.getStartAt();
+    }
+
+    public String getThemeName() {
+        return theme.getName();
     }
 
     @Override

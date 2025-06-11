@@ -1,6 +1,7 @@
 package roomescape.global.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import roomescape.global.auth.service.AuthService;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.service.MemberService;
 
+@Slf4j
 @RestController
 public class AuthController {
 
@@ -35,8 +37,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(final @RequestBody LoginRequest loginRequest,
                                       final HttpServletResponse httpServletResponse) {
+        log.info("로그인 시도 email = {}", loginRequest.email());
         LoginResponse loginResponse = authService.login(loginRequest);
         cookieManager.addCookieToResponse(httpServletResponse, TOKEN, loginResponse.accessToken());
+        log.info("로그인 성공 email = {}", loginRequest.email());
         return ResponseEntity.ok().build();
     }
 

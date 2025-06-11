@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,33 +15,33 @@ import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.service.ReservationFacadeService;
-import roomescape.reservation.service.WaitingService;
+import roomescape.reservation.service.WaitingFacadeService;
 
+@Slf4j
 @RestController
 public class WaitingController {
 
-    private final WaitingService waitingService;
-    private final ReservationFacadeService reservationFacadeService;
+    private final WaitingFacadeService waitingFacadeService;
 
-    public WaitingController(final WaitingService waitingService,
-                             final ReservationFacadeService reservationFacadeService) {
-        this.waitingService = waitingService;
-        this.reservationFacadeService = reservationFacadeService;
+    public WaitingController(WaitingFacadeService waitingFacadeService) {
+        this.waitingFacadeService = waitingFacadeService;
     }
+
 
     @GetMapping("/waiting")
     public ResponseEntity<List<ReservationResponse>> findWaitings(
     ) {
-        return ResponseEntity.ok(waitingService.findWaitings());
+        return ResponseEntity.ok(waitingFacadeService.findWaitings());
     }
 
     @RequireRole(MemberRole.USER)
     @DeleteMapping("/waiting/{id}")
-    public ResponseEntity<Void> deleteReservations(
+    public ResponseEntity<Void> deleteWaiting(
             @PathVariable("id") Long id
     ) {
-        waitingService.delete(id);
+        log.info("대기 삭제 시도 waitingId = {}", id);
+        waitingFacadeService.deleteWaiting(id);
+        log.info("대기 삭제 성공 waitingId = {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -50,7 +51,10 @@ public class WaitingController {
             @RequestBody ReservationRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.createWaiting(request, userInfo.id());
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        log.info("대기 생성 시도 memberId = {}, date = {}, timeId = {}, themeId = {}", userInfo.id(), request.date(),
+                request.timeId(), request.themeId());
+        ReservationResponse response = waitingFacadeService.createWaiting(request, userInfo.id());
+        log.info("대기 생성 성공 memberId = {}, waitingId = {}", userInfo.id(), response.id());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

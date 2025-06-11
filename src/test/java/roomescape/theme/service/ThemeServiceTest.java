@@ -20,6 +20,7 @@ import roomescape.member.dto.request.SignupRequest;
 import roomescape.member.dto.response.SignUpResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.ReservationService;
@@ -59,8 +60,6 @@ class ThemeServiceTest {
 
     private MemberService memberService;
 
-    private ReservationService reservationService;
-
     private ReservationTimeService reservationTimeService;
 
     @BeforeEach
@@ -69,7 +68,6 @@ class ThemeServiceTest {
         memberService = new MemberService(memberRepository, myPasswordEncoder);
         reservationTimeService = new ReservationTimeService(reservationTimeRepository,
                 reservationRepository);
-        reservationService = new ReservationService(reservationRepository);
     }
 
     @Test

@@ -1,0 +1,16 @@
+== Reservation API
+
+=== 특정 조건 예약 조회
+operation::reservation-controller-dos-test/find-reservations[snippets='curl-request,http-request,http-response']
+
+=== 회원 예약 생성
+operation::reservation-controller-dos-test/create-reservation[snippets='curl-request,http-request,http-response']
+
+=== 관리자 예약 생성
+operation::reservation-controller-dos-test/create-admin-reservation[snippets='curl-request,http-request,http-response']
+
+=== 예약 삭제
+operation::reservation-controller-dos-test/delete-reservations[snippets='curl-request,http-request,http-response']
+
+=== 본인 예약 조회
+operation::reservation-controller-dos-test/find-my-reservations[snippets='curl-request,http-request,http-response']

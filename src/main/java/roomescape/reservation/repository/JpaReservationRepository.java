@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 
 public interface JpaReservationRepository extends ListCrudRepository<Reservation, Long>, ReservationRepository {
@@ -27,7 +28,7 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
               SELECT 1
               FROM Reservation r
               WHERE r.info.time.id = :timeId)
-            """)
+           """)
     boolean existsByTimeId(@Param("timeId") Long timeId);
 
     @Query("""
@@ -36,7 +37,7 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
                 FROM Reservation r
                 WHERE r.info.theme.id = :themeId
             )
-            """)
+           """)
     boolean existsByThemeId(@Param("themeId") Long themeId);
 
     @Query("""
@@ -45,7 +46,7 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
                 FROM Reservation r
                 WHERE (r.info.date, r.info.time.id, r.info.theme.id) = (:date, :timeId, :themeId)
             )
-            """)
+           """)
     boolean existsByInfoDateAndInfoTimeIdAndInfoThemeId(
             @Param("date") LocalDate date,
             @Param("timeId") Long timeId,
@@ -53,21 +54,34 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
     );
 
     @Query("""
-            SELECT new roomescape.reservationtime.dto.response.AvailableReservationTimeResponse(
-                rt.id,
-                rt.startAt,
-                CASE WHEN r.id IS NOT NULL THEN TRUE ELSE FALSE END AS already_booked
-            )
-            FROM ReservationTime AS rt
-            LEFT JOIN Reservation r
-              ON rt.id = r.info.time.id
-             AND r.info.date = :date
-             AND r.info.theme.id = :themeId
-            ORDER BY rt.startAt
-            """)
+                SELECT new roomescape.reservationtime.dto.response.AvailableReservationTimeResponse(
+                    rt.id,
+                    rt.startAt,
+                    CASE WHEN r.id IS NOT NULL THEN TRUE ELSE FALSE END AS already_booked
+                )
+                FROM ReservationTime AS rt
+                LEFT JOIN Reservation r
+                  ON rt.id = r.info.time.id
+                 AND r.info.date = :date
+                 AND r.info.theme.id = :themeId
+                ORDER BY rt.startAt
+           """)
     List<AvailableReservationTimeResponse> findBookedTimesByDateAndThemeId(
             @Param("date") LocalDate date,
             @Param("themeId") Long themeId
+    );
+
+    @Query("""
+               SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r,p)
+               FROM Reservation r
+               JOIN FETCH r.info.theme
+               JOIN FETCH r.info.time
+               LEFT JOIN Payment p
+                   ON r.id = p.reservation.id
+               WHERE r.member.id = :memberId
+           """)
+    List<ReservationWithPayment> findReservationWithPaymentByMemberId(
+            @Param("memberId") Long memberId
     );
 
     @EntityGraph(attributePaths = {"member", "info.theme", "info.time"})

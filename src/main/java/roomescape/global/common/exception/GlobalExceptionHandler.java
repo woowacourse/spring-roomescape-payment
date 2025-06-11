@@ -1,6 +1,7 @@
 package roomescape.global.common.exception;
 
 import java.time.format.DateTimeParseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -8,11 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.global.auth.exception.ForbiddenException;
 import roomescape.global.auth.exception.UnAuthorizedException;
-import roomescape.member.exception.MemberDuplicatedException;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.reservationtime.exception.ReservationTimeInUseException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -46,8 +47,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
-    @ExceptionHandler(MemberDuplicatedException.class)
-    public ResponseEntity<String> handleMemberDuplicatedException(MemberDuplicatedException e) {
+    @ExceptionHandler(DuplicatedException.class)
+    public ResponseEntity<String> handleDuplicatedException(DuplicatedException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
@@ -73,6 +74,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+        log.error("알 수 없는 예외 발생", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("예상치 못한 서버 오류입니다. 서버에 문의해주세요.");
     }

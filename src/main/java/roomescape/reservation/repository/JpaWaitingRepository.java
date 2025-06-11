@@ -21,7 +21,7 @@ public interface JpaWaitingRepository extends WaitingRepository,
                 FROM Waiting w
                 WHERE (w.info.date, w.info.time.id, w.info.theme.id) = (:date, :timeId, :themeId)
             )
-            """)
+           """)
     boolean existsByDateAndTimeIdAndThemeId(
             @Param("date") LocalDate date,
             @Param("timeId") Long timeId,
@@ -34,7 +34,7 @@ public interface JpaWaitingRepository extends WaitingRepository,
                  WHERE w.info.date   = :date
                    AND w.info.time.id  = :timeId
                    AND w.info.theme.id = :themeId
-            """)
+           """)
     int findMaxOrderByDateAndTimeAndTheme(
             @Param("date") LocalDate date,
             @Param("timeId") Long timeId,
@@ -54,7 +54,7 @@ public interface JpaWaitingRepository extends WaitingRepository,
               )
               FROM Waiting w
               WHERE w.member.id = :memberId
-            """)
+           """)
     List<WaitingWithRank> findWaitingsWithRankByMemberId(@Param("memberId") Long memberId);
 
     Optional<Waiting> findFirstByInfoDateAndInfoTimeAndInfoThemeOrderByTurnAsc(

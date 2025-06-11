@@ -15,10 +15,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.config.TestConfig;
-import roomescape.global.auth.service.MyPasswordEncoder;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.member.service.MemberService;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.fixture.TestFixture;
@@ -27,6 +26,7 @@ import roomescape.reservation.repository.WaitingRepository;
 import roomescape.reservation.service.ReservationFacadeService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.WaitingService;
+import roomescape.reservation.service.transaction.ReservationTransactionService;
 import roomescape.reservationtime.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.response.ReservationTimeResponse;
@@ -35,7 +35,6 @@ import roomescape.reservationtime.exception.ReservationTimeInUseException;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.theme.service.ThemeService;
 
 @DataJpaTest
 @Import(TestConfig.class)
@@ -66,6 +65,9 @@ class ReservationTimeServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private WaitingRepository waitingRepository;
 
     @Mock
@@ -77,13 +79,14 @@ class ReservationTimeServiceTest {
                 reservationRepository);
         theme = themeRepository.save(theme);
         member = memberRepository.save(member);
-        reservationFacadeService = new ReservationFacadeService(
-                new ReservationService(reservationRepository),
-                new WaitingService(waitingRepository),
-                new MemberService(memberRepository, new MyPasswordEncoder()),
-                new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository),
-                paymentService
+        ReservationService reservationService = new ReservationService(reservationRepository, reservationTimeRepository,
+                themeRepository, memberRepository, paymentRepository);
+        WaitingService waitingService = new WaitingService(waitingRepository, reservationTimeRepository,
+                memberRepository, themeRepository);
+        ReservationTransactionService reservationTransactionService = new ReservationTransactionService(
+                reservationService, paymentService);
+        reservationFacadeService = new ReservationFacadeService(reservationService, waitingService,
+                paymentService, reservationTransactionService
         );
     }
 
