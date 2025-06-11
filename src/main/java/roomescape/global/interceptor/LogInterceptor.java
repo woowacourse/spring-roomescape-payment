@@ -25,10 +25,7 @@ public class LogInterceptor implements HandlerInterceptor {
         String requestURI = request.getRequestURI();
         int status = response.getStatus();
 
-        LOGGER.info("[API RESPONSE] {}: {}", requestURI, status);
-        if (status >= 200 && status < 300) {
-            LOGGER.info("[API RESPONSE] {}: {}", requestURI, status);
-        } else if (status >= 400 && status < 500) {
+        if (status >= 400 && status < 500) {
             LOGGER.warn("[API RESPONSE - CLIENT ERROR] {}: {}", requestURI, status);
         } else if (status >= 500) {
             LOGGER.error("[API RESPONSE - SERVER ERROR] {}: {}", requestURI, status);
