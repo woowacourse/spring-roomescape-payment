@@ -32,7 +32,7 @@ public class TossRestClient {
             log.info("[TOSS 응답] 결제 승인 성공: paymentKey={}, orderId={}, amount={}",
                     response.paymentKey(), response.orderId(), response.totalAmount());
             return response;
-        } catch (Exception e) {
+        } catch (PaymentException e) {
             log.error("[TOSS 오류] 결제 승인 실패: paymentKey={}, orderId={}, 이유={}",
                     requestDto.paymentKey(), requestDto.orderId(), e.getMessage(), e);
             throw new PaymentException(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
