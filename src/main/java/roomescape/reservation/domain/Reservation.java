@@ -1,6 +1,5 @@
 package roomescape.reservation.domain;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.*;
 import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
