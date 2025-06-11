@@ -58,9 +58,9 @@ public class TossPayment extends BaseEntity {
     public void fail() {
         if (paymentStatus.canBeFailed()) {
             paymentStatus = PaymentStatus.FAILED;
+            return;
         }
         throw new PaymentException("%s 상태에서 %s 상태로 변경될 수 없습니다"
                 .formatted(this.paymentStatus, PaymentStatus.FAILED));
     }
-
 }
