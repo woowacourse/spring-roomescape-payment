@@ -29,6 +29,15 @@ public class AutoWaitingPromotionService {
         this.clock = clock;
     }
 
+    /**
+     * 예약 삭제 이벤트 발생 시 자동 승격을 수행하는 로직입니다.
+     * 운영 환경에서는 @Async + @TransactionalEventListener(AFTER_COMMIT)로 별도 트랜잭션에서 실행됩니다.
+     * 하지만 테스트 환경에서는 SyncTaskExecutor 인해 동기 실행되므로,
+     * AFTER_COMMIT 후 트랜잭션 정리 이전의 '중간 상태'에서 실행되며 트랜잭션 문제가 발생할 수 있습니다.
+     * 이를 방지하기 위해 Propagation.REQUIRES_NEW 사용하여 항상 새로운 트랜잭션에서 동작하도록 합니다.
+     * 자세한 테스트 코드는 test 패키지 참고:
+     * (test/java/roomescape/application/reservation/event/DeleteReservationEventListenerTest.java)
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void promote(LocalDate reservationDate, Long reservationTimeId, Long themeId) {
         validateExistsReservation(reservationDate, reservationTimeId, themeId);
