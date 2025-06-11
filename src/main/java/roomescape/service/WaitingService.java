@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.domain.Reservation.validateReservableTime;
+import static roomescape.domain.reservation.Reservation.validateReservableTime;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.waiting.Waiting;
 import roomescape.domain.waiting.WaitingWithRank;
-import roomescape.dto.reservation.MyReservationAndWaitingsResponse;
+import roomescape.dto.reservation.MyReservationWaitingResponse;
 import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.waiting.WaitingCreateRequest;
 import roomescape.dto.waiting.WaitingResponse;
@@ -77,10 +77,10 @@ public class WaitingService {
         waitingRepository.deleteById(id);
     }
 
-    public List<MyReservationAndWaitingsResponse> findMyWaitings(Long id) {
+    public List<MyReservationWaitingResponse> findMyWaitings(Long id) {
         List<WaitingWithRank> waitingsWithRank = waitingQueryRepository.findWaitingsWithRankByMemberId(id);
         return waitingsWithRank.stream()
-                .map(MyReservationAndWaitingsResponse::from)
+                .map(MyReservationWaitingResponse::from)
                 .toList();
     }
 

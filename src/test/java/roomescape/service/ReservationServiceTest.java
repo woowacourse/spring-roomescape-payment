@@ -21,24 +21,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationWithPayment;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MyReservationAndWaitingsResponse;
+import roomescape.dto.reservation.MyReservationWaitingResponse;
 import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationQueryRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
+
+    @Mock
+    private ReservationQueryRepository reservationQueryRepository;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -238,12 +243,14 @@ class ReservationServiceTest {
         Reservation reservation1 = testReservation;
         Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime,
                 testTheme);
-        List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
+        ReservationWithPayment reservationPayment1 = new ReservationWithPayment(reservation1, "testkey", 10000L);
+        ReservationWithPayment reservationPayment2 = new ReservationWithPayment(reservation2, "testkey2", 20000L);
+        List<ReservationWithPayment> reservations = Arrays.asList(reservationPayment1, reservationPayment2);
 
-        when(reservationRepository.findReservationsByMemberId(loginInfo.id())).thenReturn(reservations);
+        when(reservationQueryRepository.findReservationsWithPaymentByMemberId(loginInfo.id())).thenReturn(reservations);
 
         // when
-        List<MyReservationAndWaitingsResponse> responses = reservationService.findMyReservations(loginInfo.id());
+        List<MyReservationWaitingResponse> responses = reservationService.findMyReservations(loginInfo.id());
 
         // then
         assertThat(responses).hasSize(2);

@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 import javax.crypto.SecretKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
@@ -20,6 +22,7 @@ import roomescape.exception.UnauthorizedException;
 @Component
 public class JwtTokenProvider {
     private final static String ISSUER = "roomescape";
+    private final static Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${jwt.secret}")
     private String key;
@@ -31,7 +34,7 @@ public class JwtTokenProvider {
     }
 
     public String createToken(Member member) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .subject(member.getId().toString())
                 .claim("name", member.getName())
                 .claim("role", member.getRole().toString())
@@ -40,6 +43,8 @@ public class JwtTokenProvider {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(secretKey)
                 .compact();
+        log.debug("token 발급 성공, id={}", member.getId());
+        return token;
     }
 
     public Long extractId(String token) {

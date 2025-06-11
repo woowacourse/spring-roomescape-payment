@@ -7,7 +7,7 @@ public record WaitingWithRankResponse(
         Long rank
 ) {
     public static WaitingWithRankResponse from(WaitingWithRank waitingWithRank) {
-        return new WaitingWithRankResponse(WaitingResponse.from(waitingWithRank.getWaiting()),
-                waitingWithRank.getRank());
+        return new WaitingWithRankResponse(WaitingResponse.from(waitingWithRank.waiting()),
+                waitingWithRank.rank());
     }
 }
