@@ -14,7 +14,19 @@ public class OrderAmountVerificationCache {
     private final Map<String, Long> cache = new ConcurrentHashMap<>();
 
     public void register(final String key, final long amount) {
-        cache.put(key, amount);
+        if (!cache.containsKey(key)) {
+            cache.put(key, amount);
+        }
+
+        if (cache.get(key) == amount) {
+            log.info("이미 존재하는 주문 번호에 동일한 금액으로 등록 시도 - orderId: {}, amount: {}", key, amount);
+            return;
+        }
+
+        if (cache.containsKey(key)) {
+            log.error("이미 존재하는 주문 번호에 다른 금액으로 등록 시도 - orderId: {}, amount: {}", key, amount);
+            throw new PaymentException("이미 존재하는 주문 번호에 다른 금액으로 등록을 시도할 수 없습니다.");
+        }
     }
 
     public void check(final String key, final long amount) {
