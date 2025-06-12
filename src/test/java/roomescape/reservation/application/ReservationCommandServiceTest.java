@@ -14,8 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.NotFoundException;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PrePaymentValidRequest;
-import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
@@ -30,7 +30,7 @@ class ReservationCommandServiceTest {
     private ReservationCommandService reservationCommandService;
 
     @MockitoBean
-    private TossPaymentClient tossPaymentClient;
+    private PaymentService paymentService;
 
     @Test
     void 예약을_추가한다() {
