@@ -3,6 +3,8 @@ package roomescape.service;
 import static roomescape.domain.Reservation.validateReservableTime;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -22,6 +24,8 @@ import roomescape.repository.WaitingRepository;
 
 @Service
 public class WaitingService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReservationService.class);
 
     private final WaitingRepository waitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -58,7 +62,7 @@ public class WaitingService {
 
         Waiting requestWaiting = Waiting.createWithoutId(request.date(), member, theme, ReservationTime);
         Waiting newWaiting = waitingRepository.save(requestWaiting);
-
+        LOG.info("예약 대기 생성 성공: {}", newWaiting.getId());
         return WaitingResponse.from(newWaiting);
     }
 
@@ -75,6 +79,7 @@ public class WaitingService {
             throw new NotFoundException("[ERROR] 등록된 예약 대기 번호만 삭제할 수 있습니다. 입력된 번호는 " + id + "입니다.");
         }
         waitingRepository.deleteById(id);
+        LOG.info("예약 대기 삭제 성공: {}", id);
     }
 
     public List<MyReservationAndWaitingsResponse> findMyWaitings(Long id) {
@@ -91,5 +96,6 @@ public class WaitingService {
 
         waitingRepository.deleteById(id);
         reservationService.createReservation(ReservationCreateRequest.from(waiting));
+        LOG.info("예약 대기의 예약 확정 성공: {}(삭제됨)", id);
     }
 }

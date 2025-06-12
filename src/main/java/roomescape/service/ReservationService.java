@@ -3,8 +3,13 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.controller.GlobalExceptionHandler;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -24,6 +29,8 @@ import roomescape.repository.ThemeRepository;
 @Service
 @Transactional(readOnly = true)
 public class ReservationService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -58,6 +65,7 @@ public class ReservationService {
 
         Reservation requestReservation = Reservation.createWithoutId(member, request.date(), reservationTime, theme);
         Reservation newReservation = reservationRepository.save(requestReservation);
+        LOG.info("예약 생성 성공: {}", newReservation.getId());
 
         return ReservationResponse.from(newReservation);
     }
@@ -92,6 +100,7 @@ public class ReservationService {
             throw new NotFoundException("[ERROR] 등록된 예약번호만 삭제할 수 있습니다. 입력된 번호는 " + id + "입니다.");
         }
         reservationRepository.deleteById(id);
+        LOG.info("예약 삭제 성공: {}", id);
     }
 
     public List<MyReservationAndWaitingsResponse> findMyReservations(Long id) {
