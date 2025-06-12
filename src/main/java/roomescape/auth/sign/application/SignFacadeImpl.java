@@ -24,7 +24,7 @@ public class SignFacadeImpl implements SignFacade {
     @Override
     public void signIn(final SignInWebRequest signInWebRequest,
                        final HttpServletResponse httpServletResponse) {
-        log.info("[SIGN] 로그인 요청: {}", signInWebRequest);
+        log.info("[SIGN] 로그인 요청: {}", signInWebRequest.email());
         final SignInResult result = signInUseCase.execute(
                 signInWebRequest.toServiceRequest());
 
@@ -33,7 +33,7 @@ public class SignFacadeImpl implements SignFacade {
 
     @Override
     public UserSessionResponse signUp(final SignUpWebRequest request) {
-        log.info("[SIGN] 회원가입 요청: {}", request);
+        log.info("[SIGN] 회원가입 요청: {}", request.email());
         return UserSessionResponse.from(
                 signUpUseCase.execute(request.toServiceRequest()));
     }
