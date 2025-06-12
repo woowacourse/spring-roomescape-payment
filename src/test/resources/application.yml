@@ -33,3 +33,6 @@ pay:
     timeout:
       connection: 2000
       read: 8000
+
+springdoc:
+  server-url: http://13.124.20.46:8080

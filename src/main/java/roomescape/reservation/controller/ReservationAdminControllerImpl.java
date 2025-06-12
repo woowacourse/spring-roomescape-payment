@@ -22,7 +22,7 @@ import roomescape.reservation.service.ReservationService;
 @RestController
 public class ReservationAdminControllerImpl implements ReservationAdminController {
 
-    public static final String BASE_PATH = "/reservations";
+    public static final String BASE_PATH = "/admin/reservations";
 
     private final ReservationService reservationService;
 
@@ -39,7 +39,7 @@ public class ReservationAdminControllerImpl implements ReservationAdminControlle
     }
 
     @RoleRequired(value = Role.ADMIN)
-    @GetMapping("/admin" + BASE_PATH)
+    @GetMapping(BASE_PATH + "/search")
     public ResponseEntity<List<ReservationWebResponse>> getReservationsByAdmin(
             @ModelAttribute final ReservationSearchWebRequest reservationSearchWebRequest
     ) {
@@ -47,7 +47,7 @@ public class ReservationAdminControllerImpl implements ReservationAdminControlle
     }
 
     @RoleRequired(value = Role.ADMIN)
-    @PostMapping("/admin" + BASE_PATH)
+    @PostMapping(BASE_PATH)
     public ResponseEntity<ReservationWebResponse> createReservationByAdmin(
             @RequestBody final CreateReservationByAdminWebRequest createReservationByAdminWebRequest
     ) {
