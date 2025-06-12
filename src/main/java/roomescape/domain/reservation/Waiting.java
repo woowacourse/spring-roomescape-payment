@@ -2,11 +2,11 @@ package roomescape.domain.reservation;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import roomescape.domain.BaseEntity;
 import roomescape.domain.member.Member;
 import roomescape.infrastructure.error.exception.WaitingException;
@@ -16,11 +16,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Waiting extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -37,18 +35,10 @@ public class Waiting extends BaseEntity {
     private Theme theme;
 
     public Waiting(final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
-        this(null, member, date, time, theme);
-    }
-
-    public Waiting(final Long id, final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
-        this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
-    }
-
-    protected Waiting() {
     }
 
     public void validateWaitable(final LocalDateTime currentDateTime) {
@@ -68,25 +58,5 @@ public class Waiting extends BaseEntity {
 
     private boolean isOwner(final Long memberId) {
         return Objects.equals(this.member.getId(), memberId);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public ReservationTime getTime() {
-        return time;
-    }
-
-    public Theme getTheme() {
-        return theme;
     }
 }

@@ -2,7 +2,7 @@ package roomescape.presentation.api.reservation.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
+import roomescape.application.reservation.command.dto.CreateReservationWithTossPaymentCommand;
 
 import java.time.LocalDate;
 
@@ -23,8 +23,8 @@ public record CreateReservationWithPaymentRequest(
         String paymentType
 ) {
 
-    public CreateReservationWithPaymentCommand toCreateCommand(final Long memberId) {
-        return new CreateReservationWithPaymentCommand(
+    public CreateReservationWithTossPaymentCommand toCreateCommand(final Long memberId) {
+        return new CreateReservationWithTossPaymentCommand(
                 date,
                 timeId,
                 themeId,

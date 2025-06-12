@@ -1,5 +1,7 @@
 package roomescape.presentation.api.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Tag(name = "사용자 예약 API")
 @RestController
 public class PersonalReservationController {
 
@@ -25,6 +28,10 @@ public class PersonalReservationController {
         this.waitingQueryService = waitingQueryService;
     }
 
+    @Operation(
+            summary = "개인 예약 조회",
+            description = "사용자가 자신의 예약과 대기열을 조회합니다. 예약은 날짜순으로 정렬됩니다."
+    )
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<MyReservationResponse>> findMineReservations(@AuthPrincipal final AuthInfo authInfo) {
         final List<MyReservationResponse> reservations = getSortedReservationsWithStatus(authInfo.memberId());
@@ -40,7 +47,7 @@ public class PersonalReservationController {
     }
 
     private List<MyReservationResponse> getReservations(final Long memberId) {
-        return reservationQueryService.findReservationsWithStatus(memberId)
+        return reservationQueryService.getReservationsWithStatusAndPayment(memberId)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();

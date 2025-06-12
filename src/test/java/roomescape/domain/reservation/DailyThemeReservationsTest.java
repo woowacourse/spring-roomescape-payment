@@ -21,14 +21,12 @@ class DailyThemeReservationsTest {
         // given
         final List<Reservation> reservations = List.of(
                 new Reservation(
-                        1L,
                         new Member(1L, "test1", new Email("email1@gmail.com"), "password", MemberRole.NORMAL),
                         LocalDate.of(2025, 5, 8),
                         new ReservationTime(1L, LocalTime.of(12, 0)),
                         new Theme(1L, "test", "description", "thumbnail")
                 ),
                 new Reservation(
-                        2L,
                         new Member(1L, "test1", new Email("email1@gmail.com"), "password", MemberRole.NORMAL),
                         LocalDate.of(2025, 5, 8),
                         new ReservationTime(1L, LocalTime.of(12, 0)),
@@ -48,14 +46,12 @@ class DailyThemeReservationsTest {
         // given
         final List<Reservation> reservations = List.of(
                 new Reservation(
-                        1L,
                         new Member(1L, "test1", new Email("email1@gmail.com"), "password", MemberRole.NORMAL),
                         LocalDate.of(2025, 5, 8),
                         new ReservationTime(1L, LocalTime.of(12, 0)),
                         new Theme(1L, "test", "description", "thumbnail")
                 ),
                 new Reservation(
-                        2L,
                         new Member(1L, "test1", new Email("email1@gmail.com"), "password", MemberRole.NORMAL),
                         LocalDate.of(2025, 5, 8),
                         new ReservationTime(2L, LocalTime.of(13, 0)),

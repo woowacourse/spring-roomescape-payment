@@ -1,5 +1,7 @@
 package roomescape.presentation.api.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +17,7 @@ import roomescape.presentation.api.reservation.request.CreateReservationTimeRequ
 import java.net.URI;
 
 @RestController
+@Tag(name = "관리자 예약 시간 API")
 @RequestMapping("/admin/times")
 public class AdminReservationTimeController {
 
@@ -29,6 +32,10 @@ public class AdminReservationTimeController {
         this.deleteReservationTimeService = deleteReservationTimeService;
     }
 
+    @Operation(
+            summary = "관리자 예약 시간 생성",
+            description = "관리자가 예약 시간을 생성합니다. 요청 본문에 필요한 예약 시간 정보를 포함해야 합니다."
+    )
     @PostMapping
     public ResponseEntity<Void> create(
             @Valid @RequestBody final CreateReservationTimeRequest createReservationTImeRequest) {
@@ -37,6 +44,10 @@ public class AdminReservationTimeController {
                 .build();
     }
 
+    @Operation(
+            summary = "관리자 예약 시간 삭제",
+            description = "관리자가 예약 시간을 삭제합니다. 예약 시간 ID를 경로 변수로 전달해야 합니다."
+    )
     @DeleteMapping("/{timeId}")
     public ResponseEntity<Void> deleteReservationTime(@PathVariable("timeId") final Long reservationTimeId) {
         deleteReservationTimeService.removeById(reservationTimeId);

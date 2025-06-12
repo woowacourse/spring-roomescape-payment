@@ -7,17 +7,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.member.Email;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.reservation.Theme;
+import roomescape.domain.reservation.repository.ReservationTimeRepository;
+import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.infrastructure.security.JwtProvider;
-import roomescape.presentation.support.methodresolver.AuthInfoArgumentResolver;
-import roomescape.testconfig.TestConfig;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
 class ReservationControllerTest {
 
     @LocalServerPort
@@ -26,32 +32,47 @@ class ReservationControllerTest {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @MockitoBean
-    private AuthInfoArgumentResolver authInfoArgumentResolver;
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
+
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
+    private Clock clock;
+
+    private Member savedMember;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        savedMember = memberRepository.save(new Member("tester", new Email("tester@email.com"), "password"));
     }
 
     @Test
     void 예약결제_토스서버오류() {
         // given
+        themeRepository.save(new Theme("테마", "테마 설명", "thumbnail.com"));
+        reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
+
         final String requestBody = """
                     {
-                        "date": "2024-07-01",
-                        "timeId": 2,
+                        "date": "%s",
+                        "timeId": 1,
                         "themeId": 1,
                         "paymentKey": "pk_test_123456789",
                         "orderId": "ORDER-123456",
                         "amount": 10000,
                         "paymentType": "NORMAL"
                     }
-                """;
+                """.formatted(LocalDate.now(clock).plusDays(1));
 
         // when
         final var response = RestAssured.given()
-                .cookie("token", jwtProvider.issue(TestConfig.TESTER.memberId()))
+                .cookie("token", jwtProvider.issue(savedMember.getId()).value())
                 .contentType(ContentType.JSON)
                 .body(requestBody)
                 .post("/reservations")
@@ -62,7 +83,7 @@ class ReservationControllerTest {
         // then
         assertAll(() -> {
             assertThat(response.statusCode()).isEqualTo(400);
-            assertThat(response.asString()).isEqualTo("{\"message\":\"존재하지 않는 결제입니다.\"}");
+            assertThat(response.asString()).isEqualTo("{\"message\":\"존재하지 않는 결제 정보입니다\"}");
         });
     }
 }
