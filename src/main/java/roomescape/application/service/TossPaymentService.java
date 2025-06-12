@@ -39,8 +39,7 @@ public class TossPaymentService {
         TossPaymentConfirmResponseDto tossPaymentConfirmResponseDto = tossPaymentWithHttpClient.requestConfirmation(
                 tossPaymentConfirmDto, requestKey);
 
-        String status = tossPaymentConfirmResponseDto.status();
-        if (!PaymentStatus.isAcceptedStatus(status)) {
+        if (!PaymentStatus.isAcceptedStatus(tossPaymentConfirmResponseDto.status())) {
             throw new PaymentClientException("승인되지 않은 결제 내역입니다.");
         }
     }
