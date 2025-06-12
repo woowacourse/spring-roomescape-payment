@@ -16,7 +16,7 @@
 
 == 관리자 예약 API
 
-=== 예약 추가
+=== 관리자용 예약 추가
 
 관리자가 새로운 예약을 추가합니다.
 
@@ -36,7 +36,7 @@ include::{snippets}/reservation/admin/reservation-save/http-response.adoc[]
 
 include::{snippets}/reservation/admin/reservation-save/response-fields.adoc[]
 
-=== 예약 취소
+=== 관리자용 예약 취소
 
 관리자가 지정된 ID의 예약을 취소합니다.
 

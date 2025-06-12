@@ -68,6 +68,46 @@ include::{snippets}/reservation/find-mine/http-response.adoc[]
 
 include::{snippets}/reservation/find-mine/response-fields.adoc[]
 
+=== 예약 가능 시간 조회
+
+특정 날짜와 테마에 대한 예약 가능한 시간 목록을 조회합니다.
+
+==== 요청
+
+include::{snippets}/reservation/find-available-times/http-request.adoc[]
+
+===== 쿼리 파라미터
+
+include::{snippets}/reservation/find-available-times/query-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation/find-available-times/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/reservation/find-available-times/response-fields.adoc[]
+
+=== 예약 추가
+
+새로운 예약을 생성합니다.
+
+==== 요청
+
+include::{snippets}/reservation/save/http-request.adoc[]
+
+===== 요청 필드
+
+include::{snippets}/reservation/save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation/save/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/reservation/save/response-fields.adoc[]
+
 == 데이터 모델
 
 === ReservationResponse
