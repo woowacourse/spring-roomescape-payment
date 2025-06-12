@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: prod
+    default: dev
   jpa:
     open-in-view: false
 
@@ -24,6 +24,38 @@ spring:
       path: /h2-console
   datasource:
     url: jdbc:h2:mem:database
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+
+security:
+  jwt:
+    token:
+      secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
+      expire-length: 36000000 # 60 minutes
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:dev-database
   jpa:
     show-sql: true
     properties:
