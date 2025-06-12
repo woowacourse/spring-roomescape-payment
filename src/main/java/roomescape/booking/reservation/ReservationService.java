@@ -1,17 +1,17 @@
 package roomescape.booking.reservation;
 
+import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
+import roomescape.booking.reservation.dto.ReservationPayment;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.exception.custom.reason.reservation.ReservationNotFoundException;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.theme.Theme;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -53,8 +53,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> getAllByEmail(final String email) {
-        return reservationRepository.findAllByMember_Email(email);
+    public List<ReservationPayment> getReservationPaymentsByEmail(final String email) {
+        return reservationRepository.findReservationPaymentsByMember_Email(email);
     }
 
     @Transactional(readOnly = true)

@@ -1,14 +1,24 @@
 package roomescape.booking;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.JwtProvider;
@@ -16,19 +26,6 @@ import roomescape.auth.TokenBody;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.member.MemberRole;
-import roomescape.payment.PaymentClient;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookingController.class)
 class BookingControllerTest {
@@ -72,8 +69,8 @@ class BookingControllerTest {
         given(jwtProvider.extractBody(any())).willReturn(new TokenBody(claims));
 
         List<BookingResponse> responses = List.of(
-                new BookingResponse(1L, null, "예약"),
-                new BookingResponse(2L, null, "1번째 예약대기")
+                new BookingResponse(1L, null, "예약", "paymentKey1", 1000L),
+                new BookingResponse(2L, null, "1번째 예약대기", null, null)
         );
 
         given(bookingService.readAllByMember(any(LoginMember.class))).willReturn(responses);
@@ -84,8 +81,13 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].status").value("예약"))
+                .andExpect(jsonPath("$[0].paymentKey").value("paymentKey1"))
+                .andExpect(jsonPath("$[0].amount").value(1000L))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"));
+                .andExpect(jsonPath("$[1].status").value("1번째 예약대기"))
+                .andExpect(jsonPath("$[1].paymentKey").isEmpty())
+                .andExpect(jsonPath("$[1].amount").isEmpty());
+
     }
 
     @Test

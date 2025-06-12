@@ -1,5 +1,14 @@
 package roomescape.payment;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +21,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.RestClientConfiguration;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.payment.dto.PaymentConfirmRequest;
-
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @RestClientTest(TossPaymentClient.class)
 @ContextConfiguration(classes = RestClientConfiguration.class)
@@ -174,5 +175,22 @@ class TossPaymentClientTest {
         assertThatThrownBy(() -> tossPaymentClient.confirm(paymentConfirmRequest))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 승인에 실패하였습니다.");
+    }
+
+    @DisplayName("결제 승인 API가 성공한다.")
+    @Test
+    void confirm7() {
+        // given
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess());
+        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
+                "orderId",
+                1000L,
+                "paymentKey"
+        );
+
+        // when & then
+        assertThatCode(() -> tossPaymentClient.confirm(paymentConfirmRequest));
     }
 }

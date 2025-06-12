@@ -1,7 +1,11 @@
 package roomescape.api;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,11 +20,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.theme.dto.ThemeRequest;
-
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ThemeApiTest {
@@ -38,8 +37,10 @@ public class ThemeApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM schedule");
+        jdbcTemplate.update("DELETE FROM PAYMENT");
         jdbcTemplate.update("DELETE FROM reservation");
+        jdbcTemplate.update("DELETE FROM ORDERS");
+        jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation_time");
         jdbcTemplate.update("DELETE FROM theme");
         jdbcTemplate.update("ALTER TABLE schedule ALTER COLUMN id RESTART WITH 1");

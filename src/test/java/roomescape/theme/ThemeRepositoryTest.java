@@ -1,5 +1,8 @@
 package roomescape.theme;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +17,6 @@ import roomescape.reservationtime.ReservationTime;
 import roomescape.reservationtime.ReservationTimeRepository;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleRepository;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @DataJpaTest
 class ThemeRepositoryTest {
@@ -44,22 +43,28 @@ class ThemeRepositoryTest {
         ReservationTime reservationTime = new ReservationTime(LocalTime.now());
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
 
-        Schedule schedule1OfTheme1 = scheduleRepository.save(new Schedule(LocalDate.now(), savedReservationTime, savedTheme1));
-        Schedule schedule2OfTheme1 = scheduleRepository.save(new Schedule(LocalDate.now().plusDays(1), savedReservationTime, savedTheme1));
-        Schedule schedule3OfTheme1 = scheduleRepository.save(new Schedule(LocalDate.now().plusDays(2), savedReservationTime, savedTheme1));
-        Schedule schedule1OfTheme2 = scheduleRepository.save(new Schedule(LocalDate.now(), savedReservationTime, savedTheme2));
-        Schedule schedule2OfTheme2 = scheduleRepository.save(new Schedule(LocalDate.now().plusDays(1), savedReservationTime, savedTheme2));
-        Schedule schedule1OfTheme3 = scheduleRepository.save(new Schedule(LocalDate.now(), savedReservationTime, savedTheme3));
+        Schedule schedule1OfTheme1 = scheduleRepository.save(
+                new Schedule(LocalDate.now(), savedReservationTime, savedTheme1));
+        Schedule schedule2OfTheme1 = scheduleRepository.save(
+                new Schedule(LocalDate.now().plusDays(1), savedReservationTime, savedTheme1));
+        Schedule schedule3OfTheme1 = scheduleRepository.save(
+                new Schedule(LocalDate.now().plusDays(2), savedReservationTime, savedTheme1));
+        Schedule schedule1OfTheme2 = scheduleRepository.save(
+                new Schedule(LocalDate.now(), savedReservationTime, savedTheme2));
+        Schedule schedule2OfTheme2 = scheduleRepository.save(
+                new Schedule(LocalDate.now().plusDays(1), savedReservationTime, savedTheme2));
+        Schedule schedule1OfTheme3 = scheduleRepository.save(
+                new Schedule(LocalDate.now(), savedReservationTime, savedTheme3));
 
         Member member = new Member("may@example.com", "1234", "메이", MemberRole.MEMBER);
         Member savedMember = memberRepository.save(member);
 
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule3OfTheme1));
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme2));
-        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme2));
-        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme3));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme1, null));
+        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme1, null));
+        reservationRepository.save(new Reservation(savedMember, schedule3OfTheme1, null));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme2, null));
+        reservationRepository.save(new Reservation(savedMember, schedule2OfTheme2, null));
+        reservationRepository.save(new Reservation(savedMember, schedule1OfTheme3, null));
 
         // when
         List<Theme> themes = themeRepository.findAllOrderByRank(LocalDate.now(), LocalDate.now().plusDays(2), 3);

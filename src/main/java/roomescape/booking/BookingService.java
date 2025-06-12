@@ -1,20 +1,18 @@
 package roomescape.booking;
 
-import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.dto.ReservationPayment;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.schedule.Schedule;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -25,11 +23,12 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
-        List<Reservation> reservations = reservationService.getAllByEmail(loginMember.email());
+        List<ReservationPayment> reservationPayments = reservationService.getReservationPaymentsByEmail(
+                loginMember.email());
         List<Waiting> waitings = waitingService.findAllByEmail(loginMember.email());
 
         return Stream.concat(
-                reservations.stream().map(BookingResponse::of),
+                reservationPayments.stream().map(BookingResponse::of),
                 waitings.stream().map((waiting) -> BookingResponse.of(waiting, waitingService.getRank(waiting) + 1))
         ).toList();
     }
@@ -50,7 +49,7 @@ public class BookingService {
 
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
-        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING);
+        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), null);
         reservationService.create(reservation);
     }
 }

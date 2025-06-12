@@ -1,13 +1,19 @@
 package roomescape.order;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.Member;
 import roomescape.schedule.Schedule;
 
-import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,13 +29,14 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Schedule schedule;
 
-    public Order(final String id, final Long amount, final PaymentStatus paymentStatus, final Member member, final Schedule schedule) {
+    public Order(final String id, final Long amount, final PaymentStatus paymentStatus, final Member member,
+                 final Schedule schedule) {
         if (!schedule.isAmountEqualTo(amount)) {
             throw new IllegalArgumentException("주문 금액이 스케줄의 가격과 다릅니다.");
         }
