@@ -2,6 +2,8 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.aop.ServiceLogging;
+import roomescape.domain.Payment;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -22,6 +24,8 @@ import roomescape.presentation.dto.response.ReservationResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -58,6 +62,7 @@ public class ReservationService {
         return ReservationResponse.from(reservations);
     }
 
+    @ServiceLogging
     @Transactional
     public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request,
                                                        PaymentProcessRequest paymentProcessRequest,
@@ -66,11 +71,12 @@ public class ReservationService {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-        paymentService.processPayment(paymentProcessRequest);
+        paymentService.processPayment(paymentProcessRequest, created);
 
         return ReservationResponse.from(created);
     }
 
+    @ServiceLogging
     @Transactional
     public ReservationResponse createAdminReservation(AdminReservationCreateRequest request) {
         Member member = memberService.findMemberById(request.memberId());
@@ -79,6 +85,7 @@ public class ReservationService {
         return ReservationResponse.from(created);
     }
 
+    @ServiceLogging
     private Reservation createReservation(LocalDate date, Long timeId, Long themeId, Member member) {
         ReservationDate reservationDate = new ReservationDate(date);
         ReservationTime reservationTime = reservationTimeService.findReservationTimeById(timeId);
@@ -97,6 +104,7 @@ public class ReservationService {
         }
     }
 
+    @ServiceLogging
     @Transactional
     public void cancelReservationById(Long id) {
         Reservation reservation = findReservationById(id);
@@ -107,6 +115,7 @@ public class ReservationService {
         }
     }
 
+    @ServiceLogging
     private void processWaitingToReservation(ReservationInfo reservationInfo) {
         Waiting firstRankWaiting = waitingService.findFirstRankWaitingByReservationInfo(reservationInfo);
 
@@ -118,7 +127,7 @@ public class ReservationService {
         ReservationInfo newReservationInfo = ReservationInfo.create(newReservation);
 
         waitingService.deleteWaitingById(firstRankWaiting.getId());
-        waitingService.updateWaitings(reservationInfo, newReservationInfo);
+        waitingService.updateWaitingsRankAndReservationInfo(reservationInfo, newReservationInfo);
     }
 
     private Reservation findReservationById(Long id) {
@@ -140,7 +149,20 @@ public class ReservationService {
     public List<MyReservationResponse> getMyReservations(LoginMember loginMember) {
         Member member = memberService.findMemberById(loginMember.id());
         List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        List<Payment> payments = paymentService.findPaymentsByMember(member);
+        List<Reservation> notPaidReservations = notPaidReservations(reservations, payments);
         List<Waiting> waitings = waitingService.findWaitingsByMember(member);
-        return MyReservationResponse.from(reservations, waitings);
+
+        return MyReservationResponse.from(notPaidReservations, payments, waitings);
+    }
+
+    private List<Reservation> notPaidReservations(List<Reservation> allReservations, List<Payment> payments) {
+        Set<Reservation> paidReservations = payments.stream()
+                .map(Payment::getReservation)
+                .collect(Collectors.toSet());
+
+        return allReservations.stream()
+                .filter(reservation -> !paidReservations.contains(reservation))
+                .toList();
     }
 }

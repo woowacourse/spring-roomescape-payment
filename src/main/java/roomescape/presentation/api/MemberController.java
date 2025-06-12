@@ -1,5 +1,6 @@
 package roomescape.presentation.api;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import roomescape.presentation.dto.response.MemberResponse;
 
 import java.util.List;
 
+@Hidden
 @RestController
 public class MemberController {
 

@@ -182,7 +182,7 @@ function deleteRow(event) {
 
   requestDelete(reservationId)
       .then(() => {
-        return requestRead(RESERVATION_API_ENDPOINT)
+        return requestRead(ADMIN_RESERVATION_API_ENDPOINT)
       })
       .then(render)
       .catch(error => console.error('Error:', error));

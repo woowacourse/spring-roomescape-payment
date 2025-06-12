@@ -1,10 +1,16 @@
 package roomescape.domain;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
+import java.math.BigDecimal;
 import java.util.Objects;
+
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +30,13 @@ public class Payment {
 
     private String orderId;
 
-    public static Payment create(String paymentKey, String orderId) {
-        return new Payment(null, paymentKey, orderId);
+    private BigDecimal amount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Reservation reservation;
+
+    public static Payment create(String paymentKey, String orderId, BigDecimal amount, Reservation reservation) {
+        return new Payment(null, paymentKey, orderId, amount, reservation);
     }
 
     @Override
@@ -40,5 +51,16 @@ public class Payment {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "id=" + id +
+                ", paymentKey='" + paymentKey + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", amount=" + amount +
+                ", reservationId=" + (reservation == null ? null : reservation.getId()) +
+                '}';
     }
 }

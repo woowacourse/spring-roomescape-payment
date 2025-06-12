@@ -42,6 +42,11 @@ public class Waiting {
         this.reservationInfo = reservationInfo;
     }
 
+    public void updateRank(long newRank) {
+        validateRank(newRank);
+        this.rank = newRank;
+    }
+
     private void validateRank(long rank) {
         if (rank <= 0) {
             throw new IllegalArgumentException("[ERROR] 순위는 0을 초과해야 합니다.");

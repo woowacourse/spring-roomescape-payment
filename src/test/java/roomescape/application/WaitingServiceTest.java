@@ -167,6 +167,26 @@ class WaitingServiceTest extends BaseTest {
     }
 
     @Test
+    void 사용자가_본인의_예약대기를_취소하면_후순위_랭크가_업데이트된다() {
+        ReservationInfo reservationInfo = createReservationInfo();
+
+        Member waitingMember = memberDbFixture.듀이_사용자();
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        Waiting firstWaiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
+        Waiting secondWaiting = waitingDbFixture.두번째_대기(reservationInfo, waitingMember);
+
+        waitingService.deleteWaitingByIdAndMember(firstWaiting.getId(), loginMember);
+
+        List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
+        Waiting waiting = waitings.getFirst();
+
+        assertAll(
+                () -> assertThat(waitings).hasSize(1),
+                () -> assertThat(waiting.getRank()).isEqualTo(1L)
+        );
+    }
+
+    @Test
     void 사용자가_본인의_예약대기가_아닌_예약대기를_취소하면_예외가_발생한다() {
         ReservationInfo reservationInfo = createReservationInfo();
 
@@ -201,11 +221,30 @@ class WaitingServiceTest extends BaseTest {
         Member waitingMember = memberDbFixture.듀이_사용자();
         Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
-        waitingService.deleteWaitingById(waiting.getId());
+        waitingService.deleteWaitingByIdAndUpdateWaitingsRank(waiting.getId());
 
         List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
 
         assertThat(waitings).isEmpty();
+    }
+
+    @Test
+    void 관리자가_예약대기를_취소하면_후순위_랭크가_업데이트된다() {
+        ReservationInfo reservationInfo = createReservationInfo();
+
+        Member waitingMember = memberDbFixture.듀이_사용자();
+        Waiting firstWaiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
+        Waiting secondWaiting = waitingDbFixture.두번째_대기(reservationInfo, waitingMember);
+
+        waitingService.deleteWaitingByIdAndUpdateWaitingsRank(firstWaiting.getId());
+
+        List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
+        Waiting waiting = waitings.getFirst();
+
+        assertAll(
+                () -> assertThat(waitings).hasSize(1),
+                () -> assertThat(waiting.getRank()).isEqualTo(1L)
+        );
     }
 
     @Test
@@ -276,19 +315,42 @@ class WaitingServiceTest extends BaseTest {
 
     @Test
     @Transactional
-    void 예약대기의_순번을_업데이트한다() {
+    void 예약대기의_순번과_예약정보를_업데이트한다() {
         ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
         ReservationInfo reservationInfo = createReservationInfo();
 
         Member firstWaitingMember = memberDbFixture.한스_사용자();
-        Waiting waiting = waitingDbFixture.두번째_대기(reservationInfo, firstWaitingMember);
+        Waiting firstWaiting = waitingDbFixture.첫번째_대기(reservationInfo, firstWaitingMember);
+
+        Member secondWaitingMember = memberDbFixture.브라운_사용자();
+        Waiting secondWaiting = waitingDbFixture.두번째_대기(reservationInfo, secondWaitingMember);
         Reservation newReservation = reservationDbFixture.예약_생성(firstWaitingMember, ReservationDateFixture.예약날짜_25_4_23, reservationTime, theme);
         ReservationInfo newReservationInfo = ReservationInfo.create(newReservation);
 
-        waitingService.updateWaitings(reservationInfo, newReservationInfo);
+        waitingService.deleteWaitingById(firstWaiting.getId());
+        waitingService.updateWaitingsRankAndReservationInfo(reservationInfo, newReservationInfo);
 
-        assertThat(waiting.getRank()).isEqualTo(1L);
+        assertAll(
+                () -> assertThat(secondWaiting.getRank()).isEqualTo(1L),
+                () -> assertThat(secondWaiting.getReservationInfo()).isEqualTo(newReservationInfo)
+        );
+    }
+
+    @Test
+    @Transactional
+    void 예약대기의_순번을_업데이트한다() {
+        ReservationInfo reservationInfo = createReservationInfo();
+
+        Member firstWaitingMember = memberDbFixture.한스_사용자();
+        Waiting firstWaiting = waitingDbFixture.첫번째_대기(reservationInfo, firstWaitingMember);
+
+        Member secondWaitingMember = memberDbFixture.브라운_사용자();
+        Waiting secondWaiting = waitingDbFixture.두번째_대기(reservationInfo, secondWaitingMember);
+
+        waitingService.deleteWaitingByIdAndUpdateWaitingsRank(firstWaiting.getId());
+
+        assertThat(secondWaiting.getRank()).isEqualTo(1L);
     }
 
     private ReservationInfo createReservationInfo() {

@@ -40,7 +40,7 @@ class WaitingTest {
     }
 
     @Test
-    void 변경하려는_대기순위가_0이하이면_예외가_발생한다() {
+    void 대기순위와_예약정보_변경시_변경하려는_대기순위가_0이하이면_예외가_발생한다() {
         Reservation reservation = createReservation();
         ReservationInfo reservationInfo = ReservationInfo.create(reservation);
 
@@ -52,6 +52,34 @@ class WaitingTest {
         long newRank = 0L;
 
         assertThatThrownBy(() -> waiting.updateRankAndReservationInfo(newReservationInfo, newRank))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 대기순위를_변경한다() {
+        Reservation reservation = createReservation();
+        ReservationInfo reservationInfo = ReservationInfo.create(reservation);
+
+        Member waitingMember = Member.create("제로", Role.USER, "zero@test.com", "zero");
+        Waiting waiting = Waiting.create(reservationInfo, waitingMember, 2L);
+        long newRank = 1L;
+
+        waiting.updateRank(newRank);
+
+        assertThat(waiting.getRank()).isEqualTo(newRank);
+    }
+
+    @Test
+    void 대기순위만_변경시_변경하려는_대기순위가_0이하이면_예외가_발생한다() {
+        Reservation reservation = createReservation();
+        ReservationInfo reservationInfo = ReservationInfo.create(reservation);
+
+        Member waitingMember = Member.create("제로", Role.USER, "zero@test.com", "zero");
+        Waiting waiting = Waiting.create(reservationInfo, waitingMember, 1L);
+
+        long newRank = 0L;
+
+        assertThatThrownBy(() -> waiting.updateRank(newRank))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

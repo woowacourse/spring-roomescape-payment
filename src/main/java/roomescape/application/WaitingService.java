@@ -2,6 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.aop.ServiceLogging;
 import roomescape.domain.Member;
 import roomescape.domain.ReservationInfo;
 import roomescape.domain.ReservationStatus;
@@ -36,6 +37,7 @@ public class WaitingService {
         this.currentTimeService = currentTimeService;
     }
 
+    @ServiceLogging
     @Transactional
     public WaitingResponse createWaiting(ReservationCreateRequest request, LoginMember loginMember) {
         ReservationInfo reservationInfo = reservationRepository.findReservationInfo(request.date(), request.timeId(), request.themeId(), ReservationStatus.RESERVED);
@@ -74,12 +76,13 @@ public class WaitingService {
         return waitingRepository.findAllByMember(member);
     }
 
+    @ServiceLogging
     @Transactional
     public void deleteWaitingByIdAndMember(Long id, LoginMember loginMember) {
         Member member = memberService.findMemberById(loginMember.id());
         Waiting waiting = findWaitingById(id);
         validateWaitingByMember(waiting, member);
-        waitingRepository.deleteById(waiting.getId());
+        deleteWaitingByIdAndUpdateWaitingsRank(id);
     }
 
     public Waiting findWaitingById(Long id) {
@@ -93,6 +96,7 @@ public class WaitingService {
         }
     }
 
+    @ServiceLogging
     @Transactional
     public void deleteWaitingById(Long id) {
         Waiting waiting = findWaitingById(id);
@@ -114,12 +118,26 @@ public class WaitingService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 예약 대기 건이 존재하지 않습니다."));
     }
 
+    @ServiceLogging
     @Transactional
-    public void updateWaitings(ReservationInfo reservationInfo, ReservationInfo newReservationInfo) {
+    public void updateWaitingsRankAndReservationInfo(ReservationInfo reservationInfo, ReservationInfo newReservationInfo) {
         List<Waiting> waitings = waitingRepository.findAllByReservationInfo(reservationInfo);
         waitings.forEach(waiting -> {
             long newRank = waiting.getRank() - 1;
             waiting.updateRankAndReservationInfo(newReservationInfo, newRank);
+        });
+    }
+
+    @ServiceLogging
+    @Transactional
+    public void deleteWaitingByIdAndUpdateWaitingsRank(Long id) {
+        ReservationInfo reservationInfo = findWaitingById(id).getReservationInfo();
+        waitingRepository.deleteById(id);
+
+        List<Waiting> waitings = waitingRepository.findAllByReservationInfo(reservationInfo);
+        waitings.forEach(waiting -> {
+            long newRank = waiting.getRank() - 1;
+            waiting.updateRank(newRank);
         });
     }
 }

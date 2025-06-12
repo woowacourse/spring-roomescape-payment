@@ -1,13 +1,19 @@
 package roomescape.presentation.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.Member;
 import roomescape.presentation.dto.request.LoginMember;
 
 import java.util.List;
 
 public record MemberResponse(
+        @Schema(example = "3")
         Long id,
+
+        @Schema(example = "회원2")
         String name,
+
+        @Schema(example = "member2@email.com")
         String email
 ) {
 
