@@ -42,7 +42,7 @@ public class ReservationCreateService {
         validateDuplication(schedule);
 
         order.pay(request.amount(), member, schedule);
-        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(),
+        final PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(),
                 request.paymentKey());
         paymentClient.confirm(paymentRequest);
         appendPayment(request.paymentKey(), order);
@@ -51,7 +51,7 @@ public class ReservationCreateService {
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation saveReservation(final Schedule schedule, final Member member, Order order) {
+    private Reservation saveReservation(final Schedule schedule, final Member member, final Order order) {
         final Reservation notSavedReservation = new Reservation(member, schedule, order);
         return reservationRepository.save(notSavedReservation);
     }
@@ -68,8 +68,8 @@ public class ReservationCreateService {
         }
     }
 
-    private void appendPayment(String paymentKey, Order order) {
-        Payment payment = Payment.create(order.getAmount(), paymentKey, order);
+    private void appendPayment(final String paymentKey, final Order order) {
+        final Payment payment = Payment.create(order.getAmount(), paymentKey, order);
         paymentRepository.save(payment);
     }
 
