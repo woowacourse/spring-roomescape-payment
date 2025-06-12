@@ -40,14 +40,25 @@ public class PaymentService {
 
     public Payment pay(final String paymentKey, final String orderId, final long amount) {
         var request = new PaymentRequest(paymentKey, orderId, amount);
+        var confirmation = send(request);
 
+        try {
+            return register(confirmation.paymentKey(), confirmation.orderId(), confirmation.totalAmount(),
+                    confirmation.status());
+        } catch (DataAccessException e) {
+            // TODO: 결제 취소 API 연동하기
+            throw new PaymentInternalException("예기치 못한 문제로 결제가 실패했습니다. 익일까지 환불되지 않으면 관리자에게 문의해주세요.");
+        }
+    }
+
+    private PaymentConfirmation send(final PaymentRequest request) {
         var paymentDetails = paymentProvider.confirm(request);
+
         if (paymentDetails.isFailed()) {
             throwPaymentException(paymentDetails.status());
         }
 
-        var confirmation = paymentDetails.confirmation();
-        return register(confirmation.paymentKey(), confirmation.orderId(), confirmation.totalAmount(), confirmation.status());
+        return paymentDetails.confirmation();
     }
 
     private void throwPaymentException(final TransactionStatus status) {
