@@ -1,18 +1,21 @@
 package roomescape.reservation.service;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
-import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
@@ -37,38 +40,47 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
-    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     public List<ReservationWebResponse> getAll() {
-        return ReservationConverter.toDto(
-                reservationQueryUseCase.getAll()
-        );
+        return ReservationConverter.toDto(reservationQueryUseCase.getAll());
     }
 
     public List<ReservationWaitWebResponse> getAllReservationWait() {
-        return ReservationWaitConverter.toDto(
-                reservationWaitQueryUseCase.getAll()
-        );
+        return ReservationWaitConverter.toDto(reservationWaitQueryUseCase.getAll());
     }
 
-    public List<ReservationWithStatusResponse> getWithReservationWaitByMemberId(final Long memberId) {
+    public List<ReservationWithStatusResponse> findMyReservationsWithWaitingByMemberId(final Long loginMemberId) {
         final List<ReservationWithStatusResponse> allReservations = new ArrayList<>();
-        allReservations.addAll(getByMemberId(memberId));
-        allReservations.addAll(getReservationWaitByMemberId(memberId));
+        allReservations.addAll(getByMemberId(loginMemberId));
+        allReservations.addAll(getReservationWaitByMemberId(loginMemberId));
 
         return allReservations.stream()
                 .sorted(Comparator.comparing(ReservationWithStatusResponse::getDate)
-                        .thenComparing(ReservationWithStatusResponse::getTime))
-                .toList();
+                        .thenComparing(ReservationWithStatusResponse::getTime)
+                ).toList();
     }
 
-    public List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
-        return reservationQueryUseCase.getByMemberId(memberId).stream()
-                .map(ReservationWithStatusResponse::from)
-                .toList();
+    private List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
+        List<Reservation> reservations = reservationQueryUseCase.getByMemberId(memberId);
+        Map<Long, Payment> payments = getPaymentsByReservations(reservations);
+        return reservations.stream()
+                .map(reservation -> ReservationWithStatusResponse.of(
+                        reservation,
+                        payments.getOrDefault(reservation.getId(), null))
+                ).toList();
     }
 
-    public List<ReservationWithStatusResponse> getReservationWaitByMemberId(final Long memberId) {
+    private Map<Long, Payment> getPaymentsByReservations(List<Reservation> reservations) {
+        List<Long> reservationIds = reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        return paymentRepository.findAllByReservationIdIn(reservationIds)
+                .stream()
+                .collect(toMap(payment -> payment.getReservation().getId(), identity()));
+    }
+
+    private List<ReservationWithStatusResponse> getReservationWaitByMemberId(final Long memberId) {
         return reservationWaitQueryUseCase.getByMemberId(memberId).stream()
                 .map(reservationWaitWithRank -> ReservationWithStatusResponse.of(
                         reservationWaitWithRank.reservationWait(),
@@ -93,19 +105,6 @@ public class ReservationService {
                         createReservationByAdminWebRequest.themeId()
                 )
         );
-
-        return ReservationConverter.toDto(reservation);
-    }
-
-    @Transactional
-    public ReservationWebResponse createAndPay(
-            final CreateReservationWithPaymentWebRequest webRequest,
-            final MemberInfo memberInfo
-    ) {
-        CreateReservationServiceRequest createRequest = webRequest.toCreateServiceRequest(webRequest, memberInfo);
-        Reservation reservation = reservationCommandUseCase.create(createRequest);
-
-        paymentService.confirm(webRequest.toPaymentConfirmRequest());
         return ReservationConverter.toDto(reservation);
     }
 
@@ -121,7 +120,6 @@ public class ReservationService {
                         createReservationWebRequest.themeId()
                 )
         );
-
         return ReservationWaitConverter.toDto(reservationWait);
     }
 

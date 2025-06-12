@@ -1,10 +1,12 @@
 package roomescape.reservation.controller.dto;
 
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationWait;
 
@@ -20,29 +22,37 @@ public class ReservationWithStatusResponse {
     private final LocalDate date;
     private final LocalTime time;
     private final String status;
+    private final PaymentWebResponse payment;
 
-    public static ReservationWithStatusResponse from(
-            final Reservation reservation
-    ) {
+    public static ReservationWithStatusResponse of(Reservation reservation, @Nullable Payment payment) {
         return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
-                CONFIRMED
+                CONFIRMED,
+                makePaymentWebResponse(payment)
         );
     }
 
+    private static PaymentWebResponse makePaymentWebResponse(Payment payment) {
+        if (payment == null) {
+            return new PaymentWebResponse("", 0);
+        }
+        return new PaymentWebResponse(payment.getOrderId(), payment.getAmount());
+    }
+
     public static ReservationWithStatusResponse of(
-            final ReservationWait reservationWait,
-            final Long rank
+            ReservationWait reservationWait,
+            Long rank
     ) {
         return new ReservationWithStatusResponse(
                 reservationWait.getId(),
                 reservationWait.getTheme().getName().getValue(),
                 reservationWait.getDate().getValue(),
                 reservationWait.getTime().getStartAt(),
-                String.format(PENDING_STATUS_FORMAT, rank)
+                String.format(PENDING_STATUS_FORMAT, rank),
+                new PaymentWebResponse("", 0)
         );
     }
 }

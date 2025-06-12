@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import roomescape.common.interceptor.LoggingInterceptor;
 import roomescape.member.auth.AdminPageInterceptor;
 import roomescape.member.auth.AuthorizationInterceptor;
 import roomescape.member.auth.MemberInfoArgumentResolver;
@@ -28,9 +29,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthorizationInterceptor(jwtTokenExtractor, authService))
                 .addPathPatterns("/**")
-                .excludePathPatterns("/", "/login", "/signup");
-
+                .excludePathPatterns("/", "/login", "/signup", "/swagger-ui/**", "/v3/api-docs/**");
         registry.addInterceptor(new AdminPageInterceptor(jwtTokenExtractor, authService))
                 .addPathPatterns("/admin/**");
+        registry.addInterceptor(new LoggingInterceptor())
+                .excludePathPatterns("/swagger-ui/**", "/v3/api-docs/**");
     }
 }

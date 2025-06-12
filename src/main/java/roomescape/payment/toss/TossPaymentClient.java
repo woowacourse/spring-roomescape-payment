@@ -5,9 +5,10 @@ import static org.springframework.web.client.RestClient.Builder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.common.config.TossPaymentsProperties;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
@@ -15,20 +16,17 @@ import roomescape.payment.dto.PaymentConfirmResponse;
 @Component
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final String AUTHORIZATION_DELIMITER = ":";
-
     private RestClient restClient;
 
     public TossPaymentClient(
-            @Value("${toss.base-url}") String baseUrl,
-            @Value("${pay.toss.secret-key}") String secretKey,
-            Builder restClientBuilder) {
-        restClient = restClientBuilder
+            TossPaymentsProperties properties,
+            @Qualifier("tossRestClientBuilder") Builder builder
+    ) {
+        restClient = builder
                 .defaultStatusHandler(new TossPaymentErrorHandler())
-                .defaultHeader("Authorization", getAuthorization(secretKey))
+                .defaultHeader("Authorization", getAuthorization(properties.getSecretKey()))
                 .defaultHeader("Content-Type", "application/json")
-                .baseUrl(baseUrl)
+                .baseUrl(properties.getBaseUrl())
                 .build();
     }
 
@@ -41,7 +39,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     private String getAuthorization(String secretKey) {
-        return AUTHORIZATION_PREFIX + encodeToBase64((secretKey + AUTHORIZATION_DELIMITER));
+        return "Basic " + encodeToBase64((secretKey + ":"));
     }
 
     private String encodeToBase64(String value) {

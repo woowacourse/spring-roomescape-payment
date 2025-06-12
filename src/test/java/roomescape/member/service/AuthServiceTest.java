@@ -14,6 +14,8 @@ import roomescape.member.auth.jwt.JwtTokenProvider;
 import roomescape.member.controller.dto.LoginRequest;
 import roomescape.member.controller.dto.MemberInfoResponse;
 import roomescape.member.controller.dto.SignupRequest;
+import roomescape.member.domain.Member;
+import roomescape.member.log.MemberProbe;
 import roomescape.member.repository.FakeAccountRepository;
 import roomescape.member.repository.FakeMemberRepository;
 import roomescape.member.service.usecase.MemberCommandUseCase;
@@ -38,7 +40,7 @@ class AuthServiceTest {
         FakeMemberRepository fakeMemberRepository = new FakeMemberRepository();
         FakeAccountRepository fakeAccountRepository = new FakeAccountRepository();
         MemberService memberService = new MemberService(
-                new MemberCommandUseCase(fakeMemberRepository, fakeAccountRepository),
+                new MemberCommandUseCase(fakeMemberRepository, fakeAccountRepository, new MemberProbe()),
                 new MemberQueryUseCase(fakeMemberRepository, fakeAccountRepository)
         );
 
@@ -46,7 +48,8 @@ class AuthServiceTest {
                 memberService,
                 jwtTokenProvider,
                 jwtTokenExtractor,
-                passwordEncoder
+                passwordEncoder,
+                new MemberProbe()
         );
     }
 

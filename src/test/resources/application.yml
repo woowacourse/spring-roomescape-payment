@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: auth,pay
-
   thymeleaf:
     cache: false
     prefix: classpath:/templates/
@@ -24,3 +21,18 @@ spring:
   sql:
     init:
       mode: never
+
+jwt:
+  key: /VCEkdrvbjkCLRp0G0LK12VsDYViO/kufd8UVphCq80MdiZzNlefqOcwqfpvW+jIRNBmhiNKbNUGXSwum0DSgUjkEl2To/350R/ffncBkVeO7tfNq/4rNXWGGHre9p8s14m0k2z/QS4=
+  expiration: 360000
+
+pay:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    base-url: https://api.tosspayments.com/v1/payments/confirm
+    timeout:
+      connection: 2000
+      read: 8000
+
+springdoc:
+  server-url: http://13.124.20.46:8080

@@ -32,6 +32,11 @@ public class FakeReservationRepository implements ReservationRepository {
                                          && Objects.equals(reservation.getTheme().getId(), themeId));
     }
 
+    @Override
+    public void delete(Reservation reservation) {
+        
+    }
+
 
     @Override
     public Optional<Reservation> findByInfoDateAndInfoTimeIdAndInfoThemeId(

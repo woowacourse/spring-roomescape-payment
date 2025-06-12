@@ -15,6 +15,7 @@ import roomescape.member.controller.dto.SignupRequest;
 import roomescape.member.domain.Account;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.member.log.MemberProbe;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenExtractor jwtTokenExtractor;
     private final PasswordEncoder passwordEncoder;
+    private final MemberProbe memberProbe;
 
     public MemberInfoResponse signup(SignupRequest signupRequest) {
         return MemberConverter.toResponse(
@@ -42,7 +44,9 @@ public class AuthService {
         if (!account.isSamePassword(passwordEncoder, loginRequest.password())) {
             throw new AuthenticationException("비밀번호가 일치하지 않습니다.");
         }
-        return jwtTokenProvider.generateToken(account);
+        String token = jwtTokenProvider.generateToken(account);
+        memberProbe.login(account.getMember());
+        return token;
     }
 
     public LoginCheckResponse checkLogin(final String token) {

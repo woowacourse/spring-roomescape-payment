@@ -30,4 +30,6 @@ public interface ReservationRepository {
     boolean existsByInfoTimeId(Long timeId);
 
     boolean existsByInfoDateAndInfoTimeIdAndInfoThemeId(ReservationDate date, Long timeId, Long themeId);
+
+    void delete(Reservation reservation);
 }

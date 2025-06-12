@@ -21,7 +21,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import roomescape.member.controller.dto.LoginRequest;
 import roomescape.member.controller.dto.SignupRequest;
 import roomescape.member.service.AuthService;
-import roomescape.reservation.controller.ReservationController;
+import roomescape.reservation.controller.ReservationControllerImpl;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -32,7 +32,7 @@ public class MissionStepTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private ReservationController reservationController;
+    private ReservationControllerImpl reservationController;
 
     @Autowired
     private AuthService authService;
@@ -135,13 +135,13 @@ public class MissionStepTest {
                 .statusCode(403);
 
         RestAssured.given().log().all()
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(401);
 
         RestAssured.given().log().all()
                 .cookie("token", memberToken)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(403);
 
@@ -153,7 +153,7 @@ public class MissionStepTest {
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200);
     }

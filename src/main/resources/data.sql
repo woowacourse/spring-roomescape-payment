@@ -42,6 +42,13 @@ VALUES (2, CURRENT_DATE + 1, 1, 1);
 INSERT INTO reservation (member_id, reservation_date, time_id, theme_id)
 VALUES (3, CURRENT_DATE + 1, 2, 2);
 
+-- Payment 데이터 (현재 날짜 기준 예약)
+INSERT INTO payment (reservation_id, payment_key, amount, order_id)
+VALUES (1, 'testPaymentKey1', 1500, 'testOrderId1');
+
+INSERT INTO payment (reservation_id, payment_key, amount, order_id)
+VALUES (2, 'testPaymentKey2', 1000, 'testOrderId2');
+
 -- ReservationWait 데이터 (대기 예약)
 INSERT INTO reservation_wait (member_id, reservation_date, time_id, theme_id)
 VALUES (3, CURRENT_DATE + 1, 1, 1);

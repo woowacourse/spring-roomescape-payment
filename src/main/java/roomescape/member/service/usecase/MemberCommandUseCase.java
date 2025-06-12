@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import roomescape.common.exception.ConflictException;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Account;
+import roomescape.member.domain.Member;
+import roomescape.member.log.MemberProbe;
 import roomescape.member.repository.AccountRepository;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberConverter;
@@ -16,6 +18,7 @@ public class MemberCommandUseCase {
 
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
+    private final MemberProbe memberProbe;
 
     @Transactional
     public MemberInfo create(Account account) {
@@ -23,8 +26,10 @@ public class MemberCommandUseCase {
             throw new ConflictException("이미 존재하는 이메일입니다.");
         }
 
-        final MemberInfo dto = MemberConverter.toDto(memberRepository.save(account.getMember()));
+        Member newMember = memberRepository.save(account.getMember());
+        final MemberInfo dto = MemberConverter.toDto(newMember);
         accountRepository.save(account);
+        memberProbe.signup(newMember);
         return dto;
     }
 }
