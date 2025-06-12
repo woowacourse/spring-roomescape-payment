@@ -53,7 +53,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationPayment> getAllByEmail(final String email) {
+    public List<ReservationPayment> getReservationPaymentsByEmail(final String email) {
         return reservationRepository.findReservationPaymentsByMember_Email(email);
     }
 

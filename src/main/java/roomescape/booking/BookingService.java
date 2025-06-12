@@ -23,11 +23,12 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
-        List<ReservationPayment> reservations = reservationService.getAllByEmail(loginMember.email());
+        List<ReservationPayment> reservationPayments = reservationService.getReservationPaymentsByEmail(
+                loginMember.email());
         List<Waiting> waitings = waitingService.findAllByEmail(loginMember.email());
 
         return Stream.concat(
-                reservations.stream().map(BookingResponse::of),
+                reservationPayments.stream().map(BookingResponse::of),
                 waitings.stream().map((waiting) -> BookingResponse.of(waiting, waitingService.getRank(waiting) + 1))
         ).toList();
     }
