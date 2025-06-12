@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

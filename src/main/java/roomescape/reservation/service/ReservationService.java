@@ -16,7 +16,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.application.Payment;
-import roomescape.reservation.config.PaymentClient;
+import roomescape.payment.client.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationRequest;

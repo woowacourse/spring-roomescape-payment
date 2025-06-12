@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.client;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;

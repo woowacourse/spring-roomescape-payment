@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.client.handler;
 
 import java.io.IOException;
 import java.net.URI;

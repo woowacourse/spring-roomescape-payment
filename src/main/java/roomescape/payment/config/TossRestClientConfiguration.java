@@ -1,4 +1,4 @@
-package roomescape.reservation.config;
+package roomescape.payment.config;
 
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.client.TossPaymentInterceptor;
+import roomescape.payment.client.handler.TossClientErrorHandler;
+import roomescape.payment.client.handler.TossServerErrorHandler;
 
 @Configuration
 public class TossRestClientConfiguration {
