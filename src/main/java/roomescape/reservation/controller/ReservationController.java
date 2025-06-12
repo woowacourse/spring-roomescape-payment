@@ -1,8 +1,11 @@
 package roomescape.reservation.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,11 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import roomescape.auth.dto.LoginMember;
+import roomescape.auth.application.LoginMember;
+import roomescape.auth.config.AuthenticationPrincipal;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -27,10 +27,11 @@ import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
 
-@RestController
-@RequestMapping("/reservations")
-@RequiredArgsConstructor
+@Slf4j
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -53,19 +54,21 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse saveReservation(
             @Valid @RequestBody final ReservationRequest request,
-            final LoginMember member
+            @AuthenticationPrincipal final LoginMember loginMember
     ) {
-        return reservationService.saveReservation(request, member);
+        return reservationService.saveReservation(request, loginMember);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservation(@PathVariable final Long id) {
-        reservationService.deleteReservation(id);
+    public void deleteReservation(
+            @AuthenticationPrincipal final LoginMember loginMember,
+            @PathVariable final Long reservationId) {
+        reservationService.deleteReservation(loginMember, reservationId);
     }
 
     @GetMapping("/mine")
-    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
+    public List<MyReservationResponse> findMyReservations(@AuthenticationPrincipal final LoginMember loginMember) {
         return reservationService.findMyReservations(loginMember);
     }
 }

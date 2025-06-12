@@ -1,81 +1,98 @@
 package roomescape.member.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.global.config.AdminAuthBaseTest;
 import roomescape.member.dto.MemberRequest;
-import roomescape.member.repository.MemberRepository;
+import roomescape.member.dto.MemberResponse;
+import roomescape.member.dto.MemberResponses;
 import roomescape.member.service.MemberService;
 
 @SpringBootTest
+@AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class MemberControllerTest {
+class MemberControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockitoBean
     private MemberService memberService;
 
-    @BeforeEach
-    void setUp() {
-        memberRepository.deleteAll();
+    @Test
+    @DisplayName("회원 가입 API")
+    void signup() throws Exception {
+        // given
+        MemberRequest request = new MemberRequest("test@example.com", "password123!", "홍길동");
+        doNothing().when(memberService).save(any(MemberRequest.class));
+
+        // when && then
+        mockMvc.perform(post("/members")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andDo(document("member/singup",
+                        preprocessRequest(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호"),
+                                fieldWithPath("name").description("회원 이름")
+                        )
+                ));
     }
 
     @Test
-    void 모든_회원_조회_성공() throws Exception {
+    @DisplayName("모든 회원 조회 API")
+    void findAllMember() throws Exception {
         // given
-        memberService.save(new MemberRequest("hong@example.com", "password123", "홍길동"));
-        memberService.save(new MemberRequest("kim@example.com", "password123", "김철수"));
+        List<MemberResponse> memberList = List.of(
+                new MemberResponse(1L, "사용자1"),
+                new MemberResponse(2L, "사용자2")
+        );
+        MemberResponses responses = new MemberResponses(memberList);
 
-        // when & then
-        mockMvc.perform(get("/members")
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
+        given(memberService.findAllMember()).willReturn(responses);
+
+        // when && then
+        mockMvc.perform(addAuthCookie(get("/admin/members")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.members.length()", is(2)))
-                .andExpect(jsonPath("$.members[0].name", is("홍길동")))
-                .andExpect(jsonPath("$.members[1].name", is("김철수")));
-    }
-
-    @Test
-    void 회원_가입_성공() throws Exception {
-        // given
-        MemberRequest request = new MemberRequest("new@example.com", "password123", "신규회원");
-
-        // when & then
-        mockMvc.perform(post("/members")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"신규회원\", \"email\": \"new@example.com\", \"password\": \"password123\"}")
-                )
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    void 중복된_이메일로_회원_가입_실패() throws Exception {
-        // given
-        memberService.save(new MemberRequest("existing@example.com", "password123", "중복회원"));
-
-        // when & then
-        mockMvc.perform(post("/members")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"중복회원\", \"email\": \"existing@example.com\", \"password\": \"password123\"}")
-                )
-                .andExpect(status().isBadRequest());
+                .andExpect(jsonPath("$.members[0].id").value(1L))
+                .andExpect(jsonPath("$.members[0].name").value("사용자1"))
+                .andExpect(jsonPath("$.members[1].id").value(2L))
+                .andExpect(jsonPath("$.members[1].name").value("사용자2"))
+                .andDo(document("member/find-all",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("members[].id").description("회원 ID"),
+                                fieldWithPath("members[].name").description("회원 이름")
+                        )
+                ));
     }
 }

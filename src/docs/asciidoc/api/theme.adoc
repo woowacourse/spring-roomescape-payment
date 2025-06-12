@@ -1,0 +1,130 @@
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+= 🎭 테마 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== 개요
+
+이 문서는 방탈출 테마 관리를 위한 REST API를 설명합니다.
+
+== 테마 API
+
+=== 테마 생성
+
+테마를 새로 생성합니다.
+
+==== 요청
+
+include::{snippets}/theme/save/http-request.adoc[]
+
+===== 요청 필드
+
+include::{snippets}/theme/save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/theme/save/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/theme/save/response-fields.adoc[]
+
+=== 모든 테마 조회
+
+등록된 모든 테마 정보를 조회합니다.
+
+==== 요청
+
+include::{snippets}/theme/find-all/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/theme/find-all/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/theme/find-all/response-fields.adoc[]
+
+=== 인기 테마 순위 조회
+
+최근 7일간 인기 있는 테마 목록을 조회합니다.
+
+==== 요청
+
+include::{snippets}/theme/find-popular/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/theme/find-popular/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/theme/find-popular/response-fields.adoc[]
+
+=== 테마 삭제
+
+지정된 ID의 테마를 삭제합니다.
+해당 테마로 예약된 건이 있는 경우 삭제할 수 없습니다.
+
+==== 요청
+
+include::{snippets}/theme/delete/http-request.adoc[]
+
+===== 경로 변수
+
+include::{snippets}/theme/delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/theme/delete/http-response.adoc[]
+
+== 데이터 모델
+
+== 데이터 모델
+
+=== ThemeRequest
+
+|===
+|필드명|타입|설명
+
+|name
+|String
+|테마 이름
+
+|description
+|String
+|테마 설명
+
+|thumbnail
+|String
+|테마 썸네일 URL
+|===
+
+=== ThemeResponse
+
+|===
+|필드명|타입|설명
+
+|id
+|Long
+|테마 ID
+
+|name
+|String
+|테마 이름
+
+|description
+|String
+|테마 설명
+
+|thumbnail
+|String
+|테마 썸네일 URL
+|===

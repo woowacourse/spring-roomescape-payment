@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.auth.dto.LoginMember;
 
 @Getter
 @Entity
@@ -79,21 +78,11 @@ public class Member {
                 .build();
     }
 
-    public static Member from(final LoginMember loginMember) {
-        return builder()
-                .id(loginMember.id())
-                .name(loginMember.name())
-                .email(loginMember.email())
-                .password(null)
-                .role(loginMember.role())
-                .build();
-    }
-
     public boolean matchesPassword(final String password) {
         return this.password.equals(password);
     }
 
-    public boolean isAdmin() {
-        return this.role.isAdmin();
+    public boolean isNotAdmin() {
+        return !role.isAdmin();
     }
 }

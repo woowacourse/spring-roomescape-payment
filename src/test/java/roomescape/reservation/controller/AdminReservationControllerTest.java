@@ -1,196 +1,132 @@
 package roomescape.reservation.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
-import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
-import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservationtime.domain.ReservationTime;
-import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.global.config.AdminAuthBaseTest;
+import roomescape.member.dto.MemberResponse;
+import roomescape.reservation.dto.AdminReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.service.ReservationService;
+import roomescape.reservationtime.dto.ReservationTimeResponse;
+import roomescape.theme.dto.ThemeResponse;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@AutoConfigureRestDocs
 @AutoConfigureMockMvc
-class AdminReservationControllerTest {
+class AdminReservationControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private ThemeRepository themeRepository;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    private Member adminMember;
-    private Theme theme;
-    private ReservationTime time;
-    private String adminToken;
-
-    @BeforeEach
-    void setUp() {
-        adminMember = memberRepository.save(Member.withRole("관리자", "admin@example.com", "password", MemberRole.ADMIN));
-        theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
-        time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
-        adminToken = jwtTokenProvider.createToken(Jwts.claims().subject(adminMember.getId().toString()).build());
-    }
+    @MockitoBean
+    private ReservationService reservationService;
 
     @Test
-    void 관리자_예약_생성_성공() throws Exception {
+    @DisplayName("관리자 예약 추가 테스트 데이터")
+    void saveReservationTestData() throws Exception {
         // given
-        LocalDate date = LocalDate.now().plusDays(1);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        String content = String.format("{" +
-                        "\"date\": \"%s\"," +
-                        "\"timeId\": %d," +
-                        "\"themeId\": %d," +
-                        "\"memberId\": %d" +
-                        "}",
-                date.toString(),
-                time.getId(),
-                theme.getId(),
-                adminMember.getId());
+        LocalDate date = LocalDate.of(2024, 1, 1);
+        long timeId = 1L;
+        long themeId = 1L;
+        long memberId = 1L;
 
-        // when & then
-        mockMvc.perform(post("/admin/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("token", adminToken))
-                        .content(content))
-                .andExpect(status().isCreated());
-    }
+        AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, memberId);
 
-    @Test
-    void 관리자_예약_취소_성공() throws Exception {
-        // given
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
-                LocalDate.now().plusDays(1),
-                time,
-                theme,
-                adminMember,
-                currentDateTime
+        ReservationResponse response = new ReservationResponse(
+                1L, date,
+                new ReservationTimeResponse(timeId, LocalTime.of(13, 0)),
+                new ThemeResponse(themeId, "방탈출 테마1", "테마1 설명", "theme1.jpg"),
+                new MemberResponse(memberId, "테스트 사용자")
         );
-        Reservation savedReservation = reservationRepository.save(reservation);
 
-        // when & then
-        mockMvc.perform(delete(String.format("/admin/reservations/%d", savedReservation.getId()))
+        given(reservationService.saveAdminReservation(any(AdminReservationRequest.class))).willReturn(response);
+
+        // when && then
+        mockMvc.perform(addAuthCookie(post("/admin/reservations"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("token", adminToken)))
-                .andExpect(status().isNoContent());
-
-        assertThat(reservationRepository.findById(savedReservation.getId())).isEmpty();
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.date").value("2024-01-01"))
+                .andExpect(jsonPath("$.time.id").value(timeId))
+                .andExpect(jsonPath("$.time.startAt").value("13:00"))
+                .andExpect(jsonPath("$.theme.id").value(themeId))
+                .andExpect(jsonPath("$.theme.name").value("방탈출 테마1"))
+                .andExpect(jsonPath("$.theme.description").value("테마1 설명"))
+                .andExpect(jsonPath("$.theme.thumbnail").value("theme1.jpg"))
+                .andExpect(jsonPath("$.member.id").value(memberId))
+                .andExpect(jsonPath("$.member.name").value("테스트 사용자"))
+                .andDo(document("reservation/admin/reservation-save",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("timeId").description("예약 시간 ID"),
+                                fieldWithPath("themeId").description("테마 ID"),
+                                fieldWithPath("memberId").description("회원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("예약 ID"),
+                                fieldWithPath("date").description("예약 날짜"),
+                                fieldWithPath("time.id").description("예약 시간 ID"),
+                                fieldWithPath("time.startAt").description("시작 시간"),
+                                fieldWithPath("theme.id").description("테마 ID"),
+                                fieldWithPath("theme.name").description("테마 이름"),
+                                fieldWithPath("theme.description").description("테마 설명"),
+                                fieldWithPath("theme.thumbnail").description("테마 썸네일 이미지"),
+                                fieldWithPath("member.id").description("회원 ID"),
+                                fieldWithPath("member.name").description("회원 이름")
+                        )
+                ));
     }
 
     @Test
-    void 관리자_예약_시간_검증_실패() throws Exception {
+    @DisplayName("관리자 예약 취소 테스트 데이터")
+    void cancelReservationTestData() throws Exception {
         // given
-        LocalDate date = LocalDate.now().minusDays(1);
-        String content = String.format("{" +
-                        "\"date\": \"%s\"," +
-                        "\"timeId\": %d," +
-                        "\"themeId\": %d," +
-                        "\"memberId\": %d" +
-                        "}",
-                date.toString(),
-                time.getId(),
-                theme.getId(),
-                adminMember.getId());
+        Long reservationId = 1L;
 
-        // when & then
-        mockMvc.perform(post("/admin/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("token", adminToken))
-                        .content(content))
-                .andExpect(status().isBadRequest());
-    }
+        doNothing().when(reservationService).deleteReservation(anyLong());
 
-    @Test
-    void 관리자_권한_없는_유저_실패() throws Exception {
-        // given
-        Member userMember = memberRepository.save(Member.withDefaultRole("유저", "user@example.com", "password"));
-        String userToken = jwtTokenProvider.createToken(Jwts.claims().subject(userMember.getId().toString()).build());
-        LocalDate date = LocalDate.now().plusDays(1);
-        String content = String.format("{" +
-                        "\"date\": \"%s\"," +
-                        "\"timeId\": %d," +
-                        "\"themeId\": %d," +
-                        "\"memberId\": %d" +
-                        "}",
-                date.toString(),
-                time.getId(),
-                theme.getId(),
-                userMember.getId());
-
-        // when & then
-        mockMvc.perform(post("/admin/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("token", userToken))
-                        .content(content))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void 관리자_예약_시간_중복_검증() throws Exception {
-        // given
-        LocalDate date = LocalDate.now().plusDays(1);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
-                date,
-                time,
-                theme,
-                adminMember,
-                currentDateTime
-        );
-        reservationRepository.save(reservation);
-
-        String content = String.format("{" +
-                        "\"date\": \"%s\"," +
-                        "\"timeId\": %d," +
-                        "\"themeId\": %d," +
-                        "\"memberId\": %d" +
-                        "}",
-                date.toString(),
-                time.getId(),
-                theme.getId(),
-                adminMember.getId());
-
-        // when & then
-        mockMvc.perform(post("/admin/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie("token", adminToken))
-                        .content(content))
-                .andExpect(status().isBadRequest());
+        // when && then
+        mockMvc.perform(addAuthCookie(delete("/admin/reservations/{reservationId}", reservationId)))
+                .andExpect(status().isNoContent())
+                .andDo(document("reservation/admin/reservation-delete",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("reservationId").description("삭제할 예약 ID")
+                        )
+                ));
     }
 }

@@ -1,100 +1,127 @@
 package roomescape.reservationtime.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalTime;
-
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
+import roomescape.global.config.AdminAuthBaseTest;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
-import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.reservationtime.service.ReservationTimeService;
 
 @SpringBootTest
+@AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationTimeControllerTest {
+class ReservationTimeControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockitoBean
     private ReservationTimeService reservationTimeService;
 
-    private final LocalTime testTime = LocalTime.of(13, 0);
+    @Test
+    @DisplayName("예약 시간 생성 API")
+    void saveTime() throws Exception {
+        // given
+        LocalTime startTime = LocalTime.of(10, 0);
+        ReservationTimeRequest request = new ReservationTimeRequest(startTime);
+        ReservationTimeResponse response = new ReservationTimeResponse(1L, startTime);
 
-    @BeforeEach
-    void setUp() {
-        reservationTimeRepository.deleteAll();
+        given(reservationTimeService.saveTime(any(ReservationTimeRequest.class))).willReturn(response);
+
+        // when && then
+        mockMvc.perform(addAuthCookie(post("/admin/times"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.startAt").value("10:00"))
+                .andDo(document("reservationTime/save",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("startAt").description("예약 시간")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("예약 시간 ID"),
+                                fieldWithPath("startAt").description("예약 시간")
+                        )
+                ));
     }
 
     @Test
-    void 예약_시간_생성_성공() throws Exception {
+    @DisplayName("모든 예약 시간 조회 API")
+    void findAll() throws Exception {
         // given
-        ReservationTimeRequest request = new ReservationTimeRequest(testTime);
+        List<ReservationTimeResponse> responses = List.of(
+                new ReservationTimeResponse(1L, LocalTime.of(10, 0)),
+                new ReservationTimeResponse(2L, LocalTime.of(12, 0))
+        );
 
-        // when & then
-        mockMvc.perform(post("/times")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"startAt\": \"13:00\"}")
-        )
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("id").exists())
-        .andExpect(jsonPath("startAt").value("13:00"));
+        given(reservationTimeService.findAll()).willReturn(responses);
+
+        // when && then
+        mockMvc.perform(addAuthCookie(get("/admin/times")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].startAt").value("10:00"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].startAt").value("12:00"))
+                .andDo(document("reservationTime/find-all",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 시간 ID"),
+                                fieldWithPath("[].startAt").description("예약 시간")
+                        )
+                ));
     }
 
     @Test
-    void 모든_예약_시간_조회_성공() throws Exception {
+    @DisplayName("예약 시간 삭제 API")
+    void deleteTime() throws Exception {
         // given
-        reservationTimeService.saveTime(new ReservationTimeRequest(LocalTime.of(13, 0)));
-        reservationTimeService.saveTime(new ReservationTimeRequest(LocalTime.of(14, 0)));
+        Long timeId = 1L;
+        doNothing().when(reservationTimeService).delete(anyLong());
 
-        // when & then
-        mockMvc.perform(get("/times")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()", is(2)))
-        .andExpect(jsonPath("[0].startAt", is("13:00")))
-        .andExpect(jsonPath("[1].startAt", is("14:00")));
-    }
-
-    @Test
-    void 예약_시간_삭제_성공() throws Exception {
-        // given
-        ReservationTimeResponse response = reservationTimeService.saveTime(new ReservationTimeRequest(testTime));
-        Long id = response.id();
-
-        // when & then
-        mockMvc.perform(delete("/times/{id}", id)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void 존재하지_않는_예약_시간_삭제_실패() throws Exception {
-        // given
-        // when & then
-        mockMvc.perform(delete("/times/999")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isNoContent());
+        // when && then
+        mockMvc.perform(addAuthCookie(delete("/admin/times/{timeId}", timeId)))
+                .andExpect(status().isNoContent())
+                .andDo(document("reservationTime/delete",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("timeId").description("삭제할 시간 ID")
+                        )
+                ));
     }
 }

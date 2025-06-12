@@ -1,10 +1,11 @@
 package roomescape.auth.infrastructure;
 
-import io.jsonwebtoken.Claims;
+import roomescape.auth.application.LoginMember;
+import roomescape.member.domain.Member;
 
 public interface TokenProvider {
 
-    String createToken(final Claims claims);
+    String createToken(final Member member);
 
-    String extractPrincipal(final String token);
+    LoginMember extractLoginMember(final String token);
 }

@@ -12,7 +12,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -58,9 +60,16 @@ public class ReservationStatus {
         if (rank == null || rank == 0) {
             throw new IllegalStateException("더이상 대기 순번을 앞당길 수 없습니다. Waiting.id: " + id);
         }
+
+        Long oldRank = rank;
+        Status oldStatus = status;
+
         rank--;
         if (rank == 0) {
             status = Status.BOOKED;
         }
+
+        log.info("[대기 순번 감소] statusId: {}, status 변경: {} -> {}, rank 변경: {} -> {}",
+                id, oldStatus, status, oldRank, rank);
     }
 }

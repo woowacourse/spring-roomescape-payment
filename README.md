@@ -37,43 +37,6 @@
 - 결제 승인 처리
 - 결제 실패 처리
 
-## 📌 API 명세
-
-### 예약 관련 API
-
-| Method | URL                | Description | HTTP Status    |
-|--------|--------------------|-------------|----------------|
-| GET    | /reservations      | 예약 전체 조회    | 200 OK         |
-| POST   | /reservations      | 예약 추가       | 201 CREATED    |
-| DELETE | /reservations/{id} | 예약 삭제       | 204 NO CONTENT |
-| GET    | /reservations/mine | 내 예약 목록 조회  | 200 OK         |
-
-### 예약 시간 관련 API
-
-| Method | URL              | Description  | HTTP Status    |
-|--------|------------------|--------------|----------------|
-| GET    | /times           | 예약 시간 전체 조회  | 200 OK         |
-| GET    | /times/available | 예약 가능한 시간 조회 | 200 OK         |
-| POST   | /times           | 예약 시간 추가     | 201 CREATED    |
-| DELETE | /times/{id}      | 예약 시간 삭제     | 204 NO CONTENT |
-
-### 테마 관련 API
-
-| Method | URL          | Description | HTTP Status    |
-|--------|--------------|-------------|----------------|
-| GET    | /themes      | 테마 전체 조회    | 200 OK         |
-| GET    | /themes/rank | 테마 순위 조회    | 200 OK         |
-| POST   | /themes      | 테마 추가       | 201 CREATED    |
-| DELETE | /themes/{id} | 테마 삭제       | 204 NO CONTENT |
-
-### 인증 관련 API
-
-| Method | URL          | Description | HTTP Status    |
-|--------|--------------|-------------|----------------|
-| POST   | /login       | 로그인         | 200 OK         |
-| POST   | /logout      | 로그아웃        | 204 NO CONTENT |
-| GET    | /login/check | 로그인 확인      | 200 OK         |
-
 ## 📌 요구사항
 
 ### 사용자 예약 기능 개선

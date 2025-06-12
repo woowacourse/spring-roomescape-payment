@@ -1,8 +1,5 @@
 package roomescape.reservation.domain;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,13 +10,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.exception.ReservationException;
+import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.Payment;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -47,6 +47,10 @@ public class Reservation {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 
+    @JoinColumn
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Payment payment;
+
     @JoinColumn(name = "status_id", nullable = false)
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ReservationStatus reservationStatus;
@@ -59,7 +63,8 @@ public class Reservation {
             @NonNull final Theme theme,
             @NonNull final Member member,
             @NonNull final ReservationStatus reservationStatus,
-            @NonNull final LocalDateTime currentDateTime
+            @NonNull final LocalDateTime currentDateTime,
+            @NonNull final Payment payment
     ) {
         this.id = id;
         this.date = date;
@@ -67,6 +72,7 @@ public class Reservation {
         this.theme = theme;
         this.member = member;
         this.reservationStatus = reservationStatus;
+        this.payment = payment;
         validateFutureOrPresent(currentDateTime);
     }
 
@@ -75,7 +81,8 @@ public class Reservation {
             final ReservationTime reservationTime,
             final Theme theme,
             final Member member,
-            final LocalDateTime currentDateTime
+            final LocalDateTime currentDateTime,
+            final Payment payment
     ) {
         return builder()
                 .id(null)
@@ -85,6 +92,7 @@ public class Reservation {
                 .member(member)
                 .currentDateTime(currentDateTime)
                 .reservationStatus(ReservationStatus.booked())
+                .payment(payment)
                 .build();
     }
 
@@ -94,21 +102,23 @@ public class Reservation {
             final Theme theme,
             final Member member,
             final LocalDateTime currentDateTime,
-            final Long rank
+            final Long rank,
+            final Payment payment
     ) {
-            return builder()
-                    .id(null)
-                    .date(date)
-                    .time(reservationTime)
-                    .theme(theme)
-                    .member(member)
-                    .currentDateTime(currentDateTime)
-                    .reservationStatus(ReservationStatus.waiting(rank))
-                    .build();
+        return builder()
+                .id(null)
+                .date(date)
+                .time(reservationTime)
+                .theme(theme)
+                .member(member)
+                .currentDateTime(currentDateTime)
+                .reservationStatus(ReservationStatus.waiting(rank))
+                .payment(payment)
+                .build();
     }
 
     private void validateFutureOrPresent(LocalDateTime currentDateTime) {
-        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
+        LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
             throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");
         }

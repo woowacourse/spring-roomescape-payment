@@ -1,112 +1,160 @@
 package roomescape.theme.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
+import roomescape.global.config.AdminAuthBaseTest;
+import roomescape.theme.dto.PopularThemeResponse;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
-import roomescape.theme.repository.ThemeRepository;
 import roomescape.theme.service.ThemeService;
 
 @SpringBootTest
+@AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ThemeControllerTest {
+class ThemeControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ThemeRepository themeRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockitoBean
     private ThemeService themeService;
 
-    @BeforeEach
-    void setUp() {
-        themeRepository.deleteAll();
-    }
-
     @Test
-    void 테마_생성_성공() throws Exception {
+    @DisplayName("테마 생성 API")
+    void saveTheme() throws Exception {
         // given
-        ThemeRequest request = new ThemeRequest("테스트 테마", "테스트 설명", "테스트 썸네일");
+        ThemeRequest request = new ThemeRequest("방탈출 테마", "방탈출 테마 설명", "https://example.com/thumbnail.jpg");
+        ThemeResponse response = new ThemeResponse(1L, "방탈출 테마", "방탈출 테마 설명", "https://example.com/thumbnail.jpg");
 
-        // when & then
-        mockMvc.perform(post("/themes")
+        given(themeService.saveTheme(any(ThemeRequest.class))).willReturn(response);
+
+        // when && then
+        mockMvc.perform(addAuthCookie(post("/admin/themes"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"테스트 테마\", \"description\": \"테스트 설명\", \"thumbnail\": \"테스트 썸네일\"}")
-                )
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("name").value("테스트 테마"))
-                .andExpect(jsonPath("description").value("테스트 설명"))
-                .andExpect(jsonPath("thumbnail").value("테스트 썸네일"));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("방탈출 테마"))
+                .andExpect(jsonPath("$.description").value("방탈출 테마 설명"))
+                .andExpect(jsonPath("$.thumbnail").value("https://example.com/thumbnail.jpg"))
+                .andDo(document("theme/save",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 URL")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("테마 ID"),
+                                fieldWithPath("name").description("테마 이름"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 URL")
+                        )
+                ));
     }
 
     @Test
-    void 모든_테마_조회_성공() throws Exception {
+    @DisplayName("모든 테마 조회 API")
+    void findAll() throws Exception {
         // given
-        themeService.saveTheme(new ThemeRequest("테마1", "설명1", "썸네일1"));
-        themeService.saveTheme(new ThemeRequest("테마2", "설명2", "썸네일2"));
+        List<ThemeResponse> responses = List.of(
+                new ThemeResponse(1L, "테마1", "테마1 설명", "https://example.com/thumbnail1.jpg"),
+                new ThemeResponse(2L, "테마2", "테마2 설명", "https://example.com/thumbnail2.jpg")
+        );
 
-        // when & then
-        mockMvc.perform(get("/themes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
+        given(themeService.findAll()).willReturn(responses);
+
+        // when && then
+        mockMvc.perform(get("/themes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(jsonPath("[0].name", is("테마1")))
-                .andExpect(jsonPath("[1].name", is("테마2")));
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("테마1"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].name").value("테마2"))
+                .andDo(document("theme/find-all",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 ID"),
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 URL")
+                        )
+                ));
     }
 
     @Test
-    void 인기_테마_조회_성공() throws Exception {
+    @DisplayName("인기 테마 순위 조회 API")
+    void findAllPopular() throws Exception {
         // given
-        themeService.saveTheme(new ThemeRequest("테마1", "설명1", "썸네일1"));
-        themeService.saveTheme(new ThemeRequest("테마2", "설명2", "썸네일2"));
+        List<PopularThemeResponse> responses = List.of(
+                new PopularThemeResponse("테마1", "테마1 설명", "https://example.com/thumbnail1.jpg"),
+                new PopularThemeResponse("테마2", "테마2 설명", "https://example.com/thumbnail2.jpg")
+        );
 
-        // when & then
-        mockMvc.perform(get("/themes/ranking")
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
+        given(themeService.findAllPopular()).willReturn(responses);
+
+        // when && then
+        mockMvc.perform(get("/themes/ranking"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(0)));
+                .andExpect(jsonPath("$[0].name").value("테마1"))
+                .andExpect(jsonPath("$[1].name").value("테마2"))
+                .andDo(document("theme/find-popular",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].name").description("테마 이름"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 URL")
+                        )
+                ));
     }
 
     @Test
-    void 테마_삭제_성공() throws Exception {
+    @DisplayName("테마 삭제 API")
+    void deleteTheme() throws Exception {
         // given
-        ThemeResponse response = themeService.saveTheme(new ThemeRequest("테스트 테마", "테스트 설명", "테스트 썸네일"));
-        Long id = response.id();
+        Long themeId = 1L;
+        doNothing().when(themeService).delete(anyLong());
 
-        // when & then
-        mockMvc.perform(delete("/themes/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void 존재하지_않는_테마_삭제_실패() throws Exception {
-        // given
-        // when & then
-        mockMvc.perform(delete("/themes/999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isNoContent());
+        // when && then
+        mockMvc.perform(addAuthCookie(delete("/admin/themes/{themeId}", themeId)))
+                .andExpect(status().isNoContent())
+                .andDo(document("theme/delete",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("themeId").description("삭제할 테마 ID")
+                        )
+                ));
     }
 }

@@ -1,0 +1,96 @@
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+= ⏰ 예약 시간 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== 개요
+
+이 문서는 방탈출 예약 시간 관리를 위한 REST API를 설명합니다.
+
+== 예약 시간 API
+
+=== 예약 시간 생성
+
+새로운 예약 시간을 생성합니다.
+
+==== 요청
+
+include::{snippets}/reservationTime/save/http-request.adoc[]
+
+===== 요청 필드
+
+include::{snippets}/reservationTime/save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/reservationTime/save/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/reservationTime/save/response-fields.adoc[]
+
+=== 모든 예약 시간 조회
+
+등록된 모든 예약 시간 정보를 조회합니다.
+
+==== 요청
+
+include::{snippets}/reservationTime/find-all/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservationTime/find-all/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/reservationTime/find-all/response-fields.adoc[]
+
+=== 예약 시간 삭제
+
+지정된 ID의 예약 시간을 삭제합니다.
+해당 시간으로 예약된 건이 있는 경우 삭제할 수 없습니다.
+
+==== 요청
+
+include::{snippets}/reservationTime/delete/http-request.adoc[]
+
+===== 경로 변수
+
+include::{snippets}/reservationTime/delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/reservationTime/delete/http-response.adoc[]
+
+== 데이터 모델
+
+=== ReservationTimeRequest
+
+|===
+|필드명|타입|설명
+
+|startAt
+|String
+|예약 시간 (HH:mm 형식)
+|===
+
+=== ReservationTimeResponse
+
+|===
+|필드명|타입|설명
+
+|id
+|Long
+|예약 시간 ID
+
+|startAt
+|String
+|예약 시간 (HH:mm 형식)
+|=== 

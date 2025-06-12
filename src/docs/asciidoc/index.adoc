@@ -1,0 +1,66 @@
+= 📘 REST API 문서
+:toc: left
+:toclevels: 2
+:source-highlighter: highlightjs
+:sectanchors:
+:sectnums:
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: css
+
+== 🧾 개요
+
+Spring REST Docs 기반 문서입니다.
+API 명세 및 요청/응답 예시를 통해 클라이언트-서버 간 명확한 계약을 제공합니다.
+
+== 🔧 공통 정보
+
+=== 📍 공통 헤더
+
+|===
+| Header | 설명 | 필수 여부
+
+| `Content-Type`
+| `application/json`
+| ✅
+
+| `Authorization`
+| `Bearer {access-token}`
+| 🔒 로그인 필요 API에만
+|===
+
+== 👤 어드민용 API
+
+👉 link:view/admin.html[Admin View API 문서로 이동]
+
+=== 📅 관리자 예약 API
+
+👉 link:api/admin-reservation.html[Admin Reservation API 문서로 이동]
+
+== 👤 사용자용 페이지 API
+
+👉 link:view/user.html[User View API 문서로 이동]
+
+=== 🔐 인증 API
+
+👉 link:api/auth.html[Auth API 문서로 이동]
+
+=== ⏰ 예약 시간 API
+
+👉 link:api/reservationtime.html[Reservation Time API 문서로 이동]
+
+=== 📅 예약 API
+
+👉 link:api/reservation.html[Reservation API 문서로 이동]
+
+=== 👤 회원 API
+
+👉 link:api/member.html[Member API 문서로 이동]
+
+=== 🎭 테마 API
+
+👉 link:api/theme.html[Theme API 문서로 이동]
+
+== 📎 참고
+
+- REST Docs: https://docs.spring.io/spring-restdocs/

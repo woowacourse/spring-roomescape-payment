@@ -1,0 +1,62 @@
+= 🧑‍💻 사용자 페이지 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+== 개요
+
+== 📄 페이지 목록
+
+=== 홈페이지 (/)
+
+.HTTP 요청 예제
+include::{snippets}/page-user/home/httpie-request.adoc[]
+
+.응답 뷰 이름
+`index`
+
+=== 예약 페이지 (/reservation)
+
+예약 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-user/reservation/httpie-request.adoc[]
+
+.응답 뷰 이름
+`reservation`
+
+=== 내 예약 정보 페이지 (/reservation-mine)
+
+사용자의 예약 정보를 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-user/mine/httpie-request.adoc[]
+
+.응답 뷰 이름
+`reservation-mine`
+
+=== 로그인 페이지 (/login)
+
+로그인 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-user/login/httpie-request.adoc[]
+
+.응답 뷰 이름
+`login`
+
+=== 회원가입 페이지 (/signup)
+
+회원가입 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-user/signup/httpie-request.adoc[]
+
+.응답 뷰 이름
+`signup`
