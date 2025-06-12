@@ -6,6 +6,7 @@ import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.dto.time.ReservationTimeCreateRequestDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.exception.DuplicateContentException;
+import roomescape.exception.common.BadRequestException;
 import roomescape.exception.common.ForbiddenException;
 import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaReservationRepository;
@@ -38,7 +39,7 @@ public class ReservationTimeCommandService {
             throw new NotFoundException("예약 시간", id);
         }
         if (reservationRepository.existsByTimeId(id)) {
-            throw new ForbiddenException("이 시간의 예약이 이미 존재합니다. 예약 id : " + id);
+            throw new BadRequestException("해당 시간의 예약이 이미 존재하여 시간을 삭제할 수 없습니다. 예약 id : " + id);
         }
 
         reservationTimeRepository.deleteById(id);
