@@ -2,10 +2,12 @@ package roomescape.application;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.payment.OrderId;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentKey;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRepository;
@@ -24,6 +26,7 @@ public class PaymentService {
     private final PaymentProvider paymentProvider;
     private final PaymentRepository paymentRepository;
 
+    @Transactional
     public Payment register(String paymentKey, String orderId, long totalAmount, String status) {
         var payment = new Payment(
             new PaymentKey(paymentKey),
