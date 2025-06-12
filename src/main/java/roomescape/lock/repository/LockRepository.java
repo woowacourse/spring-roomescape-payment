@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.lock.LockEntity;
 
-public interface LockRepository extends JpaRepository<LockEntity, String> {
+public interface LockRepository extends JpaRepository<LockEntity, Long> {
 
     @org.springframework.data.jpa.repository.Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select l from LockEntity l where l.lockKey = :key")
