@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithRank;
@@ -23,14 +24,15 @@ public record MyReservation(
     static final String WAITING_STATUS = "%s번째 예약대기";
 
     public static MyReservation from(Reservation reservation) {
+        Payment payment = reservation.getPayment();
         return new MyReservation(
             reservation.getId(),
             reservation.getThemeName(),
             reservation.getDate(),
             reservation.getStartAt(),
             reservation.getStatus().getTitle(),
-            reservation.getPayment() != null ? reservation.getPayment().getPaymentKey() : null, // NOTE. 가독성이 떨어지는지 여쭤보기
-            reservation.getPayment() != null ? reservation.getPayment().getAmount() : null
+            payment != null ? payment.getPaymentKey() : null, // NOTE. 가독성이 떨어지는지 여쭤보기
+            payment != null ? payment.getAmount() : null
         );
     }
 
