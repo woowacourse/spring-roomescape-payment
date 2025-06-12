@@ -89,7 +89,7 @@ public class LogMessageFormatter {
     }
 
     private String formatJsonIfPossible(String body) {
-        if (body.isEmpty() || !isJsonLike(body)) {
+        if (body.isEmpty()) {
             return body;
         }
         try {
@@ -98,10 +98,5 @@ public class LogMessageFormatter {
         } catch (JsonProcessingException e) {
             return body;
         }
-    }
-
-    private boolean isJsonLike(String body) {
-        String trimmed = body.trim();
-        return trimmed.startsWith("{") || trimmed.startsWith("[");
     }
 }
