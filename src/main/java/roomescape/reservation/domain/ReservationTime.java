@@ -22,7 +22,7 @@ public class ReservationTime extends TimeStamp {
     @Column(nullable = false)
     private LocalTime startAt;
 
-    public ReservationTime() {
+    protected ReservationTime() {
     }
 
     public ReservationTime(final Long id, final LocalTime startAt) {

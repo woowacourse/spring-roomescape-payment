@@ -2,6 +2,11 @@ plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+}
+
+configurations {
+    asciidoctorExt
 }
 
 group = 'nextstep'
@@ -32,8 +37,30 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.3'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    baseDirFollowsSourceDir()
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}") {
+        into("BOOT-INF/classes/static/docs")
+    }
 }

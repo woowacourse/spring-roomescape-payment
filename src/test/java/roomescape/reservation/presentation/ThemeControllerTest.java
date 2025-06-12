@@ -1,21 +1,35 @@
 package roomescape.reservation.presentation;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.snippet.Attributes.key;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.DatabaseCleaner;
 import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
@@ -25,10 +39,13 @@ import roomescape.reservation.presentation.fixture.ReservationFixture;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
+@ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 class ThemeControllerTest {
     private final DatabaseCleaner databaseCleaner;
     private final ReservationFixture reservationFixture = new ReservationFixture();
     private final MemberFixture memberFixture = new MemberFixture();
+
+    private RequestSpecification spec;
 
     @LocalServerPort
     int port;
@@ -39,10 +56,15 @@ class ThemeControllerTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
         databaseCleaner.clear();
         databaseCleaner.setUserInfo();
+
+        this.spec = new RequestSpecBuilder()
+                .setPort(port)
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @Test
@@ -79,7 +101,24 @@ class ThemeControllerTest {
         );
 
         // when - then
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
+                .filter(document("{class-name}/{method-name}",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id")
+                                        .description("식별자")
+                                        .attributes(key("displayName").value("id")),
+                                fieldWithPath("[].name")
+                                        .description("테마 이름")
+                                        .attributes(key("displayName").value("name")),
+                                fieldWithPath("[].description")
+                                        .description("테마 시나리오 설명")
+                                        .attributes(key("displayName").value("description")),
+                                fieldWithPath("[].thumbnail")
+                                        .description("썸네일 이미지 주소")
+                                        .attributes(key("displayName").value("thumbnail"))
+                        )))
                 .contentType(ContentType.JSON)
                 .cookies(cookies)
                 .when().get("/themes")

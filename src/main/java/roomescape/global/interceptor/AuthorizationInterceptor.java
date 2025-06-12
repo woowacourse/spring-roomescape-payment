@@ -16,6 +16,9 @@ import roomescape.member.domain.Role;
 
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationInterceptor.class);
+
     private final AuthorizationExtractor authorizationExtractor;
     private final TokenProvider tokenProvider;
 
@@ -52,16 +55,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
 
         if (currentUserRole != requiredRole) {
-            log();
+            LOGGER.warn("Authorization failed");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return false;
         }
 
         return true;
-    }
-
-    private static void log() {
-        Logger logger = LoggerFactory.getLogger(AuthorizationInterceptor.class);
-        logger.warn("Authorization failed");
     }
 }

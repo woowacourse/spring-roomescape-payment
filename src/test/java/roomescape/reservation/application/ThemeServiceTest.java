@@ -129,7 +129,8 @@ class ThemeServiceTest {
                         "우테코 레벨3를 탈출하는 내용입니다.",
                         "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"),
                 LocalDate.now().minusDays(3),
-                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40))
+                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40)),
+                null
         ));
 
         // when

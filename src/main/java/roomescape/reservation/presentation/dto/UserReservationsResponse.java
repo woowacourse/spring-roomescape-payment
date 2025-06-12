@@ -13,6 +13,7 @@ public class UserReservationsResponse {
     private LocalDate date;
     private LocalTime time;
     private String status;
+    private PaymentResponse payment;
 
     private UserReservationsResponse() {
     }
@@ -23,6 +24,14 @@ public class UserReservationsResponse {
         this.date = reservation.getDate();
         this.time = reservation.getReservationTime().getStartAt();
         this.status = "예약";
+        this.payment = getPaymentResponse(reservation);
+    }
+
+    private PaymentResponse getPaymentResponse(Reservation reservation) {
+        if (reservation.getPayment() != null) {
+            return new PaymentResponse(reservation.getPayment().getPaymentKey(), reservation.getPayment().getAmount());
+        }
+        return null;
     }
 
     public UserReservationsResponse(final WaitingWithRank reservation) {
@@ -52,5 +61,9 @@ public class UserReservationsResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public PaymentResponse getPayment() {
+        return payment;
     }
 }

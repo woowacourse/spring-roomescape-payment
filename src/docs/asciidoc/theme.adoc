@@ -1,0 +1,20 @@
+== 테마
+
+=== `/themes`
+
+모든 테마 목록을 조회합니다.
+
+operation::theme-controller-test/get-themes-test[snippets='http-request,http-response,response-fields']
+
+==== 상태코드
+
+[cols="10,~"]
+|===
+|코드 | 설명
+
+|200
+|성공
+
+|401
+|유효하지 않은 JWT 토큰으로 인한 실패
+|===

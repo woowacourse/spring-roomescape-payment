@@ -20,13 +20,13 @@ public class ReservationInfo {
     @ManyToOne
     private ReservationTime reservationTime;
 
+    protected ReservationInfo() {
+    }
+
     public ReservationInfo(final Theme theme, final LocalDate date, final ReservationTime reservationTime) {
         this.theme = theme;
         this.date = date;
         this.reservationTime = reservationTime;
-    }
-
-    public ReservationInfo() {
     }
 
     public Theme getTheme() {

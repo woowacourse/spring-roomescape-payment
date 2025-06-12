@@ -1,0 +1,23 @@
+== 예약 시간
+
+=== `/times/available`
+
+선택한 날짜와 테마 id에 해당하는 예약 시간을 조회합니다.
+
+operation::reservation-time-controller-test/get-available-times-test[snippets='http-request,http-response,response-fields']
+
+==== 상태코드
+
+[cols="10,~"]
+|===
+|코드 | 설명
+
+|200
+|성공
+
+|400
+|잘못된 요청 파라미터로 인한 실패
+
+|401
+|유효하지 않은 JWT 토큰으로 인한 실패
+|===

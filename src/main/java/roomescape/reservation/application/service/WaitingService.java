@@ -86,6 +86,8 @@ public class WaitingService {
     public void acceptWaiting(final Long id) {
         final Waiting waiting = findWaitingById(id);
 
+        validateIsDuplicate(waiting.getDate(), waiting.getReservationTime());
+
         final Reservation reservation = new Reservation(
                 waiting.getMember(),
                 waiting.getReservationInfo()
@@ -100,7 +102,7 @@ public class WaitingService {
                 .orElseThrow(() -> new IllegalStateException("이미 삭제되어 있는 리소스입니다."));
     }
 
-    private ReservationTime getReservationTime(Long timeId) {
+    private ReservationTime getReservationTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NoSuchElementException("예약 시간 정보를 찾을 수 없습니다."));
     }
@@ -115,15 +117,22 @@ public class WaitingService {
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
     }
 
-    private void validateReservationDateTime(LocalDate reservationDate, ReservationTime reservationTime) {
+    private void validateReservationDateTime(final LocalDate reservationDate, final ReservationTime reservationTime) {
         final LocalDateTime reservationDateTime = LocalDateTime.of(reservationDate, reservationTime.getStartAt());
 
         validateIsPast(reservationDateTime);
     }
 
-    private static void validateIsPast(LocalDateTime reservationDateTime) {
+    private void validateIsPast(final LocalDateTime reservationDateTime) {
         if (reservationDateTime.isBefore(LocalDateTime.now())) {
             throw new DateTimeException("지난 일시에 대한 예약 대기 생성은 불가능합니다.");
+        }
+    }
+
+    private void validateIsDuplicate(final LocalDate reservationDate, final ReservationTime reservationTime) {
+        if (reservationRepository.existsByReservationInfoDateAndReservationInfoReservationTimeStartAt(reservationDate,
+                reservationTime.getStartAt())) {
+            throw new IllegalStateException("중복된 일시의 예약은 불가능합니다.");
         }
     }
 }

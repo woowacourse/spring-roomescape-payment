@@ -1,35 +1,73 @@
 package roomescape.payment.domain;
 
-public class Payment {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import roomescape.global.common.TimeStamp;
 
-    private final String paymentKey;
+@Entity
+@SQLRestriction("deleted_at is NULL")
+@SQLDelete(sql = "UPDATE payment SET deleted_at = NOW() WHERE id = ?")
+public class Payment extends TimeStamp {
 
-    private final String orderId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private final Integer amount;
+    @Column(nullable = false)
+    private String orderId;
 
-    private final String paymentType;
+    @Column(nullable = false)
+    private String paymentKey;
 
-    public Payment(final String paymentKey, final String orderId, final Integer amount, final String paymentType) {
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
-        this.amount = amount;
-        this.paymentType = paymentType;
+    @Column(nullable = false)
+    private Integer amount;
+
+    @Column(nullable = false)
+    private LocalDateTime approvedAt;
+
+    protected Payment() {
     }
 
-    public String getPaymentKey() {
-        return paymentKey;
+    public Payment(final Long id, final String orderId, final String paymentKey, final Integer amount,
+                   final LocalDateTime approvedAt) {
+        this.id = id;
+        this.orderId = orderId;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.approvedAt = approvedAt;
+    }
+
+    public Payment(final String orderId, final String paymentKey, final Integer amount,
+                   final LocalDateTime approvedAt) {
+        this.orderId = orderId;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.approvedAt = approvedAt;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getOrderId() {
         return orderId;
     }
 
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
     public Integer getAmount() {
         return amount;
     }
 
-    public String getPaymentType() {
-        return paymentType;
+    public LocalDateTime getApprovedAt() {
+        return approvedAt;
     }
 }
