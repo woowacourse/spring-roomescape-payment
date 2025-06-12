@@ -13,25 +13,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
 import roomescape.payment.application.dto.PrePaymentValidRequest;
+import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(ReservationTestConfig.class)
 public class MemberReservationApiTest {
 
     @LocalServerPort
     private int port;
     private String token;
+
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {

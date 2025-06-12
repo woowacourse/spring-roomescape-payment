@@ -9,13 +9,13 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.payment.application.dto.PrePaymentValidRequest;
-import roomescape.reservation.ReservationTestConfig;
+import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
@@ -24,11 +24,13 @@ import roomescape.reservation.application.dto.ReservationResponse;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest
-@Import(ReservationTestConfig.class)
 class ReservationCommandServiceTest {
 
     @Autowired
     private ReservationCommandService reservationCommandService;
+
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
 
     @Test
     void 예약을_추가한다() {
