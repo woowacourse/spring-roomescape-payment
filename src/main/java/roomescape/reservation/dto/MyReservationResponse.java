@@ -12,7 +12,7 @@ public record MyReservationResponse(
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
         String paymentKey,
-        Long amount
+        long amount
 ) {
 
     public MyReservationResponse(final Reservation reservation) {

@@ -30,7 +30,7 @@ public class Payment {
     private Payment(
             final Long id,
             @NonNull final String paymentKey,
-            @NonNull final Long amount
+            final long amount
     ) {
         this.id = id;
         this.paymentKey = paymentKey;
