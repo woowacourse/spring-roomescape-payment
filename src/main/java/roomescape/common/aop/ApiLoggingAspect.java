@@ -20,6 +20,10 @@ public class ApiLoggingAspect {
     public void controller() {
     }
 
+    @Pointcut("execution(* roomescape.payment.service.client..*.*(..))")
+    public void externalApiClient() {
+    }
+
     @Around("controller()")
     public Object logApi(ProceedingJoinPoint joinPoint) throws Throwable {
 
@@ -54,6 +58,43 @@ public class ApiLoggingAspect {
             log.info("[응답 - 예외] {} {}, executionTime: {}ms, message: {}",
                 request.getMethod(),
                 request.getRequestURI(),
+                executionTime,
+                e.getMessage());
+
+            throw e;
+        }
+    }
+
+    @Around("externalApiClient()")
+    public Object logExternalApi(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+
+        log.info("[외부 API 요청] {}.{}, controller: {}, args: {}",
+            joinPoint.getSignature().getDeclaringType().getSimpleName(),
+            joinPoint.getSignature().getName(),
+            joinPoint.getSignature().getDeclaringTypeName(),
+            Arrays.toString(joinPoint.getArgs()));
+
+        try {
+            Object response = joinPoint.proceed();
+
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+
+            log.info("[외부 API 응답] {}.{}, response: {}, executionTime: {}",
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(),
+                response,
+                executionTime);
+
+            return response;
+        } catch (Throwable e) {
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+
+            log.error("[외부 API 예외] {} {}, executionTime: {}ms, message: {}",
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
+                joinPoint.getSignature().getName(),
                 executionTime,
                 e.getMessage());
 
