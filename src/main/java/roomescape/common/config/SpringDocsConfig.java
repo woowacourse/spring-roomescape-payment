@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
         name = "cookieAuth",
         type = SecuritySchemeType.APIKEY,
         in = SecuritySchemeIn.COOKIE,
-        paramName = "access_token",
+        paramName = "token",
         description = "쿠키에 담긴 JWT 기반 인증 및 인가"
 )
 @Configuration
