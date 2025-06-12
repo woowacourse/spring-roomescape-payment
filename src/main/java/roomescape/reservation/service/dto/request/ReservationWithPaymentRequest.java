@@ -20,6 +20,6 @@ public record ReservationWithPaymentRequest(
         @NotNull Long amount
 ) {
     public Payment toPendingPayment() {
-        return new Payment(paymentKey, amount, PaymentStatus.PENDING);
+        return new Payment(paymentKey, orderId, amount, PaymentStatus.PENDING);
     }
 }

@@ -23,6 +23,8 @@ public class Payment {
 
     private String paymentKey;
 
+    private String orderId;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "amount", nullable = false))
     private Amount amount;
@@ -32,15 +34,16 @@ public class Payment {
 
     protected Payment() {}
 
-    public Payment(Long id, String paymentKey, Long amount, PaymentStatus status) {
+    public Payment(Long id, String paymentKey, String orderId, Long amount, PaymentStatus status) {
         this.id = id;
+        this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = new Amount(amount);
         this.status = status;
     }
 
-    public Payment(String paymentKey, Long amount, PaymentStatus status) {
-        this(null, paymentKey, amount, status);
+    public Payment(String paymentKey, String orderId, Long amount, PaymentStatus status) {
+        this(null, paymentKey, orderId, amount, status);
     }
 
     public void complete() {
