@@ -7,7 +7,6 @@ import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentGateway;
-import roomescape.payment.domain.PaymentInfo;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.infra.TossPaymentGatewayClient;
 
@@ -32,9 +31,7 @@ public class PaymentService {
     ) {
         TossConfirmResponse response = tossPaymentGatewayClient.processPaymentConfirm(
             new TossConfirmRequest(request.paymentKey(), request.orderId(), request.amount()));
-        Payment payment = new Payment(
-            new PaymentInfo(response.paymentKey(), response.orderId(), response.easyPay().amount()),
-            PaymentGateway.TOSS_PAYMENTS);
+        Payment payment = new Payment(response.paymentKey(), response.orderId(), response.easyPay().amount(), PaymentGateway.TOSS_PAYMENTS);
         return paymentRepository.save(payment);
     }
 }

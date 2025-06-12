@@ -1,6 +1,5 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,8 +15,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Embedded
-    private PaymentInfo paymentInfo;
+    private String paymentKey;
+    private String orderId;
+    private Long amount;
 
     @Enumerated(value = EnumType.STRING)
     private PaymentGateway paymentGateway;
@@ -25,30 +25,50 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Long id, final PaymentInfo paymentInfo, final PaymentGateway paymentGateway) {
+    public Payment(final Long id, final String paymentKey, final String orderId,
+        final Long amount, final PaymentGateway paymentGateway) {
         this.id = id;
-        this.paymentInfo = paymentInfo;
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
         this.paymentGateway = paymentGateway;
     }
 
-    public Payment(final PaymentInfo paymentInfo, final PaymentGateway paymentGateway) {
-        this(null, paymentInfo, paymentGateway);
+    public Payment(
+        final String paymentKey,
+        final String orderId,
+        final Long amount,
+        final PaymentGateway paymentGateway
+    ) {
+        this(null, paymentKey, orderId, amount, paymentGateway);
     }
 
     public Long getId() {
         return id;
     }
 
-    public PaymentInfo getPaymentInfo() {
-        return paymentInfo;
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public PaymentGateway getPaymentGateway() {
+        return paymentGateway;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment payment = (Payment) o;
+        final Payment payment = (Payment) o;
         if (id == null || payment.id == null) {
             return false;
         }

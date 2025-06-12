@@ -29,8 +29,8 @@ public record MyReservation(
             reservation.getDate(),
             reservation.getStartAt(),
             reservation.getStatus().getTitle(),
-            reservation.getPayment() != null ? reservation.getPayment().getPaymentInfo().getPaymentKey() : null, // NOTE. 가독성이 떨어지는지 여쭤보기
-            reservation.getPayment() != null ? reservation.getPayment().getPaymentInfo().getAmount() : null
+            reservation.getPayment() != null ? reservation.getPayment().getPaymentKey() : null, // NOTE. 가독성이 떨어지는지 여쭤보기
+            reservation.getPayment() != null ? reservation.getPayment().getAmount() : null
         );
     }
 
