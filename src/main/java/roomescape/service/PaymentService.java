@@ -3,20 +3,20 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
+import roomescape.domain.repository.PaymentRepository;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.response.PaymentResponse;
 import roomescape.exception.PaymentNotFoundException;
-import roomescape.infrastructure.PaymentRepositoryAdaptor;
 import roomescape.infrastructure.payment.PaymentClient;
 
 @Service
 public class PaymentService {
     private final PaymentClient paymentClient;
-    private final PaymentRepositoryAdaptor paymentRepositoryAdaptor;
+    private final PaymentRepository paymentRepository;
 
-    public PaymentService(final PaymentClient paymentClient, final PaymentRepositoryAdaptor paymentRepositoryAdaptor) {
+    public PaymentService(final PaymentClient paymentClient, final PaymentRepository paymentRepository) {
         this.paymentClient = paymentClient;
-        this.paymentRepositoryAdaptor = paymentRepositoryAdaptor;
+        this.paymentRepository = paymentRepository;
     }
 
     public PaymentResponse approve(PaymentRequest paymentRequest) {
@@ -32,11 +32,11 @@ public class PaymentService {
     }
 
     public Payment save(Payment payment) {
-        return paymentRepositoryAdaptor.save(payment);
+        return paymentRepository.save(payment);
     }
 
     public Payment findPaymentByReservationId(Long reservationId) {
-        return paymentRepositoryAdaptor.findByReservationId(reservationId)
+        return paymentRepository.findByReservationId(reservationId)
                 .orElseThrow(PaymentNotFoundException::new);
     }
 }

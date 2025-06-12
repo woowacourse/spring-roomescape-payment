@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.repository.ReservationRepository;
+import roomescape.dto.ReservationWithPayment;
 import roomescape.dto.request.ReservationCondition;
 
 public class FakeReservationRepository implements ReservationRepository {
@@ -113,6 +115,18 @@ public class FakeReservationRepository implements ReservationRepository {
     public List<Reservation> findByMemberId(Long memberId) {
         return reservations.stream()
                 .filter(reservation -> reservation.getMember().getId().equals(memberId))
+                .toList();
+    }
+
+    @Override
+    public List<ReservationWithPayment> findAllWithPaymentByMemberId(final Long memberId) {
+        FakePaymentRepository fakePaymentRepository = new FakePaymentRepository();
+        return reservations.stream()
+                .filter(reservation -> reservation.getMember().getId().equals(memberId))
+                .map(reservation -> {
+                    Payment payment = fakePaymentRepository.findByReservationId(reservation.getId()).orElse(null);
+                    return new ReservationWithPayment(reservation, payment);
+                })
                 .toList();
     }
 }
