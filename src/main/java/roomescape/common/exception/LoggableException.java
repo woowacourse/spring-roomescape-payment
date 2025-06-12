@@ -8,7 +8,8 @@ public class LoggableException extends RuntimeException {
     private final ErrorCode errorCode;
     private final LogLevel logLevel;
 
-    public LoggableException(ErrorCode errorCode, LogLevel logLevel) {
+    public LoggableException(ErrorCode errorCode, LogLevel logLevel, String message) {
+        super(message);
         this.errorCode = errorCode;
         this.logLevel = logLevel;
     }

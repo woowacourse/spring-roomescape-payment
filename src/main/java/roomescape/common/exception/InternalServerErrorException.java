@@ -5,15 +5,7 @@ import roomescape.common.exception.vo.ErrorCode;
 
 public class InternalServerErrorException extends LoggableException {
 
-    private final String message;
-
     public InternalServerErrorException(String message) {
-        super(ErrorCode.SERVER_ERROR, LogLevel.ERROR);
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super(ErrorCode.SERVER_ERROR, LogLevel.ERROR, message);
     }
 }
