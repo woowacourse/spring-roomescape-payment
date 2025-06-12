@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import roomescape.member.domain.MemberId;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.domain.WaitingId;
-import roomescape.reservation.waiting.domain.WaitingWithRank;
+import roomescape.reservation.waiting.dto.response.WaitingWithRank;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.time.domain.ReservationTime;

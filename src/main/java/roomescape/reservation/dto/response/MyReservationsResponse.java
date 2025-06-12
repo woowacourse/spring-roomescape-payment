@@ -3,8 +3,7 @@ package roomescape.reservation.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.reservation.domain.ReservationWithPayment;
-import roomescape.reservation.waiting.domain.WaitingWithRank;
+import roomescape.reservation.waiting.dto.response.WaitingWithRank;
 
 public record MyReservationsResponse(
         Long id,
@@ -19,23 +18,23 @@ public record MyReservationsResponse(
 
     public static MyReservationsResponse from(final ReservationWithPayment reservationWithPayment) {
         return new MyReservationsResponse(
-                reservationWithPayment.getReservation().getId(),
-                reservationWithPayment.getReservation().themeName(),
-                reservationWithPayment.getReservation().getDate(),
-                reservationWithPayment.getReservation().startTime(),
-                reservationWithPayment.getReservation().statusDescription(),
-                reservationWithPayment.getPayment().getAmount(),
-                reservationWithPayment.getPayment().getPaymentKey()
+                reservationWithPayment.reservation().getId(),
+                reservationWithPayment.reservation().themeName(),
+                reservationWithPayment.reservation().getDate(),
+                reservationWithPayment.reservation().startTime(),
+                reservationWithPayment.reservation().statusDescription(),
+                reservationWithPayment.payment().getAmount(),
+                reservationWithPayment.payment().getPaymentKey()
         );
     }
 
     public static MyReservationsResponse from(final WaitingWithRank waitingWithRank) {
         return new MyReservationsResponse(
-                waitingWithRank.getId(),
-                waitingWithRank.themeName(),
-                waitingWithRank.getDate(),
-                waitingWithRank.startTime(),
-                String.valueOf(waitingWithRank.getRank()),
+                waitingWithRank.waiting().getId(),
+                waitingWithRank.waiting().themeName(),
+                waitingWithRank.waiting().getDate(),
+                waitingWithRank.waiting().startTime(),
+                String.valueOf(waitingWithRank.rank()),
                 null,
                 null
         );

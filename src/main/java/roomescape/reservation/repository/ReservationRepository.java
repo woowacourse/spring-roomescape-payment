@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import roomescape.member.domain.MemberId;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
-import roomescape.reservation.domain.ReservationWithPayment;
+import roomescape.reservation.dto.response.ReservationWithPayment;
 import roomescape.theme.domain.ThemeId;
 import roomescape.time.domain.ReservationTimeId;
 
