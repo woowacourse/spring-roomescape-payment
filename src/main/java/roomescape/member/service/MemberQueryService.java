@@ -1,6 +1,7 @@
 package roomescape.member.service;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import roomescape.member.repository.MemberRepository;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class MemberQueryService {
 
     private final PasswordEncoder passwordEncoder;

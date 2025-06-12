@@ -2,8 +2,10 @@ package roomescape.member.domain;
 
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.AccessDeniedException;
 
+@Slf4j
 public enum MemberRole {
     ADMIN(List.of("ADMIN")),
     MEMBER(List.of("MEMBER")),

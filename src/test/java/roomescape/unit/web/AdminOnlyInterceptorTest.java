@@ -39,7 +39,7 @@ class AdminOnlyInterceptorTest {
 
         assertThatThrownBy(() -> interceptor.preHandle(request, response, new Object()))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessageContaining("어드민이 아닙니다.");
+                .hasMessageContaining("관리자가 아닙니다.");
     }
 
     @Test

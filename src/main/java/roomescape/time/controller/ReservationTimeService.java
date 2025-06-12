@@ -10,42 +10,42 @@ import roomescape.time.controller.dto.CreateReservationTimeRequest;
 import roomescape.time.controller.dto.ReservationTimeResponse;
 import roomescape.time.domain.AvailableReservationTime;
 import roomescape.time.domain.ReservationTime;
-import roomescape.time.service.TimeCommandService;
-import roomescape.time.service.TimeQueryService;
+import roomescape.time.service.ReservationTimeCommandService;
+import roomescape.time.service.ReservationTimeQueryService;
 
 @Service
-public class TimeService {
-    private final TimeCommandService timeCommandService;
-    private final TimeQueryService timeQueryService;
+public class ReservationTimeService {
+    private final ReservationTimeCommandService reservationTimeCommandService;
+    private final ReservationTimeQueryService reservationTimeQueryService;
     private final ThemeQueryService themeQueryService;
 
-    public TimeService(
-            final TimeCommandService timeCommandService,
-            final TimeQueryService timeQueryService,
+    public ReservationTimeService(
+            final ReservationTimeCommandService reservationTimeCommandService,
+            final ReservationTimeQueryService reservationTimeQueryService,
             final ThemeQueryService themeQueryService
     ) {
-        this.timeCommandService = timeCommandService;
-        this.timeQueryService = timeQueryService;
+        this.reservationTimeCommandService = reservationTimeCommandService;
+        this.reservationTimeQueryService = reservationTimeQueryService;
         this.themeQueryService = themeQueryService;
     }
 
     public ReservationTimeResponse createReservationTime(final CreateReservationTimeRequest request) {
-        ReservationTime time = timeCommandService.createReservationTime(request.startAt());
+        ReservationTime time = reservationTimeCommandService.createReservationTime(request.startAt());
         return ReservationTimeResponse.from(time);
     }
 
     public List<ReservationTimeResponse> findAllReservationTimes() {
-        return ReservationTimeResponse.from(timeQueryService.findAll());
+        return ReservationTimeResponse.from(reservationTimeQueryService.findAll());
     }
 
     public void deleteReservationTimeById(final Long timeId) {
-        timeCommandService.deleteTimeById(timeId);
+        reservationTimeCommandService.deleteTimeById(timeId);
     }
 
     public List<AvailableReservationTimeResponse> findAvailableReservationTimes(
             final AvailableReservationTimeRequest request
     ) {
-        List<AvailableReservationTime> availableReservationTimes = timeQueryService.findAvailableReservationTimes(
+        List<AvailableReservationTime> availableReservationTimes = reservationTimeQueryService.findAvailableReservationTimes(
                 new ReservationDate(request.date()), themeQueryService.getById(request.themeId())
         );
         return AvailableReservationTimeResponse.from(availableReservationTimes);

@@ -18,6 +18,6 @@ public class ReservationDbFixture {
             final ReservationSchedule schedule,
             final Member member
     ) {
-        return reservationRepository.save(new Reservation(null, member, schedule));
+        return reservationRepository.save(new Reservation(member, schedule));
     }
 }

@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.BadRequestException;
 
 @Embeddable
+@Slf4j
 public record ThemeName(
         @Column(nullable = false)
         @Size(max = ThemeName.MAX_NAME_LENGTH)

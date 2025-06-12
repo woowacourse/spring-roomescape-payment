@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.BadRequestException;
 
 @Embeddable
+@Slf4j
 public record MemberName(
         @Column(nullable = false)
         @Size(max = MemberName.MAXIMUM_NAME_LENGTH)

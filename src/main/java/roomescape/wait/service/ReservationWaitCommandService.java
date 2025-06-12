@@ -1,5 +1,6 @@
 package roomescape.wait.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.AccessDeniedException;
@@ -15,6 +16,7 @@ import roomescape.wait.repository.ReservationWaitRepository;
 
 @Service
 @Transactional
+@Slf4j
 public class ReservationWaitCommandService {
     private final ReservationWaitRepository reservationWaitRepository;
     private final ReservationQueryService reservationQueryService;
@@ -57,7 +59,7 @@ public class ReservationWaitCommandService {
             Member member
     ) {
         if (member.getRole() != MemberRole.ADMIN && !wait.getMember().equals(member)) {
-            throw new AccessDeniedException("예약 대기는 어드민 또는 본인만 취소 가능합니다.");
+            throw new AccessDeniedException("예약 대기는 관리자 또는 본인만 취소 가능합니다.");
         }
         reservationWaitRepository.deleteById(wait.getId());
     }

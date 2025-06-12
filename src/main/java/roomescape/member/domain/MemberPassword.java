@@ -5,9 +5,11 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.global.exception.BadRequestException;
 
 @Embeddable
+@Slf4j
 public record MemberPassword(
         @Column(nullable = false)
         @Size(max = MemberPassword.MAXIMUM_PASSWORD_LENGTH)

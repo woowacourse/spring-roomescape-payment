@@ -2,6 +2,7 @@ package roomescape.time.service;
 
 
 import java.time.LocalTime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.BadRequestException;
@@ -10,11 +11,12 @@ import roomescape.time.domain.ReservationTime;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @Service
-public class TimeCommandService {
+@Slf4j
+public class ReservationTimeCommandService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationQueryService reservationQueryService;
 
-    public TimeCommandService(
+    public ReservationTimeCommandService(
             final ReservationTimeRepository reservationTimeRepository,
             final ReservationQueryService reservationQueryService
     ) {
@@ -33,7 +35,7 @@ public class TimeCommandService {
     @Transactional
     public void deleteTimeById(final Long timeId) {
         if (reservationQueryService.existsReservationInTime(timeId)) {
-            throw new BadRequestException("해당 시간에 이미 예약이 존재하여 삭제할 수 없습니다.");
+            throw new BadRequestException("해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(timeId);
     }

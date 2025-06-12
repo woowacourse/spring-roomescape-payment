@@ -1,5 +1,6 @@
 package roomescape.theme.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.BadRequestException;
@@ -11,6 +12,7 @@ import roomescape.theme.domain.ThemeThumbnail;
 import roomescape.theme.repository.ThemeRepository;
 
 @Service
+@Slf4j
 public class ThemeCommandService {
 
     private final ThemeRepository themeRepository;

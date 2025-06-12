@@ -21,16 +21,16 @@ class TossAuthTokenTest {
     }
 
     @Test
-    @DisplayName("Base64 UTF-8로 인코딩")
+    @DisplayName("secretKey에 콜론(:)을 추가한 후 Base64 UTF-8로 인코딩해서 출력")
     void 토큰은_인코딩된_상태로_조회된다() {
         // given
         TossAuthToken tossAuthToken = new TossAuthToken("hans");
 
         // when
-        String token = tossAuthToken.token();
+        String token = tossAuthToken.generateToken();
 
         // then
-        assertThat(token).containsPattern("aGFuczo=");
+        assertThat(token).containsPattern("basic aGFuczo=");
 
     }
 }

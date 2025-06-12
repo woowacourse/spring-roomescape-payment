@@ -17,13 +17,13 @@ import roomescape.wait.service.ReservationWaitCommandService;
 import roomescape.wait.service.ReservationWaitQueryService;
 
 @Service
-public class WaitService {
+public class ReservationWaitService {
     private final ReservationWaitCommandService reservationWaitCommandService;
     private final ReservationWaitQueryService reservationWaitQueryService;
     private final ScheduleQueryService scheduleQueryService;
     private final MemberQueryService memberQueryService;
 
-    public WaitService(
+    public ReservationWaitService(
             final ReservationWaitCommandService reservationWaitCommandService,
             final ReservationWaitQueryService reservationWaitQueryService,
             final ScheduleQueryService scheduleQueryService,

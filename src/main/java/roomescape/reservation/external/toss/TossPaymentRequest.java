@@ -1,15 +1,26 @@
 package roomescape.reservation.external.toss;
 
+import lombok.extern.slf4j.Slf4j;
+import roomescape.global.exception.BadRequestException;
+import roomescape.reservation.service.dto.PaymentRequest;
+
+@Slf4j
 public record TossPaymentRequest(
-        String paymentKey,
+        String orderId,
         Long amount,
-        String orderId
-) {
-    public static TossPaymentRequest from(TossPaymentResponse tossPaymentResponse) {
-        return new TossPaymentRequest(
-                tossPaymentResponse.paymentKey(),
-                tossPaymentResponse.totalAmount(),
-                tossPaymentResponse.orderId()
-        );
+        String paymentKey) implements PaymentRequest {
+
+    public TossPaymentRequest {
+        if (orderId == null || orderId.isBlank()) {
+            throw new BadRequestException("주문 ID가 null이거나 공백이어서는 안 됩니다.");
+        }
+
+        if (amount == null || amount <= 0) {
+            throw new BadRequestException("결제 금액은 null이거나 0 이하여서는 안 됩니다.");
+        }
+
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new BadRequestException("paymentKey가 null이거나 공백이어서는 안 됩니다.");
+        }
     }
 }
