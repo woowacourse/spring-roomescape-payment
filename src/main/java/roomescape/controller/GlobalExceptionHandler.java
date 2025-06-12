@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossPaymentClientException.class)
     public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentClientException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<ErrorResponse> handleRestClientException(RestClientException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
