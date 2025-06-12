@@ -43,8 +43,8 @@ public class ReservationService {
         private final PaymentRepository paymentRepository;
 
         public ReservationService(MemberRepository memberRepository, ReservationRepository reservationRepository,
-                                  ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                                  PaymentRepository paymentRepository) {
+                        ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
+                        PaymentRepository paymentRepository) {
                 this.memberRepository = memberRepository;
                 this.reservationRepository = reservationRepository;
                 this.reservationTimeRepository = reservationTimeRepository;
@@ -150,15 +150,14 @@ public class ReservationService {
                 List<Payment> payments = paymentRepository.findAllByReservations(reservations);
 
                 Map<Reservation, Payment> reservationsWithPayment = payments.stream()
-                        .collect(Collectors.toMap(Payment::getReservation, payment->payment));
+                                .collect(Collectors.toMap(Payment::getReservation, payment -> payment));
 
                 List<ReservationDetail> details = member.calculateReservationRanks(reservations).stream()
-                        .map(rank -> new ReservationDetail(
-                                rank.reservation(),
-                                reservationsWithPayment.get(rank.reservation()),
-                                rank.rank()
-                        ))
-                        .toList();
+                                .map(rank -> new ReservationDetail(
+                                                rank.reservation(),
+                                                reservationsWithPayment.get(rank.reservation()),
+                                                rank.rank()))
+                                .toList();
 
                 return details.stream()
                                 .map(MyReservationResponse::from)

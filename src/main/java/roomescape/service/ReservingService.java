@@ -10,7 +10,6 @@ import roomescape.entity.Reservation;
 import roomescape.global.ReservationStatus;
 
 @Service
-@Transactional
 public class ReservingService {
     private final ReservationService reservationService;
     private final PaymentService paymentService;

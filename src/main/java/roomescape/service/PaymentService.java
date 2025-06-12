@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
@@ -26,13 +28,13 @@ public class PaymentService {
     public PaymentService(
             PaymentRepository paymentRepository,
             @Qualifier("tossClient") RestClient restClient,
-            ObjectMapper objectMapper
-    ) {
+            ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest, Reservation reservation) {
         String authorizations = getAuthorizationToken();
 
