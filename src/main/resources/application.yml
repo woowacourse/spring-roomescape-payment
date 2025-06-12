@@ -38,3 +38,6 @@ pay:
 logging:
   level:
     root: info
+
+springdoc:
+  server-url: http://3.35.134.88:8080
