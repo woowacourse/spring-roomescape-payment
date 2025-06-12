@@ -12,7 +12,7 @@ import roomescape.exception.custom.reason.reservationtime.ReservationTimeNotFoun
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeUsedException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.reservation.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.ReservationTimeRequest;

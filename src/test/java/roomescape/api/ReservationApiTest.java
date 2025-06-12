@@ -24,7 +24,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.payment.PaymentManager;
 import roomescape.payment.dto.PaymentError;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
@@ -43,6 +48,7 @@ class ReservationApiTest {
 
     @MockitoBean
     private final PaymentManager paymentManager;
+
 
     public ReservationApiTest(
             @LocalServerPort final int port,
@@ -81,6 +87,7 @@ class ReservationApiTest {
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM completed_payment");
         jdbcTemplate.update("DELETE FROM reservation");
         jdbcTemplate.update("DELETE FROM reservation_time");
         jdbcTemplate.update("DELETE FROM theme");
@@ -277,7 +284,7 @@ class ReservationApiTest {
     @DisplayName("예약 삭제")
     class Delete {
 
-        @DisplayName("주어진 아이디에 해당하는 예약이 있다면 200 OK 응답")
+        @DisplayName("주어진 아이디에 해당하는 예약이 있지만, 결제가 취소되지 않았을 경우 삭제 실패 및 400 응답")
         @Test
         void remove1() {
             // given
@@ -291,7 +298,7 @@ class ReservationApiTest {
             RestAssured.given().port(port).log().all()
                     .when().delete("/reservations/1")
                     .then().log().all()
-                    .statusCode(204);
+                    .statusCode(400);
         }
 
         @DisplayName("주어진 아이디에 해당하는 예약이 없다면 404로 응답한다.")

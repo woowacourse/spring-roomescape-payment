@@ -189,7 +189,7 @@ function onReservationButtonClick(event, paymentWidget) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "히스타 집에서 살아남기 예약 1회",
-            amount: 1028300,
+            amount: 1,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);

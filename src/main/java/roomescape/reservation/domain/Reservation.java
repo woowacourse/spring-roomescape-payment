@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -53,6 +54,10 @@ public class Reservation {
     @Column(nullable = false)
     private ReservationStatus reservationStatus;
 
+    @OneToOne(mappedBy = "reservation")
+    @JoinColumn(nullable = false)
+    private CompletedPayment completedPayment;
+
     protected Reservation() {
         id = null;
     }
@@ -67,7 +72,7 @@ public class Reservation {
             ) {
         validatePastTime(date, reservationTime, currentDateTime);
 
-        return new Reservation(null, date, member, reservationTime, theme, reservationStatus);
+        return new Reservation(null, date, member, reservationTime, theme, reservationStatus, null);
     }
 
     private static void validatePastTime(final ReservationDate date, final ReservationTime reservationTime,

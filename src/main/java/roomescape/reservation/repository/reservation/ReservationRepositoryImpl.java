@@ -1,9 +1,12 @@
-package roomescape.reservation.repository;
+package roomescape.reservation.repository.reservation;
 
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.TransientObjectException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Repository;
+import roomescape.exception.custom.reason.reservation.ReservationNotDeletedException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
@@ -56,11 +59,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByAsc(final ReservationDate date,
-                                                                                         final ReservationTime reservationTime,
-                                                                                         final Theme theme,
-                                                                                         final ReservationStatus reservationStatus) {
-        return reservationJpaRepository.findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByIdAsc(date, reservationTime,
+    public List<Reservation> findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByAsc(
+            final ReservationDate date,
+            final ReservationTime reservationTime,
+            final Theme theme,
+            final ReservationStatus reservationStatus) {
+        return reservationJpaRepository.findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByIdAsc(date,
+                reservationTime,
                 theme,
                 reservationStatus);
     }
@@ -90,7 +95,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             final Theme theme,
             final ReservationStatus reservationStatus
     ) {
-        return reservationJpaRepository.existsByReservationTimeAndDateAndThemeAndReservationStatus(reservationTime, date,
+        return reservationJpaRepository.existsByReservationTimeAndDateAndThemeAndReservationStatus(reservationTime,
+                date,
                 theme, reservationStatus);
     }
 }

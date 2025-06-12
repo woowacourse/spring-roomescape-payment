@@ -11,18 +11,34 @@ public record MineReservationResponse(
         LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        String paymentKey,
+        Long amount
 ) {
 
-    public static MineReservationResponse from(final WaitingRankReservation waitingRankReservation){
+    public static MineReservationResponse from(WaitingRankReservation waitingRankReservation) {
+        if (waitingRankReservation.getReservation().getCompletedPayment() == null) {
+            return new MineReservationResponse(
+                    waitingRankReservation.getReservation().getId(),
+                    waitingRankReservation.getReservation().getTheme().getName(),
+                    waitingRankReservation.getReservation().getDate().date(),
+                    waitingRankReservation.getReservation().getReservationTime().getStartAt(),
+                    waitingRankReservation.getReservation().getReservationStatus().getMessage(),
+                    waitingRankReservation.getWaitingRank(),
+                    "정보 없음",
+                    0L
+            );
+        }
+
         return new MineReservationResponse(
                 waitingRankReservation.getReservation().getId(),
                 waitingRankReservation.getReservation().getTheme().getName(),
                 waitingRankReservation.getReservation().getDate().date(),
                 waitingRankReservation.getReservation().getReservationTime().getStartAt(),
                 waitingRankReservation.getReservation().getReservationStatus().getMessage(),
-                waitingRankReservation.getWaitingRank()
+                waitingRankReservation.getWaitingRank(),
+                waitingRankReservation.getReservation().getCompletedPayment().getPaymentKey(),
+                waitingRankReservation.getReservation().getCompletedPayment().getAmount()
         );
     }
-
 }

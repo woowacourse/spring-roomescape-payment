@@ -36,6 +36,7 @@ import roomescape.exception.custom.reason.reservation.ReservationPastTimeExcepti
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepositoryImpl;
+import roomescape.reservation.domain.CompletedPayment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationStatus;
@@ -45,8 +46,9 @@ import roomescape.reservation.dto.MineReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ReservationRepositoryImpl;
+import roomescape.reservation.repository.payment.CompletedPaymentRepositoryImpl;
+import roomescape.reservation.repository.reservation.ReservationRepository;
+import roomescape.reservation.repository.reservation.ReservationRepositoryImpl;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.reservationtime.repository.ReservationTimeRepositoryImpl;
@@ -61,7 +63,8 @@ import roomescape.theme.repository.ThemeRepositoryImpl;
         ReservationTimeRepositoryImpl.class,
         ReservationRepositoryImpl.class,
         ReservationService.class,
-        PaymentManager.class
+        PaymentManager.class,
+        CompletedPaymentRepositoryImpl.class
 })
 @Transactional(propagation = Propagation.SUPPORTS)
 public class ReservationServiceTest {
@@ -70,11 +73,13 @@ public class ReservationServiceTest {
     private final ReservationRepository reservationRepository;
     @MockitoBean
     private final PaymentManager paymentManager;
+
     private final ReservationService reservationService;
 
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepositoryImpl themeRepositoryFacade;
     private final MemberRepositoryImpl memberRepositoryFacade;
+    private final CompletedPaymentRepositoryImpl completedPaymentRepositoryFacade;
 
     @Autowired
     public ReservationServiceTest(
@@ -84,7 +89,8 @@ public class ReservationServiceTest {
 
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepositoryImpl themeRepositoryFacade,
-            final MemberRepositoryImpl memberRepositoryFacade
+            final MemberRepositoryImpl memberRepositoryFacade,
+            final CompletedPaymentRepositoryImpl completedPaymentRepositoryFacade
     ) {
         this.reservationRepository = reservationRepository;
         this.paymentManager = paymentManager;
@@ -93,7 +99,7 @@ public class ReservationServiceTest {
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepositoryFacade = themeRepositoryFacade;
         this.memberRepositoryFacade = memberRepositoryFacade;
-
+        this.completedPaymentRepositoryFacade = completedPaymentRepositoryFacade;
     }
 
     @Nested
@@ -657,7 +663,7 @@ public class ReservationServiceTest {
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
             final MineReservationResponse expected = new MineReservationResponse(
                     1L, "테마", LocalDate.of(2025, 12, 30),
-                    LocalTime.of(12, 40), "예약", 0L
+                    LocalTime.of(12, 40), "예약", 0L, "paymentKey", 1000L
             );
 
             final Member member = new Member(loginMember.email(), "pass", "boogie", MemberRole.MEMBER);
@@ -668,11 +674,13 @@ public class ReservationServiceTest {
                     currentDateTime.toLocalDate());
             final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
                     ReservationStatus.PENDING, currentDateTime);
+            final CompletedPayment completedPayment = CompletedPayment.of(reservation, new PaymentRequest("", "paymentKey", 1000L, ""));
 
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
+            completedPaymentRepositoryFacade.save(completedPayment);
 
             // when
             final List<MineReservationResponse> actual = reservationService.readAllMine(loginMember);

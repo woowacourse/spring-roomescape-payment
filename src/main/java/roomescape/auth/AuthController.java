@@ -1,5 +1,6 @@
 package roomescape.auth;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.server.Cookie.SameSite;
@@ -17,6 +18,7 @@ import roomescape.config.AuthenticationPrincipal;
 
 @RestController
 @AllArgsConstructor
+@Tag(name = "인증 관련 API", description = "로그인 및 인증 상태 확인을 위한 API입니다.")
 public class AuthController {
 
     private static final String TOKEN_NAME = "token";
@@ -30,7 +32,7 @@ public class AuthController {
         final String jwt = authService.generateToken(request);
         final ResponseCookie cookie = ResponseCookie
                 .from(TOKEN_NAME, jwt)
-                .secure(true)
+//                .secure(true) - 현재 배포 환경 (HTTP) 문제로 임시 주석
                 .httpOnly(true)
                 .sameSite(SameSite.LAX.attributeValue())
                 .build();
