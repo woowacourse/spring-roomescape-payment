@@ -1,7 +1,6 @@
 spring:
   profiles:
     active: local
-
   h2:
     console:
       enabled: true  # H2 콘솔 활성화
@@ -9,6 +8,11 @@ spring:
 
   datasource:
     url: jdbc:h2:mem:database  # 인메모리 H2 DB 사용
+  jpa:
+    show-sql: on
+    properties:
+      hibernate:
+        format_sql: true
 
 jwt:
   secret: iwantcoffee-americano+ice-americano-is-best-i.love_it+yaho
