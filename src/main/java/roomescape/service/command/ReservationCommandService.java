@@ -13,6 +13,8 @@ import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
+import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.common.NotFoundException;
@@ -44,15 +46,15 @@ public class ReservationCommandService {
         this.waitingTicketRepository = waitingTicketRepository;
     }
 
-    public ReservationResponseDto bookReservation(ReservationCreateDto request) {
+    public ReservationResponseDto bookReservation(MemberReservationCreateRequestDto request, LoginInfo loginInfo) {
         ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NotFoundException("예약 시간", request.timeId()));
 
         validateDuplicate(request.date(), request.timeId(), request.themeId());
         Theme theme = themeRepository.findById(request.themeId())
                 .orElseThrow(() -> new NotFoundException("테마", request.themeId()));
-        Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new NotFoundException("유저", request.memberId()));
+        Member member = memberRepository.findById(loginInfo.id())
+                .orElseThrow(() -> new NotFoundException("유저", loginInfo.id()));
         Reservation requestReservation = new Reservation(member, request.date(), reservationTime, theme, ReservationStatus.RESERVED);
         requestReservation.validateReservableTime(LocalDateTime.now());
 

@@ -125,6 +125,6 @@ public class ReservationControllerTest {
                         .cookie(cookie))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        verify(paymentClient, atLeastOnce()).confirmPayment(requestDto.extractTossPaymentDto());
+        verify(paymentClient, atLeastOnce()).confirmPayment(requestDto.toTossPaymentDto());
     }
 }

@@ -8,11 +8,9 @@ public record MemberReservationCreateRequestDto
          Long themeId,
          Long timeId,
          String paymentKey,
-         String orderId,
-         Long amount
+         String orderId
 ) {
-    public TossPaymentConfirmRequestDto extractTossPaymentDto() {
-        return new TossPaymentConfirmRequestDto(paymentKey, orderId, amount);
+    public TossPaymentRequestDto toTossPaymentDto() {
+        return new TossPaymentRequestDto(paymentKey, orderId);
     }
-
 }

@@ -13,7 +13,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.http.MediaType;
 import roomescape.config.RestClientConfiguration;
-import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
+import roomescape.dto.reservation.TossPaymentRequestDto;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 import roomescape.exception.common.BadRequestException;
@@ -62,7 +62,7 @@ public class PaymentClientTest {
 
 
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
+                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
                         "paymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmServerException.class);
@@ -87,7 +87,7 @@ public class PaymentClientTest {
 
 
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
+                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
                         "wrongPaymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmClientException.class);
@@ -97,7 +97,7 @@ public class PaymentClientTest {
     @Test
     void invalidPaymentAmountExceptionTest() {
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
+                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
                         "paymentKey", "RESERVATIONthisisorderid", 1500L
                 ))
         ).isInstanceOf(BadRequestException.class);

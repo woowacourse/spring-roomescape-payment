@@ -15,7 +15,12 @@ public enum OrderItem {
         this.price = price;
     }
 
-    public static OrderItem findByOrderIdPrefix(String orderId) {
+    public static Long calculatePaymentAmount(String orderId, Long orderQuantity) {
+        OrderItem orderItem = findByOrderIdPrefix(orderId);
+        return orderItem.getPrice() * orderQuantity;
+    }
+
+    private static OrderItem findByOrderIdPrefix(String orderId) {
         return Arrays.stream(OrderItem.values())
                 .filter(item -> orderId.startsWith(item.name))
                 .findFirst()
@@ -24,5 +29,9 @@ public enum OrderItem {
 
     public boolean isSameAmount(Long orderAmount, Long orderQuantity) {
         return orderAmount.equals(price * orderQuantity);
+    }
+
+    public Long getPrice() {
+        return price;
     }
 }
