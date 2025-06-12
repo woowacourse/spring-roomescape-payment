@@ -2,6 +2,8 @@ package roomescape.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,6 +16,7 @@ import roomescape.member.domain.Role;
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminInterceptor.class);
     private final JwtTokenHandler jwtTokenHandler;
     private final AuthTokenCookieProvider authTokenCookieProvider;
 

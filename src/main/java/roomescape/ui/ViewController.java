@@ -21,25 +21,25 @@ public class ViewController {
     @RequiredAdmin
     @GetMapping("/admin/reservation")
     public String adminReservationDashboard() {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @RequiredAdmin
     @GetMapping("/admin/time")
     public String adminReservationTimeDashboard() {
-        return "/admin/time";
+        return "admin/time";
     }
 
     @RequiredAdmin
     @GetMapping("/admin/theme")
     public String adminReservationThemeDashboard() {
-        return "/admin/theme";
+        return "admin/theme";
     }
 
     @RequiredAdmin
     @GetMapping("/admin/waiting")
     public String adminWaitingDashboard() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 
     @GetMapping("/reservation")

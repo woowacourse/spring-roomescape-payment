@@ -1,3 +1,16 @@
+insert into payment(payment_key,amount)
+values('testLemonKey123',1000);
+insert into payment(payment_key,amount)
+values('testLemonKey124',5000);
+insert into payment(payment_key,amount)
+values('testLemonKey125',10000);
+insert into payment(payment_key,amount)
+values('testLemonKey126',1000);
+insert into payment(payment_key,amount)
+values('testLemonKey127',5000);
+insert into payment(payment_key,amount)
+values('testLemonKey128',10000);
+
 insert into reservation_time (start_at)
 values ('12:00');
 insert into reservation_time (start_at)
@@ -18,36 +31,28 @@ insert into member (name, email, password, role)
 values ('밍곰', 'minggom@woowa.com', '12341234', 'ADMIN');
 
 -- 포스티의 예약 (과거)
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 1, 3, 1);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 2, 3, 1);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 3, 3, 1);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, -1, CURRENT_DATE), 1, 3, 1, 1);
+
 
 -- 포스티의 예약 (진행중)
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 1, 3, 1);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 2, 3, 1);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 3, 3, 1);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, 1, CURRENT_DATE), 1, 3, 1, 2);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, 1, CURRENT_DATE), 2, 3, 1, 3);
+
 
 -- 밍곰의 예약 (과거)
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 1, 1, 2);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 2, 1, 2);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, -1, CURRENT_DATE), 1, 2, 2);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, -1, CURRENT_DATE), 2, 1, 2, 4);
+
 
 -- 밍곰의 예약 (진행중)
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 1, 1, 2);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 2, 1, 2);
-insert into reservation (date, time_id, theme_id, member_id)
-values (DATEADD(day, 1, CURRENT_DATE), 1, 2, 2);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, 1, CURRENT_DATE), 1, 1, 2, 5);
+insert into reservation (date, time_id, theme_id, member_id, payment_id)
+values (DATEADD(day, 1, CURRENT_DATE), 2, 1, 2, 6);
+
 
 -- 포스티의 대기 예약
 insert into waiting (date, time_id, theme_id, member_id, created_at)

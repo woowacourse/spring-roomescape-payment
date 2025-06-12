@@ -10,8 +10,8 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.infraStructure.PaymentClientSelector;
 import roomescape.payment.infraStructure.PaymentGatewayClient;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
-import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.response.ConfirmPaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -50,7 +50,7 @@ public class CreateReservationService {
         this.paymentClientSelector = paymentClientSelector;
     }
 
-    public ReservationResponse create(final ReservationCreateRequest request) {
+    public Reservation create(final ReservationCreateRequest request) {
         if (isAlreadyBooked(request)) {
             throw new DuplicatedException("중복되는 예약이 존재합니다.");
         }
@@ -58,9 +58,7 @@ public class CreateReservationService {
         Reservation reservation = createReservation(request);
         validateReservationDateTime(reservation);
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return ReservationResponse.from(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private boolean isAlreadyBooked(final ReservationCreateRequest request) {
@@ -105,12 +103,14 @@ public class CreateReservationService {
                 request.themeId(),
                 loginMember
         );
-        ReservationResponse reservationResponse = create(reservationCreateRequest);
+        Reservation reservation = create(reservationCreateRequest);
         PaymentGatewayClient paymentGatewayClient = paymentClientSelector.getPaymentGatewayBySelector(request.pgType());
+
         ConfirmPaymentResponse paymentResponse = paymentGatewayClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
         Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
-        paymentRepository.save(payment);
+        Payment createdPayment = paymentRepository.save(payment);
+        reservation.addPayment(createdPayment);
 
-        return reservationResponse;
+        return ReservationResponse.from(reservation);
     }
 }

@@ -4,6 +4,20 @@ spring:
 
 ---
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+logging:
+  level:
+    root: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
 spring:
   config:
     activate:
@@ -15,10 +29,10 @@ spring:
   datasource:
     url: jdbc:h2:mem:database
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
@@ -34,6 +48,7 @@ security:
     token:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
+
 
 payment:
   toss:

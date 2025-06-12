@@ -1,15 +1,8 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 import roomescape.waiting.domain.ReservationInformation;
 import roomescape.waiting.domain.Waiting;
@@ -33,6 +26,9 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Member member;
+
+    @OneToOne
+    private Payment payment;
 
     protected Reservation() {
     }
@@ -67,6 +63,10 @@ public class Reservation {
         );
     }
 
+    public void addPayment(Payment payment) {
+        this.payment = payment;
+    }
+
     public boolean isBefore(LocalDateTime compare) {
         return reservationInformation.isBefore(compare);
     }
@@ -89,5 +89,9 @@ public class Reservation {
 
     public Theme getTheme() {
         return reservationInformation.getTheme();
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }

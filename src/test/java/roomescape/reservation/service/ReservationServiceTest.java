@@ -8,12 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.infraStructure.dto.response.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.dto.response.PaymentFailure;
+import roomescape.payment.infraStructure.toss.TossPaymentClient;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
@@ -27,9 +33,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -46,6 +52,11 @@ class ReservationServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
 
     @DisplayName("모든 예약 정보를 가져온다")
     @Test
@@ -59,7 +70,16 @@ class ReservationServiceTest {
         Member savedMember = memberRepository.save(member);
 
         LocalDate date = LocalDate.of(2024, 4, 29);
-        reservationRepository.save(new Reservation(savedMember, date, savedTime, savedTheme));
+
+        Reservation reservation = new Reservation(savedMember, date, savedTime, savedTheme);
+        Reservation createdReservation = reservationRepository.save(reservation);
+
+        ConfirmPaymentResponse fakeResponse = new ConfirmPaymentResponse(5000,"testkey",new PaymentFailure(null,"제로"));
+        given(tossPaymentClient.postConfirmPayment(any())).willReturn(fakeResponse);
+
+        Payment payment = new Payment(fakeResponse.paymentKey(), fakeResponse.totalAmount());
+        Payment createdPayment = paymentRepository.save(payment);
+        reservation.addPayment(createdPayment);
 
         // when
         List<ReservationResponse> response = reservationService.getAll();

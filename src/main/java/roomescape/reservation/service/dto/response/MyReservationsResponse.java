@@ -1,6 +1,7 @@
 package roomescape.reservation.service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.waiting.domain.Waiting;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@Schema(name = "MyReservationsResponse(나의 예약 목록 조회 응답 DTO)")
 public record MyReservationsResponse(
         Long id,
         String theme,
@@ -17,7 +19,9 @@ public record MyReservationsResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        String paymentKey,
+        Integer amount
 ) {
 
     public static MyReservationsResponse from(Reservation reservation) {
@@ -28,7 +32,9 @@ public record MyReservationsResponse(
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 reservationStatus.getDescription(),
-                null
+                null,
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
         );
     }
 
@@ -47,7 +53,9 @@ public record MyReservationsResponse(
                 waiting.getDate(),
                 waiting.getTime().getStartAt(),
                 ReservationStatus.WAITING.getDescription(),
-                waitingInfoDataResponse.rank().value()
+                waitingInfoDataResponse.rank().value(),
+                null,
+                null
         );
     }
 }

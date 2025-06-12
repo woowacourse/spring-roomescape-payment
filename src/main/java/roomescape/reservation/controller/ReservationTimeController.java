@@ -1,6 +1,10 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +22,10 @@ import java.util.List;
 
 @RequestMapping("/times")
 @RestController
+@Tag(name = "예약 시간 컨트롤러", description = "예약 시간에 관한 API 모음")
 public class ReservationTimeController {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservationTimeController.class);
 
     private final ReservationTimeService reservationTimeService;
 
@@ -27,6 +34,7 @@ public class ReservationTimeController {
     }
 
     @GetMapping
+    @Operation(summary = "예약 시간 목록 조회", description = "모든 예약 시간 목록을 가져옵니다.")
     public ResponseEntity<List<ReservationTimeResponse>> readAllReservationTimes() {
         List<ReservationTimeResponse> responses = reservationTimeService.getAll();
 
@@ -34,16 +42,22 @@ public class ReservationTimeController {
     }
 
     @PostMapping
+    @Operation(summary = "예약 시간 생성", description = "입력받은 예약 시간을 생성합니다.")
     public ResponseEntity<ReservationTimeResponse> create(@Valid @RequestBody final ReservationTimeRequest request) {
+        log.info("[POST / ReservationTimeCreate.Request] startAt={}", request.startAt());
         ReservationTimeResponse response = reservationTimeService.create(request);
+        log.info("[POST / ReservationTimeCreate.Response] [SUCCESS] id={}, startAt={}", response.id(), response.startAt());
 
         return ResponseEntity.created(URI.create("/times/" + response.id()))
                 .body(response);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 시간 삭제", description = "선택한 예약 시간을 삭제합니다.")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        log.info("[DELETE / ReservationTimeDelete.Request] id={}", id);
         reservationTimeService.delete(id);
+        log.info("[DELETE / ReservationTimeDelete] [SUCCESS]");
 
         return ResponseEntity.noContent().build();
     }

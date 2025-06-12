@@ -15,6 +15,7 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.config.ClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;
@@ -60,8 +61,8 @@ class CreateReservationServiceTest {
         ReservationCreateRequest request = new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
 
         // when
-        ReservationResponse result = reservationService.create(request);
-
+        Reservation beforePaymentReservation = reservationService.create(request);
+        ReservationResponse result = ReservationResponse.fromWithoutPayment(beforePaymentReservation);
         // then
         assertSoftly(softly -> {
             softly.assertThat(result.member().name()).isEqualTo("포스티");
