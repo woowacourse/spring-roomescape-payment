@@ -96,13 +96,13 @@ public class ReservationService {
                 .toList();
     }
 
-    private ReservationDetail getReservationDetail(final ReservationWithOrder waiting) {
-        if (waiting.isWaiting()) {
-            return new ReservationDetail(waiting, null, null);
+    private ReservationDetail getReservationDetail(final ReservationWithOrder waitingInfo) {
+        if (waitingInfo.isWaiting()) {
+            return ReservationDetail.ofWaiting(waitingInfo);
         }
 
-        var payment = paymentRepository.getById(waiting.reservation().paymentId().get());
-        return new ReservationDetail(waiting, payment.paymentKey(), payment.totalAmount());
+        var payment = paymentRepository.getById(waitingInfo.reservation().paymentId().get());
+        return ReservationDetail.ofReserved(waitingInfo, payment);
     }
 
     private Reservation reserve(final long userId, final RoomescapeSchedule schedule, final ReservationStatus status) {

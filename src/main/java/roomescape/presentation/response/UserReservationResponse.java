@@ -17,13 +17,13 @@ public record UserReservationResponse(
 ) {
 
     public static UserReservationResponse from(final ReservationDetail detail) {
-        var reservation = detail.waiting().reservation();
+        var reservation = detail.waitingInfo().reservation();
         return new UserReservationResponse(
             reservation.id(),
             reservation.date(),
             TimeSlotResponse.from(reservation.timeSlot()),
             ThemeResponse.from(reservation.theme()),
-            writeDescription(detail.waiting()),
+            writeDescription(detail.waitingInfo()),
             writePaymentKey(detail),
             detail.amount()
         );
