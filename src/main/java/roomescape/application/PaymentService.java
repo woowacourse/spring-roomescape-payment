@@ -38,7 +38,6 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    @Transactional
     public Payment pay(final String paymentKey, final String orderId, final long amount) {
         var request = new PaymentRequest(paymentKey, orderId, amount);
 
