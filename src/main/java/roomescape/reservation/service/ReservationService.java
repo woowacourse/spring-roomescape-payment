@@ -79,6 +79,53 @@ public class ReservationService {
         return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, loginMember, payment));
     }
 
+    public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
+        log.info("[(관리자) 예약 추가 요청] date: {}, timeId: {}, themeId: {}, memberId: {}", request.date(), request.timeId(),
+                request.themeId(), request.memberId());
+
+        ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
+        Theme theme = themeRepository.getById(request.themeId());
+        Member member = memberRepository.getById(request.memberId());
+        if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
+            log.warn("[예약 검증 실패] 이미 예약된 시간대 - date: {}, time: {}, theme: {}",
+                    request.date(), reservationTime.getStartAt(), theme.getName());
+            throw new ReservationException("해당 시간은 이미 예약되어있습니다.");
+        }
+        Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
+                LocalDateTime.now(clock), null);
+        Reservation newReservation = reservationRepository.save(reservation);
+        log.info("[(관리자) 예약 성공] reservationId: {}", newReservation.getId());
+        return new ReservationResponse(newReservation);
+    }
+
+    public void deleteReservation(final LoginMember loginMember, final Long reservationId) {
+        log.info("[예약 삭제 요청] reservationId: {}", reservationId);
+
+        Reservation reservation = reservationRepository.getById(reservationId);
+        if (loginMember.isNotAdmin()) {
+            validateOwner(reservation, loginMember);
+        }
+
+        Long deleteRank = reservation.getReservationStatus().getRank();
+        if (reservation.isBooked()) {
+            deleteRank = 0L;
+        }
+        List<ReservationStatus> reservationStatuses = reservationRepository.findAllWaiting(reservation.getDate(),
+                reservation.getTime(),
+                reservation.getTheme());
+        reduceWaitingRanks(deleteRank, reservationStatuses);
+        reservationRepository.deleteById(reservationId);
+        log.info("[예약 삭제 성공] reservationId: {}", reservation.getId());
+    }
+
+    @Performance
+    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
+        Member member = getMemberById(loginMember.getId());
+        return reservationRepository.findAllByMember(member).stream()
+                .map(MyReservationResponse::new)
+                .toList();
+    }
+
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
                                            Theme theme, LoginMember loginMember, Payment payment) {
         Member member = getMemberById(loginMember.getId());
@@ -107,41 +154,6 @@ public class ReservationService {
         return newReservation;
     }
 
-    public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
-        log.info("[(관리자) 예약 추가 요청] date: {}, timeId: {}, themeId: {}, memberId: {}", request.date(), request.timeId(),
-                request.themeId(), request.memberId());
-
-        ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
-        Theme theme = themeRepository.getById(request.themeId());
-        Member member = memberRepository.getById(request.memberId());
-        if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
-            log.warn("[예약 검증 실패] 이미 예약된 시간대 - date: {}, time: {}, theme: {}",
-                    request.date(), reservationTime.getStartAt(), theme.getName());
-            throw new ReservationException("해당 시간은 이미 예약되어있습니다.");
-        }
-        Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
-                LocalDateTime.now(clock), null);
-        Reservation newReservation = reservationRepository.save(reservation);
-        log.info("[(관리자) 예약 성공] reservationId: {}", newReservation.getId());
-        return new ReservationResponse(newReservation);
-    }
-
-    public void deleteReservation(final Long id) {
-        log.info("[예약 삭제 요청] reservationId: {}", id);
-
-        Reservation reservation = reservationRepository.getById(id);
-        Long deleteRank = reservation.getReservationStatus().getRank();
-        if (reservation.isBooked()) {
-            deleteRank = 0L;
-        }
-        List<ReservationStatus> reservationStatuses = reservationRepository.findAllWaiting(reservation.getDate(),
-                reservation.getTime(),
-                reservation.getTheme());
-        reduceWaitingRanks(deleteRank, reservationStatuses);
-        reservationRepository.deleteById(id);
-        log.info("[예약 삭제 성공] reservationId: {}", reservation.getId());
-    }
-
     private void reduceWaitingRanks(final Long deleteRank, final List<ReservationStatus> reservationStatuses) {
         reservationStatuses.stream()
                 .filter(waiting -> waiting.getRank() != null)
@@ -149,19 +161,17 @@ public class ReservationService {
                 .forEach(ReservationStatus::reduceRank);
     }
 
-    @Performance
-    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        Member member = getMemberById(loginMember.getId());
-        return reservationRepository.findAllByMember(member).stream()
-                .map(MyReservationResponse::new)
-                .toList();
-    }
-
-    public Member getMemberById(final Long memberId) {
+    private Member getMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> {
                     log.warn("[회원 조회 실패] 존재하지 않는 회원 ID: {}", memberId);
                     return new MemberNotFoundException(INTERNAL_SERVER_ERROR.getMessage());
                 });
+    }
+
+    private void validateOwner(Reservation reservation, LoginMember loginMember) {
+        if (!reservation.getMember().getId().equals(loginMember.getId())) {
+            throw new IllegalArgumentException("다른 사용자의 예약은 삭제할 수 없습니다.");
+        }
     }
 }

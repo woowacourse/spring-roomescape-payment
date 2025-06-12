@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.auth.application.LoginMember;
+import roomescape.auth.config.AuthenticationPrincipal;
 import roomescape.reservation.dto.AdminReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -31,8 +33,10 @@ public class AdminReservationController {
 
     @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelReservation(@PathVariable final Long reservationId) {
-        reservationService.deleteReservation(reservationId);
+    public void cancelReservation(
+            @AuthenticationPrincipal final LoginMember loginMember,
+            @PathVariable final Long reservationId) {
+        reservationService.deleteReservation(loginMember, reservationId);
     }
 }
 
