@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import roomescape.common.exception.PaymentException;
 
+@Slf4j
 public class TossPaymentErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -24,11 +26,14 @@ public class TossPaymentErrorHandler extends DefaultResponseErrorHandler {
 
                 boolean exists = FilteredPaymentErrorCode.exists(tossPaymentError.code());
                 if (exists) {
+                    log.atWarn().log("토스 요청 중 FilteredPaymentErrorCode에 해당하는 에러 발생");
                     throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", INTERNAL_SERVER_ERROR.name());
                 }
+                log.atWarn().log("토스 요청 중 FilteredPaymentErrorCode에 해당하지 않는 에러 발생");
                 throw new PaymentException(response.getStatusCode(), tossPaymentError.message(), tossPaymentError.code());
             }
         } catch (IOException e) {
+            log.atError().setCause(e).log("토스 요청 예외 처리중 에러 발생");
             throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", e);
         }
     }

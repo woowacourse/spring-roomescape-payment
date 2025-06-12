@@ -40,4 +40,4 @@ logging:
     root: info
 
 springdoc:
-  server-url: http://3.35.134.88:8080
+  server-url: http://13.124.20.46:8080
