@@ -136,10 +136,10 @@ public class AuthApiTest {
     void interceptor1() {
         RestAssured.given().log().all().port(port)
                 .when().get("/admin/reservation")
-                .then().log().all().statusCode(400);
+                .then().log().all().statusCode(401);
     }
 
-    @DisplayName("쿠키를 사용하는 api에 대해 token 키를 가진 쿠키가 존재하지 않는다면, 400을 응답한다.")
+    @DisplayName("쿠키를 사용하는 api에 대해 token 키를 가진 쿠키가 존재하지 않는다면, 401을 응답한다.")
     @Test
     void interceptor2() {
         // given
@@ -149,7 +149,7 @@ public class AuthApiTest {
         RestAssured.given().log().all().port(port)
                 .cookie(notToken)
                 .when().get("/admin/reservation")
-                .then().log().all().statusCode(400);
+                .then().log().all().statusCode(401);
     }
 
 

@@ -3,6 +3,8 @@ package roomescape.auth;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -10,9 +12,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.exception.custom.reason.auth.AuthNotExistsCookieException;
 import roomescape.exception.custom.reason.auth.AuthNotValidTokenException;
 import roomescape.member.MemberRole;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -33,7 +32,7 @@ public class AuthorizationAdminInterceptor implements HandlerInterceptor {
 
         final TokenBody tokenBody = jwtProvider.extractBody(token);
         if (tokenBody == null || !Objects.equals(tokenBody.role(), MemberRole.ADMIN)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setStatus(HttpStatus.FORBIDDEN.value());
             return false;
         }
 

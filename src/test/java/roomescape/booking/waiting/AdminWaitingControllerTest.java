@@ -1,8 +1,24 @@
 package roomescape.booking.waiting;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.Cookie;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +34,6 @@ import roomescape.member.dto.MemberResponse;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.schedule.dto.ScheduleResponse;
 import roomescape.theme.dto.ThemeResponse;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminWaitingController.class)
 class AdminWaitingControllerTest {
@@ -116,7 +115,7 @@ class AdminWaitingControllerTest {
     }
 
     @Test
-    @DisplayName("일반 회원은 모든 대기를 조회할 수 없고, 401을 응답한다")
+    @DisplayName("일반 회원은 모든 대기를 조회할 수 없고, 403을 응답한다")
     void readAllUnauthorized() throws Exception {
         // given
         Map<String, Object> memberClaims = new HashMap<>();
@@ -130,7 +129,7 @@ class AdminWaitingControllerTest {
         // when & then
         mockMvc.perform(get("/admin/waitings")
                         .cookie(new Cookie("token", "abc")))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -154,7 +153,7 @@ class AdminWaitingControllerTest {
     }
 
     @Test
-    @DisplayName("일반 회원은 관리자 권한으로 대기를 삭제할 수 없고, 401을 응답한다")
+    @DisplayName("일반 회원은 관리자 권한으로 대기를 삭제할 수 없고, 403을 응답한다")
     void deleteByIdUnauthorized() throws Exception {
         // given
         Map<String, Object> memberClaims = new HashMap<>();
@@ -168,6 +167,6 @@ class AdminWaitingControllerTest {
         // when & then
         mockMvc.perform(delete("/admin/waitings/1")
                         .cookie(new Cookie("token", "abc")))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 }

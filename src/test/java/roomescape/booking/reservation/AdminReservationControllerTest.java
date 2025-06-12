@@ -1,9 +1,19 @@
 package roomescape.booking.reservation;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.Cookie;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +28,6 @@ import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.member.MemberRole;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminReservationController.class)
 class AdminReservationControllerTest {
@@ -92,7 +91,7 @@ class AdminReservationControllerTest {
     }
 
     @Test
-    @DisplayName("일반 회원은 특정 회원의 예약을 생성할 수 없고, 401을 응답한다.")
+    @DisplayName("일반 회원은 특정 회원의 예약을 생성할 수 없고, 403을 응답한다.")
     void createReservation2() throws Exception {
         // given
         Map<String, Object> memberClaims = new HashMap<>();
@@ -110,7 +109,7 @@ class AdminReservationControllerTest {
                         .cookie(new Cookie("token", "abc"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -125,7 +124,8 @@ class AdminReservationControllerTest {
         given(jwtProvider.extractBody(any()))
                 .willReturn(new TokenBody(claims));
 
-        AdminFilterReservationRequest request = new AdminFilterReservationRequest(1L, 1L, LocalDate.now().minusDays(1), LocalDate.now());
+        AdminFilterReservationRequest request = new AdminFilterReservationRequest(1L, 1L, LocalDate.now().minusDays(1),
+                LocalDate.now());
         given(reservationService.getAllByMemberAndThemeAndDateRange(request))
                 .willReturn(any());
 
@@ -138,7 +138,7 @@ class AdminReservationControllerTest {
     }
 
     @Test
-    @DisplayName("일반 회원은 필터링된 예약을 확인할 수 없고, 401을 응답한다.")
+    @DisplayName("일반 회원은 필터링된 예약을 확인할 수 없고, 403을 응답한다.")
     void readAllByMemberAndThemeAndDateRange2() throws Exception {
         // given
         Map<String, Object> memberClaims = new HashMap<>();
@@ -156,6 +156,6 @@ class AdminReservationControllerTest {
                         .cookie(new Cookie("token", "abc"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 }
