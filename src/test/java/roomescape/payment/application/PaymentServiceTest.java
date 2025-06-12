@@ -18,6 +18,7 @@ import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossConfirmResponse.EasyPayInfo;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.infra.TossPaymentGatewayClient;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 
 @ActiveProfiles("test")
@@ -35,7 +36,8 @@ class PaymentServiceTest {
     void 결제_저장_테스트() {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("key", "orderId", 1000L);
-        PaymentRequest paymentRequest = new PaymentRequest(paymentInfo.getPaymentKey(), paymentInfo.getOrderId(), paymentInfo.getAmount());
+        PaymentRequest paymentRequest = new PaymentRequest(paymentInfo.getPaymentKey(),
+            paymentInfo.getOrderId(), paymentInfo.getAmount());
         TossConfirmRequest tossConfirmRequest = new TossConfirmRequest(paymentRequest.paymentKey(),
             paymentRequest.orderId(), paymentRequest.amount());
 
@@ -56,8 +58,12 @@ class PaymentServiceTest {
         );
     }
 
-    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
-        PaymentInfo paymentInfo) {
+    private MemberReservationRequest createRequest(
+        LocalDate now,
+        Long timeId,
+        Long themeId,
+        PaymentInfo paymentInfo
+    ) {
         return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
             paymentInfo.getOrderId(), paymentInfo.getAmount());
     }

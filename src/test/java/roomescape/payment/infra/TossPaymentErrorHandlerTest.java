@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +24,8 @@ import roomescape.payment.application.dto.TossErrorResponse;
 class TossPaymentErrorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final TossPaymentErrorHandler tossPaymentErrorHandler = new TossPaymentErrorHandler(objectMapper);
+    private final TossPaymentErrorHandler tossPaymentErrorHandler = new TossPaymentErrorHandler(
+        objectMapper);
 
     @ParameterizedTest
     @MethodSource("tossErrorCodesTreatedAsClientError")
@@ -35,10 +36,13 @@ class TossPaymentErrorHandlerTest {
 
         ClientHttpResponse response = mock(ClientHttpResponse.class);
         when(response.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-        when(response.getBody()).thenReturn(new ByteArrayInputStream(errorJson.getBytes(StandardCharsets.UTF_8)));
+        when(response.getBody()).thenReturn(
+            new ByteArrayInputStream(errorJson.getBytes(StandardCharsets.UTF_8)));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST, response))
+        assertThatThrownBy(
+            () -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST,
+                response))
             .isInstanceOf(ExternalApiException.class)
             .satisfies(e -> {
                 ExternalApiException ex = (ExternalApiException) e;
@@ -52,15 +56,19 @@ class TossPaymentErrorHandlerTest {
     @Test
     void 응답이_서버_내부_오류로_간주되는_경우_변환된_에러를_발생시킨다() throws Exception {
         // given
-        TossErrorResponse error = new TossErrorResponse("INVALID_AUTHORIZE_AUTH", "유효하지 않은 인증 방식입니다");
+        TossErrorResponse error = new TossErrorResponse("INVALID_AUTHORIZE_AUTH",
+            "유효하지 않은 인증 방식입니다");
         String errorJson = objectMapper.writeValueAsString(error);
 
         ClientHttpResponse response = mock(ClientHttpResponse.class);
         when(response.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-        when(response.getBody()).thenReturn(new ByteArrayInputStream(errorJson.getBytes(StandardCharsets.UTF_8)));
+        when(response.getBody()).thenReturn(
+            new ByteArrayInputStream(errorJson.getBytes(StandardCharsets.UTF_8)));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST, response))
+        assertThatThrownBy(
+            () -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.POST,
+                response))
             .isInstanceOf(ExternalApiException.class)
             .satisfies(e -> {
                 ExternalApiException ex = (ExternalApiException) e;
@@ -83,10 +91,13 @@ class TossPaymentErrorHandlerTest {
 
         ClientHttpResponse response = mock(ClientHttpResponse.class);
         when(response.getStatusCode()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR);
-        when(response.getBody()).thenReturn(new ByteArrayInputStream(invalidJson.getBytes(StandardCharsets.UTF_8)));
+        when(response.getBody()).thenReturn(
+            new ByteArrayInputStream(invalidJson.getBytes(StandardCharsets.UTF_8)));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.GET, response))
+        assertThatThrownBy(
+            () -> tossPaymentErrorHandler.handleError(new URI("http://localhost"), HttpMethod.GET,
+                response))
             .isInstanceOf(DeserializationException.class)
             .hasMessage("Error parsing Toss error");
     }

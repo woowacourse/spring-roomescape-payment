@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.infra;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -33,15 +33,21 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response) throws IOException {
+    public void handleError(
+        final URI url,
+        final HttpMethod method,
+        final ClientHttpResponse response
+    ) throws IOException {
         HttpStatus status = (HttpStatus) response.getStatusCode();
         TossErrorResponse error = parseErrorResponse(response.getBody());
 
         if (TossErrorCodesTreatedAsClientError.contains(error.code())) {
             throw new ExternalApiException(status, error.message());
         }
-        logger.error("Toss API Unexpected error occurred: Code: {}, Message: {}", error.code(), error.message());
-        throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "결제가 실패했습니다. 관리자 문의가 필요합니다.");
+        logger.error("Toss API Unexpected error occurred: Code: {}, Message: {}", error.code(),
+            error.message());
+        throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR,
+            "결제가 실패했습니다. 관리자 문의가 필요합니다.");
     }
 
     private TossErrorResponse parseErrorResponse(final InputStream bodyStream) {

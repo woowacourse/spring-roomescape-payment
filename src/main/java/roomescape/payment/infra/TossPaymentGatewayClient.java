@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.infra;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
