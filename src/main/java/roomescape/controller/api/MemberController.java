@@ -1,6 +1,8 @@
 package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,9 @@ public class MemberController {
     }
 
     @Operation(summary = "회원가입 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "중복된 이메일입니다.")
+    })
     @PostMapping("/members")
     public ResponseEntity<MemberSignupResponse> signup(@RequestBody SignUpRequest request) {
         MemberSignupResponse response = memberService.registerMember(request);

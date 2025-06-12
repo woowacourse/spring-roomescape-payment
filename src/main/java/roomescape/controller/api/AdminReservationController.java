@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.dto.auth.AdminOperation;
 import roomescape.dto.reservation.AdminReservationCreateRequest;
 import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationResponse;
@@ -32,6 +33,7 @@ public class AdminReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "예약 추가 성공")
     })
+    @AdminOperation
     @PostMapping
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody AdminReservationCreateRequest requestDto) {
@@ -43,6 +45,7 @@ public class AdminReservationController {
     }
 
     @Operation(summary = "관리자용 예약 목록 검색 API")
+    @AdminOperation
     @GetMapping("/search")
     public ResponseEntity<List<ReservationResponse>> searchReservationsByPeriod(
             @RequestParam("themeId") long themeId,

@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(UnauthorizedException ex) {
-        LOG.error("Fail Response: {}", ex.getMessage(), ex);
+        LOG.warn("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.UNAUTHORIZED

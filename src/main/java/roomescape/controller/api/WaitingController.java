@@ -38,7 +38,8 @@ public class WaitingController {
 
     @Operation(summary = "예약 대기 추가 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "예약 대기 추가 성공")
+            @ApiResponse(responseCode = "201", description = "예약 대기 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
     })
     @PostMapping
     public ResponseEntity<WaitingResponse> addWaiting(@CurrentMember LoginInfo loginInfo,
@@ -53,7 +54,8 @@ public class WaitingController {
 
     @Operation(summary = "예약 대기 승인 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "예약 대기 승인 성공")
+            @ApiResponse(responseCode = "204", description = "예약 대기 승인 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
     })
     @PostMapping("/{id}")
     public ResponseEntity<Void> approveWaiting(@PathVariable("id") final Long id) {
@@ -63,7 +65,8 @@ public class WaitingController {
 
     @Operation(summary = "예약 대기 삭제 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "예약 대기 삭제 성공")
+            @ApiResponse(responseCode = "204", description = "예약 대기 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable("id") final Long id) {

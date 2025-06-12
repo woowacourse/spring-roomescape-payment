@@ -53,7 +53,8 @@ public class ThemeController {
 
     @Operation(summary = "테마 삭제 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "테마 삭제 성공")
+            @ApiResponse(responseCode = "204", description = "테마 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final Long id) {

@@ -45,7 +45,10 @@ public class ReservationController {
 
     @Operation(summary = "예약 추가 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "예약 추가 성공")
+            @ApiResponse(responseCode = "201", description = "예약 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
+            @ApiResponse(responseCode = "404", description = "토스 클라이언트 예외"),
+            @ApiResponse(responseCode = "404", description = "토스 서버 예외")
     })
     @PostMapping
     public ResponseEntity<String> addReservation(@CurrentMember LoginInfo loginInfo,
@@ -68,7 +71,8 @@ public class ReservationController {
 
     @Operation(summary = "예약 삭제 API")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "예약 삭제 성공")
+            @ApiResponse(responseCode = "204", description = "예약 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long id) {
