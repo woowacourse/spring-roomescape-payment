@@ -20,7 +20,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.AuthorizationExtractor;
+import roomescape.auth.Role;
+import roomescape.domain.Member;
 import roomescape.domain.Payment;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.ReservationResponse;
@@ -35,6 +40,10 @@ import roomescape.service.ReservationService;
 
 @WebMvcTest(value = {ReservationController.class, AuthorizationExtractor.class})
 class ReservationControllerTest {
+
+    private static final Member member = Member.createWithoutId("이름", "email", "123", Role.MEMBER);
+    private static final ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+    private static final Theme theme = Theme.createWithoutId("이름", "설명", "섬네일");
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,11 +74,12 @@ class ReservationControllerTest {
         ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "1");
-        Payment payment = Payment.createPaymentWithoutId("1", "1", 1000);
+        Reservation reservation = Reservation.createWithoutId(member, LocalDate.of(2026, 8, 8), time, theme);
+        Payment payment = Payment.createPaymentWithoutId("10", reservation, "1", 1000);
 
-        given(paymentService.createPaymentInfo(any())).willReturn(payment);
-        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
-                payment)).willReturn(response);
+        given(paymentService.approve(any())).willReturn(payment);
+        given(reservationService.reserveWithPayment(1L, request.timeId(), request.themeId(),
+                request.date(), payment)).willReturn(response);
         given(reservationFacade.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
                 paymentRequest)).willReturn(response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");

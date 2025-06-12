@@ -68,12 +68,12 @@ public class ReservationService {
     }
 
     private List<ReservationWithStatusResponse> findReservationByMemberId(Long memberId) {
-        return reservationRepository.findByMemberId(memberId).stream()
-                .map(reservation -> {
-                    Payment payment = paymentService.findPaymentByReservationId(reservation.getId());
+        return reservationRepository.findAllWithPaymentByMemberId(memberId).stream()
+                .map(reservationWithPayment -> {
+                    Reservation reservation = reservationWithPayment.reservation();
+                    Payment payment = reservationWithPayment.payment();
                     return ReservationWithStatusResponse.of(reservation, payment);
-                })
-                .toList();
+                }).toList();
     }
 
     private List<ReservationWithStatusResponse> findWaitingByMemberId(Long memberId) {

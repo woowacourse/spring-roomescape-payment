@@ -9,6 +9,7 @@ import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.repository.ReservationRepository;
+import roomescape.dto.ReservationWithPayment;
 import roomescape.dto.request.ReservationCondition;
 
 @Repository
@@ -77,5 +78,10 @@ public class ReservationRepositoryAdaptor implements ReservationRepository {
     @Override
     public List<Reservation> findByMemberId(Long memberId) {
         return jpaReservationRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId) {
+        return jpaReservationRepository.findAllWithPaymentByMemberId(memberId);
     }
 }
