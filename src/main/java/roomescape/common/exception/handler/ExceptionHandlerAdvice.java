@@ -27,4 +27,12 @@ public class ExceptionHandlerAdvice {
         ErrorResponse response = new ErrorResponse(status, "잘못된 요청입니다.");
         return ResponseEntity.status(status).body(response);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(RuntimeException e) {
+        log.error("invoked IllegalStateException - message: {}", e.getMessage());
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorResponse response = new ErrorResponse(status, "요청 처리 과정에서 오류가 발생했습니다.");
+        return ResponseEntity.status(status).body(response);
+    }
 }
