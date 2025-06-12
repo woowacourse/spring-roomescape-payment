@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.ReservationDetail;
+import roomescape.dto.internal.ReservationDetail;
 import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
@@ -154,9 +154,9 @@ public class ReservationService {
 
                 List<ReservationDetail> details = member.calculateReservationRanks(reservations).stream()
                         .map(rank -> new ReservationDetail(
-                                rank.getReservation(),
-                                reservationsWithPayment.get(rank.getReservation()),
-                                rank.getRank()
+                                rank.reservation(),
+                                reservationsWithPayment.get(rank.reservation()),
+                                rank.rank()
                         ))
                         .toList();
 

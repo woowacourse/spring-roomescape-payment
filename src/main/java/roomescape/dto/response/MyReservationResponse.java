@@ -2,8 +2,7 @@ package roomescape.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.ReservationDetail;
-import roomescape.domain.ReservationWithRank;
+import roomescape.dto.internal.ReservationDetail;
 import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 
@@ -19,8 +18,8 @@ public record MyReservationResponse(
 
     public static MyReservationResponse from(ReservationDetail reservationDetail) {
 
-        Payment payment = reservationDetail.getPayment();
-        Reservation reservation = reservationDetail.getReservation();
+        Payment payment = reservationDetail.payment();
+        Reservation reservation = reservationDetail.reservation();
 
 
         return new MyReservationResponse(
@@ -28,7 +27,7 @@ public record MyReservationResponse(
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                reservation.getStatus().renderText(reservationDetail.getRank()),
+                reservation.getStatus().renderText(reservationDetail.rank()),
                 payment != null ? payment.getPaymentKey() : null,
                 payment != null ? payment.getAmount() : 0
         );
