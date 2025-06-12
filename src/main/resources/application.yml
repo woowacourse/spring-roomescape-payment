@@ -4,7 +4,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
-
 toss:
   payment:
     base-url: https://api.tosspayments.com/v1
@@ -17,3 +16,5 @@ toss:
 spring:
   profiles:
     active: dev
+  jpa:
+    open-in-view: false
