@@ -22,15 +22,21 @@ public class LogAspect {
 
     @Before("controller()")
     public void logBeforeApiCall(final JoinPoint joinPoint) throws Throwable {
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = getMethod(joinPoint);
         log.info("api call : {}", method.getName());
 
-        Object[] args = joinPoint.getArgs();
-        if (args.length <= 0) {
-            log.info("no parameter");
-        }
-        for (Object arg : args) {
-            log.info("parameter : {}", arg);
+        String[] paramNames =  methodSignature.getParameterNames();
+        Object[] paramValues = joinPoint.getArgs();
+
+        if (paramValues.length == 0) {
+            log.info("params is empty");
+        } else {
+            for (int i = 0;i< paramValues.length;i++) {
+                if (paramValues[i] == null) {
+                    log.info("'{}' param value is null", paramNames[i]);
+                }
+            }
         }
     }
 
