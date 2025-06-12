@@ -15,7 +15,7 @@ spring:
       data-locations: classpath:data.sql
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
     properties:
@@ -28,10 +28,10 @@ security:
     token:
       secret-key: s8R$kQz3nZ!L5pT7c@J#xM9vB1&uD6hE
       access:
-        expire-length: 600000 # 10 분
+        expire-length: 60000000
 
 payment:
   toss:
     timeout: 3000
-    baseUrl: https://api.tosspayments.com/v1
+    baseUrl: https://api.tosspayments.com/
     secretKey: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

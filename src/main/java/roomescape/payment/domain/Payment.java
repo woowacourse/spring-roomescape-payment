@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
@@ -28,20 +29,27 @@ public class Payment {
 
     private BigDecimal amount;
 
+    @JoinColumn(name = "reservation_id")
     @ManyToOne
     private Reservation reservation;
 
     @Enumerated(value = EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus paymentStatus;
 
-    private Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
-                    final Reservation reservation, final PaymentStatus status) {
+    private Payment(
+            final Long id,
+            final String orderId,
+            final String paymentKey,
+            final BigDecimal amount,
+            final Reservation reservation,
+            final PaymentStatus paymentStatus
+    ) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
-        this.status = status;
+        this.paymentStatus = paymentStatus;
     }
 
     public static Payment pending(
@@ -62,10 +70,18 @@ public class Payment {
     }
 
     public void success() {
-        this.status = PaymentStatus.SUCCESS;
+        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     public void fail() {
-        this.status = PaymentStatus.FAILED;
+        this.paymentStatus = PaymentStatus.FAILED;
+    }
+
+    public void removeReservation() {
+        this.reservation = null;
+    }
+
+    public boolean isSuccess() {
+        return this.paymentStatus == PaymentStatus.SUCCESS;
     }
 }

@@ -3,7 +3,7 @@ package roomescape.payment.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -20,21 +20,19 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(@Qualifier("tossPaymentRestClient") final RestClient restClient,
+    public TossPaymentClient(final RestClient tossPaymentRestClient,
                              final ObjectMapper objectMapper) {
-        this.restClient = restClient;
+        this.restClient = tossPaymentRestClient;
         this.objectMapper = objectMapper;
     }
 
-    public PaymentResponse requestPayment(final PaymentRequest request) {
+    public PaymentResponse requestPaymentConfirm(final PaymentRequest request) {
         return restClient.post()
                 .uri("v1/payments/confirm")
                 .body(TossPaymentRequest.from(request))
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        (req, res) -> {
-                            handleException(res);
-                        })
+                        (req, res) -> handleException(res))
                 .body(TossPaymentResponse.class);
     }
 
@@ -43,7 +41,8 @@ public class TossPaymentClient implements PaymentClient {
             TossErrorResponse error = objectMapper.readValue(is, TossErrorResponse.class);
             throw new TossPaymentException(error.code(), error.message());
         } catch (IOException e) {
-            throw new RuntimeException("에러 응답 파싱 실패", e);
+            throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    "오류 응답을 읽는 중에 문제가 발생했습니다.");
         }
     }
 }

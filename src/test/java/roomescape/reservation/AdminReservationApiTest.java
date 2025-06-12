@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
+import roomescape.payment.application.dto.PrePaymentValidRequest;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -100,15 +102,23 @@ class AdminReservationApiTest {
     }
 
     @Test
-    void PENDING_예약을_ACCEPTED로_변경한다() {
+    void 대기를_예약으로_승격한다() {
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
                 .when().delete("/admin/reservations/7")
                 .then().log().all()
                 .statusCode(204);
 
+        final PrePaymentValidRequest prePaymentValidRequest = new PrePaymentValidRequest(
+                "WEB_RSV_123456789",
+                "주문",
+                BigDecimal.valueOf(1000L)
+        );
+
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+                .contentType(ContentType.JSON)
+                .body(prePaymentValidRequest)
                 .when().put("/admin/waitings/accept/1")
                 .then().log().all()
                 .statusCode(200);

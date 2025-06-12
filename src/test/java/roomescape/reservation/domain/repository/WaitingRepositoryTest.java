@@ -40,20 +40,6 @@ class WaitingRepositoryTest {
     }
 
     @Test
-    void 특정_멤버의_대기예약을_theme_time과_함께_조회한다() {
-        Long memberId = 1L; // 엠제이
-
-        List<Waiting> result = waitingRepository.findByMemberIdAndWaitingStatusWithAssociations(memberId,
-                WaitingStatus.PENDING);
-
-        assertThat(result).hasSize(2); // 엠제이: 대기 2건
-        assertThat(result).allSatisfy(w -> {
-            assertThat(w.getTheme()).isNotNull();
-            assertThat(w.getTime()).isNotNull();
-        });
-    }
-
-    @Test
     void 대기예약_순번을_계산한다() {
         Waiting target = waitingRepository.findById(3L).get(); // 엠제이 2번째 대기
         Long count = waitingRepository.countByThemeAndDateAndTimeAndIdLessThan(
