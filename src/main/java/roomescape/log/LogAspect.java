@@ -30,7 +30,7 @@ public class LogAspect {
     public void all() {
     }
 
-    @Pointcut("execution(* roomescape..ui..*(..))")
+    @Pointcut("execution(* roomescape..ui..*Controller.*(..))")
     public void controller() {
     }
 
@@ -90,6 +90,10 @@ public class LogAspect {
     }
 
     private String getRole(final HttpServletRequest request) {
+        if (!authTokenExtractor.isCookiesExist(request)) {
+            return AuthRole.GUEST.getRoleName();
+        }
+
         final String accessToken = authTokenExtractor.extract(request);
         if (!authTokenProvider.isValidToken(accessToken)) {
             return AuthRole.GUEST.getRoleName();
