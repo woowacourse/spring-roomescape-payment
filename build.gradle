@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id "org.asciidoctor.jvm.convert" version "3.3.2"
+    id 'org.ec4j.editorconfig' version "0.1.0"
 }
 
 configurations {
@@ -49,7 +50,7 @@ def snippetsDir = file('build/generated-snippets')
 
 asciidoctor {
     inputs.dir snippetsDir
-    dependsOn test // 테스트가 실행되고 스니펫이 생성된 후 문서가 빌드되도록 합니다.
+    dependsOn test
     configurations 'asciidoctorExt'
 
     attributes(
@@ -64,6 +65,13 @@ test {
 bootJar {
     dependsOn asciidoctor
     from("build/generated-snippets/html5") {
-        into 'static/docs' // 최종 JAR 파일 내의 위치입니다.
+        into 'static/docs'
     }
 }
+
+editorconfig {
+    includes = ['src/**/*.java', 'build.gradle']  // 자바 파일과 build.gradle 파일을 포함
+    excludes = ['build/**', 'out/**']  // 빌드 및 출력 디렉터리 제외
+}
+
+check.dependsOn editorconfigCheck

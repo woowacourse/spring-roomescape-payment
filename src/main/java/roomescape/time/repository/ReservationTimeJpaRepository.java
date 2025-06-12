@@ -12,12 +12,12 @@ public interface ReservationTimeJpaRepository extends JpaRepository<ReservationT
     boolean existsByStartAt(final LocalTime startAt);
 
     @Query("""
-            SELECT rt 
-            FROM ReservationTime rt 
+            SELECT rt
+            FROM ReservationTime rt
             WHERE rt.id NOT IN (
-                SELECT r.time.id 
-                FROM Reservation r 
-                WHERE r.date = :date 
+                SELECT r.time.id
+                FROM Reservation r
+                WHERE r.date = :date
                 AND r.theme.id = :themeId
             )
             """)
