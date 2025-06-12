@@ -1,4 +1,4 @@
-package roomescape.common.ui;
+package roomescape.common.infra;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
