@@ -18,24 +18,19 @@ public class AccessLogger {
     private static final int HTTP_CLIENT_ERROR_THRESHOLD = 400;
     private static final long SLOW_REQUEST_THRESHOLD_MS = 3000;
 
-    private final LoggingPolicy loggingPolicy;
     private final LogMessageFormatter formatter;
 
     public void log(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response,
                     FilterChain filterChain)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
         long startTime = System.currentTimeMillis();
-        boolean shouldLog = loggingPolicy.shouldLog(request);
-
-        if (shouldLog) {
-            log.info(formatter.formatRequest(request));
-        }
+        log.info(formatter.formatRequest(request));
 
         try {
             filterChain.doFilter(request, response);
             long elapsedTime = System.currentTimeMillis() - startTime;
-            logResponse(response, elapsedTime, shouldLog);
+            logResponse(response, elapsedTime);
         } catch (Exception e) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             log.error(formatter.formatExceptionResponse(response, elapsedTime), e);
@@ -43,7 +38,7 @@ public class AccessLogger {
         }
     }
 
-    private void logResponse(ContentCachingResponseWrapper response, long elapsedTime, boolean loggedRequest) {
+    private void logResponse(ContentCachingResponseWrapper response, long elapsedTime) {
         int status = response.getStatus();
         boolean isError = status >= HTTP_CLIENT_ERROR_THRESHOLD;
         boolean isSlow = elapsedTime > SLOW_REQUEST_THRESHOLD_MS;
@@ -58,8 +53,6 @@ public class AccessLogger {
             return;
         }
 
-        if (loggedRequest) {
-            log.info(formatter.formatResponse(response, elapsedTime));
-        }
+        log.info(formatter.formatResponse(response, elapsedTime));
     }
 }

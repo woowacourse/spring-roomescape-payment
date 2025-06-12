@@ -1,4 +1,4 @@
-package roomescape.global;
+package roomescape.log;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
