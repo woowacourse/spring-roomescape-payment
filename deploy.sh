@@ -1,12 +1,8 @@
 #!/bin/bash
 
 # 변수 설정
-REPO_URL="https://github.com/saera-yook/spring-roomescape-payment.git"
-PROJECT_NAME="spring-roomescape-payment"
-BRANCH_NAME="step2"
-SECRET_KEY="test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
-JAR_NAME="$PROJECT_NAME-0.0.1-SNAPSHOT.jar"
-LOG_DIR="/home/ubuntu/logs"
+
+source .env
 
 echo "> Git 프로젝트 클론 또는 pull"
 if [ ! -d "$PROJECT_NAME" ]; then
