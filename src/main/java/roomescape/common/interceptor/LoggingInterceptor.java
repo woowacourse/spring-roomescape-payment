@@ -11,16 +11,21 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         request.setAttribute("uuid", randomUUID().toString());
-        log.atInfo().log("request : uuid={}, path={}", request.getAttribute("uuid"), request.getRequestURI());
+        log.atInfo().log("request : uuid={}, path={}, method={}, ", request.getAttribute("uuid"), request.getRequestURI(),
+                        request.getMethod());
         return true;
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-            throws Exception {
-        log.atInfo().log("response : uuid={}, path={}", request.getAttribute("uuid"), request.getRequestURI());
+    public void afterCompletion(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception ex
+    ) {
+        log.atInfo().log("response : uuid={}, path={}, method={}, ", request.getAttribute("uuid"), request.getRequestURI(),
+                        request.getMethod());
     }
 }

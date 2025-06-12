@@ -135,13 +135,13 @@ public class MissionStepTest {
                 .statusCode(403);
 
         RestAssured.given().log().all()
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(401);
 
         RestAssured.given().log().all()
                 .cookie("token", memberToken)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(403);
 
@@ -153,7 +153,7 @@ public class MissionStepTest {
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200);
     }
