@@ -1,0 +1,172 @@
+package roomescape.reservation.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.auth.service.dto.LoginMember;
+import roomescape.common.exception.BadRequestException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.NotFoundException;
+import roomescape.member.domain.Member;
+import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.PaymentReservation;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.repository.PaymentReservationRepository;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.service.dto.request.ReservationCreateRequest;
+import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
+import roomescape.reservation.service.dto.response.ReservationResponse;
+import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.waiting.domain.ReservationInformation;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.repository.WaitingRepository;
+
+import java.time.LocalDateTime;
+
+@Service
+public class ReservationCommandService {
+    private final ReservationRepository reservationRepository;
+    private final ReservationTimeRepository reservationTimeRepository;
+    private final ThemeRepository themeRepository;
+    private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
+    private final WaitingRepository waitingRepository;
+    private final PaymentReservationRepository paymentReservationRepository;
+
+    public ReservationCommandService(
+            final ReservationRepository reservationRepository,
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final PaymentRepository paymentRepository,
+            final WaitingRepository waitingRepository,
+            final PaymentReservationRepository paymentReservationRepository
+    ) {
+        this.reservationRepository = reservationRepository;
+        this.reservationTimeRepository = reservationTimeRepository;
+        this.themeRepository = themeRepository;
+        this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
+        this.waitingRepository = waitingRepository;
+        this.paymentReservationRepository = paymentReservationRepository;
+    }
+
+    @Transactional
+    public void confirm(final Long id) {
+        Reservation reservation = getReservation(id);
+        reservation.confirm();
+        reservationRepository.save(reservation);
+    }
+
+    private Reservation getReservation(Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
+    }
+
+    @Transactional
+    public void cancel(final Long id, final LoginMember loginMember) {
+        Reservation reservation = getAuthorizedReservation(id, loginMember);
+        reservation.cancel();
+        reservationRepository.save(reservation);
+        promoteFirstWaitingFor(reservation);
+    }
+
+    private Reservation getAuthorizedReservation(final Long id, LoginMember loginMember) {
+        return switch (loginMember.role()) {
+            case MEMBER -> reservationRepository.findByIdAndMemberId(id, loginMember.id())
+                    .orElseThrow(() -> new ForbiddenException("삭제 권한이 없습니다."));
+            case ADMIN -> reservationRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
+        };
+    }
+
+    private void promoteFirstWaitingFor(final Reservation reservation) {
+        Waiting firstWaiting = waitingRepository.findFirstByReservationInfo(ReservationInformation.of(reservation));
+        if (firstWaiting != null) {
+            waitingRepository.delete(firstWaiting);
+            reservationRepository.save(Reservation.of(firstWaiting));
+        }
+    }
+
+    @Transactional
+    public ReservationWithPaymentResponse createWithPendingPayment(
+            final ReservationWithPaymentRequest request,
+            final LoginMember loginMember
+    ) {
+        ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.from(request, loginMember);
+
+        Reservation savedReservation = createReservation(reservationCreateRequest, ReservationStatus.PENDING);
+        Payment savedPayment = paymentRepository.save(request.toPendingPayment());
+
+        PaymentReservation paymentReservation = new PaymentReservation(savedReservation, savedPayment);
+        paymentReservationRepository.save(paymentReservation);
+
+        return ReservationWithPaymentResponse.from(savedReservation, savedPayment);
+    }
+
+    @Transactional
+    public ReservationResponse create(final ReservationCreateRequest request) {
+        Reservation savedReservation = createReservation(request, ReservationStatus.CONFIRMED);
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation createReservation(
+            final ReservationCreateRequest request,
+            final ReservationStatus status
+    ) {
+        Reservation reservation = convertRequestToReservation(request, status);
+
+        validateDuplicated(reservation);
+        validateReservationDateTime(reservation);
+
+        return reservationRepository.save(reservation);
+    }
+
+    private void validateDuplicated(final Reservation reservation) {
+        if (isAlreadyBooked(reservation)) {
+            throw new ConflictException("중복되는 예약이 존재합니다.");
+        }
+    }
+
+    private boolean isAlreadyBooked(final Reservation reservation) {
+        return reservationRepository.existsByReservationInformation(reservation.getReservationInformation());
+    }
+
+    private Reservation convertRequestToReservation(
+            final ReservationCreateRequest request,
+            final ReservationStatus status
+    ) {
+        ReservationTime reservationTime = getReservationTime(request);
+        Theme theme = getTheme(request);
+        LoginMember loginMember = request.loginMember();
+        Member member = memberRepository.findById(loginMember.id())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 회원입니다."));
+        return new Reservation(member, request.date(), reservationTime, theme, status);
+    }
+
+    private Theme getTheme(final ReservationCreateRequest request) {
+        Long themeId = request.themeId();
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
+    }
+
+    private ReservationTime getReservationTime(final ReservationCreateRequest request) {
+        Long timeId = request.timeId();
+        return reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약 가능 시간입니다."));
+    }
+
+    private void validateReservationDateTime(final Reservation reservation) {
+        LocalDateTime now = LocalDateTime.now();
+        if (reservation.isBefore(now)) {
+            throw new BadRequestException("과거 날짜의 예약은 생성할 수 없습니다.");
+        }
+    }
+}

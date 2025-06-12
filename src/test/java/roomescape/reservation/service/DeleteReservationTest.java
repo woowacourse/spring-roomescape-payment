@@ -15,6 +15,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -29,8 +30,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({DeleteReservationService.class})
-class DeleteReservationServiceTest {
+@Import({ReservationCommandService.class})
+class DeleteReservationTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -41,7 +42,7 @@ class DeleteReservationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private DeleteReservationService deleteReservationService;
+    private ReservationCommandService reservationCommandService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -55,7 +56,7 @@ class DeleteReservationServiceTest {
         ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
         Theme theme = new Theme("theme", "desc", "thumbnail");
 
-        Reservation myReservation = new Reservation(me, LocalDate.now().plusDays(1), time, theme);
+        Reservation myReservation = new Reservation(me, LocalDate.now().plusDays(1), time, theme, ReservationStatus.CONFIRMED);
 
         entityManager.persist(me);
         entityManager.persist(other);
@@ -65,7 +66,7 @@ class DeleteReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> {
-            deleteReservationService.delete(myReservation.getId(), LoginMember.of(other));
+            reservationCommandService.cancel(myReservation.getId(), LoginMember.of(other));
         }).isInstanceOf(ForbiddenException.class);
     }
 
@@ -82,12 +83,12 @@ class DeleteReservationServiceTest {
 
         LocalDate date = nextDay();
         Reservation savedReservation = reservationRepository.save(
-                new Reservation(savedMember, date, savedTime, savedTheme));
+                new Reservation(savedMember, date, savedTime, savedTheme, ReservationStatus.CONFIRMED));
 
         Long id = savedReservation.getId();
 
         // then
-        assertThatCode(() -> deleteReservationService.delete(id, LoginMember.of(member)))
+        assertThatCode(() -> reservationCommandService.cancel(id, LoginMember.of(member)))
                 .doesNotThrowAnyException();
     }
 
@@ -96,7 +97,7 @@ class DeleteReservationServiceTest {
     void test8() {
         Member member = new Member("어드민", "test@test.com", "12341234", Role.ADMIN);
         Long id = 1L;
-        assertThatThrownBy(() -> deleteReservationService.delete(id, LoginMember.of(member)))
+        assertThatThrownBy(() -> reservationCommandService.cancel(id, LoginMember.of(member)))
                 .isInstanceOf(NotFoundException.class);
     }
 

@@ -35,7 +35,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({CreateReservationService.class})
+@Import({ReservationCommandService.class})
 public class CreateReservationWithPaymentTest {
 
     private final LocalDateTime now = LocalDateTime.now();
@@ -47,7 +47,7 @@ public class CreateReservationWithPaymentTest {
     private EntityManager entityManager;
 
     @Autowired
-    private CreateReservationService reservationService;
+    private ReservationCommandService reservationService;
 
     @MockitoBean
     private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);
@@ -63,8 +63,8 @@ public class CreateReservationWithPaymentTest {
     @Test
     void createMembersPaymentAndReservation() {
         // given
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -78,7 +78,7 @@ public class CreateReservationWithPaymentTest {
                 theme.getId(),
                 paymentResponse.paymentKey(),
                 paymentRequest.orderId(),
-                1000
+                1000L
         );
 
         // when

@@ -1,14 +1,20 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import roomescape.payment.domain.vo.Amount;
 import roomescape.payment.domain.vo.PaymentStatus;
 
 @Entity
+@Getter
 public class Payment {
 
     @Id
@@ -17,25 +23,27 @@ public class Payment {
 
     private String paymentKey;
 
-    private Integer amount;
+    private String orderId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "amount", nullable = false))
+    private Amount amount;
 
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus status;
 
-    private Long reservationId;
-
     protected Payment() {}
 
-    public Payment(Long id, String paymentKey, Integer amount, PaymentStatus status, Long reservationId) {
+    public Payment(Long id, String paymentKey, String orderId, Long amount, PaymentStatus status) {
         this.id = id;
+        this.orderId = orderId;
         this.paymentKey = paymentKey;
-        this.amount = amount;
+        this.amount = new Amount(amount);
         this.status = status;
-        this.reservationId = reservationId;
     }
 
-    public Payment(String paymentKey, Integer amount, PaymentStatus status, Long reservationId) {
-        this(null, paymentKey, amount, status, reservationId);
+    public Payment(String paymentKey, String orderId, Long amount, PaymentStatus status) {
+        this(null, paymentKey, orderId, amount, status);
     }
 
     public void complete() {
@@ -46,23 +54,7 @@ public class Payment {
         status = PaymentStatus.FAILED;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public Long getReservationId() {
-        return reservationId;
+    public Long getAmount() {
+        return amount.value();
     }
 }

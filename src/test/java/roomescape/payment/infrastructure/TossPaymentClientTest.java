@@ -15,7 +15,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.InternalServerErrorException;
-import roomescape.config.PaymentRestClientConfig;
+import roomescape.payment.config.PaymentRestClientConfig;
 import roomescape.payment.infrastructure.dto.PaymentFailure;
 import roomescape.payment.infrastructure.dto.request.ConfirmPaymentRequest;
 import roomescape.payment.infrastructure.dto.response.ConfirmPaymentResponse;
@@ -37,7 +37,7 @@ class TossPaymentClientTest {
 
     private static final String PAYMENT_KEY = "testKey";
     private static final String ORDER_ID = "testId";
-    private static final int AMOUNT = 1000;
+    private static final long AMOUNT = 1_000;
 
     @Autowired
     private TossPaymentErrorHandler tossPaymentErrorHandler;

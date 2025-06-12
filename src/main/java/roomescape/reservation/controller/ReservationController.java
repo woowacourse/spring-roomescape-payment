@@ -1,5 +1,9 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.reservation.service.CreateReservationWithPaymentService;
-import roomescape.reservation.service.DeleteReservationService;
+import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.dto.request.FilteringReservationRequest;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
@@ -25,24 +29,26 @@ import roomescape.reservation.service.dto.response.ReservationWithPaymentRespons
 import java.time.LocalDate;
 import java.util.List;
 
+@Tag(name = "예약 관리")
 @RequestMapping("/reservations")
 @RestController
 public class ReservationController {
 
     private final ReservationQueryService reservationQueryService;
     private final CreateReservationWithPaymentService createReservationWithPaymentService;
-    private final DeleteReservationService deleteReservationService;
+    private final ReservationCommandService reservationCommandService;
 
     public ReservationController(
             final ReservationQueryService reservationQueryService,
             final CreateReservationWithPaymentService createReservationWithPaymentService,
-            final DeleteReservationService deleteReservationService
+            final ReservationCommandService reservationCommandService
     ) {
         this.reservationQueryService = reservationQueryService;
         this.createReservationWithPaymentService = createReservationWithPaymentService;
-        this.deleteReservationService = deleteReservationService;
+        this.reservationCommandService = reservationCommandService;
     }
 
+    @Operation(summary = "전체 예약 내역 조회")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> readAllReservations() {
         List<ReservationResponse> response = reservationQueryService.getAll();
@@ -50,6 +56,7 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "예약 가능 시간 조회", description = "주어진 조건 내에서 생성 가능한 모든 예약 시간을 조회한다.")
     @GetMapping("/times")
     public ResponseEntity<List<ReservationTimeWithBookedResponse>> readAvailableReservationTimes(
             @RequestParam("date") final LocalDate date,
@@ -60,22 +67,30 @@ public class ReservationController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "예약 및 결제 요청", description = "로그인 유저의 결제 정보로 결제를 진행하고, 원하는 예약을 생성한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @PostMapping
     public ResponseEntity<ReservationResponse> createWithPayment(
             @Valid @RequestBody ReservationWithPaymentRequest request,
-            final LoginMember loginMember
+            @Parameter(hidden = true) final LoginMember loginMember
     ) {
         ReservationWithPaymentResponse response = createReservationWithPaymentService.create(request, loginMember);
 
         return ResponseEntity.ok(ReservationResponse.from(response));
     }
 
+    @Operation(summary = "예약 삭제", description = "로그인 유저가 생성한 예약을 삭제한다. 타인의 예약은 삭제할 수 없다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") final Long id, LoginMember loginMember) {
-        deleteReservationService.delete(id, loginMember);
+    public ResponseEntity<Void> delete(
+            @PathVariable("id") final Long id,
+            @Parameter(hidden = true) LoginMember loginMember
+    ) {
+        reservationCommandService.cancel(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "예약 내역 조건 검색", description = "조건에 해당하는 모든 예약 내역을 조회한다.")
     @GetMapping("/filtering")
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteringReservationRequest request
@@ -85,8 +100,10 @@ public class ReservationController {
         return ResponseEntity.ok(reservationResponses);
     }
 
+    @Operation(summary = "내 예약 조회", description = "로그인 유저가 생성한 모든 예약 내역을 조회한다.")
+    @Parameter(name = "Authorization", description = "로그인 시 발급 받은 토큰", in = ParameterIn.HEADER, required = true)
     @GetMapping("/my")
-    public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Valid LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Parameter(hidden = true) @Valid LoginMember loginMember) {
         List<MyReservationsResponse> response = reservationQueryService.getAllLoginMemberReservations(loginMember);
         return ResponseEntity.ok(response);
     }

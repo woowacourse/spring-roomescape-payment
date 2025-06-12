@@ -44,7 +44,7 @@ public class ReservationQueryService {
 
     public List<MyReservationsResponse> getAllLoginMemberReservations(LoginMember loginMember) {
         ArrayList<MyReservationsResponse> results = new ArrayList<>(
-                reservationRepository.findAllByMemberId(loginMember.id())
+                reservationRepository.findAllWithPaymentByMemberId(loginMember.id())
                         .stream()
                         .map(MyReservationsResponse::from)
                         .toList()
@@ -73,6 +73,7 @@ public class ReservationQueryService {
     }
 
     private void validateDateFromTo(LocalDate from, LocalDate to) {
+        if (from == null || to == null) return ;
         if (from.isAfter(to)) {
             throw new BadRequestException("종료 날짜는 시작 날짜보다 앞설 수 없습니다.");
         }

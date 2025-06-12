@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.vo.PaymentStatus;
-import roomescape.reservation.domain.Reservation;
 
 import java.time.LocalDate;
 
@@ -18,9 +17,9 @@ public record ReservationWithPaymentRequest(
         @NotNull Long themeId,
         @NotEmpty String paymentKey,
         @NotEmpty String orderId,
-        @NotNull Integer amount
+        @NotNull Long amount
 ) {
-    public Payment toPendingPayment(Reservation reservation) {
-        return new Payment(paymentKey, amount, PaymentStatus.PENDING, reservation.getId());
+    public Payment toPendingPayment() {
+        return new Payment(paymentKey, orderId, amount, PaymentStatus.PENDING);
     }
 }

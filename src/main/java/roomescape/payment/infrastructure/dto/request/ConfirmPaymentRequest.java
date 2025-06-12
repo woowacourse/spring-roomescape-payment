@@ -5,7 +5,7 @@ import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 public record ConfirmPaymentRequest(
         String paymentKey,
         String orderId,
-        Integer amount
+        Long amount
 ) {
     public static ConfirmPaymentRequest from(ReservationWithPaymentRequest paymentRequest) {
         return new ConfirmPaymentRequest(

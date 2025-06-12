@@ -14,13 +14,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final LoginMemberArgumentResolver loginMemberArgumentResolver;
     private final AdminInterceptor adminInterceptor;
+    private final LoggingHandlerInterceptor loggingHandlerInterceptor;
 
     public WebMvcConfig(
             final LoginMemberArgumentResolver loginMemberArgumentResolver,
-            final AdminInterceptor adminInterceptor
+            final AdminInterceptor adminInterceptor,
+            final LoggingHandlerInterceptor loggingHandlerInterceptor
     ) {
         this.loginMemberArgumentResolver = loginMemberArgumentResolver;
         this.adminInterceptor = adminInterceptor;
+        this.loggingHandlerInterceptor = loggingHandlerInterceptor;
     }
 
     @Override
@@ -31,5 +34,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor);
+        registry.addInterceptor(loggingHandlerInterceptor);
     }
 }
