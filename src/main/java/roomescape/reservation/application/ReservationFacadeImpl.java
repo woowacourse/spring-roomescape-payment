@@ -50,7 +50,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     public List<ReservationResponse> getAll() {
-        log.info("[RESERVATION] 전체 예약 목록 조회 요청");
         final List<Reservation> reservations = reservationQueryService.getAll();
         final List<Long> userIds = reservations.stream()
                 .map(Reservation::getUserId)
@@ -61,7 +60,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     public List<AvailableReservationTimeWebResponse> getAvailable(final LocalDate date, final Long themeId) {
-        log.info("[RESERVATION] 예약 가능 시간 조회 요청: date={}, themeId={}", date, themeId);
         final AvailableReservationTimeServiceRequest request = new AvailableReservationTimeServiceRequest(
                 ReservationDate.from(date),
                 themeId);
@@ -72,7 +70,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     public List<ReservationResponse> getByParams(final ReservationSearchWebRequest request) {
-        log.info("[RESERVATION] 파라미터로 예약 목록 조회 요청: {}", request);
         final List<Reservation> reservations = reservationQueryService.getByParams(request.toServiceRequest());
         final List<Long> userIds = reservations.stream()
                 .map(Reservation::getUserId)
@@ -83,7 +80,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     public List<MyReservationsResponse> getAllByUserId(final Long userId) {
-        log.info("[RESERVATION] 사용자별 예약 목록 조회 요청: userId={}", userId);
         userQueryService.getById(userId);
         return reservationViewQueryService.getAllByUserId(userId)
                 .stream()
@@ -123,7 +119,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     public List<WaitingReservationResponse> getAllWaiting() {
-        log.info("[RESERVATION] 대기 예약 목록 조회 요청");
         final List<WaitingReservation> waiting = waitingReservationQueryService.getAll();
         final List<Long> userIds = waiting.stream()
                 .map(WaitingReservation::getUserId)

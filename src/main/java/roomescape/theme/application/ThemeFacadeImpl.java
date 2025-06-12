@@ -21,14 +21,12 @@ public class ThemeFacadeImpl implements ThemeFacade {
 
     @Override
     public List<ThemeResponse> getAll() {
-        log.info("[THEME] 전체 테마 조회 요청");
         return ThemeResponse.from(
                 themeQueryService.getAll());
     }
 
     @Override
     public List<ThemeResponse> getRanking() {
-        log.info("[THEME] 테마 랭킹 조회 요청");
         final int count = 10;
         final int dateRange = 7;
         final LocalDate endDate = LocalDate.now();

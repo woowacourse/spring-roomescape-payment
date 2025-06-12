@@ -20,7 +20,6 @@ public class ReservationTimeFacadeImpl implements ReservationTimeFacade {
 
     @Override
     public List<ReservationTimeResponse> getAll() {
-        log.info("[TIME] 전체 예약 시간 조회 요청");
         return ReservationTimeResponse.from(
                 reservationTimeQueryService.getAll());
     }

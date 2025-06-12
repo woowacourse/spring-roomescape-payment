@@ -16,7 +16,6 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     public List<UserResponse> getAll() {
-        log.info("[USER] 전체 사용자 조회 요청");
         return UserResponse.from(
                 userQueryService.getAll());
     }
