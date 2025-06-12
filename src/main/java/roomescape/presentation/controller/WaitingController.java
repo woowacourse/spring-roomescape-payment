@@ -40,14 +40,14 @@ public class WaitingController {
     @Operation(summary = "웨이팅 삭제")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteWaiting(LoginMember loginMember, @PathVariable Long id) {
+    public void deleteWaiting(@Parameter(hidden = true) LoginMember loginMember, @PathVariable Long id) {
         waitingService.deleteWaiting(loginMember, id);
     }
 
     @Operation(summary = "나의 웨이팅 전체 조회")
     @GetMapping("/mine")
     @ResponseStatus(HttpStatus.OK)
-    public List<MemberWaitingResponseDto> getMyWaitings(LoginMember loginMember) {
+    public List<MemberWaitingResponseDto> getMyWaitings(@Parameter(hidden = true) LoginMember loginMember) {
         return waitingService.getMyWaitings(loginMember);
     }
 }

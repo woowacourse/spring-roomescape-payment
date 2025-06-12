@@ -1,6 +1,7 @@
 package roomescape.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -51,7 +52,7 @@ public class ReservationTicketController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTicketResponseDto addReservation(
             @RequestBody @Valid ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
-            LoginMember loginMember) {
+            @Parameter(hidden = true) LoginMember loginMember) {
 
         reservationTicketPaymentService.processReservationRegistration(reservationTicketPaymentRequestDto, loginMember);
 

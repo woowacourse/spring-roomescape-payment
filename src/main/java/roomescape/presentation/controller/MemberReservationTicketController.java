@@ -1,6 +1,7 @@
 package roomescape.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class MemberReservationTicketController {
     @Operation(summary = "회원의 예약 정보 조회")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<MemberReservationResponseDto> getMemberReservations(LoginMember loginMember) {
+    public List<MemberReservationResponseDto> getMemberReservations(
+            @Parameter(hidden = true) LoginMember loginMember) {
         return reservationTicketService.getReservationTicketsOfMember(loginMember);
     }
 }
