@@ -56,10 +56,10 @@ public class ReservationPayService {
             Payment payment = webRequest.toPayment(savedReservation, PaymentStatus.DONE);
             paymentRepository.save(payment);
         } catch (IllegalArgumentException | OptimisticLockException e) {
-            log.atError().log("결제 내역 DB 저장 실패 - 사용자에게는 정상 응답. "
-                            + "paymentKey:{}, orderId:{}, amount:{}, reservationId:{}",
-                    webRequest.paymentKey(), webRequest.orderId(), webRequest.amount(), savedReservation.getId()
-            );
+            log.atError().setCause(e)
+                    .log("결제 정보 DB 저장 실패 - 사용자에게는 정상 응답. paymentKey:{}, orderId:{}, amount:{}, reservationId:{}",
+                            webRequest.paymentKey(), webRequest.orderId(), webRequest.amount(),
+                            savedReservation.getId());
         }
     }
 }
