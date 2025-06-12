@@ -19,6 +19,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
+    public boolean isExistsByReservationId(final Long reservationId) {
+        return paymentRepository.existsByReservation_Id(reservationId);
+    }
+
+    @Override
     public List<Payment> findAll() {
         return paymentRepository.findAll();
     }

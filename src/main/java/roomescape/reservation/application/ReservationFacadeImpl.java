@@ -99,9 +99,18 @@ public class ReservationFacadeImpl implements ReservationFacade {
     public ReservationResponse createWithPayment(final CreateReservationWithUserIdWebRequest reservationRequest,
                                                  final PaymentRequest paymentRequest) {
         final User user = userQueryService.getById(reservationRequest.userId());
-        final Reservation reservation = reservationCommandService.create(
-                reservationRequest.toServiceRequest());
-        final Payment payment = confirmPaymentWithRollback(paymentRequest, reservation);
+        final Reservation reservation = reservationQueryService.findBySlot(reservationRequest.toServiceRequest())
+                .orElse(reservationCommandService.create(reservationRequest.toServiceRequest()));
+
+        if (paymentRepository.isExistsByReservationId(reservation.getId())) {
+            throw new DuplicateException(
+                    DomainTerm.RESERVATION,
+                    reservationRequest.date(),
+                    reservationRequest.timeId(),
+                    reservationRequest.themeId());
+        }
+
+        confirmPaymentWithRollback(paymentRequest, reservation);
         return ReservationResponse.from(reservation, user);
     }
 

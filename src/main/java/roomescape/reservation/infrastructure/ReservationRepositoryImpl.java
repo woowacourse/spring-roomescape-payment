@@ -47,6 +47,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
+    public Optional<Reservation> findBySlot(final ReservationDate date, final Long timeId, final Long themeId) {
+        return jpaReservationRepository.findByDateAndTime_IdAndTheme_Id(date, timeId, themeId);
+    }
+
+    @Override
     public List<Long> findTimeIdByParams(final ReservationDate date, final Long themeId) {
         return jpaReservationRepository.findAllByDateAndThemeId(date, themeId).stream()
                 .map(Reservation::getTime)

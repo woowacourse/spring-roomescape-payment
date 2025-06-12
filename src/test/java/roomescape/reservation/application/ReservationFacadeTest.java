@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
+import roomescape.common.exception.DuplicateException;
 import roomescape.common.exception.NotFoundException;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.infrastructure.client.TossPaymentClient;
@@ -17,7 +18,6 @@ import roomescape.payment.infrastructure.client.dto.PaymentResult;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
-import roomescape.reservation.application.service.ReservationViewQueryService;
 import roomescape.reservation.application.service.WaitingReservationCommandService;
 import roomescape.reservation.application.service.WaitingReservationQueryService;
 import roomescape.reservation.domain.Reservation;
@@ -57,9 +57,6 @@ class ReservationFacadeTest {
 
     @Mock
     private ReservationQueryService reservationQueryService;
-
-    @Mock
-    private ReservationViewQueryService reservationViewQueryService;
 
     @Mock
     private WaitingReservationCommandService waitingReservationCommandService;
@@ -240,6 +237,8 @@ class ReservationFacadeTest {
         given(reservationCommandService.create(any())).willReturn(reservation);
         given(tossPaymentClient.confirmPayment(any())).willReturn(response);
         given(paymentRepository.save(any())).willReturn(response.toEntity(reservation));
+        given(paymentRepository.isExistsByReservationId(any())).willReturn(true);
+
         //when
         ReservationResponse result = reservationFacade.createWithPayment(request, paymentRequest);
 
@@ -248,6 +247,38 @@ class ReservationFacadeTest {
         then(reservationCommandService).should(times(1)).create(any());
         then(tossPaymentClient).should(times(1)).confirmPayment(any());
         then(paymentRepository).should(times(1)).save(any());
+        then(paymentRepository).should(times(1)).isExistsByReservationId(any());
+
+    }
+
+    @Test
+    @DisplayName("이미 결제된 예약을 생성하려할 경우, 예외가 발생한다.")
+    void createWithPaymentWhenAlreadyPayment() {
+        //given
+        CreateReservationWithUserIdWebRequest request = createCreateRequest();
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
+                0,
+                "orderId");
+        PaymentResult response = new PaymentResult("paymentKey",
+                0,
+                "orderId");
+
+        Reservation reservation = createReservation(1L);
+        given(userQueryService.getById(any())).willReturn(createUser(1L));
+        given(reservationCommandService.create(any())).willReturn(reservation);
+        given(paymentRepository.isExistsByReservationId(any())).willReturn(true);
+
+        //when
+        assertThatThrownBy(() -> reservationFacade.createWithPayment(request, paymentRequest))
+                .isInstanceOf(DuplicateException.class)
+                .hasMessageContaining("RESERVATION already exists");
+
+        //then
+        then(reservationCommandService).should(times(1)).create(any());
+        then(paymentRepository).should(times(1)).isExistsByReservationId(any());
+
+        then(tossPaymentClient).should(times(0)).confirmPayment(any());
+        then(paymentRepository).should(times(0)).save(any());
     }
 
     @Test

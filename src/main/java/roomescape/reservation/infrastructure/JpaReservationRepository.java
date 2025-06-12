@@ -12,6 +12,7 @@ import roomescape.reservation.domain.vo.MyReservation;
 import roomescape.reservation.domain.vo.ThemeBookingCount;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JpaReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
@@ -57,5 +58,7 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
             WHERE r.userId = :userId
             """)
     List<MyReservation> findMyReservationsByUserId(@Param("userId") Long userId);
+
+    Optional<Reservation> findByDateAndTime_IdAndTheme_Id(ReservationDate date, Long time_id, Long theme_id);
 }
 

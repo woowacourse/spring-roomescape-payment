@@ -33,4 +33,6 @@ public interface ReservationRepository {
     void updateUserId(Long id, Long userId);
 
     List<MyReservation> findMyReservationsByUserId(Long userId);
+
+    Optional<Reservation> findBySlot(ReservationDate date, Long timeId, Long themeId);
 }

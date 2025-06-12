@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceResponse;
+import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.dto.ReservationSearchRequest;
 import roomescape.reservation.application.dto.ThemeToBookCountServiceResponse;
@@ -17,6 +18,7 @@ import roomescape.time.domain.ReservationTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -50,6 +52,10 @@ public class ReservationQueryService {
         }
 
         return responses;
+    }
+
+    public Optional<Reservation> findBySlot(final CreateReservationServiceRequest request) {
+        return reservationRepository.findBySlot(request.date(), request.timeId(), request.themeId());
     }
 
     public List<ThemeToBookCountServiceResponse> getRanking(final ReservationDate startDate,

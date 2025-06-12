@@ -7,4 +7,6 @@ public interface PaymentRepository {
     Payment save(Payment payment);
 
     List<Payment> findAll();
+
+    boolean isExistsByReservationId(Long id);
 }
