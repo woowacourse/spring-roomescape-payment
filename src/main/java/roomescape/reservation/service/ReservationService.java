@@ -1,12 +1,17 @@
 package roomescape.reservation.service;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
@@ -57,12 +62,22 @@ public class ReservationService {
     }
 
     private List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
-        return reservationQueryUseCase.getByMemberId(memberId)
-                .stream()
+        List<Reservation> reservations = reservationQueryUseCase.getByMemberId(memberId);
+        Map<Long, Payment> payments = getPaymentsByReservations(reservations);
+        return reservations.stream()
                 .map(reservation -> ReservationWithStatusResponse.of(
                         reservation,
-                        paymentRepository.findByReservation(reservation).orElse(null))
+                        payments.getOrDefault(reservation.getId(), null))
                 ).toList();
+    }
+
+    private Map<Long, Payment> getPaymentsByReservations(List<Reservation> reservations) {
+        List<Long> reservationIds = reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        return paymentRepository.findAllByReservationIdIn(reservationIds)
+                .stream()
+                .collect(toMap(payment -> payment.getReservation().getId(), identity()));
     }
 
     private List<ReservationWithStatusResponse> getReservationWaitByMemberId(final Long memberId) {
