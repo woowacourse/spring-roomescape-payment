@@ -10,7 +10,6 @@ import roomescape.member.repository.JpaAccountRepository;
 
 @Repository
 @RequiredArgsConstructor
-// TODO : 구현체 이름 고민해보기
 public class AccountRepositoryImpl implements AccountRepository {
 
     private final JpaAccountRepository jpaAccountRepository;

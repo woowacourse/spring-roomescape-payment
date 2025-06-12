@@ -29,6 +29,7 @@ class PaymentRestClientTest {
 
         // When & Then
         assertThatThrownBy(() -> paymentRestClient.confirm(request))
-            .isInstanceOf(PaymentException.class);
+            .isInstanceOf(PaymentException.class)
+                .hasMessage("");
     }
 }

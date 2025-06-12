@@ -2,7 +2,7 @@ package roomescape.common.exception;
 
 import roomescape.common.exception.error.GeneralErrorCode;
 
-public class ReferencedByOtherException extends CustomException {
+public class ReferencedByOtherException extends BusinessException {
 
     public ReferencedByOtherException(String message) {
         super(message, GeneralErrorCode.CONFLICT);

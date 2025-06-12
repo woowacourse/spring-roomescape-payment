@@ -11,7 +11,8 @@ class AccountTest {
     void 멤버가_null이면_예외가_발생한다() {
         // when & then
         assertThatThrownBy(() -> Account.withoutId(null, Password.from("1234")))
-                .isInstanceOf(InvalidInputException.class);
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage("Account.member 은(는) null일 수 없습니다.");
 
     }
 
@@ -24,7 +25,9 @@ class AccountTest {
                         MemberEmail.from("siso@gmail.com"),
                         Role.ADMIN
                 ), null)
-        ).isInstanceOf(InvalidInputException.class);
+        ).isInstanceOf(InvalidInputException.class)
+                .hasMessage("Account.password 은(는) null일 수 없습니다.");
+
 
     }
 }

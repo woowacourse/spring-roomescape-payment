@@ -74,9 +74,8 @@ class ThemeCommandUseCaseTest {
         themeCommandUseCase.delete(saved.getId());
 
         // then
-        assertThatThrownBy(() -> themeRepository.findById(saved.getId())
-                .orElseThrow())
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(themeRepository.findById(saved.getId()))
+                .isEmpty();
     }
 
     @Test
@@ -88,6 +87,7 @@ class ThemeCommandUseCaseTest {
         // when
         // then
         assertThatThrownBy(() -> themeCommandUseCase.delete(themeId))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("데이터베이스에 해당 id가 존재하지 않습니다.");
     }
 }

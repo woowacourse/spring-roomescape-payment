@@ -14,40 +14,63 @@ import roomescape.common.exception.error.GeneralErrorCode;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<ErrorResponse> handleDateTimeParseException(final HttpServletRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.of(GeneralErrorCode.INVALID_DATETIME_FORMAT, request);
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
-
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ErrorResponse> handlePaymentException(final PaymentException e,
-        final HttpServletRequest request) {
+                                                                final HttpServletRequest request) {
+        log.warn("External API Payment Failed - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponse errorResponse = ErrorResponse.of(e, request);
+        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(PaymentServerException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentServerException(final PaymentServerException e,
+                                                                final HttpServletRequest request) {
+        log.error("External API Payment Server Error - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.of(e, request);
+        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConnectTimeOutException.class)
+    public ResponseEntity<ErrorResponse> handleConnectTimeOutException(final ConnectTimeOutException e,
+                                                                       final HttpServletRequest request) {
+        log.warn("Connect Time Out - URI '{} {}', {} ", request.getMethod(), request.getRequestURI(), e.getMessage());
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode, request);
+        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException e,
+                                                               final HttpServletRequest request) {
+        log.warn("{} - URI '{} {}', {} ", e.getClass().getSimpleName(), request.getMethod(), request.getRequestURI(), e.getMessage());
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode, request);
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(final CustomException e,
                                                                final HttpServletRequest request) {
+        log.warn("Unexpected Custom Error - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponse errorResponse = ErrorResponse.of(errorCode, request);
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 
-    @ExceptionHandler(ConnectTimeOutException.class)
-    public ResponseEntity<ErrorResponse> handleConnectTimeOutException(final ConnectTimeOutException e,
-                                                               final HttpServletRequest request) {
-        log.debug(e.getMessage(), e);
-        ErrorCode errorCode = e.getErrorCode();
-        ErrorResponse errorResponse = ErrorResponse.of(errorCode, request);
-        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorResponse> handleDateTimeParseException(final DateTimeParseException e,
+                                                                      final HttpServletRequest request) {
+        log.error("Datetime Parsing Failed - URI '{} {}'", request.getMethod(), request.getRequestURI(), e);
+        ErrorResponse errorResponse = ErrorResponse.of(GeneralErrorCode.INVALID_DATETIME_FORMAT, request);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleAllException(final HttpServletRequest request, RuntimeException e) {
-        log.error(e.getMessage(), e);
+    public ResponseEntity<ErrorResponse> handleAllException(final HttpServletRequest request,
+                                                            final RuntimeException e) {
+        log.error("Unexpected Error - URI '{} {}' ", request.getMethod(), request.getRequestURI(), e);
         ErrorResponse errorResponse = ErrorResponse.of(GeneralErrorCode.INTERNAL_SERVER_ERROR, request);
         return ResponseEntity.internalServerError().body(errorResponse);
     }

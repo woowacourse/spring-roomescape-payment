@@ -14,6 +14,7 @@ import roomescape.member.domain.MemberName;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.FakeMemberRepository;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.PaymentMethod;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.repository.FakeReservationRepository;
@@ -167,7 +168,8 @@ class ThemeQueryUseCaseTest {
                                             member,
                                             ReservationDate.from(date.getValue().plusDays(j)),
                                             time,
-                                            themes[i]
+                                            themes[i],
+                                            PaymentMethod.PENDING_PAYMENT
                                     )
                             )
                     );
@@ -180,7 +182,8 @@ class ThemeQueryUseCaseTest {
                                             member,
                                             ReservationDate.from(date.getValue().plusDays(j)),
                                             time,
-                                            themes[i]
+                                            themes[i],
+                                            PaymentMethod.PENDING_PAYMENT
                                     )
                             )
                     );

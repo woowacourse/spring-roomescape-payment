@@ -27,7 +27,7 @@ public class Account {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "id", nullable = false)
     private Member member;
 
     @Embedded

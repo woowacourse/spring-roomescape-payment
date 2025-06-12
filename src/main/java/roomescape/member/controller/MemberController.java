@@ -11,7 +11,7 @@ import roomescape.member.service.AccountMemberService;
 
 @RequiredArgsConstructor
 @RestController
-public class MemberController {
+public class MemberController implements SwaggerMemberController {
 
     private final AccountMemberService accountMemberService;
 

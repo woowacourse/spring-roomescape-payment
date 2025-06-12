@@ -19,7 +19,7 @@ public class WaitingQueryUseCase {
 
     public Waiting get(Long id) {
         return waitingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약 대기 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("id: %d에 해당하는 예약 대기 정보를 찾을 수 없습니다.", id));
     }
 
     public boolean existsByParams(ReservationDate date, Long timeId, Long themeId, Long memberId) {
@@ -40,6 +40,6 @@ public class WaitingQueryUseCase {
 
     public Waiting getEarliest(ReservationDate date, Long timeId, Long themeId) {
         return waitingRepository.findEarliestByParams(date, timeId, themeId)
-                .orElseThrow(() -> new NotFoundException("예약 대기 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("date: %s, timeId: %d, themeId: %d에 해당하는 예약 대기 정보를 찾을 수 없습니다."));
     }
 }

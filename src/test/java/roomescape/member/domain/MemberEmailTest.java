@@ -15,14 +15,16 @@ class MemberEmailTest {
 
         // When & Then
         assertThatThrownBy(() -> MemberEmail.from(email)
-        ).isInstanceOf(InvalidInputException.class);
+        ).isInstanceOf(InvalidInputException.class)
+                .hasMessage("MemberEmail.value 은(는) 유효한 이메일 형식이 아닙니다.");
     }
 
     @Test
     void 이메일이_null이라면_예외가_발생한다() {
         // When & Then
         assertThatThrownBy(() -> MemberEmail.from(null)
-        ).isInstanceOf(InvalidInputException.class);
+        ).isInstanceOf(InvalidInputException.class)
+                .hasMessage("MemberEmail.value 은(는) 유효한 이메일 형식이 아닙니다.");
     }
 
     @Test

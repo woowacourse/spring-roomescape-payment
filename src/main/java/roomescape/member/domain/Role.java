@@ -1,8 +1,10 @@
 package roomescape.member.domain;
 
 import java.util.Arrays;
+import lombok.Getter;
 import roomescape.common.exception.NotFoundException;
 
+@Getter
 public enum Role {
 
     MEMBER("1", "회원"),
@@ -28,18 +30,10 @@ public enum Role {
         return Arrays.stream(values())
                 .filter(role -> role.getCode().equals(code))
                 .findAny()
-                .orElseThrow(() -> new NotFoundException("해당 코드에 대한 권한이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 코드에 대한 권한이 존재하지 않습니다. : %s", code));
     }
 
     public boolean isEqual(Role role) {
         return this.equals(role);
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }

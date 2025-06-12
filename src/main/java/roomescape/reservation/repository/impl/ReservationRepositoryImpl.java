@@ -11,10 +11,14 @@ import roomescape.reservation.repository.ReservationRepository;
 
 @Repository
 @RequiredArgsConstructor
-// TODO : 구현체 이름 고민해보기
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final JpaReservationRepository jpaReservationRepository;
+
+    @Override
+    public boolean existsById(final Long id) {
+        return jpaReservationRepository.existsById(id);
+    }
 
     @Override
     public boolean existsByTimeId(Long timeId) {

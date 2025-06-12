@@ -16,6 +16,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.common.exception.ConnectTimeOutException;
 import roomescape.common.exception.ConnectionException;
+import roomescape.common.exception.CustomException;
+import roomescape.common.exception.PaymentServerException;
 import roomescape.common.exception.error.PaymentErrorCode;
 import roomescape.common.exception.PaymentException;
 import roomescape.common.exception.ReadTimeOutException;
@@ -76,10 +78,10 @@ public class PaymentRestClient implements PaymentClient {
         }
     }
 
-    private PaymentException getPaymentError(
+    private CustomException getPaymentError(
         PaymentClientErrorResponse error, HttpStatusCode httpStatusCode) {
         if (serverErrorCases.contains(error.code())) {
-            return new PaymentException(error.message(), PaymentErrorCode.SERVER_ERROR);
+            return new PaymentServerException(error.message(), PaymentErrorCode.SERVER_ERROR);
         }
         if (httpStatusCode.is4xxClientError()) {
             return new PaymentException(error.message(), PaymentErrorCode.CLIENT_ERROR);
@@ -92,10 +94,10 @@ public class PaymentRestClient implements PaymentClient {
 
         if (cause instanceof SocketTimeoutException) {
             String message = cause.getMessage();
-            if (message.equals(READ_TIME_OUT_MESSAGE)) {
+            if (READ_TIME_OUT_MESSAGE.equals(message)) {
                 return new ReadTimeOutException(cause.getMessage());
             }
-            if (message.equals(CONNECT_TIME_OUT_MESSAGE)) {
+            if (CONNECT_TIME_OUT_MESSAGE.equals(message)) {
                 return new ConnectTimeOutException(cause.getMessage());
             }
             return new TimeOutException(cause.getMessage());

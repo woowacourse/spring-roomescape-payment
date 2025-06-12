@@ -30,7 +30,7 @@ public class ReservationQueryUseCase {
 
     public Reservation get(Long id) {
         return reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("id: %d에 해당하는 예약을 찾을 수 없습니다.", id));
     }
 
     public List<Reservation> getByMemberId(final Long memberId) {

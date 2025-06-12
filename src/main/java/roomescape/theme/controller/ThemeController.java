@@ -22,7 +22,7 @@ import roomescape.theme.service.ThemeService;
 @RestController
 @RequestMapping(ThemeController.BASE_PATH)
 @RequiredArgsConstructor
-public class ThemeController {
+public class ThemeController implements SwaggerThemeController {
 
     public static final String BASE_PATH = "/themes";
 

@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.AlreadyExistException;
+import roomescape.common.exception.AuthorizationException;
+import roomescape.common.exception.error.GeneralErrorCode;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.payment.service.converter.PaymentConverter;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
@@ -17,6 +20,7 @@ import roomescape.reservation.controller.dto.CreateWaitingWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
+import roomescape.reservation.domain.PaymentMethod;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.Waiting;
@@ -41,83 +45,92 @@ public class ReservationService {
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
-            reservationQueryUseCase.getAll());
+                reservationQueryUseCase.getAll());
     }
 
     public List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
         List<ReservationWithStatusResponse> reservationWithStatusResponses = reservationQueryUseCase.getByMemberId(
-                memberId).stream()
-            .map(ReservationConverter::toDtoWithStatus)
-            .collect(Collectors.toList());
+                        memberId).stream()
+                .map(ReservationConverter::toDtoWithPayment)
+                .collect(Collectors.toList());
 
         waitingQueryUseCase.getWaitingWithRank(memberId).stream()
-            .map(ReservationConverter::toDtoWithStatus)
-            .forEach(reservationWithStatusResponses::add);
+                .map(ReservationConverter::toDtoWithStatus)
+                .forEach(reservationWithStatusResponses::add);
 
         return reservationWithStatusResponses;
     }
 
     public List<ReservationWebResponse> getAllWaiting() {
         return waitingQueryUseCase.getAll().stream()
-            .map(ReservationConverter::toDto)
-            .toList();
+                .map(ReservationConverter::toDto)
+                .toList();
     }
 
     public List<AvailableReservationTimeWebResponse> getAvailable(final LocalDate date,
-        final Long id) {
+                                                                  final Long id) {
         final AvailableReservationTimeServiceRequest serviceRequest = new AvailableReservationTimeServiceRequest(
-            date,
-            id);
+                date,
+                id);
 
         return reservationQueryUseCase.getTimesWithAvailability(serviceRequest).stream()
-            .map(ReservationConverter::toWebDto)
-            .toList();
+                .map(ReservationConverter::toWebDto)
+                .toList();
     }
 
     public ReservationWebResponse create(
-        final CreateReservationWithMemberIdWebRequest createReservationWithMemberIdWebRequest) {
+            final CreateReservationWithMemberIdWebRequest createReservationWithMemberIdWebRequest) {
         return ReservationConverter.toDto(
-            reservationCommandUseCase.create(
-                new CreateReservationServiceRequest(
-                    createReservationWithMemberIdWebRequest.memberId(),
-                    createReservationWithMemberIdWebRequest.date(),
-                    createReservationWithMemberIdWebRequest.timeId(),
-                    createReservationWithMemberIdWebRequest.themeId())));
+                reservationCommandUseCase.create(
+                        new CreateReservationServiceRequest(
+                                createReservationWithMemberIdWebRequest.memberId(),
+                                createReservationWithMemberIdWebRequest.date(),
+                                createReservationWithMemberIdWebRequest.timeId(),
+                                createReservationWithMemberIdWebRequest.themeId(),
+                                PaymentMethod.PENDING_PAYMENT
+                        )
+                )
+        );
     }
 
     @Transactional
     public ReservationWithStatusResponse create(
-        final CreateReservationWebRequest createReservationWebRequest,
-        final MemberInfo memberInfo) {
+            final CreateReservationWebRequest createReservationWebRequest,
+            final MemberInfo memberInfo) {
 
         final Reservation reservation = reservationCommandUseCase.create(
-            new CreateReservationServiceRequest(
-                memberInfo.id(),
-                createReservationWebRequest.date(),
-                createReservationWebRequest.timeId(),
-                createReservationWebRequest.themeId()));
+                new CreateReservationServiceRequest(
+                        memberInfo.id(),
+                        createReservationWebRequest.date(),
+                        createReservationWebRequest.timeId(),
+                        createReservationWebRequest.themeId(),
+                        PaymentMethod.PENDING_PAYMENT
+                )
+        );
 
-        paymentService.confirm(PaymentConverter.toPaymentDto(createReservationWebRequest));
+        Payment payment = paymentService.confirm(PaymentConverter.toPaymentDto(createReservationWebRequest));
+
+        reservation.confirmPayment(PaymentMethod.PAID_PG, payment);
 
         return ReservationConverter.toDtoWithStatus(reservation);
     }
 
     public ReservationWithStatusResponse createWaiting(
-        final CreateWaitingWebRequest createWaitingWebRequest,
-        final MemberInfo memberInfo
+            final CreateWaitingWebRequest createWaitingWebRequest,
+            final MemberInfo memberInfo
     ) {
 
         validateExistOwnReservation(createWaitingWebRequest, memberInfo);
 
         return ReservationConverter.toDtoWithStatus(
-            waitingCommandUseCase.create(
-                new CreateReservationWithMemberIdServiceRequest(
-                    memberInfo.id(),
-                    createWaitingWebRequest.date(),
-                    createWaitingWebRequest.timeId(),
-                    createWaitingWebRequest.themeId()
+                waitingCommandUseCase.create(
+                        new CreateReservationWithMemberIdServiceRequest(
+                                memberInfo.id(),
+                                createWaitingWebRequest.date(),
+                                createWaitingWebRequest.timeId(),
+                                createWaitingWebRequest.themeId()
+                        )
                 )
-            )
         );
     }
 
@@ -127,55 +140,67 @@ public class ReservationService {
         reservationCommandUseCase.delete(id);
 
         if (waitingQueryUseCase.existsByParams(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
-        )) {
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId())
+        ) {
             promoteWaitingToReservation(reservation);
         }
     }
 
-    public void deleteWaiting(Long id) {
+    public void deleteWaiting(final Long id) {
+        waitingCommandUseCase.delete(id);
+    }
+
+    public void deleteWaiting(final Long id, final MemberInfo memberInfo) {
+        final Waiting waiting = waitingQueryUseCase.get(id);
+
+        if (!waiting.isOwner(memberInfo)) {
+            throw new AuthorizationException("대기의 소유자와 로그인된 회원이 일치하지 않습니다.", GeneralErrorCode.FORBIDDEN);
+        }
+
         waitingCommandUseCase.delete(id);
     }
 
     public List<ReservationWebResponse> search(
-        final ReservationSearchWebRequest reservationSearchWebRequest) {
+            final ReservationSearchWebRequest reservationSearchWebRequest) {
         return reservationQueryUseCase.search(
-                reservationSearchWebRequest.memberId(),
-                reservationSearchWebRequest.themeId(),
-                ReservationDate.from(reservationSearchWebRequest.from()),
-                ReservationDate.from(reservationSearchWebRequest.to()))
-            .stream()
-            .map(ReservationConverter::toDto)
-            .toList();
+                        reservationSearchWebRequest.memberId(),
+                        reservationSearchWebRequest.themeId(),
+                        ReservationDate.from(reservationSearchWebRequest.from()),
+                        ReservationDate.from(reservationSearchWebRequest.to()))
+                .stream()
+                .map(ReservationConverter::toDto)
+                .toList();
     }
 
     private void validateExistOwnReservation(final CreateWaitingWebRequest createWaitingWebRequest,
-        final MemberInfo memberInfo) {
+                                             final MemberInfo memberInfo) {
         if (reservationQueryUseCase.existsByParams(
-            ReservationDate.from(createWaitingWebRequest.date()),
-            createWaitingWebRequest.timeId(),
-            createWaitingWebRequest.themeId(),
-            memberInfo.id())) {
+                ReservationDate.from(createWaitingWebRequest.date()),
+                createWaitingWebRequest.timeId(),
+                createWaitingWebRequest.themeId(),
+                memberInfo.id())
+        ) {
             throw new AlreadyExistException("이미 예약이 존재합니다.");
         }
     }
 
     private void promoteWaitingToReservation(final Reservation reservation) {
         final Waiting waiting = waitingQueryUseCase.getEarliest(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId()
         );
 
         reservationCommandUseCase.create(
-            new CreateReservationServiceRequest(
-                waiting.getMember().getId(),
-                waiting.getDate().getValue(),
-                waiting.getTime().getId(),
-                waiting.getTheme().getId()
-            )
+                new CreateReservationServiceRequest(
+                        waiting.getMember().getId(),
+                        waiting.getDate().getValue(),
+                        waiting.getTime().getId(),
+                        waiting.getTheme().getId(),
+                        PaymentMethod.PENDING_PAYMENT
+                )
         );
 
         waitingCommandUseCase.delete(waiting.getId());

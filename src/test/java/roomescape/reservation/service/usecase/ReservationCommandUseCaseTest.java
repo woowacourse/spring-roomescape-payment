@@ -16,6 +16,10 @@ import roomescape.member.domain.Role;
 import roomescape.member.repository.FakeMemberRepository;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.usecase.MemberQueryUseCase;
+import roomescape.payment.repository.FakePaymentRepository;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.usecase.PaymentQueryUseCase;
+import roomescape.reservation.domain.PaymentMethod;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.repository.FakeReservationRepository;
@@ -43,6 +47,7 @@ class ReservationCommandUseCaseTest {
     private ReservationTimeRepository reservationTimeRepository;
     private ThemeRepository themeRepository;
     private MemberRepository memberRepository;
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +55,7 @@ class ReservationCommandUseCaseTest {
         reservationTimeRepository = new FakeReservationTimeRepository();
         themeRepository = new FakeThemeRepository();
         memberRepository = new FakeMemberRepository();
+        paymentRepository = new FakePaymentRepository();
 
         reservationCommandUseCase = new ReservationCommandUseCase(
                 reservationRepository,
@@ -57,7 +63,8 @@ class ReservationCommandUseCaseTest {
                         new ReservationTimeQueryUseCase(reservationTimeRepository)),
                 new ReservationTimeQueryUseCase(reservationTimeRepository),
                 new ThemeQueryUseCase(themeRepository),
-                new MemberQueryUseCase(memberRepository)
+                new MemberQueryUseCase(memberRepository),
+                new PaymentQueryUseCase(paymentRepository)
         );
     }
 
@@ -87,7 +94,8 @@ class ReservationCommandUseCaseTest {
                 member.getId(),
                 LocalDate.of(2025, 8, 5),
                 reservationTime.getId(),
-                theme.getId());
+                theme.getId(),
+                PaymentMethod.PENDING_PAYMENT);
 
         // when
         final Reservation reservation = reservationCommandUseCase.create(requestDto);
@@ -130,7 +138,8 @@ class ReservationCommandUseCaseTest {
                         member.getId(),
                         LocalDate.of(2025, 8, 10),
                         reservationTime.getId(),
-                        theme.getId()
+                        theme.getId(),
+                        PaymentMethod.PENDING_PAYMENT
                 ));
 
         // When & Then
@@ -139,7 +148,9 @@ class ReservationCommandUseCaseTest {
                         member.getId(),
                         LocalDate.of(2025, 8, 10),
                         reservationTime.getId(),
-                        theme.getId())))
+                        theme.getId(),
+                        PaymentMethod.PENDING_PAYMENT
+                )))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage("추가하려는 예약이 이미 존재합니다.");
     }
@@ -169,7 +180,9 @@ class ReservationCommandUseCaseTest {
                         member,
                         ReservationDate.from(LocalDate.of(2025, 8, 10)),
                         reservationTime,
-                        theme));
+                        theme,
+                        PaymentMethod.PENDING_PAYMENT
+                ));
 
         // when
         reservationCommandUseCase.delete(reservation.getId());
@@ -187,6 +200,7 @@ class ReservationCommandUseCaseTest {
 
         // When & Then
         assertThatThrownBy(() -> reservationCommandUseCase.delete(id))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("id: %d에 해당하는 예약을 찾을 수 없습니다.", id);
     }
 }

@@ -12,6 +12,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberEmail;
 import roomescape.member.domain.MemberName;
 import roomescape.member.domain.Role;
+import roomescape.reservation.domain.PaymentMethod;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.repository.FakeReservationRepository;
@@ -93,7 +94,8 @@ class ReservationTimeCommandUseCaseTest {
         // when
         // then
         assertThatThrownBy(() -> reservationTimeCommandUseCase.delete(id))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("데이터베이스에 해당 id가 존재하지 않습니다.");
     }
 
     @Test
@@ -116,7 +118,8 @@ class ReservationTimeCommandUseCaseTest {
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1L)),
                 savedTime,
-                theme
+                theme,
+                PaymentMethod.PENDING_PAYMENT
         ));
 
         // when

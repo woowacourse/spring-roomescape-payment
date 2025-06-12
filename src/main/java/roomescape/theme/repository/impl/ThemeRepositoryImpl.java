@@ -12,7 +12,6 @@ import roomescape.theme.repository.ThemeRepository;
 
 @Repository
 @RequiredArgsConstructor
-// TODO : 구현체 이름 고민해보기
 public class ThemeRepositoryImpl implements ThemeRepository {
 
     private final JpaThemeRepository jpaThemeRepository;

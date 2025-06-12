@@ -21,7 +21,7 @@ import roomescape.time.service.ReservationTimeService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ReservationTimeController.BASE_PATH)
-public class ReservationTimeController {
+public class ReservationTimeController implements SwaggerReservationTimeController {
 
     public static final String BASE_PATH = "/times";
 

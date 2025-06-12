@@ -61,6 +61,7 @@ class MemberCommandUseCaseTest {
 
         // when & then
         assertThatThrownBy(() -> memberCommandUseCase.create(member))
-                .isInstanceOf(AlreadyExistException.class);
+                .isInstanceOf(AlreadyExistException.class)
+                .hasMessage("이미 존재하는 이메일입니다.");
     }
 }

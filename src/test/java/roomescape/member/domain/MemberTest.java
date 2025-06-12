@@ -35,7 +35,8 @@ class MemberTest {
                 MemberName.from(name),
                 MemberEmail.from(email),
                 null
-        )).isInstanceOf(InvalidInputException.class);
+        )).isInstanceOf(InvalidInputException.class)
+                .hasMessage("Member.role 은(는) null일 수 없습니다.");
     }
 
     @Test

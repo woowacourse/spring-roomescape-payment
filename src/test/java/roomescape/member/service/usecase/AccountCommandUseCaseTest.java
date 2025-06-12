@@ -72,6 +72,7 @@ class AccountCommandUseCaseTest {
 
         // when & then
         assertThatThrownBy(() -> accountCommandUseCase.create(account))
-                .isInstanceOf(AlreadyExistException.class);
+                .isInstanceOf(AlreadyExistException.class)
+                .hasMessage("이미 존재하는 계정입니다.");
     }
 }

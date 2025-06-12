@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -17,6 +18,7 @@ import lombok.experimental.FieldNameConstants;
 import roomescape.common.BaseEntity;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.utils.Validator;
+import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
@@ -34,15 +36,18 @@ public class Waiting extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private Member member;
 
     @Embedded
     private ReservationDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private ReservationTime time;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private Theme theme;
 
     private static Waiting of(
@@ -97,10 +102,14 @@ public class Waiting extends BaseEntity {
             return;
         }
         if (date.isBefore(now.toLocalDate())) {
-            throw new BadRequestException("지난 날짜는 예약할 수 없습니다.");
+            throw new BadRequestException("지난 날짜는 예약 대기할 수 없습니다.");
         }
         if (time.isBefore(now.toLocalTime())) {
-            throw new BadRequestException("이미 지난 시간에는 예약할 수 없습니다.");
+            throw new BadRequestException("이미 지난 시간에는 예약 대기할 수 없습니다.");
         }
+    }
+
+    public boolean isOwner(final MemberInfo memberInfo) {
+        return member.isSameMember(memberInfo);
     }
 }

@@ -11,9 +11,6 @@ public class PaymentException extends CustomException {
 
     @Override
     public String getMessageForClient() {
-        if (errorCode == PaymentErrorCode.CLIENT_ERROR) {
-            return getMessage();
-        }
-        return super.getMessageForClient();
+        return getMessage();
     }
 }

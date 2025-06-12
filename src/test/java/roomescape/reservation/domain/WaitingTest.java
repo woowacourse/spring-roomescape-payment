@@ -35,13 +35,15 @@ class WaitingTest {
                     ReservationDate.from(LocalDate.now().minusDays(1L)),
                     ReservationTime.withoutId(LocalTime.now()),
                     theme
-            )).isInstanceOf(BadRequestException.class);
+            )).isInstanceOf(BadRequestException.class)
+                    .hasMessage("지난 날짜는 예약 대기할 수 없습니다.");
             softAssertions.assertThatThrownBy(() -> Waiting.withoutId(
                     member,
                     ReservationDate.from(LocalDate.now()),
                     ReservationTime.withoutId(LocalTime.now().minusMinutes(1L)),
                     theme
-            )).isInstanceOf(BadRequestException.class);
+            )).isInstanceOf(BadRequestException.class)
+                    .hasMessage("이미 지난 시간에는 예약 대기할 수 없습니다.");
         });
     }
 }

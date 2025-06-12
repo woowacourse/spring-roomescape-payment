@@ -92,7 +92,8 @@ class WaitingQueryUseCaseTest {
 
         // When & Then
         assertThatThrownBy(() -> waitingQueryUseCase.get(thrownId))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("id: %d에 해당하는 예약 대기 정보를 찾을 수 없습니다.", thrownId);
     }
 
     @Test

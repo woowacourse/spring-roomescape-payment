@@ -17,7 +17,12 @@ import roomescape.member.repository.FakeMemberRepository;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberConverter;
 import roomescape.member.service.usecase.MemberQueryUseCase;
+import roomescape.payment.repository.FakePaymentRepository;
+import roomescape.payment.repository.JpaPaymentRepository;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.usecase.PaymentCommandUseCase;
+import roomescape.payment.service.usecase.PaymentQueryUseCase;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateWaitingWebRequest;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
@@ -53,6 +58,7 @@ class ReservationServiceTest {
     private ReservationTimeRepository reservationTimeRepository;
     private ReservationRepository reservationRepository;
     private WaitingRepository waitingRepository;
+    private PaymentRepository paymentRepository;
 
     @Mock
     private PaymentService paymentService;
@@ -62,39 +68,42 @@ class ReservationServiceTest {
         reservationRepository = new FakeReservationRepository();
         reservationTimeRepository = new FakeReservationTimeRepository();
         final ReservationTimeQueryUseCase reservationTimeQueryUseCase = new ReservationTimeQueryUseCase(
-            reservationTimeRepository);
+                reservationTimeRepository);
 
         final ReservationQueryUseCase reservationQueryUseCase = new ReservationQueryUseCase(
-            reservationRepository,
-            reservationTimeQueryUseCase
+                reservationRepository,
+                reservationTimeQueryUseCase
         );
 
         themeRepository = new FakeThemeRepository();
         memberRepository = new FakeMemberRepository();
+        paymentRepository = new FakePaymentRepository();
+
         final ReservationCommandUseCase reservationCommandUseCase = new ReservationCommandUseCase(
-            reservationRepository,
-            reservationQueryUseCase,
-            reservationTimeQueryUseCase,
-            new ThemeQueryUseCase(themeRepository),
-            new MemberQueryUseCase(memberRepository)
+                reservationRepository,
+                reservationQueryUseCase,
+                reservationTimeQueryUseCase,
+                new ThemeQueryUseCase(themeRepository),
+                new MemberQueryUseCase(memberRepository),
+                new PaymentQueryUseCase(paymentRepository)
         );
 
         waitingRepository = new FakeWaitingRepository();
         final WaitingCommandUseCase waitingCommandUseCase = new WaitingCommandUseCase(
-            waitingRepository,
-            new WaitingQueryUseCase(waitingRepository),
-            reservationTimeQueryUseCase,
-            new ThemeQueryUseCase(themeRepository),
-            new MemberQueryUseCase(memberRepository)
+                waitingRepository,
+                new WaitingQueryUseCase(waitingRepository),
+                reservationTimeQueryUseCase,
+                new ThemeQueryUseCase(themeRepository),
+                new MemberQueryUseCase(memberRepository)
         );
         final WaitingQueryUseCase waitingQueryUseCase = new WaitingQueryUseCase(waitingRepository);
 
         reservationService = new ReservationService(
-            reservationQueryUseCase,
-            reservationCommandUseCase,
-            waitingCommandUseCase,
-            waitingQueryUseCase,
-            paymentService
+                reservationQueryUseCase,
+                reservationCommandUseCase,
+                waitingCommandUseCase,
+                waitingQueryUseCase,
+                paymentService
         );
     }
 
@@ -102,150 +111,151 @@ class ReservationServiceTest {
     void 예약이_존재한다면_대기를_생성한다() {
         // Given
         final ReservationTime reservationTime = reservationTimeRepository.save(
-            ReservationTime.withoutId(
-                LocalTime.of(18, 0)
-            )
+                ReservationTime.withoutId(
+                        LocalTime.of(18, 0)
+                )
         );
 
         final Theme theme = themeRepository.save(
-            Theme.withoutId(
-                ThemeName.from("공포"),
-                ThemeDescription.from("지구별 방탈출 최고"),
-                ThemeThumbnail.from("www.making.com")
-            )
+                Theme.withoutId(
+                        ThemeName.from("공포"),
+                        ThemeDescription.from("지구별 방탈출 최고"),
+                        ThemeThumbnail.from("www.making.com")
+                )
         );
 
         final Member member = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("강산"),
-                MemberEmail.from("123@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("강산"),
+                        MemberEmail.from("123@gmail.com"),
+                        Role.MEMBER
+                )
         );
         final Member member2 = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("siso"),
-                MemberEmail.from("123123@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("siso"),
+                        MemberEmail.from("123123@gmail.com"),
+                        Role.MEMBER
+                )
         );
 
         final CreateReservationWebRequest request = new CreateReservationWebRequest(
-            LocalDate.now().plusYears(1),
-            reservationTime.getId(),
-            theme.getId(),
-            "temp_key",
-            "temp_id",
-            10000L
+                LocalDate.now().plusYears(1),
+                reservationTime.getId(),
+                theme.getId(),
+                "temp_key",
+                "temp_id",
+                10000L
         );
         final CreateWaitingWebRequest request2 = new CreateWaitingWebRequest(
-            request.date(),
-            request.timeId(),
-            request.themeId()
+                request.date(),
+                request.timeId(),
+                request.themeId()
         );
         reservationService.create(request, MemberConverter.toDto(member));
 
         // When
         final ReservationWithStatusResponse response = reservationService.createWaiting(request2,
-            MemberConverter.toDto(member2));
+                MemberConverter.toDto(member2));
 
         // Then
         assertThat(waitingRepository.findById(response.id()))
-            .isPresent();
+                .isPresent();
     }
 
     @Test
     void 본인의_예약이_존재한다면_대기를_생성하지_않고_예외가_발생한다() {
         // Given
         final ReservationTime reservationTime = reservationTimeRepository.save(
-            ReservationTime.withoutId(
-                LocalTime.of(18, 0)
-            )
+                ReservationTime.withoutId(
+                        LocalTime.of(18, 0)
+                )
         );
 
         final Theme theme = themeRepository.save(
-            Theme.withoutId(
-                ThemeName.from("공포"),
-                ThemeDescription.from("지구별 방탈출 최고"),
-                ThemeThumbnail.from("www.making.com")
-            )
+                Theme.withoutId(
+                        ThemeName.from("공포"),
+                        ThemeDescription.from("지구별 방탈출 최고"),
+                        ThemeThumbnail.from("www.making.com")
+                )
         );
 
         final Member member = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("강산"),
-                MemberEmail.from("123@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("강산"),
+                        MemberEmail.from("123@gmail.com"),
+                        Role.MEMBER
+                )
         );
 
         final CreateReservationWebRequest request = new CreateReservationWebRequest(
-            LocalDate.now().plusYears(1),
-            reservationTime.getId(),
-            theme.getId(),
-            "temp_key",
-            "temp_id",
-            10000L
+                LocalDate.now().plusYears(1),
+                reservationTime.getId(),
+                theme.getId(),
+                "temp_key",
+                "temp_id",
+                10000L
         );
         final CreateReservationWebRequest request2 = new CreateReservationWebRequest(
-            request.date(),
-            request.timeId(),
-            request.themeId(),
-            "temp_key",
-            "temp_id",
-            10000L
+                request.date(),
+                request.timeId(),
+                request.themeId(),
+                "temp_key",
+                "temp_id",
+                10000L
         );
         reservationService.create(request, MemberConverter.toDto(member));
 
         // When & Then
         assertThatThrownBy(() -> reservationService.create(request2, MemberConverter.toDto(member)))
-            .isInstanceOf(AlreadyExistException.class);
+                .isInstanceOf(AlreadyExistException.class)
+                .hasMessage("추가하려는 예약이 이미 존재합니다.");
     }
 
     @Test
     void 예약_대기가_존재할_때_예약을_삭제하면_가장_빠른_대기가_예약_상태가_된다() {
         // Given
         final ReservationTime reservationTime = reservationTimeRepository.save(
-            ReservationTime.withoutId(
-                LocalTime.of(18, 0)
-            )
+                ReservationTime.withoutId(
+                        LocalTime.of(18, 0)
+                )
         );
 
         final Theme theme = themeRepository.save(
-            Theme.withoutId(
-                ThemeName.from("공포"),
-                ThemeDescription.from("지구별 방탈출 최고"),
-                ThemeThumbnail.from("www.making.com")
-            )
+                Theme.withoutId(
+                        ThemeName.from("공포"),
+                        ThemeDescription.from("지구별 방탈출 최고"),
+                        ThemeThumbnail.from("www.making.com")
+                )
         );
 
         final Member member = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("강산"),
-                MemberEmail.from("123@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("강산"),
+                        MemberEmail.from("123@gmail.com"),
+                        Role.MEMBER
+                )
         );
         final Member member2 = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("시송"),
-                MemberEmail.from("siso@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("시송"),
+                        MemberEmail.from("siso@gmail.com"),
+                        Role.MEMBER
+                )
         );
 
         final CreateReservationWebRequest request = new CreateReservationWebRequest(
-            LocalDate.now().plusYears(1),
-            reservationTime.getId(),
-            theme.getId(),
-            "temp_key",
-            "temp_id",
-            10000L
+                LocalDate.now().plusYears(1),
+                reservationTime.getId(),
+                theme.getId(),
+                "temp_key",
+                "temp_id",
+                10000L
         );
         final CreateWaitingWebRequest request2 = new CreateWaitingWebRequest(
-            request.date(),
-            request.timeId(),
-            request.themeId()
+                request.date(),
+                request.timeId(),
+                request.themeId()
         );
 
         reservationService.create(request, MemberConverter.toDto(member));
@@ -257,9 +267,9 @@ class ReservationServiceTest {
         // Then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(waitingRepository.findAll())
-                .hasSize(0);
+                    .hasSize(0);
             softly.assertThat(reservationRepository.findAll())
-                .hasSize(1);
+                    .hasSize(1);
         });
     }
 
@@ -267,34 +277,34 @@ class ReservationServiceTest {
     void 예약_대기가_존재하지_않을_때_예약을_삭제하면_예약만_삭제된다() {
         // Given
         final ReservationTime reservationTime = reservationTimeRepository.save(
-            ReservationTime.withoutId(
-                LocalTime.of(18, 0)
-            )
+                ReservationTime.withoutId(
+                        LocalTime.of(18, 0)
+                )
         );
 
         final Theme theme = themeRepository.save(
-            Theme.withoutId(
-                ThemeName.from("공포"),
-                ThemeDescription.from("지구별 방탈출 최고"),
-                ThemeThumbnail.from("www.making.com")
-            )
+                Theme.withoutId(
+                        ThemeName.from("공포"),
+                        ThemeDescription.from("지구별 방탈출 최고"),
+                        ThemeThumbnail.from("www.making.com")
+                )
         );
 
         final Member member = memberRepository.save(
-            Member.withoutId(
-                MemberName.from("강산"),
-                MemberEmail.from("123@gmail.com"),
-                Role.MEMBER
-            )
+                Member.withoutId(
+                        MemberName.from("강산"),
+                        MemberEmail.from("123@gmail.com"),
+                        Role.MEMBER
+                )
         );
 
         final CreateReservationWebRequest request = new CreateReservationWebRequest(
-            LocalDate.now().plusYears(1),
-            reservationTime.getId(),
-            theme.getId(),
-            "temp_key",
-            "temp_id",
-            10000L
+                LocalDate.now().plusYears(1),
+                reservationTime.getId(),
+                theme.getId(),
+                "temp_key",
+                "temp_id",
+                10000L
         );
 
         reservationService.create(request, MemberConverter.toDto(member));
@@ -304,6 +314,6 @@ class ReservationServiceTest {
 
         // Then
         assertThat(reservationRepository.findAll())
-            .isEmpty();
+                .isEmpty();
     }
 }

@@ -15,7 +15,8 @@ public class AccountQueryUseCase {
     private final AccountRepository accountRepository;
 
     public Account getAccount(LoginRequest loginRequest) {
-        return accountRepository.findAccountByMemberEmail(MemberEmail.from(loginRequest.email()))
-                .orElseThrow(() -> new NotFoundException("등록된 이메일이 존재하지 않습니다."));
+        final String email = loginRequest.email();
+        return accountRepository.findAccountByMemberEmail(MemberEmail.from(email))
+                .orElseThrow(() -> new NotFoundException("email: 으로 등록된 계정이 존재하지 않습니다.", email));
     }
 }

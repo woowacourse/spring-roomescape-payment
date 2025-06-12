@@ -18,7 +18,7 @@ public class ReservationTimeQueryUseCase {
 
     public ReservationTime get(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("조회할 시간을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("id: %d에 해당하는 시간을 찾을 수 없습니다.", id));
     }
 
     public List<ReservationTime> getAll() {

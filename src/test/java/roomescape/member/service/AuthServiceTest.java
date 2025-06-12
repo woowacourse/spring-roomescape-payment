@@ -101,7 +101,8 @@ class AuthServiceTest {
 
         // when & then
         assertThatThrownBy(() -> authService.checkLogin(token))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(AuthenticationException.class)
+                .hasMessage("잘못된 토큰입니다.");
     }
 
     @Test

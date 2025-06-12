@@ -130,6 +130,7 @@ class WaitingCommandUseCaseTest {
 
         // When & Then
         assertThatThrownBy(() -> waitingCommandUseCase.create(request))
-                .isInstanceOf(AlreadyExistException.class);
+                .isInstanceOf(AlreadyExistException.class)
+                .hasMessage("추가하려는 예약 대기 정보가 이미 존재합니다.");
     }
 }

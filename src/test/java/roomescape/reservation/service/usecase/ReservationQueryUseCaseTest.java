@@ -13,6 +13,8 @@ import roomescape.member.domain.MemberName;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.FakeMemberRepository;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.reservation.domain.PaymentMethod;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.repository.FakeReservationRepository;
@@ -73,17 +75,30 @@ class ReservationQueryUseCaseTest {
                 )
         );
 
+        final Payment payment = Payment.withoutId(
+                "paymentKey123",
+                "orderId123",
+                10000L,
+                "123",
+                "123"
+        );
+
         final Reservation given1 = Reservation.withoutId(
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
-                theme);
+                theme,
+                PaymentMethod.PENDING_PAYMENT,
+                payment
+        );
 
         final Reservation given2 = Reservation.withoutId(
                 member,
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
-                theme);
+                theme,
+                PaymentMethod.PENDING_PAYMENT
+        );
 
         final Reservation saved1 = reservationRepository.save(given1);
         final Reservation saved2 = reservationRepository.save(given2);
@@ -133,7 +148,9 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                PaymentMethod.PENDING_PAYMENT
+        ));
 
         // when
         final List<AvailableReservationTimeServiceResponse> timesWithAvailability = reservationQueryUseCase.getTimesWithAvailability(
@@ -183,7 +200,9 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                PaymentMethod.PENDING_PAYMENT
+        ));
 
         // when & then
         assertThat(reservationQueryUseCase.getByMemberId(member.getId()))
@@ -217,7 +236,9 @@ class ReservationQueryUseCaseTest {
                 member,
                 date,
                 booked,
-                theme));
+                theme,
+                PaymentMethod.PENDING_PAYMENT
+        ));
 
         // when & then
         assertThat(reservationQueryUseCase.search(member.getId(), theme.getId(), from, to))

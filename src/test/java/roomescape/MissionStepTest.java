@@ -183,6 +183,9 @@ public class MissionStepTest {
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
 
+        jdbcTemplate.update("INSERT INTO payment (payment_key, order_id, amount) VALUES (?, ?, ?)",
+                "temp_key", "temp_id", "10000");
+
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");
         params.put("timeId", "1");
@@ -254,8 +257,8 @@ public class MissionStepTest {
             "공포", "설명", "엄지손톱");
 
         jdbcTemplate.update(
-            "INSERT INTO reservation (member_id, reservation_date, time_id, theme_id) VALUES (?, ?, ?, ?)",
-            1, "2023-08-05", 1, 1);
+            "INSERT INTO reservation (member_id, reservation_date, time_id, theme_id, status) VALUES (?, ?, ?, ?, ?)",
+            1, "2023-08-05", 1, 1, 1);
 
         final List<ReservationWithStatusResponse> reservations = RestAssured.given().log().all()
             .cookie("token", memberToken)
@@ -278,6 +281,9 @@ public class MissionStepTest {
 
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
+
+        jdbcTemplate.update("INSERT INTO payment (payment_key, order_id, amount) VALUES (?, ?, ?)",
+                "temp_key", "temp_id", "10000");
 
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");

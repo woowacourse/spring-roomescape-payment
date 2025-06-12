@@ -11,7 +11,6 @@ import roomescape.time.repository.ReservationTimeRepository;
 
 @Repository
 @RequiredArgsConstructor
-// TODO: 구현체 이름 고민해보기
 public class ReservationTimeRepositoryImpl implements ReservationTimeRepository {
 
     private final JpaReservationTimeRepository jpaReservationTimeRepository;

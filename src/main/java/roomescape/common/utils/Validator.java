@@ -35,4 +35,11 @@ public class Validator {
         }
         return this;
     }
+
+    public Validator positiveNumberField(final String fieldName, final Long target) {
+        if (target == null || target < 0) {
+            throw new InvalidInputException(clazz.getSimpleName() + "." + fieldName + " 은(는) 음수일 수 없습니다.");
+        }
+        return this;
+    }
 }

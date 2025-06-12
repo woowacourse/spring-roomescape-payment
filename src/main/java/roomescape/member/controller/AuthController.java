@@ -18,7 +18,7 @@ import roomescape.member.service.AuthService;
 
 @RequiredArgsConstructor
 @RestController
-public class AuthController {
+public class AuthController implements SwaggerAuthController {
 
     private final AuthService authService;
     private final JwtTokenExtractor jwtTokenExtractor;
