@@ -1,6 +1,7 @@
 package roomescape.exception;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -16,10 +17,12 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(exception = IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException 발생 - message: {}", e.getMessage(), e);
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
         return ResponseEntity.badRequest().body(response);
@@ -27,6 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(exception = UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
+        log.error("UnauthorizedException 발생 - message: {}", e.getMessage(), e);
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
         return ResponseEntity.status(UNAUTHORIZED)
@@ -35,6 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(exception = ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
+        log.error("ForbiddenException 발생 - message: {}", e.getMessage(), e);
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
         return ResponseEntity.status(FORBIDDEN)
@@ -43,6 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(exception = PaymentException.class)
     public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+        log.error("PaymentException 발생 - statusCode: {}, message: {}", e.getStatusCode(), e.getMessage(), e);
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
         return ResponseEntity.status(e.getStatusCode())
@@ -51,6 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponse>> handleValidationException(MethodArgumentNotValidException e) {
+        log.error("MethodArgumentNotValidException 발생 - message: {}", e.getMessage(), e);
         List<ErrorResponse> responses = createValidationErrorMessage(e.getBindingResult());
 
         return ResponseEntity.badRequest().body(responses);

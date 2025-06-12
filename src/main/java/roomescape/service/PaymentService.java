@@ -3,6 +3,7 @@ package roomescape.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import roomescape.exception.custom.PaymentException;
 import roomescape.repository.PaymentRepository;
 
 @Service
+@Slf4j
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -36,27 +38,44 @@ public class PaymentService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest, Reservation reservation) {
-        String authorizations = getAuthorizationToken();
+        log.info("결제 승인 시작 - orderId: {}, amount: {}, reservationId: {}",
+                paymentRequest.orderId(), paymentRequest.amount(), reservation.getId());
 
-        ConfirmPaymentResponse body = restClient.post()
-                .uri("/v1/payments/confirm")
-                .header("Authorization", authorizations)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, ((request, response) -> {
-                    PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
-                            response.getBody().readAllBytes(),
-                            PaymentErrorResponse.class);
-                    throw new PaymentException(response.getStatusCode(), paymentErrorResponse.message());
-                }))
-                .toEntity(ConfirmPaymentResponse.class)
-                .getBody();
+        try {
+            String authorizations = getAuthorizationToken();
 
-        Payment payment = new Payment(body.orderId(), body.totalAmount(), body.paymentKey(), body.type(), reservation);
-        paymentRepository.save(payment);
+            ConfirmPaymentResponse body = restClient.post()
+                    .uri("/v1/payments/confirm")
+                    .header("Authorization", authorizations)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(paymentRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, ((request, response) -> {
+                        PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
+                                response.getBody().readAllBytes(),
+                                PaymentErrorResponse.class);
+                        log.error("토스페이먼츠 API 호출 실패 - orderId: {}, statusCode: {}, message: {}",
+                                paymentRequest.orderId(), response.getStatusCode(), paymentErrorResponse.message());
+                        throw new PaymentException(response.getStatusCode(), paymentErrorResponse.message());
+                    }))
+                    .toEntity(ConfirmPaymentResponse.class)
+                    .getBody();
 
-        return body;
+            log.info("토스페이먼츠 결제 승인 성공 - paymentKey: {}, orderId: {}",
+                    body.paymentKey(), body.orderId());
+
+            Payment payment = new Payment(body.orderId(), body.totalAmount(), body.paymentKey(), body.type(),
+                    reservation);
+            paymentRepository.save(payment);
+
+            log.info("결제 정보 저장 완료 - paymentId: {}, orderId: {}", payment.getId(), payment.getOrderId());
+
+            return body;
+        } catch (Exception e) {
+            log.error("결제 승인 실패 - orderId: {}, reservationId: {}, error: {}",
+                    paymentRequest.orderId(), reservation.getId(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     private String getAuthorizationToken() {
