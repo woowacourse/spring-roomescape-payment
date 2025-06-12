@@ -1,5 +1,6 @@
 package roomescape.reservation.controller.dto;
 
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
@@ -23,7 +24,7 @@ public class ReservationWithStatusResponse {
     private final String status;
     private final PaymentWebResponse payment;
 
-    public static ReservationWithStatusResponse of(Reservation reservation, Payment payment) {
+    public static ReservationWithStatusResponse of(Reservation reservation, @Nullable Payment payment) {
         return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
