@@ -1,5 +1,7 @@
 package roomescape.auth.config;
 
+import static roomescape.global.exception.ErrorMessage.INTERNAL_SERVER_ERROR;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.auth.application.AuthService;
 import roomescape.auth.application.LoginMember;
 import roomescape.member.domain.Member;
-import roomescape.member.service.MemberService;
+import roomescape.member.exception.MemberNotFoundException;
+import roomescape.member.repository.MemberRepository;
 
 @Slf4j
 @Component
@@ -18,7 +21,7 @@ import roomescape.member.service.MemberService;
 public class AuthCheckInterceptor implements HandlerInterceptor {
 
     private final AuthService authService;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -62,7 +65,15 @@ public class AuthCheckInterceptor implements HandlerInterceptor {
     }
 
     private boolean isNotAdminMember(LoginMember loginMember) {
-        Member member = memberService.getMemberById(loginMember.getId());
+        Member member = getMemberById(loginMember.getId());
         return member.isNotAdmin();
+    }
+
+    private Member getMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> {
+                    log.warn("[권한 검증 실패] 존재하지 않는 회원 ID: {}", memberId);
+                    return new MemberNotFoundException(INTERNAL_SERVER_ERROR.getMessage());
+                });
     }
 }

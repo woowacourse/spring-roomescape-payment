@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import static roomescape.global.exception.ErrorMessage.INTERNAL_SERVER_ERROR;
+
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,8 +13,8 @@ import roomescape.auth.application.LoginMember;
 import roomescape.global.config.Performance;
 import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
+import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.repository.MemberRepository;
-import roomescape.member.service.MemberService;
 import roomescape.payment.application.Payment;
 import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
@@ -41,7 +43,6 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
 
     @Performance
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
@@ -80,7 +81,7 @@ public class ReservationService {
 
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
                                            Theme theme, LoginMember loginMember, Payment payment) {
-        Member member = memberService.getMemberById(loginMember.getId());
+        Member member = getMemberById(loginMember.getId());
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
             log.warn("[예약 검증 실패] 사용자 중복 예약 시도 - memberId: {}, date: {}, time: {}, theme: {}",
                     member.getId(), date, reservationTime.getStartAt(), theme.getName());
@@ -97,7 +98,7 @@ public class ReservationService {
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
                                           Theme theme, LoginMember loginMember, Payment payment) {
-        Member member = memberService.getMemberById(loginMember.getId());
+        Member member = getMemberById(loginMember.getId());
         Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock),
                 payment);
 
@@ -150,9 +151,17 @@ public class ReservationService {
 
     @Performance
     public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        Member member = memberService.getMemberById(loginMember.getId());
+        Member member = getMemberById(loginMember.getId());
         return reservationRepository.findAllByMember(member).stream()
                 .map(MyReservationResponse::new)
                 .toList();
+    }
+
+    public Member getMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> {
+                    log.warn("[회원 조회 실패] 존재하지 않는 회원 ID: {}", memberId);
+                    return new MemberNotFoundException(INTERNAL_SERVER_ERROR.getMessage());
+                });
     }
 }

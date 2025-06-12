@@ -6,14 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import roomescape.auth.exception.InvalidEmailException;
 import roomescape.auth.exception.InvalidPasswordException;
 import roomescape.auth.infrastructure.TokenProvider;
 import roomescape.auth.presentation.CookieManager;
 import roomescape.auth.presentation.dto.LoginRequest;
 import roomescape.member.domain.Member;
 import roomescape.member.exception.MemberNotFoundException;
-import roomescape.member.service.MemberService;
+import roomescape.member.repository.MemberRepository;
 
 @Slf4j
 @Service
@@ -22,7 +21,7 @@ public class AuthService {
 
     private final CookieManager cookieManager;
     private final TokenProvider jwtTokenProvider;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     public String createToken(final LoginRequest loginRequest) {
         Member member = getMemberByLoginRequest(loginRequest);
@@ -49,12 +48,11 @@ public class AuthService {
     }
 
     private Member getMemberByEmail(final String email) {
-        try {
-            return memberService.getMemberByEmail(email);
-        } catch (MemberNotFoundException e) {
-            log.error("인증 실패 : 존재하지 않는 이메일 - email: {}", email);
-            throw new InvalidEmailException(INVALID_LOGIN_CREDENTIALS.getMessage());
-        }
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("인증 실패 : 존재하지 않는 이메일 - email: {}", email);
+                    return new MemberNotFoundException(INVALID_LOGIN_CREDENTIALS.getMessage());
+                });
     }
 
     public LoginMember extractMemberByRequest(final HttpServletRequest request) {
