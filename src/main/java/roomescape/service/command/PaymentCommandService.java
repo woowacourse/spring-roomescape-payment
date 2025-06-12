@@ -8,7 +8,6 @@ import roomescape.domain.payment.OrderItem;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.payment.ReservationPayment;
-import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 import roomescape.dto.reservation.TossPaymentRequestDto;
 import roomescape.exception.common.NotFoundException;

@@ -3,11 +3,10 @@ package roomescape.controller.api;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import roomescape.client.PaymentClient;
 import roomescape.controller.annotation.AdminOnly;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MemberReservationCreateRequestDto;
+import roomescape.dto.reservation.ReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.PaymentCommandService;
@@ -53,7 +52,7 @@ public class ReservationController {
     @Transactional
     public ReservationResponseDto addReservation(
             @CurrentMember LoginInfo loginInfo,
-            @RequestBody MemberReservationCreateRequestDto requestDto
+            @RequestBody ReservationCreateRequestDto requestDto
     ) {
         ReservationResponseDto reservationResponse = reservationCommandService.bookReservation(
                 requestDto, loginInfo);

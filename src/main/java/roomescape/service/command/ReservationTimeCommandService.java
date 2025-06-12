@@ -7,7 +7,6 @@ import roomescape.dto.time.ReservationTimeCreateRequestDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.common.BadRequestException;
-import roomescape.exception.common.ForbiddenException;
 import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;

@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClient;
 import roomescape.client.dto.TossPaymentConfirmResponse;
 import roomescape.client.dto.TossServerErrorResponse;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
-import roomescape.dto.reservation.TossPaymentRequestDto;
 
 import java.util.Base64;
 import roomescape.exception.PaymentConfirmClientException;

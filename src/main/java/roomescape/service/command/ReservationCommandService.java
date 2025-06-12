@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.slot.ReservationTime;
@@ -14,7 +13,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MemberReservationCreateRequestDto;
+import roomescape.dto.reservation.ReservationCreateRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.common.NotFoundException;
@@ -23,7 +22,6 @@ import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 @Service
 @Transactional
@@ -46,7 +44,7 @@ public class ReservationCommandService {
         this.waitingTicketRepository = waitingTicketRepository;
     }
 
-    public ReservationResponseDto bookReservation(MemberReservationCreateRequestDto request, LoginInfo loginInfo) {
+    public ReservationResponseDto bookReservation(ReservationCreateRequestDto request, LoginInfo loginInfo) {
         ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NotFoundException("예약 시간", request.timeId()));
 

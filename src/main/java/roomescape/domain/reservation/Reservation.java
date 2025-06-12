@@ -17,7 +17,6 @@ import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.exception.PastReservationException;
-import roomescape.exception.common.BadRequestException;
 
 @Entity
 public class Reservation {

@@ -18,7 +18,7 @@ import roomescape.controller.util.CookieHandler;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MemberReservationCreateRequestDto;
+import roomescape.dto.reservation.ReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.PaymentCommandService;
@@ -116,7 +116,7 @@ public class ReservationControllerTest {
     @DisplayName("Reservation을 생성한다")
     @Test
     void addReservationTest() throws Exception {
-        MemberReservationCreateRequestDto requestDto = new MemberReservationCreateRequestDto(
+        ReservationCreateRequestDto requestDto = new ReservationCreateRequestDto(
                 LocalDate.of(2025, 8, 5),
                 1L, 1L, "paymentKey", "orderId", 1000L);
         mockMvc.perform(post("/reservations")
