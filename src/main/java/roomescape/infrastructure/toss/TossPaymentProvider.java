@@ -20,6 +20,8 @@ import roomescape.domain.payment.TransactionStatusCode;
 @Slf4j
 public class TossPaymentProvider implements PaymentProvider {
 
+    public static final String CONFIRM_ENDPOINT = "/v1/payments/confirm";
+
     private final RestClient tossRestClient;
     private final String authorizationValue;
     private final Map<String, TransactionStatusCode> tossFailureCodes;
@@ -32,8 +34,6 @@ public class TossPaymentProvider implements PaymentProvider {
 
     @Override
     public PaymentExecutionResult confirm(final PaymentRequest paymentRequest) {
-        var confirmUri = "/v1/payments/confirm";
-
         log.info("토스 페이먼츠에 결제 승인 요청 시작. orderId: {}, paymentKey: {}, amount: {}",
                 paymentRequest.orderId(),
                 paymentRequest.paymentKey(),
@@ -41,7 +41,7 @@ public class TossPaymentProvider implements PaymentProvider {
         );
 
         return tossRestClient.post()
-                .uri(confirmUri)
+                .uri(CONFIRM_ENDPOINT)
                 .header("Authorization", authorizationValue)
                 .header("Content-Type", "application/json")
                 .body(paymentRequest)
