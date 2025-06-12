@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.global.config.AdminAuthBaseTest;
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.dto.MemberResponses;
@@ -34,7 +35,7 @@ import roomescape.member.service.MemberService;
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-class MemberControllerTest {
+class MemberControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -80,7 +81,7 @@ class MemberControllerTest {
         given(memberService.findAllMember()).willReturn(responses);
 
         // when && then
-        mockMvc.perform(get("/members"))
+        mockMvc.perform(addAuthCookie(get("/admin/members")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.members[0].id").value(1L))
                 .andExpect(jsonPath("$.members[0].name").value("사용자1"))

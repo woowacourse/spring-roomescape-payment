@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.global.config.AdminAuthBaseTest;
 import roomescape.theme.dto.PopularThemeResponse;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
@@ -38,7 +39,7 @@ import roomescape.theme.service.ThemeService;
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-class ThemeControllerTest {
+class ThemeControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,7 +60,7 @@ class ThemeControllerTest {
         given(themeService.saveTheme(any(ThemeRequest.class))).willReturn(response);
 
         // when && then
-        mockMvc.perform(post("/themes")
+        mockMvc.perform(addAuthCookie(post("/admin/themes"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -147,7 +148,7 @@ class ThemeControllerTest {
         doNothing().when(themeService).delete(anyLong());
 
         // when && then
-        mockMvc.perform(delete("/themes/{themeId}", themeId))
+        mockMvc.perform(addAuthCookie(delete("/admin/themes/{themeId}", themeId)))
                 .andExpect(status().isNoContent())
                 .andDo(document("theme/delete",
                         preprocessRequest(prettyPrint()),

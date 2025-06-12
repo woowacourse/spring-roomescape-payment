@@ -19,7 +19,7 @@ import roomescape.reservationtime.service.ReservationTimeService;
 
 @Slf4j
 @RestController
-@RequestMapping("/times")
+@RequestMapping("/admin/times")
 @RequiredArgsConstructor
 public class ReservationTimeController {
 

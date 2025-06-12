@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.global.config.AdminAuthBaseTest;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.service.ReservationTimeService;
@@ -38,7 +39,7 @@ import roomescape.reservationtime.service.ReservationTimeService;
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-class ReservationTimeControllerTest {
+class ReservationTimeControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,7 +61,7 @@ class ReservationTimeControllerTest {
         given(reservationTimeService.saveTime(any(ReservationTimeRequest.class))).willReturn(response);
 
         // when && then
-        mockMvc.perform(post("/times")
+        mockMvc.perform(addAuthCookie(post("/admin/times"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -91,7 +92,7 @@ class ReservationTimeControllerTest {
         given(reservationTimeService.findAll()).willReturn(responses);
 
         // when && then
-        mockMvc.perform(get("/times"))
+        mockMvc.perform(addAuthCookie(get("/admin/times")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].startAt").value("10:00"))
@@ -114,7 +115,7 @@ class ReservationTimeControllerTest {
         doNothing().when(reservationTimeService).delete(anyLong());
 
         // when && then
-        mockMvc.perform(delete("/times/{timeId}", timeId))
+        mockMvc.perform(addAuthCookie(delete("/admin/times/{timeId}", timeId)))
                 .andExpect(status().isNoContent())
                 .andDo(document("reservationTime/delete",
                         preprocessRequest(prettyPrint()),
