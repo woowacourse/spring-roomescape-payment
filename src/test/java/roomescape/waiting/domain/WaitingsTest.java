@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ class WaitingsTest {
         // 오전 10시 예약 시간 생성
         ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
         // 테마 생성
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)
         ReservationSpec spec = ReservationSpecFixture.createSpec(LocalDate.now(), time, theme);
@@ -78,7 +79,7 @@ class WaitingsTest {
         // 오전 10시 예약 시간 생성
         ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
         // 테마 생성
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)
         ReservationSpec spec = ReservationSpecFixture.createSpec(LocalDate.now(), time, theme);
@@ -113,7 +114,7 @@ class WaitingsTest {
         ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
         entityManager.persist(time);
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)

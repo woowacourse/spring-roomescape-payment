@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.theme.exception.InvalidPriceException;
 
 @Entity
 @Getter
@@ -27,9 +29,20 @@ public class Theme {
     @Column(nullable = false)
     private String thumbnail;
 
-    public Theme(String name, String description, String thumbnail) {
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    public Theme(String name, String description, String thumbnail, BigDecimal price) {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        validatePrice(price);
+        this.price = price;
+    }
+
+    private void validatePrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidPriceException();
+        }
     }
 }

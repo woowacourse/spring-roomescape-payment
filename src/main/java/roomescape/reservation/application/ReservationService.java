@@ -8,15 +8,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.approval.application.ApprovalService;
+import roomescape.approval.domain.AdminApproval;
+import roomescape.approval.domain.Approval;
+import roomescape.approval.domain.Payment;
+import roomescape.approval.exception.payment.InvalidPaymentAmountException;
+import roomescape.approval.exception.payment.PaymentSessionExpiredException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
-import roomescape.payment.application.PaymentApprovalService;
-import roomescape.payment.application.dto.PaymentApprovalRequest;
-import roomescape.payment.exception.InvalidPaymentAmountException;
-import roomescape.payment.exception.PaymentSessionExpiredException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
-import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.UserReservationRequest;
@@ -33,7 +34,6 @@ import roomescape.reservationTime.exception.TimeNotFoundException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.exception.ThemeNotFoundException;
-import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.waiting.domain.Waitings;
@@ -48,17 +48,18 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final PaymentApprovalService paymentApprovalService;
+    private final ApprovalService approvalService;
 
-    public List<MyReservationResponse> findAllByMemberId(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
-        List<Waiting> myWaitings = waitingRepository.findByMemberId(memberId);
-        List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(myWaitings);
-        return MyReservationResponse.of(reservations, rankedWaitings);
+    public List<MyReservationResponse> findApprovedReservationsByMemberId(Long memberId) {
+        List<Reservation> reservations = reservationRepository.findApprovedReservationsByMemberId(memberId);
+        List<Approval> approvals = approvalService.findAllByReservationIn(reservations);
+        List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(memberId);
+
+        return MyReservationResponse.of(reservations, approvals, rankedWaitings);
     }
 
-    private List<WaitingWithRank> getWaitingWithRanks(List<Waiting> myWaitings) {
-        return myWaitings.stream()
+    private List<WaitingWithRank> getWaitingWithRanks(Long memberId) {
+        return waitingRepository.findByMemberId(memberId).stream()
                 .map(waiting -> {
                     Waitings waitings = new Waitings(waitingRepository.findBySpec(waiting.getSpec()));
                     long rank = waitings.getRankOf(waiting);
@@ -67,39 +68,42 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationResponse> findFiltered(AdminReservationSearchRequest request) {
-        Long memberId = request.memberId();
-        Long themeId = request.themeId();
-        LocalDate from = request.from();
-        LocalDate to = request.to();
-
+    public List<ReservationResponse> findFiltered(Long memberId, Long themeId, LocalDate from, LocalDate to) {
         return ReservationResponse.from(reservationRepository.findFiltered(memberId, themeId, from, to));
     }
 
     @Transactional
     public ReservationResponse createByUser(Long memberId, UserReservationRequest request, BigDecimal originAmount) {
+        String orderId = request.orderId();
+        BigDecimal amount = request.amount();
+        validateAmount(originAmount, amount);
+
+        Reservation reservation = reservationRepository.save(
+                create(memberId, request.date(), request.timeId(), request.themeId()));
+        approvalService.approve(new Payment(reservation, orderId, request.paymentKey(), amount));
+        return ReservationResponse.from(reservation);
+    }
+
+    private void validateAmount(BigDecimal originAmount, BigDecimal amount) {
         if (originAmount == null) {
             throw new PaymentSessionExpiredException();
         }
-        String orderId = request.orderId();
-        BigDecimal amount = request.amount();
+
         if (originAmount.compareTo(amount) != 0) {
             throw new InvalidPaymentAmountException();
         }
-
-        ReservationResponse response = create(memberId, request.date(), request.timeId(), request.themeId());
-
-        paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
-
-        return response;
     }
 
     @Transactional
-    public ReservationResponse createByAdmin(AdminReservationRequest request) {
-        return create(request.memberId(), request.date(), request.timeId(), request.themeId());
+    public ReservationResponse createByAdmin(AdminReservationRequest request, Long adminId) {
+        Member admin = memberRepository.findById(adminId).orElseThrow(MemberNotFoundException::new);
+        Reservation reservation = reservationRepository.save(
+                create(request.memberId(), request.date(), request.timeId(), request.themeId()));
+        approvalService.approve(new AdminApproval(reservation, admin));
+        return ReservationResponse.from(reservation);
     }
 
-    private ReservationResponse create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
+    private Reservation create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         ReservationDate date = new ReservationDate(dateInput);
@@ -111,8 +115,7 @@ public class ReservationService {
         ReservationSpec spec = new ReservationSpec(date, time, theme);
         validateDuplicated(spec);
 
-        Reservation reservation = new Reservation(member, spec);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return new Reservation(member, spec);
     }
 
     private void validateDuplicated(ReservationSpec spec) {
@@ -130,13 +133,12 @@ public class ReservationService {
     @Transactional
     public void deleteById(Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
+        reservation.ifPresent(approvalService::deleteByReservation);
         reservationRepository.deleteById(id);
         publishDeleteEvent(reservation);
     }
 
     private void publishDeleteEvent(Optional<Reservation> reservation) {
-        if (reservation.isPresent()) {
-            eventPublisher.publishEvent(new ReservationDeletedEvent(reservation.get()));
-        }
+        reservation.ifPresent(value -> eventPublisher.publishEvent(new ReservationDeletedEvent(value)));
     }
 }

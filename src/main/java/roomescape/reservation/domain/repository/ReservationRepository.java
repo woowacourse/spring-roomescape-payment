@@ -11,7 +11,7 @@ public interface ReservationRepository {
     List<Reservation> findFiltered(Long memberId, Long themeId, LocalDate from,
                                    LocalDate to);
 
-    List<Reservation> findAllByMemberId(Long memberId);
+    List<Reservation> findApprovedReservationsByMemberId(Long memberId);
 
     List<Reservation> findAll();
 

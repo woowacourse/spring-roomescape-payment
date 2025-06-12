@@ -40,8 +40,10 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             JOIN FETCH r.spec.theme
             JOIN FETCH r.spec.time
             WHERE (r.member.id = :memberId)
+            AND r.reservationState = roomescape.reservation.domain.ReservationState.APPROVED
+            
             """)
-    List<Reservation> findAllByMemberId(Long memberId);
+    List<Reservation> findApprovedReservationsByMemberId(Long memberId);
 
     @Query("""
             SELECT r FROM Reservation r

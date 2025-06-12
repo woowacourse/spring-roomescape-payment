@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.approval.application.ApprovalService;
+import roomescape.approval.domain.Onsite;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSpec;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -18,6 +20,7 @@ public class PromoteService {
 
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
+    private final ApprovalService approvalService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void promoteWaiting(Reservation reservation) {
@@ -28,9 +31,9 @@ public class PromoteService {
         if (waiting == null) {
             return;
         }
-
-        Reservation newReservation = new Reservation(waiting.getMember(), spec);
         waitingRepository.deleteById(waiting.getId());
-        reservationRepository.save(newReservation);
+
+        Reservation newReservation = reservationRepository.save(new Reservation(waiting.getMember(), spec));
+        approvalService.approve(new Onsite(newReservation, newReservation.getTheme().getPrice()));
     }
 }

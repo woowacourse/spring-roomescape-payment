@@ -2,6 +2,7 @@ package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.approval.application.FakeApprovalService;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
@@ -41,7 +43,8 @@ import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
         MemberRepositoryAdapter.class,
         ReservationTimeRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
-        WaitingRepositoryAdapter.class
+        WaitingRepositoryAdapter.class,
+        FakeApprovalService.class
 })
 class PromoteServiceTest {
 
@@ -84,7 +87,7 @@ class PromoteServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -118,11 +121,9 @@ class PromoteServiceTest {
 
         assertThat(newReservation.getSpec()).isEqualTo(spec);
 
-        // Verify that one of the waiting members was promoted
         assertThat(newReservation.getMember().getId())
                 .isIn(waitingMember1.getId(), waitingMember2.getId());
 
-        // Verify that one waiting was removed
         List<Waiting> remainingWaitings = waitingRepository.findAll();
         assertThat(remainingWaitings).hasSize(1);
     }

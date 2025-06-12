@@ -14,6 +14,8 @@ function render(apiResponse) {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
 
+    const formatAmount = amount => amount != null ? `₩${amount.toLocaleString('ko-KR')}` : '';
+
     data.forEach(item => {
         const row = tableBody.insertRow();
 
@@ -39,8 +41,20 @@ function render(apiResponse) {
                 requestDeleteWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
+            row.insertCell(7).textContent = '';
         } else { // 예약 완료 상태일 때
+            /*
+            TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+             예약 완료 상태일 때 결제 정보를 함께 보여주기
+             결제 정보 필드명은 자신의 response 에 맞게 변경하기
+            */
+            const approval = item.approval;
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = approval?.type || '';
+            row.insertCell(6).textContent = approval?.paymentKey || '';
+            row.insertCell(7).textContent = formatAmount(approval?.amount);
         }
     });
 }

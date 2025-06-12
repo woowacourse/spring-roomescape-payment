@@ -3,6 +3,7 @@ package roomescape.theme.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -68,7 +69,7 @@ class ThemeServiceTest {
         // 테마 썸네일 이미지 설정
         String thumbnail = "무서운 사진";
         // 테마 생성 요청 객체 생성
-        ThemeRequest request = new ThemeRequest(name, description, thumbnail);
+        ThemeRequest request = new ThemeRequest(name, description, thumbnail, BigDecimal.valueOf(10000));
 
         // when
         ThemeResponse response = themeService.create(request);
@@ -86,11 +87,11 @@ class ThemeServiceTest {
     void findAll_success() {
         // given
         // 첫 번째 테마 생성 및 저장
-        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg");
+        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme1);
 
         // 두 번째 테마 생성 및 저장
-        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg");
+        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme2);
 
         // when
@@ -117,11 +118,11 @@ class ThemeServiceTest {
         timeRepository.save(time);
 
         // 첫 번째 테마 생성 및 저장 (더 많은 예약이 있는 테마)
-        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg");
+        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme1);
 
         // 두 번째 테마 생성 및 저장 (더 적은 예약이 있는 테마)
-        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg");
+        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme2);
 
         // 오늘 날짜 설정
@@ -169,7 +170,7 @@ class ThemeServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -190,7 +191,7 @@ class ThemeServiceTest {
     @Test
     void deleteById_success() {
         // given
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 

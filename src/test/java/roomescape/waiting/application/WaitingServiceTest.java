@@ -3,6 +3,7 @@ package roomescape.waiting.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -180,7 +181,7 @@ class WaitingServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -209,7 +210,7 @@ class WaitingServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -247,7 +248,7 @@ class WaitingServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -290,7 +291,7 @@ class WaitingServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -344,7 +345,7 @@ class WaitingServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
 
         // 내일 날짜로 예약 날짜 설정
