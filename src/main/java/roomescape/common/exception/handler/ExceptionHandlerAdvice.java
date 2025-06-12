@@ -1,5 +1,6 @@
 package roomescape.common.exception.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,6 +10,7 @@ import roomescape.common.exception.dto.ErrorResponse;
 import roomescape.common.exception.vo.ErrorCode;
 
 @ControllerAdvice
+@Slf4j
 public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(CustomException.class)
@@ -19,9 +21,10 @@ public class ExceptionHandlerAdvice {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(RuntimeException e) {
+        log.warn("invoked IllegalArgumentException - message: {}", e.getMessage());
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse response = new ErrorResponse(status, e.getMessage());
+        ErrorResponse response = new ErrorResponse(status, "잘못된 요청입니다.");
         return ResponseEntity.status(status).body(response);
     }
 }
