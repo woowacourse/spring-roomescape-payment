@@ -46,50 +46,50 @@ public class RoomescapeExceptionHandler {
     @ExceptionHandler(PaymentClientException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePaymentClientException(Exception ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler({IllegalStateException.class, DataFormatException.class,
-        IllegalArgumentException.class})
+            IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleException(Exception ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleException(NotFoundException ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler(DuplicatedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleException(DuplicatedException ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler(ResourceInUseException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public String handleException(ResourceInUseException ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleException(UnauthorizedException ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 
     @ExceptionHandler(OperationNotAllowedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleException(OperationNotAllowedException ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.warn(ex.getMessage(), ex);
         return ex.getMessage();
     }
 

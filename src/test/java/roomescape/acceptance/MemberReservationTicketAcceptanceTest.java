@@ -17,13 +17,16 @@ import roomescape.infrastructure.db.MemberJpaRepository;
 import roomescape.infrastructure.db.ReservationTicketJpaRepository;
 import roomescape.infrastructure.db.ReservationTimeJpaRepository;
 import roomescape.infrastructure.db.ThemeJpaRepository;
+import roomescape.infrastructure.db.TossPaymentJpaRepository;
 import roomescape.infrastructure.jwt.JjwtJwtTokenProvider;
 import roomescape.model.Member;
+import roomescape.model.PaymentTargetType;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTicket;
 import roomescape.model.ReservationTime;
 import roomescape.model.Role;
 import roomescape.model.Theme;
+import roomescape.model.TossPayment;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -43,6 +46,10 @@ class MemberReservationTicketAcceptanceTest {
 
     @Autowired
     ReservationTicketJpaRepository reservationTicketJpaRepository;
+
+    @Autowired
+    TossPaymentJpaRepository tossPaymentJpaRepository;
+
     @Autowired
     private ReservationTicketService reservationTicketService;
 
@@ -63,6 +70,14 @@ class MemberReservationTicketAcceptanceTest {
                 new Reservation(LocalDate.now().plusDays(1), savedReservationTime, savedTheme,
                         savedMember, LocalDate.now()));
         ReservationTicket savedReservationTicket = this.reservationTicketJpaRepository.save(reservationTicket);
+        TossPayment savedTossPayment = tossPaymentJpaRepository.save(
+                new TossPayment(
+                        "paymentKey",
+                        "orderId",
+                        1000L,
+                        savedReservationTicket.getId(),
+                        PaymentTargetType.RESERVATION_TICKET
+                ));
 
         String token = jjwtJwtTokenProvider.createToken(savedMember.getEmail());
 
@@ -76,7 +91,7 @@ class MemberReservationTicketAcceptanceTest {
 
         //then
         List<MemberReservationResponseDto> comparedResponse = List.of(
-                new MemberReservationResponseDto(savedReservationTicket));
+                new MemberReservationResponseDto(savedReservationTicket, savedTossPayment));
 
         assertAll(
                 () -> assertThat(responses).hasSize(1),

@@ -16,6 +16,7 @@ public class TestPaymentConfig {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_SCHEME = "Basic ";
+    public static final String IDEMPOTENCY_KEY = "Idempotency-Key";
 
     private final ObjectMapper mapper;
 
@@ -26,12 +27,17 @@ public class TestPaymentConfig {
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
         return new TossPaymentWithRestClient(builder
                 .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey())
                 .defaultStatusHandler(new PaymentExceptionHandler(mapper))
+                .requestInterceptor((request, body, execution) -> {
+                    if (request.getURI().getPath().contains("/confirm")) {
+                        request.getHeaders().add(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey());
+                    }
+                    return execution.execute(request, body);
+                })
                 .build());
     }
 
     private String encodeSecretKey() {
-        return Base64.getEncoder().encodeToString("test-secret".getBytes());
+        return Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 }

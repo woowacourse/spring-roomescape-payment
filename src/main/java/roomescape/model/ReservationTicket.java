@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class ReservationTicket {
+public class ReservationTicket implements PaymentTarget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

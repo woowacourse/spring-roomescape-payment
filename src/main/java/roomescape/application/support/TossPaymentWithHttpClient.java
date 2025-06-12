@@ -5,6 +5,6 @@ import roomescape.dto.response.TossPaymentConfirmResponseDto;
 
 public interface TossPaymentWithHttpClient {
 
-    TossPaymentConfirmResponseDto requestConfirmation(TossPaymentConfirmDto tossPaymentConfirmDto);
+    TossPaymentConfirmResponseDto requestConfirmation(TossPaymentConfirmDto tossPaymentConfirmDto, String requestKey);
 
 }

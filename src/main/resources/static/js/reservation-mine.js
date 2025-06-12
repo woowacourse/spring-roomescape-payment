@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     theme: r.theme,
                     date: r.date,
                     time: r.time,
-                    status: '예약'
+                    status: '예약',
+                    paymentKey: r.paymentKey,
+                    amount: r.amount
                 })),
                 ...waitings.map(w => ({
                     id: w.id,
@@ -48,7 +50,6 @@ function render(data) {
         const statusText = item.status === '대기'
             ? `${item.order}번째로 대기중`
             : '예약';
-
         row.insertCell(3).textContent = statusText;
 
         if (item.status === '대기') {
@@ -57,12 +58,16 @@ function render(data) {
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick = function () {
-                console.log('hi')
                 requestDeleteWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
         } else {
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         }
     });
 
@@ -73,4 +78,12 @@ function render(data) {
                 return response;
             });
     }
+}
+
+function requestDeleteWaiting(id) {
+    return fetch(`/waiting/${id}`, {method: 'DELETE'})
+        .then(response => {
+            if (!response.ok) throw new Error('Delete failed');
+            return response;
+        });
 }

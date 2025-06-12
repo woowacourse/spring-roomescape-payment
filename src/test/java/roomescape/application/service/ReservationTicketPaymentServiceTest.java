@@ -12,16 +12,12 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.PaymentClientException;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentRequestDto;
 import roomescape.dto.request.ReservationTicketRegisterDto;
 import roomescape.dto.request.TossPaymentConfirmDto;
 import roomescape.dto.request.TossPaymentRequestDto;
@@ -41,9 +37,7 @@ import roomescape.model.TossPayment;
 import roomescape.persistence.repository.ReservationTicketRepository;
 import roomescape.persistence.repository.ReservationTimeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class ReservationTicketPaymentServiceTest {
+public class ReservationTicketPaymentServiceTest extends ServiceTest {
 
     @Autowired
     ReservationTicketPaymentService reservationTicketPaymentService;
@@ -89,12 +83,12 @@ public class ReservationTicketPaymentServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when
-        ReservationTicketResponseDto response = reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
-                new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember);
+        ReservationTicketResponseDto response = reservationTicketPaymentService.saveReservationWithPayment(
+                new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember);
 
         // then
         List<TossPayment> tossPayments = tossPaymentJpaRepository.findAll();
@@ -127,13 +121,13 @@ public class ReservationTicketPaymentServiceTest {
                 "ABORTED", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when & then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
-                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto),
+                () -> reservationTicketPaymentService.processReservationRegistration(
+                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto),
                         loginMember)).isInstanceOf(
                 PaymentClientException.class);
     }
@@ -170,13 +164,13 @@ public class ReservationTicketPaymentServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when && then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
-                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember))
+                () -> reservationTicketPaymentService.processReservationRegistration(
+                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember))
                 .isInstanceOf(DuplicatedException.class);
     }
 
@@ -203,13 +197,13 @@ public class ReservationTicketPaymentServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when && then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
-                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember))
+                () -> reservationTicketPaymentService.processReservationRegistration(
+                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember))
                 .isInstanceOf(IllegalStateException.class);
     }
 

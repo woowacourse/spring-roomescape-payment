@@ -1,0 +1,11 @@
+<included>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="roomescape.support.logging.MaskingPatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+                <maskPattern>email\s*=\s*([^\],\s]+)</maskPattern>
+                <maskPattern>password\s*=\s*([^\],\s]+)</maskPattern>
+            </layout>
+        </encoder>
+    </appender>
+</included>
