@@ -16,10 +16,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAll();
 
     @Query("""
-        SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r, p)
+        SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r, pr.payment)
         FROM Reservation r
-        JOIN FETCH Payment p
-        ON r.id = p.reservationId
+        JOIN FETCH PaymentReservation pr
+        ON r = pr.reservation
         WHERE r.member.id = :memberId
     """)
     List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId);

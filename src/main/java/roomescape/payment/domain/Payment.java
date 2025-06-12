@@ -9,10 +9,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
 import roomescape.payment.domain.vo.Amount;
 import roomescape.payment.domain.vo.PaymentStatus;
 
 @Entity
+@Getter
 public class Payment {
 
     @Id
@@ -28,20 +30,17 @@ public class Payment {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus status;
 
-    private Long reservationId;
-
     protected Payment() {}
 
-    public Payment(Long id, String paymentKey, Long amount, PaymentStatus status, Long reservationId) {
+    public Payment(Long id, String paymentKey, Long amount, PaymentStatus status) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.amount = new Amount(amount);
         this.status = status;
-        this.reservationId = reservationId;
     }
 
-    public Payment(String paymentKey, Long amount, PaymentStatus status, Long reservationId) {
-        this(null, paymentKey, amount, status, reservationId);
+    public Payment(String paymentKey, Long amount, PaymentStatus status) {
+        this(null, paymentKey, amount, status);
     }
 
     public void complete() {
@@ -52,23 +51,7 @@ public class Payment {
         status = PaymentStatus.FAILED;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
     public Long getAmount() {
         return amount.value();
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    public Long getReservationId() {
-        return reservationId;
     }
 }

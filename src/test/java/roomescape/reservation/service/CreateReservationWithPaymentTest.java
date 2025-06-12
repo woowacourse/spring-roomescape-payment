@@ -35,7 +35,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({CreateReservationService.class})
+@Import({ReservationCommandService.class})
 public class CreateReservationWithPaymentTest {
 
     private final LocalDateTime now = LocalDateTime.now();
@@ -47,7 +47,7 @@ public class CreateReservationWithPaymentTest {
     private EntityManager entityManager;
 
     @Autowired
-    private CreateReservationService reservationService;
+    private ReservationCommandService reservationService;
 
     @MockitoBean
     private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);

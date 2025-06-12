@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.reservation.service.CreateReservationWithPaymentService;
-import roomescape.reservation.service.DeleteReservationService;
+import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.dto.request.FilteringReservationRequest;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
@@ -36,16 +36,16 @@ public class ReservationController {
 
     private final ReservationQueryService reservationQueryService;
     private final CreateReservationWithPaymentService createReservationWithPaymentService;
-    private final DeleteReservationService deleteReservationService;
+    private final ReservationCommandService reservationCommandService;
 
     public ReservationController(
             final ReservationQueryService reservationQueryService,
             final CreateReservationWithPaymentService createReservationWithPaymentService,
-            final DeleteReservationService deleteReservationService
+            final ReservationCommandService reservationCommandService
     ) {
         this.reservationQueryService = reservationQueryService;
         this.createReservationWithPaymentService = createReservationWithPaymentService;
-        this.deleteReservationService = deleteReservationService;
+        this.reservationCommandService = reservationCommandService;
     }
 
     @Operation(summary = "전체 예약 내역 조회")
@@ -86,7 +86,7 @@ public class ReservationController {
             @PathVariable("id") final Long id,
             @Parameter(hidden = true) LoginMember loginMember
     ) {
-        deleteReservationService.delete(id, loginMember);
+        reservationCommandService.cancel(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 

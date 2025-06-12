@@ -35,12 +35,12 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 @ActiveProfiles("test")
 @DataJpaTest
 @Import({
-        CreateReservationService.class,
+        ReservationCommandService.class,
         PaymentRestClientConfig.class,
         TossPaymentClient.class,
         TossPaymentErrorHandler.class
 })
-class CreateReservationServiceTest {
+class ReservationCommandServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();
     private final Theme theme = new Theme("포스티", "공포", "wwww.um.com");
@@ -51,7 +51,7 @@ class CreateReservationServiceTest {
     private EntityManager entityManager;
 
     @Autowired
-    private CreateReservationService reservationService;
+    private ReservationCommandService reservationService;
 
     @BeforeEach
     void setup() {

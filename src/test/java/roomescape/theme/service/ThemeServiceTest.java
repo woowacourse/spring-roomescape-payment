@@ -12,6 +12,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -121,7 +122,7 @@ class ThemeServiceTest {
         Member savedMember = memberRepository.save(member);
 
         LocalDate date = LocalDate.of(2024, 4, 29);
-        reservationRepository.save(new Reservation(savedMember, date, savedTime, savedTheme));
+        reservationRepository.save(new Reservation(savedMember, date, savedTime, savedTheme, ReservationStatus.CONFIRMED));
 
         // when & then
         assertThatThrownBy(() -> themeService.delete(themeId))
@@ -140,12 +141,12 @@ class ThemeServiceTest {
         Theme theme1 = themeRepository.save(new Theme("테마1", "테마1", "www.m.com"));
         Theme theme2 = themeRepository.save(new Theme("테마2", "테마2", "www.m.com"));
         Theme theme3 = themeRepository.save(new Theme("테마3", "테마3", "www.m.com"));
-        reservationRepository.save(new Reservation(member, date.minusDays(1), reservationTime, theme1));
-        reservationRepository.save(new Reservation(member, date.minusDays(2), reservationTime, theme1));
-        reservationRepository.save(new Reservation(member, date.minusDays(3), reservationTime, theme1));
-        reservationRepository.save(new Reservation(member, date.minusDays(4), reservationTime, theme2));
-        reservationRepository.save(new Reservation(member, date.minusDays(5), reservationTime, theme2));
-        reservationRepository.save(new Reservation(member, date.minusDays(6), reservationTime, theme3));
+        reservationRepository.save(new Reservation(member, date.minusDays(1), reservationTime, theme1, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(member, date.minusDays(2), reservationTime, theme1, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(member, date.minusDays(3), reservationTime, theme1, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(member, date.minusDays(4), reservationTime, theme2, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(member, date.minusDays(5), reservationTime, theme2, ReservationStatus.CONFIRMED));
+        reservationRepository.save(new Reservation(member, date.minusDays(6), reservationTime, theme3, ReservationStatus.CONFIRMED));
 
         // when
         List<ThemeResponse> responses = themeService.getPopularThemes();

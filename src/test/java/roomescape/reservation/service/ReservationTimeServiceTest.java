@@ -13,6 +13,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -125,7 +126,7 @@ class ReservationTimeServiceTest {
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
         Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
 
-        reservationRepository.save(new Reservation(member, LocalDate.now(), reservationTime, theme));
+        reservationRepository.save(new Reservation(member, LocalDate.now(), reservationTime, theme, ReservationStatus.CONFIRMED));
         Long timeId = reservationTime.getId();
 
         // when & then

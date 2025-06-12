@@ -14,33 +14,34 @@ import java.util.UUID;
 public class CreateReservationWithPaymentService {
 
     private final TossPaymentClient tossPaymentClient;
-    private final CreateReservationService createReservationService;
-    private final DeleteReservationService deleteReservationService;
+    private final ReservationCommandService reservationCommandService;
     private final PaymentService paymentService;
 
     public CreateReservationWithPaymentService(
-            TossPaymentClient tossPaymentClient,
-            CreateReservationService createReservationService,
-            DeleteReservationService deleteReservationService,
-            PaymentService paymentService
+            final TossPaymentClient tossPaymentClient,
+            final ReservationCommandService reservationCommandService,
+            final PaymentService paymentService
     ) {
         this.tossPaymentClient = tossPaymentClient;
-        this.createReservationService = createReservationService;
-        this.deleteReservationService = deleteReservationService;
+        this.reservationCommandService = reservationCommandService;
         this.paymentService = paymentService;
     }
 
-    public ReservationWithPaymentResponse create(ReservationWithPaymentRequest request, LoginMember loginMember) {
-        ReservationWithPaymentResponse reservationWithPaymentResponse = createReservationService.createWithPendingPayment(request, loginMember);
+    public ReservationWithPaymentResponse create(
+            final ReservationWithPaymentRequest request,
+            final LoginMember loginMember
+    ) {
+        ReservationWithPaymentResponse reservationWithPaymentResponse = reservationCommandService.createWithPendingPayment(request, loginMember);
         try {
             tossPaymentClient.postConfirmPayment(
                     ConfirmPaymentRequest.from(request),
                     UUID.randomUUID()
             );
             paymentService.completePayment(reservationWithPaymentResponse.paymentId());
+            reservationCommandService.confirm(reservationWithPaymentResponse.id());
             return reservationWithPaymentResponse;
         } catch (Exception e) {
-            deleteReservationService.delete(reservationWithPaymentResponse.id(), loginMember);
+            reservationCommandService.cancel(reservationWithPaymentResponse.id(), loginMember);
             paymentService.failedPayment(reservationWithPaymentResponse.paymentId());
             throw e;
         }
