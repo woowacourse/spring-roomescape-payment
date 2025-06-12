@@ -3,6 +3,7 @@ package roomescape.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,11 +14,17 @@ import org.springframework.web.client.ResourceAccessException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class); // Logger 선언
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(value = CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        logger.error("CustomException 발생: message = {}, status = {}", e.getMessage(), e.getStatus());
+        HttpStatusCode status = e.getStatus();
+        if (status.is5xxServerError()) {
+            logger.error("서버 에러 발생: message = {}, status = {}", e.getMessage(), e.getStatus());
+        }
+        if (status == HttpStatus.UNAUTHORIZED) {
+            logger.warn("권한 없음: message = {}, status = {}", e.getMessage(), e.getStatus());
+        }
         ErrorResponse body = new ErrorResponse(e.getMessage());
         return ResponseEntity.status(e.getStatus()).body(body);
     }
