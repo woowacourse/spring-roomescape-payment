@@ -1,7 +1,8 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,35 +21,48 @@ public class Payment {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    @Column
     private String paymentKey;
-
-    @Column
     private String orderId;
-
-    @Column
     private String type;
-
-    @Column
     private Integer totalAmount;
-
-    @Column
     private String status;
-
-    @Column
     private String requestedAt;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
 
     public Payment(final Reservation reservation, final String paymentKey, final String orderId, final String type,
-                   final Integer totalAmount, final String status,
-                   final String requestedAt) {
+                   final Integer totalAmount, final PaymentStatus paymentStatus) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.type = type;
         this.totalAmount = totalAmount;
+        this.paymentStatus = paymentStatus;
+    }
+
+    public Payment(final Reservation reservation, final PaymentStatus paymentStatus) {
+        this.reservation = reservation;
+        this.paymentStatus = paymentStatus;
+    }
+
+
+    public static Payment createPendingPayment(final Reservation reservation) {
+        return new Payment(reservation, PaymentStatus.PENDING_FOR_PAYMENT);
+    }
+
+    public static Payment createRequestedPayment(final Reservation reservation, final String paymentKey,
+                                                 final String orderId, final String type,
+                                                 final Integer totalAmount) {
+        return new Payment(reservation, paymentKey, orderId, type, totalAmount, PaymentStatus.PAYMENT_REQUESTED);
+
+    }
+
+    public void confirm(final String status, final String requestedAt) {
         this.status = status;
         this.requestedAt = requestedAt;
+        this.paymentStatus = PaymentStatus.PAYMENT_CONFIRMED;
     }
 
     public Long getId() {
@@ -83,7 +97,10 @@ public class Payment {
         return requestedAt;
     }
 
-    public Payment() {
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
     }
 
+    public Payment() {
+    }
 }

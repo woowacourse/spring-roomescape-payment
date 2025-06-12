@@ -101,5 +101,37 @@ VALUES
     ('2025-05-11', 1, 11, 28), -- Chloe
 
     -- theme_id = 12 (1회)
-    ('2025-05-11', 2, 12, 29); -- Daniel
+    ('2025-05-11', 2, 12, 29);
+-- Daniel
+
+-- Payment 테이블에 PENDING_FOR_PAYMENT 상태의 결제 레코드 삽입
+INSERT INTO payment (reservation_id, payment_status)
+VALUES (1, 'PENDING_FOR_PAYMENT'),
+       (2, 'PENDING_FOR_PAYMENT'),
+       (3, 'PENDING_FOR_PAYMENT'),
+       (4, 'PENDING_FOR_PAYMENT'),
+       (5, 'PENDING_FOR_PAYMENT'),
+       (6, 'PENDING_FOR_PAYMENT'),
+       (7, 'PENDING_FOR_PAYMENT'),
+       (8, 'PENDING_FOR_PAYMENT'),
+       (9, 'PENDING_FOR_PAYMENT'),
+       (10, 'PENDING_FOR_PAYMENT'),
+       (11, 'PENDING_FOR_PAYMENT'),
+       (12, 'PENDING_FOR_PAYMENT'),
+       (13, 'PENDING_FOR_PAYMENT'),
+       (14, 'PENDING_FOR_PAYMENT'),
+       (15, 'PENDING_FOR_PAYMENT'),
+       (16, 'PENDING_FOR_PAYMENT'),
+       (17, 'PENDING_FOR_PAYMENT'),
+       (18, 'PENDING_FOR_PAYMENT'),
+       (19, 'PENDING_FOR_PAYMENT'),
+       (20, 'PENDING_FOR_PAYMENT'),
+       (21, 'PENDING_FOR_PAYMENT'),
+       (22, 'PENDING_FOR_PAYMENT'),
+       (23, 'PENDING_FOR_PAYMENT'),
+       (24, 'PENDING_FOR_PAYMENT'),
+       (25, 'PENDING_FOR_PAYMENT'),
+       (26, 'PENDING_FOR_PAYMENT'),
+       (27, 'PENDING_FOR_PAYMENT');
+
 

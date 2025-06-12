@@ -1,10 +1,15 @@
 package roomescape.payment.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.exception.PaymentNotFoundException;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.request.PaymentRequest;
+
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -16,10 +21,40 @@ public class PaymentService {
     }
 
 
-    public void create(final PaymentResponse response, final Reservation reservation) {
-        Payment payment = new Payment(reservation, response.paymentKey(), response.orderId(), response.type(),
-                response.totalAmount(), response.status(), response.requestedAt());
+    @Transactional
+    public void updatePaymentWithConfirm(final PaymentResponse response) {
+        Payment payment = paymentRepository.findByPaymentKey(response.paymentKey())
+                .orElseThrow(() -> new PaymentNotFoundException("요청한 paymentKey에 해당하는 결제가 없습니다."));
+        payment.confirm(response.status(), response.requestedAt());
+    }
 
+    @Transactional
+    public void createPaymentWithRequest(final Reservation reservation, final PaymentRequest request) {
+        Payment payment = Payment.createRequestedPayment(reservation, request.paymentKey(), request.orderId(),
+                request.paymentType(),
+                request.amount());
         paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public void createPendingPayment(final Reservation reservation) {
+        Payment payment = Payment.createPendingPayment(reservation);
+        paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public Payment findByReservationId(final Long id) {
+        return paymentRepository.findByReservationId(id)
+                .orElseThrow(() -> new PaymentNotFoundException("요청한 reservation_id에 해당하는 결제가 없습니다. "));
+    }
+
+    @Transactional
+    public List<Payment> findAllByReservationIds(final List<Long> reservationIds) {
+        return paymentRepository.findAllByReservationIds(reservationIds);
+    }
+
+    @Transactional
+    public void deleteById(final Long id) {
+        paymentRepository.deleteById(id);
     }
 }

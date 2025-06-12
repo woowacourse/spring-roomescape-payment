@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import jakarta.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.service.PaymentApiClient;
 import roomescape.payment.service.PaymentService;
@@ -28,6 +31,7 @@ import roomescape.theme.service.ThemeService;
 public class ReservationFacadeService {
 
     private final ReservationService reservationService;
+    private final ReservationCreatorService reservationCreatorService;
     private final WaitingService waitingService;
     private final MemberService memberService;
     private final ThemeService themeService;
@@ -36,12 +40,14 @@ public class ReservationFacadeService {
     private final PaymentApiClient paymentApiClient;
 
     public ReservationFacadeService(final ReservationService reservationService,
+                                    final ReservationCreatorService reservationCreatorService,
                                     final WaitingService waitingService,
                                     final MemberService memberService,
                                     final ThemeService themeService,
                                     final ReservationTimeService reservationTimeService,
                                     final PaymentService paymentService, final PaymentApiClient paymentApiClient) {
         this.reservationService = reservationService;
+        this.reservationCreatorService = reservationCreatorService;
         this.waitingService = waitingService;
         this.memberService = memberService;
         this.themeService = themeService;
@@ -50,40 +56,61 @@ public class ReservationFacadeService {
         this.paymentApiClient = paymentApiClient;
     }
 
+    @Transactional
     public List<MyReservationResponse> findMyReservations(final UserInfo userInfo) {
         List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
-        List<MyReservationResponse> myReservationResponses = new ArrayList<>();
-        return Stream.concat(myReservations.stream().map(MyReservationResponse::from),
+        
+        List<Payment> payments = findPayments(myReservations);
+        
+        return Stream.concat(
+                createReservationResponses(myReservations, payments),
                 waitingWithRanks.stream().map(MyReservationResponse::from)
         ).collect(Collectors.toList());
     }
 
+    private List<Payment> findPayments(List<Reservation> reservations) {
+        List<Long> reservationIds = reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        
+        if (reservationIds.isEmpty()) {
+            return List.of();
+        }
+        return paymentService.findAllByReservationIds(reservationIds);
+    }
+
+    private Stream<MyReservationResponse> createReservationResponses(List<Reservation> reservations, List<Payment> payments) {
+        return reservations.stream()
+                .map(reservation -> {
+                    Payment payment = payments.stream()
+                            .filter(p -> p.getReservation().getId().equals(reservation.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    return MyReservationResponse.from(reservation, payment);
+                });
+    }
+
+    @Transactional
     public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
         if (!reservationService.isReservationExists(request)) {
-            return ReservationResponse.of(createReservation(request, memberId));
+            Reservation reservation = reservationCreatorService.createReservation(request, memberId);
+            paymentService.createPendingPayment(reservation);
+            return ReservationResponse.of(reservation);
         }
         return createWaiting(request, memberId);
     }
 
-    public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
-        reservationService.checkIfReservationExists(request.reservation());
-        Reservation reservation = createReservation(request.reservation(), memberId);
+    public ReservationResponse reserveWithPayment(final ReservationCreateRequest request, final Long memberId) {
+        Reservation reservation = reservationCreatorService.createReservation(request.reservation(), memberId);
+        paymentService.createPaymentWithRequest(reservation, request.payment());
         PaymentResponse paymentResponse = paymentApiClient.authPayment(request.payment());
-        paymentService.create(paymentResponse, reservation);
+        paymentService.updatePaymentWithConfirm(paymentResponse);
         return ReservationResponse.of(reservation);
     }
 
-    public Reservation createReservation(final ReservationRequest request, final Long memberId) {
-        reservationService.checkIfReservationExists(request);
-        ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
-        Theme theme = themeService.findTheme(request.themeId());
-        Member member = memberService.findUserByMemberId(memberId);
-        ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
-        return reservationService.save(Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo));
-    }
-
+    @Transactional
     public ReservationResponse createWaiting(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
         Theme theme = themeService.findTheme(request.themeId());
@@ -96,7 +123,10 @@ public class ReservationFacadeService {
         return ReservationResponse.of(newWaiting);
     }
 
+    @Transactional
     public void deleteReservation(final Long reservationId) {
+        Payment payment = paymentService.findByReservationId(reservationId);
+        paymentService.deleteById(payment.getId());
         Reservation reservation = reservationService.findById(reservationId);
         reservationService.delete(reservationId);
         promoteWaiting(reservation.getInfo());
@@ -107,8 +137,15 @@ public class ReservationFacadeService {
             return;
         }
         Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-        createReservation(ReservationRequest.from(info), waiting.getMemberId());
+        Reservation reservation = reservationCreatorService.createReservation(ReservationRequest.from(info),
+                waiting.getMemberId());
+        paymentService.createPendingPayment(reservation);
         waitingService.delete(waiting.getId());
     }
 
+    @Transactional
+    public List<ReservationResponse> findReservations(final Long themeId, final Long memberId, final LocalDate dateFrom,
+                                                      final LocalDate dateTo) {
+        return reservationService.findReservations(themeId, memberId, dateFrom, dateTo);
+    }
 }
