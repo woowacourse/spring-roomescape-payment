@@ -1,9 +1,9 @@
 package roomescape.payment.model;
 
+import roomescape.payment.application.dto.response.TossPaymentsResponse;
 import roomescape.reservation.model.vo.PaymentInfo;
 
 public interface PaymentClient {
 
-    void requestConfirm(final PaymentInfo paymentInfo);
-
+    TossPaymentsResponse requestConfirm(final PaymentInfo paymentInfo);
 }

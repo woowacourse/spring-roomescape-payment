@@ -31,7 +31,6 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    //TODO : Member 역할을 Enum 객체로 표시해도 괜찮을까? 상속?
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;

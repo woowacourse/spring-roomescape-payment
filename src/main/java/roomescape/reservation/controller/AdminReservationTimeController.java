@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import roomescape.reservation.application.dto.response.ReservationTimeServiceRes
 import roomescape.reservation.controller.dto.request.CreateReservationTimeRequest;
 import roomescape.reservation.controller.dto.response.ReservationTimeResponse;
 
+@Tag(name = "Admin", description = "관리자 도메인 API")
 @RestController
 @RequestMapping("/admin/times")
 @RequiredArgsConstructor
@@ -31,7 +33,6 @@ public class AdminReservationTimeController {
         return ReservationTimeResponse.from(response);
     }
 
-    // TODO : User와 응답DTO 분리하기
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<ReservationTimeResponse> getAll() {

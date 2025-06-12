@@ -1,7 +1,7 @@
 package roomescape.reservation.model.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRepository;
 import roomescape.reservation.model.dto.ReservationWaitingDetails;
@@ -13,7 +13,7 @@ import roomescape.reservation.model.repository.ReservationTimeRepository;
 import roomescape.reservation.model.repository.ReservationWaitingRepository;
 import roomescape.reservation.model.vo.Schedule;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ReservationWaitingOperation {
 

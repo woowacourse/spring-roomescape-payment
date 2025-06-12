@@ -6,12 +6,14 @@ import roomescape.reservation.model.entity.Reservation;
 
 public class ReservationSpecification {
 
+    private ReservationSpecification() {
+    }
+
     public static Specification<Reservation> themeIdEquals(Long themeId) {
         return (root, query, criteriaBuilder) -> {
             if (themeId == null) {
                 return null;
             }
-            //TODO : QueryDSL로 안정성 높이기
             return criteriaBuilder.equal(root.get("theme").get("id"), themeId);
         };
     }

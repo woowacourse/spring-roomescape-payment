@@ -2,6 +2,7 @@ package roomescape.auth.web.controller;
 
 import static roomescape.auth.web.constant.AuthConstant.AUTH_COOKIE_KEY;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import roomescape.auth.web.support.AuthorizationExtractor;
 import roomescape.global.exception.AuthenticationException;
 import roomescape.global.util.CookieUtils;
 
+@Tag(name = "auth", description = "인증 도메인 API")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {

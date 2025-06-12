@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import roomescape.reservation.application.UserReservationTimeService;
 import roomescape.reservation.application.dto.response.ReservationTimeServiceResponse;
 import roomescape.reservation.controller.dto.response.ReservationTimeResponse;
 
+@Tag(name = "User", description = "사용자 도메인 API")
 @RestController
 @RequestMapping("/times")
 @RequiredArgsConstructor

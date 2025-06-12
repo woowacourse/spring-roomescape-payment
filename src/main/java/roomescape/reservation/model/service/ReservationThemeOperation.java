@@ -1,11 +1,11 @@
 package roomescape.reservation.model.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import roomescape.reservation.model.entity.ReservationTheme;
 import roomescape.reservation.model.repository.ReservationThemeRepository;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ReservationThemeOperation {
 
