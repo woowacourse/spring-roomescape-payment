@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @SecurityScheme(
-        name = "cookieAuth",
+        name = "loginAuth",
         type = SecuritySchemeType.APIKEY,
         in = SecuritySchemeIn.COOKIE,
         paramName = "token",
