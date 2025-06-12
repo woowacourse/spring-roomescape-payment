@@ -29,7 +29,7 @@ public class PaymentInfo {
 
     public void checkPaymentInfoMatch(final String paymentKey, final int totalAmount) {
         if ((!this.paymentKey.equals(paymentKey)) || (this.totalAmount != totalAmount)) {
-            throw new PaymentMismatchException(DomainTerm.PAYMENT_AMOUNT, paymentKey, totalAmount);
+            throw new PaymentMismatchException(DomainTerm.PAYMENT_AMOUNT);
         }
     }
 
