@@ -37,6 +37,7 @@ public class ThemeController {
 
     @Operation(summary = "테마 목록 조회", description = "모든 테마 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "테마 목록 조회 성공")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> getThemes() {
         List<Theme> themes = themeService.findAll();
@@ -49,6 +50,7 @@ public class ThemeController {
 
     @Operation(summary = "인기 테마 조회", description = "현재 날짜 기준으로 인기 있는 테마 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "인기 테마 목록 조회 성공")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> popularThemes() {
         List<Theme> rankingThemes = themeService.getRankingThemes(LocalDate.now());
@@ -63,6 +65,7 @@ public class ThemeController {
     @ApiResponse(responseCode = "201", description = "테마 추가 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @PostMapping
     @CheckRole(value = Role.ADMIN)
     public ResponseEntity<ThemeResponse> addTheme(
@@ -81,6 +84,7 @@ public class ThemeController {
     @Operation(summary = "테마 삭제", description = "관리자 권한으로 테마를 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "테마 삭제 성공")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @DeleteMapping("/{id}")
     @CheckRole(value = Role.ADMIN)
     public ResponseEntity<Void> deleteTheme(

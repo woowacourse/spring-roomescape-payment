@@ -46,6 +46,7 @@ public class ReservationController {
     @Operation(summary = "모든 예약 조회", description = "관리자 권한으로 모든 예약을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "예약 목록 조회 성공")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping
     @CheckRole(Role.ADMIN)
     public ResponseEntity<List<ReservationResponse>> getReservations() {
@@ -57,6 +58,7 @@ public class ReservationController {
     @Operation(summary = "내 예약 조회", description = "로그인한 사용자의 예약 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "내 예약 목록 조회 성공")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping("/mine")
     @CheckRole({ Role.USER, Role.ADMIN })
     public ResponseEntity<List<MyReservationResponse>> getMyReservation(
@@ -71,6 +73,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "201", description = "예약 생성 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @PostMapping
     @CheckRole(value = { Role.ADMIN, Role.USER })
     public ResponseEntity<ReservationResponse> addReservations(
@@ -91,6 +94,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "201", description = "대기 예약 생성 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @PostMapping("/waiting")
     @CheckRole(value = { Role.ADMIN, Role.USER })
     public ResponseEntity<ReservationWaitResponse> addWaitReservation(
@@ -110,6 +114,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "204", description = "예약 삭제 성공")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @DeleteMapping("/{id}")
     @CheckRole(value = { Role.ADMIN, Role.USER })
     public ResponseEntity<Void> deleteReservations(
@@ -123,6 +128,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "204", description = "대기 예약 삭제 성공")
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @DeleteMapping("/waiting/{id}")
     @CheckRole(value = { Role.ADMIN, Role.USER })
     public ResponseEntity<Void> deleteWaitReservation(

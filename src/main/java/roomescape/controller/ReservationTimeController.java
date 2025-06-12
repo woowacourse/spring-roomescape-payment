@@ -41,6 +41,7 @@ public class ReservationTimeController {
 
     @Operation(summary = "예약 시간 목록 조회", description = "모든 예약 가능 시간을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "예약 시간 목록 조회 성공")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTime> reservationTimes = reservationTimeService.findAll();
@@ -54,6 +55,7 @@ public class ReservationTimeController {
     @Operation(summary = "예약 가능 시간 조회", description = "특정 날짜와 테마에 대한 예약 가능 시간을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "예약 가능 시간 조회 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping("/available")
     public ResponseEntity<List<ReservationTimeSlotResponse>> getAvailableReservationTimes(
             @Parameter(description = "예약 가능 시간 조회 요청") @ModelAttribute @Valid AvailableTimeRequest request) {
@@ -70,6 +72,7 @@ public class ReservationTimeController {
     @ApiResponse(responseCode = "201", description = "예약 시간 추가 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 요청")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @PostMapping
     @CheckRole(value = Role.ADMIN)
     public ResponseEntity<ReservationTimeResponse> addReservationTime(
@@ -89,6 +92,7 @@ public class ReservationTimeController {
     @ApiResponse(responseCode = "204", description = "예약 시간 삭제 성공")
     @ApiResponse(responseCode = "400", description = "예약이 있는 시간은 삭제할 수 없음")
     @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @DeleteMapping("/{id}")
     @CheckRole(value = Role.ADMIN)
     public ResponseEntity<Void> deleteReservationTime(
