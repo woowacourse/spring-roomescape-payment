@@ -15,13 +15,8 @@ public class LoggingAspect {
     public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().toShortString();
         log.info(">> 진입: {}", methodName);
-        try {
-            Object result = joinPoint.proceed();
-            log.info("<< 정상 종료: {}", methodName);
-            return result;
-        } catch (Throwable e) {
-            log.error("!! 예외 발생: {}", methodName, e);
-            throw e;
-        }
+        Object result = joinPoint.proceed();
+        log.info("<< 정상 종료: {}", methodName);
+        return result;
     }
 }
