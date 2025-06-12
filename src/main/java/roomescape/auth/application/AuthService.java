@@ -38,9 +38,8 @@ public class AuthService {
 
     private void validateMemberPassword(String password, Member member) {
         if (!member.matchesPassword(password)) {
-            log.warn("인증 실패 : 비밀번호 불일치 - memberId: {}, password: {}, input: {}",
+            log.warn("인증 실패 : 비밀번호 불일치 - memberId: {}, input: {}",
                     member.getId(),
-                    member.getPassword(),
                     password
             );
             throw new InvalidPasswordException(INVALID_LOGIN_CREDENTIALS.getMessage());

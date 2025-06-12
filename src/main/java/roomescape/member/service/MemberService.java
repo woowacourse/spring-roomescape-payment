@@ -19,7 +19,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public void save(final MemberRequest request) {
-        log.info("[회원가입 요청] email: {}, password: {}, name: {}", request.email(), request.password(), request.name());
+        log.info("[회원가입 요청] email: {}, name: {}", request.email(), request.name());
 
         if (memberRepository.existsByEmail(request.email())) {
             log.warn("[회원가입 실패] 중복 이메일 가입 - duplicateEmail: {}", request.email());
@@ -28,7 +28,7 @@ public class MemberService {
         memberRepository.save(
                 Member.withDefaultRole(request.name(), request.email(), request.password()));
 
-        log.info("[회원가입 성공] email: {}, password: {}, name: {}", request.email(), request.password(), request.name());
+        log.info("[회원가입 성공] email: {}, name: {}", request.email(), request.name());
     }
 
     @Performance
