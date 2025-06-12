@@ -30,12 +30,12 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("예약을 추가할 수 있다.")
-    void saveReservation() {
+    void saveReservationWithAdminPrivileges() {
         // given
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when
-        Reservation reserved = service.saveReservation(2L, tomorrow, 2L, 2L);
+        Reservation reserved = service.saveReservationWithAdminPrivileges(2L, tomorrow, 2L, 2L);
 
         // then
         var reservations = reservationRepository.findAll();
@@ -44,30 +44,30 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("미래의 날짜와 시간에 대한 예약 생성은 가능하다.")
-    void saveReservation_WhenReserveFuture() {
+    void saveReservation_WithAdminPrivileges_WhenReserveFuture() {
         // given
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when & then
-        assertThatCode(() -> service.saveReservation(2L, tomorrow, 2L, 2L))
+        assertThatCode(() -> service.saveReservationWithAdminPrivileges(2L, tomorrow, 2L, 2L))
                 .doesNotThrowAnyException();
     }
 
     @Test
     @DisplayName("과거의 날짜와 시간에 대한 예약 생성 시 예외를 던진다.")
-    void saveReservation_WhenReservePast() {
+    void saveReservation_WithAdminPrivileges_WhenReservePast() {
         // given
         var yesterday = LocalDate.now().minusDays(1);
 
         // when & then
-        assertThatThrownBy(() -> service.saveReservation(2L, yesterday, 2L, 2L))
+        assertThatThrownBy(() -> service.saveReservationWithAdminPrivileges(2L, yesterday, 2L, 2L))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
 
     @Test
     @DisplayName("이미 예약된 날짜와 시간에 대한 예약 생성 시 예외를 던진다.")
-    void saveReservation_WhenReservationAlreadyExists() {
+    void saveReservation_WhenReservationWithAdminPrivilegesAlreadyExists() {
         // given
         var reservedUserId = 2L;
         var reservedDate = LocalDate.parse("2025-05-05");
@@ -76,7 +76,8 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> service.saveReservation(reservedUserId, reservedDate, reservedTimeSlotId, reservedThemeId))
+                () -> service.saveReservationWithAdminPrivileges(reservedUserId, reservedDate, reservedTimeSlotId,
+                        reservedThemeId))
                 .isInstanceOf(AlreadyExistedException.class)
                 .hasMessage("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
     }

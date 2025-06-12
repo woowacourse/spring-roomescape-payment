@@ -20,8 +20,8 @@ public class PaymentService {
 
     public Payment savePayment(final PaymentInfo paymentInfo) {
         PaymentResponse response = paymentClient.confirmPayment(paymentInfo);
-        Payment payment = Payment.register(response.paymentKey(), response.orderId(), response.orderName(),
-                response.amount());
+        Payment payment = Payment.register(response.orderId(), response.paymentKey(), response.orderName(),
+                response.totalAmount());
 
         return paymentRepository.save(payment);
     }

@@ -21,12 +21,12 @@ public class Payment {
     private String orderName;
     private long amount;
 
-    private Payment(final String paymentKey,
-                    final String orderId,
+    private Payment(final String orderId,
+                    final String paymentKey,
                     final String orderName,
                     final long amount) {
-        this.paymentKey = paymentKey;
         this.orderId = orderId;
+        this.paymentKey = paymentKey;
         this.orderName = orderName;
         this.amount = amount;
     }
@@ -34,8 +34,10 @@ public class Payment {
     protected Payment() {
     }
 
-    public static Payment register(final String paymentKey, final String orderId, final String orderName,
+    public static Payment register(final String orderId,
+                                   final String paymentKey,
+                                   final String orderName,
                                    final long amount) {
-        return new Payment(paymentKey, orderId, orderName, amount);
+        return new Payment(orderId, paymentKey, orderName, amount);
     }
 }

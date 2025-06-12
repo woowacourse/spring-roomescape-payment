@@ -37,8 +37,8 @@ class PaymentServiceTest {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
         Payment payment = Payment.register(
-                "test_payment_key",
                 "test_order_id",
+                "test_payment_key",
                 "테스트 결제",
                 1000
         );

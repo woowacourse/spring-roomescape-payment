@@ -37,7 +37,7 @@ class TossPaymentClientTest {
                             "paymentKey": "paymentKey",
                             "orderId": "ROOM_ESCAPE_test_order_id",
                             "orderName": "방탈출 예약 1건",
-                            "amount": 1000
+                            "totalAmount": 1000
                         }
                         """, MediaType.APPLICATION_JSON));
 
@@ -47,7 +47,7 @@ class TossPaymentClientTest {
         // then
         assertAll(() -> assertThat(result.paymentKey()).isEqualTo(paymentInfo.paymentKey()),
                 () -> assertThat(result.orderId()).isEqualTo(paymentInfo.orderId()),
-                () -> assertThat(result.amount()).isEqualTo(paymentInfo.amount()));
+                () -> assertThat(result.totalAmount()).isEqualTo(paymentInfo.amount()));
     }
 
 

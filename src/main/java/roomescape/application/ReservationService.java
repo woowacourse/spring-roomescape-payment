@@ -1,10 +1,10 @@
 package roomescape.application;
 
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
@@ -49,14 +49,16 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation saveReservation(final long userId, final LocalDate date, final long timeId, final long themeId) {
-
+    public Reservation saveReservationWithAdminPrivileges(final long userId,
+                                                          final LocalDate date,
+                                                          final long timeId,
+                                                          final long themeId) {
         User user = getUserById(userId);
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
         validateDuplicateReservation(date, timeSlot, theme);
 
-        Reservation reservation = Reservation.register(user, date, timeSlot, theme);
+        Reservation reservation = Reservation.registerWithAdminPrivileges(user, date, timeSlot, theme);
 
         return reservationRepository.save(reservation);
     }
@@ -67,15 +69,14 @@ public class ReservationService {
                                                          final LocalDate date,
                                                          final long timeId,
                                                          final long themeId) {
-
         User user = getUserById(userId);
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
         validateDuplicateReservation(date, timeSlot, theme);
 
-        Reservation reservation = Reservation.register(user, date, timeSlot, theme);
-
         Payment payment = paymentService.savePayment(paymentInfo);
+
+        Reservation reservation = Reservation.registerWithUserPrivileges(user, date, timeSlot, theme, payment);
 
         return reservationRepository.save(reservation);
     }

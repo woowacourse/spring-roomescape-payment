@@ -25,7 +25,7 @@ class ReservationTest {
         var pastDate = LocalDate.now().minusDays(1);
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, pastDate, timeSlot, theme))
+        assertThatThrownBy(() -> Reservation.registerWithAdminPrivileges(user, pastDate, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
