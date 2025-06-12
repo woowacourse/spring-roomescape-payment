@@ -16,12 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
     paymentWidget.renderPaymentMethods(
         "#payment-method",
-        {value: paymentAmount},
         {variantKey: "DEFAULT"}
     );
 
@@ -178,7 +176,6 @@ function onReservationButtonClick(event, paymentWidget) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
@@ -200,7 +197,6 @@ async function fetchReservationPayment(paymentData, reservationData) {
         timeId: reservationData.timeId,
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,
-        amount: paymentData.amount,
         paymentType: paymentData.paymentType,
     }
 
