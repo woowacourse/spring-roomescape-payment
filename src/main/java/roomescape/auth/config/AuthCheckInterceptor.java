@@ -48,7 +48,7 @@ public class AuthCheckInterceptor implements HandlerInterceptor {
                 log.warn("[권한 검증 실패] 관리자 부가 검증 실패 - URI: {}, memberId: {}, IP: {}",
                         uri, loginMember.getId(), clientIP);
 
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setStatus(HttpStatus.FORBIDDEN.value());
                 return false;
             }
 
@@ -59,7 +59,7 @@ public class AuthCheckInterceptor implements HandlerInterceptor {
             log.error("[인증 처리 오류] URI: {}, IP: {}, error: {}",
                     uri, clientIP, e.getMessage());
 
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             return false;
         }
     }
