@@ -1,12 +1,16 @@
 package roomescape.service;
 
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -19,6 +23,7 @@ import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -50,6 +55,9 @@ class ReservationServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private PaymentRepository paymentRepository;
+
     @InjectMocks
     private ReservationService reservationService;
 
@@ -64,14 +72,14 @@ class ReservationServiceTest {
     void setUp() {
         testMember = new Member(1L, "Test User", "test@example.com", Role.USER, "password");
         testTheme = new Theme(1L, "Test Theme", "Test Description", "test-thumbnail.jpg");
-        
+
         // 현재 시간보다 미래의 시간으로 설정
         LocalTime futureTime = LocalTime.now().plusHours(2);
         testReservationTime = new ReservationTime(1L, futureTime);
-        
+
         testDate = LocalDate.now().plusDays(1); // 내일 날짜로 설정
         testReservation = new Reservation(1L, testMember, testDate, testReservationTime, testTheme);
-        
+
         createRequest = new ReservationCreateRequest(testDate, 1L, 1L, 1L);
     }
 
@@ -158,7 +166,8 @@ class ReservationServiceTest {
     void findAllReservationResponses_ReturnsAllReservations() {
         // given
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(1), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(1), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findAll()).thenReturn(reservations);
@@ -182,7 +191,8 @@ class ReservationServiceTest {
         Long memberId = 1L;
 
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findReservationsByDateBetweenAndThemeIdAndMemberId(from, to, themeId, memberId))
@@ -230,12 +240,17 @@ class ReservationServiceTest {
     void findMyReservations_ReturnsUserReservations() {
         // given
         LoginInfo loginInfo = new LoginInfo(1L, "Test User", "test@example.com", Role.USER);
-        
+
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findReservationsByMemberId(loginInfo.id())).thenReturn(reservations);
+
+        Payment payment = new Payment(1L, "orderId", "paymentKey", 1000L, reservation1, LocalDateTime.now());
+        when(paymentRepository.findFirstByReservationOrderByCreatedAtDesc(any(Reservation.class)))
+                .thenReturn(Optional.of(payment));
 
         // when
         List<MyReservationAndWaitingsResponse> responses = reservationService.findMyReservations(loginInfo.id());
@@ -247,7 +262,7 @@ class ReservationServiceTest {
         assertThat(responses.get(0).date()).isEqualTo(testDate);
         assertThat(responses.get(0).time()).isEqualTo(testReservationTime.getStartAt());
         assertThat(responses.get(0).status()).isEqualTo("예약");
-        
+
         assertThat(responses.get(1).id()).isEqualTo(2L);
     }
 }

@@ -1,6 +1,8 @@
 package roomescape.service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -13,6 +15,8 @@ import roomescape.repository.MemberRepository;
 
 @Service
 public class MemberService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReservationService.class);
 
     private final MemberRepository memberRepository;
 
@@ -40,6 +44,7 @@ public class MemberService {
         }
 
         Member save = memberRepository.save(member);
+        LOG.info("사용자 회원가입 성공: {}, {}", save.getId(), save.getEmail());
         return new MemberSignupResponse(save.getId(), save.getName(),
                 save.getEmail());
     }

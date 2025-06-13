@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS payment
     order_id VARCHAR(255) NOT NULL UNIQUE,
     payment_key VARCHAR(255) NOT NULL UNIQUE,
     amount BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
     reservation_id BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (reservation_id) REFERENCES reservation (id)

@@ -1,7 +1,13 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.auth.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationPaymentRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
-import roomescape.dto.reservation.ReservationCreateRequest;
 
 @RestController
 @RequestMapping("/reservations")
@@ -32,12 +38,20 @@ public class ReservationController {
         this.reservationPaymentService = reservationPaymentService;
     }
 
+    @Operation(summary = "예약 전체 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
         List<ReservationResponse> allReservations = reservationService.findAllReservationResponses();
         return ResponseEntity.ok(allReservations);
     }
 
+    @Operation(summary = "예약 추가 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "예약 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
+            @ApiResponse(responseCode = "404", description = "토스 클라이언트 예외"),
+            @ApiResponse(responseCode = "404", description = "토스 서버 예외")
+    })
     @PostMapping
     public ResponseEntity<String> addReservation(@CurrentMember LoginInfo loginInfo,
                                                  @RequestBody final ReservationPaymentRequest request) {
@@ -51,11 +65,17 @@ public class ReservationController {
 
         ReservationResponse response = reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest,
-                paymentConfirmRequest);
+                paymentConfirmRequest,
+                LocalDateTime.now());
 
         return ResponseEntity.created(URI.create("reservations/" + response.id())).body("성공했습니다.");
     }
 
+    @Operation(summary = "예약 삭제 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "예약 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long id) {
         reservationService.deleteReservation(id);

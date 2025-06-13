@@ -1,5 +1,8 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +28,14 @@ public class AdminReservationController {
         this.reservationService = reservationService;
     }
 
+    @Operation(
+            summary = "관리자용 예약 추가 API",
+            description = "관리자 권한이 없으면 사용하지 못합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "예약 추가 성공"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음")
+    })
     @PostMapping
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody AdminReservationCreateRequest requestDto) {
@@ -35,6 +46,14 @@ public class AdminReservationController {
         return ResponseEntity.created(URI.create("reservations/" + responseDto.id())).body(responseDto);
     }
 
+    @Operation(
+            summary = "관리자용 예약 목록 검색 API",
+            description = "관리자 권한이 없으면 사용하지 못합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "예약 목록 검색 성공"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음")
+    })
     @GetMapping("/search")
     public ResponseEntity<List<ReservationResponse>> searchReservationsByPeriod(
             @RequestParam("themeId") long themeId,

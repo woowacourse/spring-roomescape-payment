@@ -1,5 +1,8 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -24,24 +27,35 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "테마 전체 조회 API")
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> getAllThemes() {
         List<ThemeResponse> allThemes = themeService.findAllThemes();
         return ResponseEntity.ok(allThemes);
     }
 
+    @Operation(summary = "테마 추가 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "테마 추가 성공")
+    })
     @PostMapping
     public ResponseEntity<ThemeResponse> postTheme(@RequestBody final ThemeCreateRequest request) {
         ThemeResponse response = themeService.createTheme(request);
         return ResponseEntity.created(URI.create("themes/" + response.id())).body(response);
     }
 
+    @Operation(summary = "인기 테마 조회 API")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> getPopularThemes() {
         List<ThemeResponse> popularThemes = themeService.findPopularThemes();
         return ResponseEntity.ok(popularThemes);
     }
 
+    @Operation(summary = "테마 삭제 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "테마 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 자원 예외"),
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final Long id) {
         themeService.deleteThemeById(id);
