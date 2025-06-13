@@ -1,6 +1,8 @@
 package roomescape.reservation.model.exception;
 
-public class ReservationAuthException  extends IllegalArgumentException {
+import roomescape.global.exception.AuthorizationException;
+
+public class ReservationAuthException extends AuthorizationException {
 
     public ReservationAuthException(String message) {
         super(message);

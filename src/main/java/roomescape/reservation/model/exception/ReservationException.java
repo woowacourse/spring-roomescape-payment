@@ -1,10 +1,11 @@
 package roomescape.reservation.model.exception;
 
-// TODO : 추상화 수준 낮추기
-public class ReservationException extends RuntimeException {
+import roomescape.global.exception.BusinessRuleViolationException;
+
+public class ReservationException extends BusinessRuleViolationException {
 
     public ReservationException(String message) {
-        super(message);
+        super(message, null);
     }
 
     public static final class InvalidReservationTimeException extends ReservationException {

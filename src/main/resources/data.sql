@@ -40,3 +40,11 @@ VALUES ('2025-06-01', 1, 2, 4, CURRENT_TIMESTAMP, 'PENDING'),
        ('2025-06-01', 2, 1, 3, CURRENT_TIMESTAMP, 'PENDING'),
        ('2025-06-02', 3, 3, 2, CURRENT_TIMESTAMP, 'DENIED'),
        ('2025-06-02', 1, 3, 1, CURRENT_TIMESTAMP, 'PENDING');
+
+-- payment 테이블 초기 데이터
+INSERT INTO payment (order_id, payment_key, amount, payment_type, status, reservation_id)
+VALUES
+    ('ORD-20250601-001', 'PAY-abc123', 20000, 'TOSS', 'SUCCESS', 1),
+    ('ORD-20250601-002', 'PAY-def456', 18000, 'TOSS', 'SUCCESS', 2),
+    ('ORD-20250602-001', 'PAY-ghi789', 20000, 'TOSS', 'SUCCESS', 3),
+    ('ORD-20250602-002', 'PAY-jkl012', 22000, 'TOSS', 'SUCCESS', 4);

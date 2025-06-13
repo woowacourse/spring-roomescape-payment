@@ -1,6 +1,7 @@
 package roomescape.reservation.model.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
@@ -17,6 +18,7 @@ import roomescape.reservation.model.vo.Schedule;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationOperation {
 
     private final ReservationRepository reservationRepository;

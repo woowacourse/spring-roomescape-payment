@@ -1,4 +1,4 @@
-package roomescape.application;
+package roomescape.reservation.application;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 

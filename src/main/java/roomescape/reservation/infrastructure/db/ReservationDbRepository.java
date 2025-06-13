@@ -1,6 +1,6 @@
 package roomescape.reservation.infrastructure.db;
 
-import static roomescape.reservation.model.entity.vo.ReservationStatus.*;
+import static roomescape.reservation.model.entity.vo.ReservationStatus.CONFIRMED;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,7 +44,8 @@ public class ReservationDbRepository implements ReservationRepository {
 
     @Override
     public boolean existDuplicatedSchedule(Schedule schedule) {
-        return reservationJpaRepository.existsByDateAndTimeIdAndThemeIdAndStatus(schedule.date(), schedule.timeId(), schedule.themeId(), CONFIRMED);
+        return reservationJpaRepository.existsByDateAndTimeIdAndThemeIdAndStatus(schedule.date(), schedule.timeId(),
+                schedule.themeId(), CONFIRMED);
     }
 
     @Override

@@ -19,5 +19,4 @@ public class ClientFailException extends RestClientException {
             super(message, statusCode);
         }
     }
-
 }

@@ -21,4 +21,8 @@ jwt:
   issuer: wade
 
 payment-api:
-  secret-key: ${PAYMENT_SECRET_KEY}
+  toss:
+    secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
+    base-url: https://api.tosspayments.com
+    connection-timeout: 3
+    read-timeout: 30

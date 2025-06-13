@@ -10,7 +10,8 @@ import roomescape.reservation.model.entity.vo.ReservationStatus;
 public interface ReservationJpaRepository extends JpaRepository<Reservation, Long>,
         JpaSpecificationExecutor<Reservation> {
 
-    boolean existsByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, ReservationStatus status);
+    boolean existsByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId,
+            ReservationStatus status);
 
     boolean existsByThemeIdAndDateGreaterThanEqual(Long reservationThemeId, LocalDate date);
 

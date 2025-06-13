@@ -18,6 +18,7 @@ import roomescape.reservation.model.vo.Schedule;
 public class ReservationWaitingDbRepository implements ReservationWaitingRepository {
 
     private final ReservationWaitingJpaRepository reservationWaitingJpaRepository;
+
     @Override
     public ReservationWaiting save(ReservationWaiting reservationWaiting) {
         return reservationWaitingJpaRepository.save(reservationWaiting);

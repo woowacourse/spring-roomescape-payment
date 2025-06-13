@@ -27,7 +27,9 @@ public interface ReservationWaitingJpaRepository extends JpaRepository<Reservati
             """)
     List<ReservationWaitingWithRank> findAllWithRankByMemberId(Long memberId);
 
-    Optional<ReservationWaiting> findFirstByDateAndTimeIdAndThemeIdAndStatusOrderByCreatedAtAsc(LocalDate date, Long timeId, Long themeId, ReservationWaitingStatus status);
+    Optional<ReservationWaiting> findFirstByDateAndTimeIdAndThemeIdAndStatusOrderByCreatedAtAsc(LocalDate date,
+            Long timeId, Long themeId, ReservationWaitingStatus status);
 
-    boolean existsByDateAndTimeIdAndThemeIdAndMemberIdAndStatus(LocalDate date, Long timeId, Long themeId, Long memberId, ReservationWaitingStatus status);
+    boolean existsByDateAndTimeIdAndThemeIdAndMemberIdAndStatus(LocalDate date, Long timeId, Long themeId,
+            Long memberId, ReservationWaitingStatus status);
 }

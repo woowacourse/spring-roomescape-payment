@@ -12,5 +12,6 @@ public record ReservationDetails(
         ReservationTime reservationTime,
         ReservationTheme reservationTheme,
         Member member
-        ) {
+) {
+
 }

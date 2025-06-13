@@ -50,7 +50,7 @@ class UserCreateReservationRequestTest {
 
         String paymentKey = "paymentKey";
         String orderId = "id";
-        Long amount = 1234L;
+        int amount = 1234;
         UserCreateReservationRequest request = new UserCreateReservationRequest(date, timeId, themeId, paymentKey,
                 orderId, amount);
 
@@ -65,7 +65,7 @@ class UserCreateReservationRequestTest {
         //given
         String paymentKey = "paymentKey";
         String orderId = "id";
-        Long amount = 1234L;
+        int amount = 1234;
         UserCreateReservationRequest request = new UserCreateReservationRequest(
                 LocalDate.now().plusDays(1),
                 1L,

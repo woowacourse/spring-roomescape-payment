@@ -9,7 +9,8 @@ public record ReservationServiceResponse(
         String name,
         LocalDate date,
         LocalTime startAt,
-        String themeName
+        String themeName,
+        Long paymentId
 ) {
 
     public static ReservationServiceResponse from(Reservation reservation) {
@@ -18,7 +19,19 @@ public record ReservationServiceResponse(
                 reservation.getMember().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                reservation.getTheme().getName()
+                reservation.getTheme().getName(),
+                null
+        );
+    }
+
+    public static ReservationServiceResponse of(Reservation reservation, Long paymentId) {
+        return new ReservationServiceResponse(
+                reservation.getId(),
+                reservation.getMember().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                reservation.getTheme().getName(),
+                paymentId
         );
     }
 }

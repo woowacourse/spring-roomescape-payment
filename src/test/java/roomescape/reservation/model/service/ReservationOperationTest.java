@@ -80,9 +80,9 @@ class ReservationOperationTest extends ServiceTestSupport {
         // then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(result.getDate()).isEqualTo(testDate);
-            softly.assertThat(result.getTime()).isEqualTo(savedTime);
-            softly.assertThat(result.getTheme()).isEqualTo(savedTheme);
-            softly.assertThat(result.getMember()).isEqualTo(savedMember);
+            softly.assertThat(result.getTime().getId()).isEqualTo(savedTime.getId());
+            softly.assertThat(result.getTheme().getId()).isEqualTo(savedTheme.getId());
+            softly.assertThat(result.getMember().getId()).isEqualTo(savedMember.getId());
             softly.assertThat(result.getStatus()).isEqualTo(CONFIRMED);
         });
     }

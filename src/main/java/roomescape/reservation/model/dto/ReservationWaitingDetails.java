@@ -13,4 +13,5 @@ public record ReservationWaitingDetails(
         ReservationTheme reservationTheme,
         Member member
 ) {
+
 }

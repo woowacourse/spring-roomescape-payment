@@ -9,6 +9,7 @@ public record AdminCreateReservationServiceRequest(
         Long timeId,
         Long themeId
 ) {
+
     public Schedule toSchedule() {
         return Schedule.builder()
                 .date(date)

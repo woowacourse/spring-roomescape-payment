@@ -3,6 +3,7 @@ package roomescape.reservation.controller.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import roomescape.payment.model.TossPaymentApprovalInfo;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
 
 public record UserCreateReservationRequest(
@@ -17,8 +18,16 @@ public record UserCreateReservationRequest(
         @NotBlank(message = "주문 ID를 필수로 입력해야 합니다.")
         String orderId,
         @NotNull(message = "금액을 필수로 입력해야 합니다.")
-        Long amount
+        int amount
 ) {
+
+    public TossPaymentApprovalInfo toTossPaymentApproveInfo() {
+        return TossPaymentApprovalInfo.builder()
+                .paymentKey(paymentKey)
+                .orderId(orderId)
+                .amount(amount)
+                .build();
+    }
 
     public CreateReservationServiceRequest toServiceRequest(Long memberId) {
         return CreateReservationServiceRequest.builder()

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.AuthenticatedMember;
 import roomescape.auth.web.resolver.AuthenticationPrincipal;
+import roomescape.payment.application.PaymentService;
 import roomescape.reservation.application.UserReservationService;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
 import roomescape.reservation.controller.dto.request.UserCreateReservationRequest;
@@ -25,7 +26,9 @@ import roomescape.reservation.controller.dto.response.UserReservationResponse;
 public class UserReservationController {
 
     private final UserReservationService userReservationService;
+    private final PaymentService paymentService;
 
+    //TODO : 멱등키 생성 및 저장으로 중복 호출 방지
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ReservationResponse create(
@@ -33,7 +36,10 @@ public class UserReservationController {
             @AuthenticationPrincipal AuthenticatedMember authenticatedMember
     ) {
         Long memberId = authenticatedMember.id();
+
         ReservationServiceResponse response = userReservationService.create(request.toServiceRequest(memberId));
+        paymentService.requestApprovalToToss(request.toTossPaymentApproveInfo());
+        paymentService.updateStatusToSuccess(response.paymentId());
         return ReservationResponse.from(response);
     }
 
