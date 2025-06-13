@@ -22,32 +22,46 @@ import java.util.Objects;
 @Slf4j
 public class LogAspect {
 
-    @Pointcut("execution(* roomescape..application..*(..))")
-    public void applicationServices() {
+    @Pointcut("execution(* roomescape..application.service.*CommandService.*(..))")
+    public void dataModificationOperations() {
     }
 
-    @Pointcut("execution(* roomescape..ui..*(..))")
-    public void controller() {
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.PostMapping) || " +
+            "@annotation(org.springframework.web.bind.annotation.PutMapping) || " +
+            "@annotation(org.springframework.web.bind.annotation.DeleteMapping)")
+    public void dataModifyingRequests() {
     }
 
-    @Around("applicationServices()")
-    public Object logExecutionTime(final ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("dataModificationOperations()")
+    public Object monitorCommandPerformance(final ProceedingJoinPoint joinPoint) throws Throwable {
         final long start = System.currentTimeMillis();
-        try {
-            return joinPoint.proceed();
-        } finally {
-            final long end = System.currentTimeMillis();
-            final long executionTime = end - start;
+        final String operation = joinPoint.getSignature().toShortString();
 
-            if (executionTime > 1000) {
-                log.warn("[SLOW EXECUTION] {} took {} ms", joinPoint.getSignature(), executionTime);
+        try {
+            Object result = joinPoint.proceed();
+
+            final long executionTime = System.currentTimeMillis() - start;
+
+            if (executionTime > 5000) {
+                log.warn("[SLOW_COMMAND] {} took {}ms - 데이터 변경 작업이 지연되고 있습니다",
+                        operation, executionTime);
+            } else if (executionTime > 1000) {
+                log.info("[COMMAND_PERFORMANCE] {} took {}ms", operation, executionTime);
             } else {
-                log.debug("[EXECUTED] {} in {} ms", joinPoint.getSignature(), executionTime);
+                log.debug("[COMMAND_OK] {} completed in {}ms", operation, executionTime);
             }
+
+            return result;
+
+        } catch (Exception e) {
+            final long executionTime = System.currentTimeMillis() - start;
+            log.error("[COMMAND_FAILED] {} failed after {}ms: {}",
+                    operation, executionTime, e.getMessage());
+            throw e;
         }
     }
 
-    @Around("controller()")
+    @Around("dataModifyingRequests()")
     public Object logRequestInfo(final ProceedingJoinPoint joinPoint) throws Throwable {
         final HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(
                 RequestContextHolder.getRequestAttributes())).getRequest();
@@ -65,7 +79,7 @@ public class LogAspect {
             logMap.put("handler_method", joinPoint.getSignature().getName());
             logMap.put("cookies", getCookieInfo(request));
 
-            log.info("[REQUEST] {}", formatLogMap(logMap));
+            log.debug("[REQUEST] {}", formatLogMap(logMap));
         } catch (Exception e) {
             log.error("[LOG ERROR] Failed to log request info: {}", e.getMessage(), e);
         }
