@@ -25,3 +25,21 @@ jwt:
 
 payment:
   toss-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+logging:
+  level:
+    root=INFO:
+  file:
+    name: logs/application.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  h2:
+    console:
+      enabled: false
+  sql:
+    init:
+      mode: never

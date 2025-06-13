@@ -4,13 +4,15 @@ import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.utils.Validator;
+import roomescape.payment.domain.Payment;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 public record CreateReservationServiceRequest(
         Long memberId,
         LocalDate date,
         Long timeId,
-        Long themeId
+        Long themeId,
+        Payment payment
 ) {
 
     public CreateReservationServiceRequest {

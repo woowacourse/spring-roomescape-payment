@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.member.controller.dto.LoginRequest;
 import roomescape.member.controller.dto.SignupRequest;
@@ -33,6 +34,7 @@ import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 public class MissionStepTest {
 
     @Autowired
@@ -71,8 +73,8 @@ public class MissionStepTest {
         memberToken = authService.login(new LoginRequest(memberEmail, memberPassword));
         adminToken = authService.login(new LoginRequest(adminEmail, adminPassword));
 
-        when(paymentService.confirm(any())).thenReturn(
-            Payment.withId(1L, "paymentKey", "orderId", 1000L, "2024-10-05", "2024-10-05"));
+        when(paymentService.completePayment(any())).thenReturn(
+            Payment.withId(1L, "paymentKey", 1000L));
     }
 
     @Test
@@ -183,6 +185,12 @@ public class MissionStepTest {
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
 
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
+            "공포", "설명", "엄지손톱");
+
+        jdbcTemplate.update("INSERT INTO payment (payment_key, amount) VALUES (?, ?)",
+            "test_payment_key", 1000L);
+
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");
         params.put("timeId", "1");
@@ -278,6 +286,9 @@ public class MissionStepTest {
 
         jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
             "공포", "설명", "엄지손톱");
+
+        jdbcTemplate.update("INSERT INTO payment (payment_key, amount) VALUES (?, ?)",
+            "test_payment_key", 1000L);
 
         final Map<String, String> params = new HashMap<>();
         params.put("date", "2025-08-05");

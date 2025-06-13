@@ -58,6 +58,16 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
+    public List<Reservation> findAllWithPayment() {
+        return jpaReservationRepository.findAllWithPayment();
+    }
+
+    @Override
+    public List<Reservation> findAllWithPaymentByMemberId(Long memberId) {
+        return jpaReservationRepository.findAllWithPaymentByMemberId(memberId);
+    }
+
+    @Override
     public void deleteById(Long id) {
         jpaReservationRepository.deleteById(id);
     }

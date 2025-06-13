@@ -14,7 +14,9 @@ public record ReservationWebResponse(
         MemberInfo memberInfo,
         LocalDate date,
         ReservationTimeWebResponse time,
-        ThemeWebResponse theme
+        ThemeWebResponse theme,
+        String paymentKey,
+        Long amount
 ) {
 
     public ReservationWebResponse {

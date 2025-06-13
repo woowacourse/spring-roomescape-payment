@@ -73,7 +73,8 @@ public class FakeReservationRepository implements ReservationRepository {
                 reservation.getMember(),
                 reservation.getDate(),
                 reservation.getTime(),
-                reservation.getTheme()
+                reservation.getTheme(),
+                reservation.getPayment()
         );
 
         reservations.add(saved);
@@ -83,6 +84,18 @@ public class FakeReservationRepository implements ReservationRepository {
     @Override
     public List<Reservation> findAll() {
         return new ArrayList<>(reservations);
+    }
+
+    @Override
+    public List<Reservation> findAllWithPayment() {
+        return new ArrayList<>(reservations);
+    }
+
+    @Override
+    public List<Reservation> findAllWithPaymentByMemberId(Long memberId) {
+        return reservations.stream()
+            .filter(reservation -> Objects.equals(reservation.getMember().getId(), memberId))
+            .toList();
     }
 
     @Override

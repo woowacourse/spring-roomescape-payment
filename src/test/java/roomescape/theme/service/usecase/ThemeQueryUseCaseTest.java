@@ -167,7 +167,8 @@ class ThemeQueryUseCaseTest {
                                             member,
                                             ReservationDate.from(date.getValue().plusDays(j)),
                                             time,
-                                            themes[i]
+                                            themes[i],
+                                            null
                                     )
                             )
                     );
@@ -180,7 +181,8 @@ class ThemeQueryUseCaseTest {
                                             member,
                                             ReservationDate.from(date.getValue().plusDays(j)),
                                             time,
-                                            themes[i]
+                                            themes[i],
+                                            null
                                     )
                             )
                     );
