@@ -3,6 +3,7 @@ package roomescape.reservation.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import roomescape.reservation.dto.response.ReservationReadResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
 public class ReservationController {
@@ -36,6 +38,7 @@ public class ReservationController {
             @AuthenticationPrincipal LoginMember loginMember,
             @RequestBody @Valid ReservationCreateRequest request
     ) {
+        log.info("회원 ID: {} 가 결제를 시도합니다.", loginMember.id());
         ReservationCreateResponse response = reservationService.createReservation(loginMember.id(), request);
         return ResponseEntity.ok().body(response);
     }

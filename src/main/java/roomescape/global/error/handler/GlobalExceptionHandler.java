@@ -27,37 +27,37 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> notFound(NotFoundException e) {
-        log.error("NotFoundException : {}", e);
+        log.warn("NotFoundException : {}", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> badRequest(BadRequestException e) {
-        log.error("BadRequestException : {}", e);
+        log.warn("BadRequestException : {}", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> conflict(ConflictException e) {
-        log.error("ConflictException : {}", e);
+        log.warn("ConflictException : {}", e);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> unauthorized(UnauthorizedException e) {
-        log.error("UnauthorizedException : {}", e);
+        log.warn("UnauthorizedException : {}", e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> forbidden(ForbiddenException e) {
-        log.error("ForbiddenException : {}", e);
+        log.warn("ForbiddenException : {}", e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<String> handleValidationException(MethodArgumentNotValidException e) {
-        log.error("ValidationException : {}", e);
+        log.warn("ValidationException : {}", e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(" / "));

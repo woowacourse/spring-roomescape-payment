@@ -17,6 +17,8 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
@@ -49,6 +51,9 @@ class ReservationTimeIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName("예약 시간을 생성한다.")
@@ -119,7 +124,8 @@ class ReservationTimeIntegrationTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.of(2024, 3, 20);
         var reservationSlot = reservationSlotRepository.save(new ReservationSlot(date, time, theme));
-        var reservation = new Reservation(reservationSlot, member);
+        var payment = paymentRepository.save(new Payment("paymentKey", "1", 1000L));
+        var reservation = new Reservation(reservationSlot, member, payment);
         reservationRepository.save(reservation);
 
         // when
@@ -159,7 +165,8 @@ class ReservationTimeIntegrationTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.of(2024, 3, 20);
         var reservationSlot = reservationSlotRepository.save(new ReservationSlot(date, time, theme));
-        var reservation = new Reservation(reservationSlot, member);
+        var payment = paymentRepository.save(new Payment("paymentKey", "1", 1000L));
+        var reservation = new Reservation(reservationSlot, member, payment);
         reservationRepository.save(reservation);
 
         // when & then

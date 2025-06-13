@@ -18,6 +18,8 @@ import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
@@ -63,10 +65,14 @@ public class WaitingAcceptanceTest {
     @Autowired
     private ReservationSlotRepository reservationSlotRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private LocalDate date;
     private ReservationTime time;
     private Theme theme;
     private ReservationSlot reservationSlot;
+    private Payment payment;
 
     @BeforeEach
     void init() {
@@ -80,6 +86,7 @@ public class WaitingAcceptanceTest {
         memberRepository.save(member);
         Member admin = new Member(DEFAULT_ADMIN_NAME, DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD, RoleType.ADMIN);
         memberRepository.save(admin);
+        payment = paymentRepository.save(new Payment("paymentKey", "1", 1000L));
     }
 
     @DisplayName("로그인을 하지 않으면 예약 대기를 생성할 수 없다.")
@@ -187,7 +194,7 @@ public class WaitingAcceptanceTest {
     private void createOtherMemberReservation(ReservationSlot reservationSlot) {
         Member other = new Member("other", "other@email.com", "password", RoleType.USER);
         memberRepository.save(other);
-        var reservation = new Reservation(reservationSlot, other);
+        var reservation = new Reservation(reservationSlot, other, payment);
         reservationRepository.save(reservation);
     }
 

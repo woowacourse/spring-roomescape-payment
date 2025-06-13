@@ -3,6 +3,7 @@ package roomescape.waiting.repository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.waiting.entity.Waiting;
@@ -29,4 +30,8 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     Optional<Waiting> findFirstByReservationSlot(ReservationSlot reservationSlot);
 
     boolean existsByReservationSlotAndMemberId(ReservationSlot reservationSlot, Long memberId);
+
+    @Modifying
+    @Query("UPDATE Waiting w SET w.status = roomescape.waiting.entity.ApprovalStatus.APPROVE WHERE w.id = :id")
+    void approveWaiting(Long id);
 }

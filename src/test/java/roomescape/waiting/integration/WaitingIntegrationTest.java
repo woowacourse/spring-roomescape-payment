@@ -19,6 +19,8 @@ import roomescape.global.error.exception.ForbiddenException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
@@ -57,6 +59,9 @@ public class WaitingIntegrationTest {
     @Autowired
     private ReservationSlotRepository reservationSlotRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     private LocalDate date;
     private Theme theme;
     private ReservationTime time;
@@ -66,6 +71,8 @@ public class WaitingIntegrationTest {
     private Member otherMember;
     private Member admin;
     private LoginMember loginMember;
+
+    private Payment payment;
 
     @BeforeEach
     void setUp() {
@@ -78,6 +85,7 @@ public class WaitingIntegrationTest {
         otherMember = memberRepository.save(new Member("미소", "miso@email.com", "password", RoleType.USER));
         admin = memberRepository.save(new Member("어드민", "admin@email.com", "password", RoleType.ADMIN));
         loginMember = new LoginMember(member.getId(), member.getPassword(), member.getRole());
+        payment = paymentRepository.save(new Payment("paymentKey", "1", 1000L));
     }
 
     @Test
@@ -85,7 +93,7 @@ public class WaitingIntegrationTest {
     void createWaiting() {
         //given
         // 타인의 예약 생성
-        var reservation = new Reservation(reservationSlot, otherMember);
+        var reservation = new Reservation(reservationSlot, otherMember, payment);
         reservationRepository.save(reservation);
 
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
@@ -124,7 +132,7 @@ public class WaitingIntegrationTest {
     void cantCreateWaitingWhenAlreadyWaiting() {
         //given
         // 타인의 예약 생성
-        var reservation = new Reservation(reservationSlot, otherMember);
+        var reservation = new Reservation(reservationSlot, otherMember, payment);
         reservationRepository.save(reservation);
 
         // 본인의 예약 대기 생성
@@ -171,7 +179,7 @@ public class WaitingIntegrationTest {
     void acceptWaitingWhenAlreadyReserved() {
         //given
         // 타인의 예약 생성
-        var reservation = new Reservation(reservationSlot, otherMember);
+        var reservation = new Reservation(reservationSlot, otherMember, payment);
         reservationRepository.save(reservation);
 
         var waiting = new Waiting(reservationSlot, member);

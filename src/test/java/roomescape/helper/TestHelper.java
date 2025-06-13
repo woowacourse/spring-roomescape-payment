@@ -60,12 +60,6 @@ public class TestHelper {
                 .post(path);
     }
 
-    public static Response delete(String path) {
-        return RestAssured.given()
-                .when()
-                .delete(path);
-    }
-
     public static Response deleteWithToken(String path, String token) {
         return RestAssured.given()
                 .cookie("token", token)

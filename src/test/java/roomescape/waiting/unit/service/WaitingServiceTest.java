@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static roomescape.waiting.entity.ApprovalStatus.REJECT;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -75,7 +76,7 @@ class WaitingServiceTest {
         admin = new Member(3L, "admin", "admin@email.com", "password", RoleType.ADMIN);
         loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());
 
-        waiting = new Waiting(1L, reservationSlot, member);
+        waiting = new Waiting(1L, reservationSlot, member, REJECT);
     }
 
     @Test
@@ -149,7 +150,7 @@ class WaitingServiceTest {
     @Test
     void cantDeleteWaitingWhenNotMine() {
         //given
-        var otherMemberWaiting = new Waiting(1L, reservationSlot, otherMember);
+        var otherMemberWaiting = new Waiting(1L, reservationSlot, otherMember, REJECT);
 
         when(waitingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(otherMemberWaiting));
@@ -163,7 +164,7 @@ class WaitingServiceTest {
     @Test
     void deleteWaitingWhenAdmin() {
         //given
-        var otherMemberWaiting = new Waiting(1L, reservationSlot, otherMember);
+        var otherMemberWaiting = new Waiting(1L, reservationSlot, otherMember, REJECT);
         var adminLoginMember = new LoginMember(admin.getId(), admin.getPassword(), admin.getRole());
 
         when(waitingRepository.findById(anyLong()))

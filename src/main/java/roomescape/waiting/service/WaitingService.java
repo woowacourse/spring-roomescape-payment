@@ -10,7 +10,7 @@ import roomescape.global.error.exception.ForbiddenException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.entity.Reservation;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
@@ -30,6 +30,7 @@ public class WaitingService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
     private final ReservationSlotRepository reservationSlotRepository;
+    private final PaymentService paymentService;
 
     public WaitingCreateResponse createWaiting(LoginMember loginMember, WaitingCreateRequest request) {
         ReservationSlot reservationSlot = reservationSlotRepository.findByDateAndTimeIdAndThemeId(
@@ -67,19 +68,12 @@ public class WaitingService {
         convertWaitingToReservation(waiting);
     }
 
-    public void changeWaitingToReservation(ReservationSlot reservationSlot) {
-        waitingRepository.findFirstByReservationSlot(reservationSlot)
-                .ifPresent(this::convertWaitingToReservation);
-    }
-
     public List<WaitingWithRank> getWaitingWithRanksByMemberId(Long memberId) {
         return waitingRepository.findWaitingsWithRankByMemberId(memberId);
     }
 
     private void convertWaitingToReservation(Waiting waiting) {
-        waitingRepository.delete(waiting);
-        Reservation reservation = new Reservation(waiting.getReservationSlot(), waiting.getMember());
-        reservationRepository.save(reservation);
+        waitingRepository.approveWaiting(waiting.getId());
     }
 
     private void validateLoginMember(Long waitingId, LoginMember loginMember) {
@@ -93,6 +87,7 @@ public class WaitingService {
     private void validateAvailableWaiting(ReservationSlot reservationSlot, LoginMember loginMember) {
         validateReserved(reservationSlot);
         validateDuplicateWaiting(reservationSlot, loginMember);
+        validateDuplicateReservation(reservationSlot, loginMember);
     }
 
     private void validateReserved(ReservationSlot reservationSlot) {
@@ -121,5 +116,13 @@ public class WaitingService {
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버 입니다."));
+    }
+
+    public void approve(long id) {
+        Waiting waiting = getWaitingById(id);
+        if (! waiting.isApprove()) {
+            throw new IllegalArgumentException("[ERROR] 현재 대기 번호 1번이 아닙니다. 대기 승인 후 다시 시도해 주세요.");
+        }
+        waitingRepository.delete(waiting);
     }
 }

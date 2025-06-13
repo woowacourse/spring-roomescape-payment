@@ -1,13 +1,16 @@
 package roomescape.waiting.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.waiting.entity.ApprovalStatus.APPROVE;
 
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
@@ -18,6 +21,7 @@ import roomescape.waiting.entity.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @DataJpaTest
+@EntityScan(basePackages = "roomescape")
 public class WaitingRepositoryTest {
 
     @Autowired
@@ -60,5 +64,34 @@ public class WaitingRepositoryTest {
 
         // then
         assertThat(count).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("대기를 승인한다.")
+    void approveWaiting() {
+        //given
+        var theme = new Theme("테마", "설명", "썸네일");
+        var time = new ReservationTime(LocalTime.of(10, 0));
+        var date = LocalDate.now().plusDays(1);
+        var slot = new ReservationSlot(date, time, theme);
+
+        var member = new Member("미소", "miso@email.com", "password", RoleType.USER);
+        var waiting = new Waiting(slot, member);
+
+        entityManager.persist(theme);
+        entityManager.persist(time);
+        entityManager.persist(slot);
+
+        entityManager.persist(member);
+        entityManager.persist(waiting);
+
+        entityManager.clear();
+
+        //when
+        waitingRepository.approveWaiting(waiting.getId());
+        Optional<Waiting> byId = waitingRepository.findById(waiting.getId());
+
+        //then
+        assertThat(byId.get().getStatus()).isEqualTo(APPROVE);
     }
 }
