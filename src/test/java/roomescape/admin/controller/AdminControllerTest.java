@@ -17,7 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.AdminReservationRequestDto;
 import roomescape.global.auth.domain.dto.TokenResponseDto;
-import roomescape.auth.fixture.AuthFixture;
+import roomescape.global.auth.fixture.AuthFixture;
 import roomescape.global.auth.service.AuthService;
 import roomescape.reservationtime.ReservationTimeTestDataConfig;
 import roomescape.theme.ThemeTestDataConfig;

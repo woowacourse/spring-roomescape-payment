@@ -16,7 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.admin.domain.dto.AdminReservationRequestDto;
-import roomescape.auth.fixture.AuthFixture;
+import roomescape.global.auth.fixture.AuthFixture;
 import roomescape.global.auth.domain.dto.TokenResponseDto;
 import roomescape.global.auth.service.AuthService;
 import roomescape.reservationtime.ReservationTimeTestDataConfig;

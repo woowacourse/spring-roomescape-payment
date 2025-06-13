@@ -3,6 +3,7 @@ package roomescape.theme.controller;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import roomescape.theme.domain.dto.ThemeRequestDto;
 import roomescape.theme.domain.dto.ThemeResponseDto;
 import roomescape.theme.service.ThemeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
@@ -29,7 +31,10 @@ public class ThemeController {
 
     @GetMapping
     public ResponseEntity<List<ThemeResponseDto>> findAll() {
-        return ResponseEntity.ok(themeService.findAll());
+        log.info("GET /themes 요청 수신");
+        List<ThemeResponseDto> themes = themeService.findAll();
+        log.info("GET /themes 요청 완료 - 총 {}건", themes.size());
+        return ResponseEntity.ok(themes);
     }
 
     @GetMapping("/ranking")

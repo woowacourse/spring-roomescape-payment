@@ -32,7 +32,7 @@ import roomescape.waiting.exception.NotFoundWaitingException;
 import roomescape.waiting.fixture.WaitingFixture;
 import roomescape.waiting.repository.WaitingRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes =
+@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes =
         {MemberTestDataConfig.class, ThemeTestDataConfig.class, ReservationTimeTestDataConfig.class,})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class UserServiceTest {

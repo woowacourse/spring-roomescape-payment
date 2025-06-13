@@ -26,7 +26,7 @@ import roomescape.waiting.domain.dto.WaitingResponseDto;
 import roomescape.waiting.exception.NotFoundWaitingException;
 import roomescape.waiting.fixture.WaitingFixture;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = {
+@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = {
         MemberTestDataConfig.class,
         ReservationTimeTestDataConfig.class,
         ThemeTestDataConfig.class

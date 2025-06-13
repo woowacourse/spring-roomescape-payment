@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 import roomescape.reservation.service.ReservationService;
 import roomescape.user.domain.User;
 
+@Slf4j
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
@@ -23,6 +25,7 @@ public class ReservationController {
     private final ReservationService service;
 
     public ReservationController(ReservationService service) {
+        log.debug("ReservationController initialized");
         this.service = service;
     }
 
@@ -35,7 +38,9 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponseDto> addWithPayment(@RequestBody ReservationWithPaymentDto requestDto,
                                                                  User user) {
+        log.info("POST /reservations 요청 수신 - 사용자: {}, 요청 데이터: {}", user.getId(), requestDto);
         ReservationResponseDto resDto = service.addWithPayment(requestDto, user);
+        log.info("POST /reservations 요청 완료 - 예약 ID: {}", resDto.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
     }
 

@@ -1,5 +1,9 @@
 package roomescape.reservation.service;
 
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,12 +32,7 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.fixture.WaitingFixture;
 import roomescape.waiting.repository.WaitingRepository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
-
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class ReservationServiceTest {
 

@@ -7,9 +7,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import roomescape.payment.global.domain.PgPayment;
 import roomescape.reservation.exception.InvalidReservationTimeException;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -31,29 +34,40 @@ public class Reservation {
     private Theme theme;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+    @OneToOne(optional = true)
+    @JoinColumn(name = "pg_payment_id", nullable = true)
+    private PgPayment pgPayment;
 
     protected Reservation() {
     }
 
     public Reservation(Long id, LocalDate date, ReservationStatus status, ReservationTime reservationTime, Theme theme,
-            User user) {
+            User user, PgPayment pgPayment) {
         this.id = id;
         this.date = date;
         this.status = status;
         this.reservationTime = reservationTime;
         this.theme = theme;
         this.user = user;
+        this.pgPayment = pgPayment;
     }
 
     public static Reservation of(LocalDate date, ReservationStatus status, ReservationTime reservationTime, Theme theme,
-            User user) {
+            User user, PgPayment payment) {
         LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
         validateTense(dateTime);
-        return new Reservation(null, date, status, reservationTime, theme, user);
+        return new Reservation(null, date, status, reservationTime, theme, user, payment);
+    }
+
+    public static Reservation of(LocalDate date, ReservationStatus status, ReservationTime reservationTime, Theme theme,
+                                 User user) {
+        LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
+        validateTense(dateTime);
+        return new Reservation(null, date, status, reservationTime, theme, user, null);
     }
 
     public static Reservation ofWaiting(Waiting waiting) {
-        return new Reservation(null, waiting.getDate(), ReservationStatus.BOOKED, waiting.getTime(), waiting.getTheme(), waiting.getMember());
+        return new Reservation(null, waiting.getDate(), ReservationStatus.BOOKED, waiting.getTime(), waiting.getTheme(), waiting.getMember(), null);
     }
 
     private static void validateTense(LocalDateTime dateTime) {
@@ -97,5 +111,9 @@ public class Reservation {
 
     public User getUser() {
         return user;
+    }
+
+    public PgPayment getPgPayment() {
+        return pgPayment;
     }
 }

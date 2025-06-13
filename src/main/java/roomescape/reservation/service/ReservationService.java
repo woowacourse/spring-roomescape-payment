@@ -3,11 +3,15 @@ package roomescape.reservation.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
-import roomescape.payment.global.domain.dto.PaymentRequestDto;
-import roomescape.payment.global.service.PaymentService;
+import roomescape.payment.global.domain.PgPayment;
+import roomescape.payment.global.domain.dto.PgPaymentRequestDto;
+import roomescape.payment.global.domain.dto.PgPaymentDataDto;
+import roomescape.payment.global.repository.PaymentRepository;
+import roomescape.payment.global.service.PgPaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
@@ -26,6 +30,7 @@ import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class ReservationService {
@@ -34,16 +39,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
+    private final PgPaymentService pgPaymentService;
 
     public ReservationService(ReservationRepository repository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository, PaymentService paymentService) {
+                              WaitingRepository waitingRepository, PaymentRepository paymentRepository, PgPaymentService pgPaymentService) {
         this.repository = repository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
+        this.pgPaymentService = pgPaymentService;
     }
 
     public List<ReservationResponseDto> findAll() {
@@ -55,20 +62,35 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponseDto add(ReservationRequestDto requestDto, User user) {
+        validateDuplicateDateTime(requestDto);
         Reservation reservation = convertReservation(requestDto, user);
-        validateDuplicateDateTime(reservation);
         Reservation savedReservation = repository.save(reservation);
         return convertReservationResponseDto(savedReservation);
     }
 
     @Transactional
     public ReservationResponseDto addWithPayment(ReservationWithPaymentDto requestDto, User user) {
+        log.info("addWithPayment 요청 - 사용자 ID: {}, 요청 데이터: {}", user.getId(), requestDto);
+
         ReservationRequestDto reservationRequestDto = convertReservationRequestDto(requestDto);
-        Reservation reservation = convertReservation(reservationRequestDto, user);
-        validateDuplicateDateTime(reservation);
-        PaymentRequestDto paymentRequestDto = convertPaymentRequestDto(requestDto);
-        paymentService.approve(paymentRequestDto);
+        validateDuplicateDateTime(reservationRequestDto);
+        log.info("중복 예약 검사 통과 - 날짜: {}, 시간 ID: {}, 테마 ID: {}",
+                reservationRequestDto.date(), reservationRequestDto.timeId(), reservationRequestDto.themeId());
+
+        PgPaymentRequestDto pgPaymentRequestDto = convertPaymentRequestDto(requestDto);
+        log.info("결제 승인 시도 - PaymentKey: {}, OrderId: {}, 금액: {}",
+                pgPaymentRequestDto.paymentKey(), pgPaymentRequestDto.orderId(), pgPaymentRequestDto.amount());
+
+        PgPaymentDataDto pgPaymentDataDto = pgPaymentService.approve(pgPaymentRequestDto);
+        log.info("결제 승인 성공 - PG사 응답: {}", pgPaymentDataDto);
+
+        PgPayment savedPgPayment = paymentRepository.save(pgPaymentDataDto.toEntity());
+        log.info("결제 정보 저장 완료 - Payment ID: {}", savedPgPayment.getId());
+
+        Reservation reservation = convertReservation(reservationRequestDto, user, savedPgPayment);
         Reservation savedReservation = repository.save(reservation);
+        log.info("예약 저장 완료 - 예약 ID: {}", savedReservation.getId());
+
         return convertReservationResponseDto(savedReservation);
     }
 
@@ -76,8 +98,8 @@ public class ReservationService {
         return ReservationRequestDto.ofReservationWithPaymentDto(requestDto);
     }
 
-    private PaymentRequestDto convertPaymentRequestDto(ReservationWithPaymentDto requestDto) {
-        return PaymentRequestDto.ofReservationWithPaymentDto(requestDto);
+    private PgPaymentRequestDto convertPaymentRequestDto(ReservationWithPaymentDto requestDto) {
+        return PgPaymentRequestDto.ofReservationWithPaymentDto(requestDto);
     }
 
     @Transactional
@@ -107,10 +129,12 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundReservationException("해당 예약 id가 존재하지 않습니다."));
     }
 
-    private void validateDuplicateDateTime(Reservation inputReservation) {
+    private void validateDuplicateDateTime(ReservationRequestDto dto) {
+        ReservationTime reservationTime = reservationTimeRepository.findById(dto.timeId())
+                .orElseThrow(InvalidReservationTimeException::new);
         boolean exists = repository.existsByDateAndReservationTime(
-                inputReservation.getDate(),
-                inputReservation.getReservationTime()
+                dto.date(),
+                reservationTime
         );
         if (exists) {
             throw new DuplicateReservationException();
@@ -132,12 +156,16 @@ public class ReservationService {
     }
 
     private Reservation convertReservation(ReservationRequestDto dto, User user) {
+        return convertReservation(dto, user, null);
+    }
+
+    private Reservation convertReservation(ReservationRequestDto dto, User user, PgPayment payment) {
         ReservationTime reservationTime = reservationTimeRepository.findById(dto.timeId())
                 .orElseThrow(InvalidReservationTimeException::new);
         Theme theme = themeRepository.findById(dto.themeId())
                 .orElseThrow(InvalidThemeException::new);
 
-        return dto.toEntity(reservationTime, theme, user);
+        return dto.toEntity(reservationTime, theme, user, payment);
     }
 
     private ReservationResponseDto convertReservationResponseDto(Reservation reservation) {

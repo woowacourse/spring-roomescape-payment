@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.payment.global.exception.InvalidPaymentException;
+import roomescape.payment.global.exception.InvalidPgPaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,8 +40,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(InvalidPaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(InvalidPaymentException e) {
+    @ExceptionHandler(InvalidPgPaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(InvalidPgPaymentException e) {
         return ResponseEntity.status(e.getStatus()).body(new ErrorResponse(e.getMessage()));
     }
 }

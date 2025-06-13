@@ -1,5 +1,6 @@
 package roomescape.reservation.domain.dto;
 
+import roomescape.payment.global.domain.PgPayment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -16,8 +17,8 @@ public record ReservationWithPaymentDto(LocalDate date,
                                         int amount,
                                         String paymentType) {
 
-    public Reservation toEntity(ReservationTime reservationTime, Theme theme, User user) {
-        return Reservation.of(date, ReservationStatus.BOOKED, reservationTime, theme, user);
+    public Reservation toEntity(ReservationTime reservationTime, Theme theme, User user, PgPayment pgPayment) {
+        return Reservation.of(date, ReservationStatus.BOOKED, reservationTime, theme, user, pgPayment);
     }
 }
 

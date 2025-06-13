@@ -259,9 +259,6 @@ function onWaitButtonClick() {
             timeId: selectedTimeId,
             reservationId: selectedReservationId
         };
-
-
-
         /*
         DONE: [3단계] 예약 대기 생성 요청 API 호출
          */

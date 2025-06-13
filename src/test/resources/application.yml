@@ -1,0 +1,26 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:database
+  sql:
+    init:
+      schema-locations: classpath:/schema.sql
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+security:
+  jwt:
+    token:
+      secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
+      expire-length: 3600000
+
+payment:
+  pg:
+    toss-payment:
+      base-url: https://api.tosspayments.com
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      connect-timeout: 15000
+      read-timeout: 60000
