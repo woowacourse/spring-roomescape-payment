@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.reservation.application.dto.ReservationTimeRequest;
 import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -42,7 +43,7 @@ public class ReservationTimeService {
     }
 
     public void deleteById(final Long id) {
-        if (reservationRepository.existsByTimeId(id)) {
+        if (reservationRepository.existsByTimeIdAndStatus(id, ReservationStatus.CONFIRMED)) {
             throw new BadRequestException("이 시간의 예약이 존재합니다.");
         }
         reservationTimeRepository.deleteById(id);

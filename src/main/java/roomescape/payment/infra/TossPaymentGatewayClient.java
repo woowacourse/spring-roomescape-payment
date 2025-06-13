@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.infra;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -9,9 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.common.log.RestClientLoggingInterceptor;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.config.TossPaymentProperties;
@@ -32,17 +34,18 @@ public class TossPaymentGatewayClient {
         this.restClient = restClientBuilder
             .requestFactory(createTimeoutFactory(properties))
             .baseUrl(properties.getBaseUrl())
+            .requestInterceptor(new RestClientLoggingInterceptor())
             .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .defaultStatusHandler(new TossPaymentErrorHandler(objectMapper))
             .build();
     }
 
-    private SimpleClientHttpRequestFactory createTimeoutFactory(final TossPaymentProperties properties) {
+    private BufferingClientHttpRequestFactory createTimeoutFactory(final TossPaymentProperties properties) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(properties.getConnectTimeout());
         factory.setReadTimeout(properties.getReadTimeout());
-        return factory;
+        return new BufferingClientHttpRequestFactory(factory);
     }
 
     private String encodeSecretKey(final String secretKey) {

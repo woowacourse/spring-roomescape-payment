@@ -31,7 +31,9 @@ function renderCombined(reservations, waitings) {
       theme: r.theme,
       date: r.date,
       time: r.time,
-      status: r.status
+      status: r.status,
+      paymentKey: r.paymentKey,
+      amount: r.amount
     })),
     ...waitings.map(w => ({
       id: w.id,
@@ -62,7 +64,9 @@ function renderCombined(reservations, waitings) {
       };
       cancelCell.appendChild(cancelButton);
     } else {
-      cancelCell.textContent = '';
+      row.insertCell(4).textContent = '';
+      row.insertCell(5).textContent = item.paymentKey;
+      row.insertCell(6).textContent = item.amount;
     }
   });
 }

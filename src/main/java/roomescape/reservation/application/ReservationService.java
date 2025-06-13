@@ -14,12 +14,14 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -61,32 +63,20 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addMemberReservation(final MemberReservationRequest request,
-        final Long memberId) {
-        paymentService.addPayment(
-            new PaymentRequest(request.date(), request.timeId(), request.themeId(),
-                request.paymentKey(), request.orderId(), request.amount()), memberId);
-        return addReservation(request.timeId(), request.themeId(), memberId, request.date());
+    public ReservationResponse addMemberReservation(final MemberReservationRequest request, final Long memberId) {
+        Payment payment = paymentService.addPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        return addReservation(request.timeId(), request.themeId(), memberId, request.date(), payment);
     }
 
     @Transactional
     public ReservationResponse addAdminReservation(final AdminReservationRequest request) {
-        return addReservation(request.timeId(), request.themeId(), request.memberId(),
-            request.date());
-    }
-
-    @Transactional
-    public void deleteById(final Long id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new NotFoundException("존재하지 않는 예약입니다.");
-        }
-        reservationRepository.deleteById(id);
+        return addReservation(request.timeId(), request.themeId(), request.memberId(), request.date(), null);
     }
 
     @Transactional
     public void deleteReservationAndGetFirstWaiting(final Long reservationId) {
         Reservation reservation = getReservation(reservationId);
-        deleteById(reservation.getId());
+        reservation.cancel();
         waitingRepository.findFirstByThemeIdAndDateAndReservationTimeIdOrderById(
             reservation.getTheme().getId(),
             reservation.getDate(),
@@ -101,9 +91,8 @@ public class ReservationService {
         final String date) {
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         final Theme selectedTheme = getTheme(themeId);
-        final List<Reservation> bookedReservations = reservationRepository.findByDateAndThemeId(
-            LocalDate.parse(date),
-            themeId);
+        final List<Reservation> bookedReservations = reservationRepository.findByDateAndThemeIdAndStatus(
+            LocalDate.parse(date), themeId, ReservationStatus.CONFIRMED);
         return getAvailableReservationTimeResponses(reservationTimes, bookedReservations,
             selectedTheme);
     }
@@ -115,7 +104,7 @@ public class ReservationService {
         final LocalDate end
     ) {
         final List<Reservation> reservations = reservationRepository
-            .findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, start, end);
+            .findByThemeIdAndMemberIdAndDateBetweenAndStatus(themeId, memberId, start, end, ReservationStatus.CONFIRMED);
         return reservations.stream()
             .map(ReservationResponse::of)
             .toList();
@@ -129,20 +118,18 @@ public class ReservationService {
     }
 
     private ReservationResponse addReservation(final Long timeId, final Long themeId,
-        final Long memberId,
-        final LocalDate date) {
+        final Long memberId, final LocalDate date, final Payment payment) {
         final ReservationTime reservationTime = getReservationTime(timeId);
         final Theme theme = getTheme(themeId);
         final Member member = getMember(memberId);
 
-        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(
-            date,
-            themeId);
+        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeIdAndStatus(date, themeId,
+            ReservationStatus.CONFIRMED);
 
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());
 
-        final Reservation reservation = new Reservation(date, reservationTime, theme, member);
+        final Reservation reservation = new Reservation(date, reservationTime, theme, member, payment);
         final Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.of(saved);
     }

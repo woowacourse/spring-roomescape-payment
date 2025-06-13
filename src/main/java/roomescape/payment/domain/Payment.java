@@ -1,19 +1,12 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
 import java.util.Objects;
-import roomescape.member.domain.Member;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
 
 @Entity
 public class Payment {
@@ -22,19 +15,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private ReservationTime reservationTime;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Theme theme;
-
-    private LocalDate date;
-
-    @Embedded
-    private PaymentInfo paymentInfo;
+    private String paymentKey;
+    private String orderId;
+    private Long amount;
 
     @Enumerated(value = EnumType.STRING)
     private PaymentGateway paymentGateway;
@@ -42,38 +25,50 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Long id, final Member member, final ReservationTime reservationTime,
-        final Theme theme, final LocalDate date, final PaymentInfo paymentInfo,
-        final PaymentGateway paymentGateway) {
+    public Payment(final Long id, final String paymentKey, final String orderId,
+        final Long amount, final PaymentGateway paymentGateway) {
         this.id = id;
-        this.member = member;
-        this.reservationTime = reservationTime;
-        this.theme = theme;
-        this.date = date;
-        this.paymentInfo = paymentInfo;
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
         this.paymentGateway = paymentGateway;
     }
 
-    public Payment(final Member member, final ReservationTime reservationTime,
-        final Theme theme, final LocalDate date, final PaymentInfo paymentInfo,
-        final PaymentGateway paymentGateway) {
-        this(null, member, reservationTime, theme, date, paymentInfo, paymentGateway);
+    public Payment(
+        final String paymentKey,
+        final String orderId,
+        final Long amount,
+        final PaymentGateway paymentGateway
+    ) {
+        this(null, paymentKey, orderId, amount, paymentGateway);
     }
 
     public Long getId() {
         return id;
     }
 
-    public PaymentInfo getPaymentInfo() {
-        return paymentInfo;
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public PaymentGateway getPaymentGateway() {
+        return paymentGateway;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment payment = (Payment) o;
+        final Payment payment = (Payment) o;
         if (id == null || payment.id == null) {
             return false;
         }
