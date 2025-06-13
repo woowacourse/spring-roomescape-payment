@@ -9,20 +9,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
+import roomescape.common.exception.DuplicateException;
 import roomescape.common.exception.NotFoundException;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.infrastructure.client.TossPaymentClient;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
-import roomescape.reservation.application.service.ReservationViewQueryService;
 import roomescape.reservation.application.service.WaitingReservationCommandService;
 import roomescape.reservation.application.service.WaitingReservationQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.ReservationView;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
@@ -32,6 +31,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.domain.ThemeThumbnail;
+import roomescape.theme.ui.dto.ThemeResponse;
 import roomescape.time.domain.ReservationTime;
 import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
@@ -59,9 +59,6 @@ class ReservationFacadeTest {
     private ReservationQueryService reservationQueryService;
 
     @Mock
-    private ReservationViewQueryService reservationViewQueryService;
-
-    @Mock
     private WaitingReservationCommandService waitingReservationCommandService;
 
     @Mock
@@ -72,6 +69,9 @@ class ReservationFacadeTest {
 
     @Mock
     private TossPaymentClient tossPaymentClient;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @Mock
     private UserQueryService userQueryService;
@@ -141,26 +141,33 @@ class ReservationFacadeTest {
     void getAllByUserId() {
         //then
         Long userId = 1L;
-        List<Reservation> reservations = List.of(createReservation(1L));
-        User user = createUser(userId);
-        List<ReservationView> reservationViews = List.of(new ReservationView(
-                "T-1",
-                userId,
-                reservations.get(0).getDate(),
-                reservations.get(0).getTime(),
-                reservations.get(0).getTheme(),
-                ReservationStatus.CONFIRMED,
-                0
+        List<MyReservationsResponse> given = List.of(new MyReservationsResponse(
+                1L,
+                LocalDate.now().plusDays(1),
+                new ReservationTime(1L, LocalTime.of(15, 0)),
+                ThemeResponse.from(new Theme(
+                        1L,
+                        ThemeName.from("테스트테마"),
+                        ThemeDescription.from("설명"),
+                        ThemeThumbnail.from("thumbnail.jpg")
+                )),
+                0,
+                "paymentKey",
+                10000
         ));
+        User user = createUser(userId);
+
         given(userQueryService.getById(any())).willReturn(user);
-        given(reservationViewQueryService.getAllByUserId(any(Long.class))).willReturn(reservationViews);
+        given(reservationQueryService.findMyReservationsByUserId(any(Long.class))).willReturn(given);
+        given(waitingReservationQueryService.findMyReservationsByUserId(any(Long.class))).willReturn(given);
 
         //when
         List<MyReservationsResponse> result = reservationFacade.getAllByUserId(userId);
 
         //then
-        assertThat(result).hasSize(1);
-        then(reservationViewQueryService).should(times(1)).getAllByUserId(any(Long.class));
+        assertThat(result).hasSize(2);
+        then(reservationQueryService).should(times(1)).findMyReservationsByUserId(any(Long.class));
+        then(waitingReservationQueryService).should(times(1)).findMyReservationsByUserId(any(Long.class));
     }
 
     @Test
@@ -220,23 +227,58 @@ class ReservationFacadeTest {
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
                 0,
-                "orderId",
-                "DONE");
+                "orderId");
         PaymentResult response = new PaymentResult("paymentKey",
                 0,
-                "orderId",
-                "DONE");
+                "orderId");
 
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
         given(tossPaymentClient.confirmPayment(any())).willReturn(response);
+        given(paymentRepository.save(any())).willReturn(response.toEntity(reservation));
+        given(paymentRepository.isExistsByReservationId(any())).willReturn(true);
+
         //when
         ReservationResponse result = reservationFacade.createWithPayment(request, paymentRequest);
 
         //then
         assertThat(result).isNotNull();
         then(reservationCommandService).should(times(1)).create(any());
+        then(tossPaymentClient).should(times(1)).confirmPayment(any());
+        then(paymentRepository).should(times(1)).save(any());
+        then(paymentRepository).should(times(1)).isExistsByReservationId(any());
+
+    }
+
+    @Test
+    @DisplayName("이미 결제된 예약을 생성하려할 경우, 예외가 발생한다.")
+    void createWithPaymentWhenAlreadyPayment() {
+        //given
+        CreateReservationWithUserIdWebRequest request = createCreateRequest();
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
+                0,
+                "orderId");
+        PaymentResult response = new PaymentResult("paymentKey",
+                0,
+                "orderId");
+
+        Reservation reservation = createReservation(1L);
+        given(userQueryService.getById(any())).willReturn(createUser(1L));
+        given(reservationCommandService.create(any())).willReturn(reservation);
+        given(paymentRepository.isExistsByReservationId(any())).willReturn(true);
+
+        //when
+        assertThatThrownBy(() -> reservationFacade.createWithPayment(request, paymentRequest))
+                .isInstanceOf(DuplicateException.class)
+                .hasMessageContaining("RESERVATION already exists");
+
+        //then
+        then(reservationCommandService).should(times(1)).create(any());
+        then(paymentRepository).should(times(1)).isExistsByReservationId(any());
+
+        then(tossPaymentClient).should(times(0)).confirmPayment(any());
+        then(paymentRepository).should(times(0)).save(any());
     }
 
     @Test

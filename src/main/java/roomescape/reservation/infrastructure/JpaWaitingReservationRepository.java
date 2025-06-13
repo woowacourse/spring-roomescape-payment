@@ -6,9 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.domain.vo.MyReservation;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface JpaWaitingReservationRepository extends JpaRepository<WaitingReservation, Long> {
@@ -25,11 +27,11 @@ public interface JpaWaitingReservationRepository extends JpaRepository<WaitingRe
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-            UPDATE WaitingReservation w 
-            SET w.waitingOrder = w.waitingOrder - 1 
-            WHERE w.time.id = :timeId 
-              AND w.theme.id = :themeId 
-              AND w.date = :date 
+            UPDATE WaitingReservation w
+            SET w.waitingOrder = w.waitingOrder - 1
+            WHERE w.time.id = :timeId
+              AND w.theme.id = :themeId
+              AND w.date = :date
               AND w.waitingOrder > :waitingOrder
             """)
     int decrementWaitingOrderAfter(@Param("timeId") Long timeId,
@@ -39,5 +41,21 @@ public interface JpaWaitingReservationRepository extends JpaRepository<WaitingRe
 
     @Query("SELECT w.userId FROM WaitingReservation w WHERE w.id = :id")
     Optional<Long> findUserIdById(@Param("id") Long id);
+
+    @Query("""
+                        SELECT new roomescape.reservation.domain.vo.MyReservation(
+                            wr.id,
+                            wr.date.value,
+                            wrt,
+                            wt,
+                            wr.waitingOrder,
+                            0
+                        )
+                        FROM WaitingReservation wr
+                        JOIN wr.time wrt
+                        JOIN wr.theme wt
+                        WHERE wr.userId = :userId
+            """)
+    List<MyReservation> findMyReservationsByUserId(@Param("userId") Long userId);
 }
 

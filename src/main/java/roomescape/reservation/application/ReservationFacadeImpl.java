@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
-import roomescape.payment.client.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -31,6 +34,7 @@ import roomescape.user.domain.User;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +48,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
     private final UserQueryService userQueryService;
 
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public List<ReservationResponse> getAll() {
@@ -82,35 +87,38 @@ public class ReservationFacadeImpl implements ReservationFacade {
     @Override
     public List<MyReservationsResponse> getAllByUserId(final Long userId) {
         userQueryService.getById(userId);
-        return reservationViewQueryService.getAllByUserId(userId)
-                .stream()
-                .map(MyReservationsResponse::from)
+        return Stream.of(
+                        reservationQueryService.findMyReservationsByUserId(userId),
+                        waitingReservationQueryService.findMyReservationsByUserId(userId)
+                ).flatMap(List::stream)
                 .sorted(Comparator.comparing(MyReservationsResponse::sequence))
                 .toList();
     }
 
     @Override
-    @Transactional
     public ReservationResponse createWithPayment(final CreateReservationWithUserIdWebRequest reservationRequest,
                                                  final PaymentRequest paymentRequest) {
         final User user = userQueryService.getById(reservationRequest.userId());
-        final Reservation reservation = reservationCommandService.create(
-                reservationRequest.toServiceRequest());
+        final Reservation reservation = reservationQueryService.findBySlot(reservationRequest.toServiceRequest())
+                .orElse(reservationCommandService.create(reservationRequest.toServiceRequest()));
 
-        PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
-        if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
-            throw new IllegalArgumentException("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
+        if (paymentRepository.isExistsByReservationId(reservation.getId())) {
+            throw new DuplicateException(
+                    DomainTerm.RESERVATION,
+                    reservationRequest.date(),
+                    reservationRequest.timeId(),
+                    reservationRequest.themeId());
         }
 
+        confirmPaymentWithRollback(paymentRequest, reservation);
         return ReservationResponse.from(reservation, user);
     }
 
     @Override
-    public ReservationResponse create(CreateReservationWithUserIdWebRequest reservationRequest) {
+    public ReservationResponse create(final CreateReservationWithUserIdWebRequest reservationRequest) {
         final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
                 reservationRequest.toServiceRequest());
-
         return ReservationResponse.from(reservation, user);
     }
 
@@ -167,6 +175,20 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final Reservation reservation = reservationCommandService.create(request.toServiceRequest());
         waitingReservationCommandService.delete(id);
         return ReservationResponse.from(reservation, user);
+    }
+
+    private Payment confirmPaymentWithRollback(final PaymentRequest paymentRequest, final Reservation reservation) {
+        try {
+            final PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
+            if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
+                throw new PaymentInternalServerException("결제 승인 검증에 실패했습니다.");
+            }
+            final Payment payment = paymentResult.toEntity(reservation);
+            return paymentRepository.save(payment);
+        } catch (Exception e) {
+            reservationCommandService.deleteForRollback(reservation.getId());
+            throw e;
+        }
     }
 
     private void promotionWaiting(final Long id, final Long waitingId) {

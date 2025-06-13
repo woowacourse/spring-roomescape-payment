@@ -72,6 +72,18 @@ public class Validator {
                 fieldDescription);
     }
 
+    public Validator validateNonNegative(final String fieldName,
+                                         final int target,
+                                         final String fieldDescription) {
+        if (target < 0) {
+            throw buildException(
+                    ValidationType.NON_NEGATIVE_CHECK,
+                    fieldName,
+                    fieldDescription);
+        }
+        return this;
+    }
+
     private InvalidInputException buildException(final ValidationType type,
                                                  final String fieldName,
                                                  final String fieldDescription) {
@@ -89,7 +101,8 @@ public class Validator {
         NULL_CHECK("while checking null"),
         BLANK_CHECK("while checking blank"),
         URI_CHECK("while checking URI"),
-        EMAIL_CHECK("while checking email");
+        EMAIL_CHECK("while checking email"),
+        NON_NEGATIVE_CHECK("while checking non-negative value");
 
         private final String description;
     }

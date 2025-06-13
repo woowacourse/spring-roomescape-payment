@@ -1,5 +1,6 @@
 package roomescape.time.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,12 +28,14 @@ public class ReservationTimeController {
     private final ReservationTimeFacade reservationTimeFacade;
 
     @GetMapping
+    @Operation(summary = "예약 시간 전체 조회")
     public ResponseEntity<List<ReservationTimeResponse>> getAll() {
         List<ReservationTimeResponse> reservationTimeResponses = reservationTimeFacade.getAll();
         return ResponseEntity.ok(reservationTimeResponses);
     }
 
     @PostMapping
+    @Operation(summary = "예약 시간 생성")
     public ResponseEntity<ReservationTimeResponse> create(
             @RequestBody final CreateReservationTimeWebRequest createReservationTimeWebRequest) {
         ReservationTimeResponse reservationTimeResponse = reservationTimeFacade.create(createReservationTimeWebRequest);
@@ -42,6 +45,7 @@ public class ReservationTimeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 시간 삭제")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         reservationTimeFacade.delete(id);
         return ResponseEntity.noContent().build();

@@ -1,30 +1,9 @@
-spring:
-  thymeleaf:
-    cache: false
-    prefix: classpath:/templates/
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        ddl-auto: create-drop
-    defer-datasource-initialization: true
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:data.sql
-  datasource:
-    url: jdbc:h2:mem:DATABASE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  config:
-    import: optional:classpath:application-secret.yml
-
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
 toss:
   payment:
     base-url: https://api.tosspayments.com/v1
@@ -32,3 +11,10 @@ toss:
     timeout:
       connect: 2
       read: 30
+    path:
+      confirm: /payments/confirm
+spring:
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false

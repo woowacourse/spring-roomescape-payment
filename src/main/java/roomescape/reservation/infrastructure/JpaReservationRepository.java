@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
+import roomescape.reservation.domain.vo.MyReservation;
+import roomescape.reservation.domain.vo.ThemeBookingCount;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JpaReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
@@ -23,7 +25,7 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
     List<Reservation> findAllByDateAndThemeId(ReservationDate date, Long themeId);
 
     @Query("""
-            SELECT new roomescape.reservation.infrastructure.vo.ThemeBookingCount(t, COUNT(r))
+            SELECT new roomescape.reservation.domain.vo.ThemeBookingCount(t, COUNT(r))
             FROM Reservation r
             JOIN r.theme t
             WHERE r.date BETWEEN :startDate AND :endDate
@@ -38,5 +40,25 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Reservation r SET r.userId = :userId WHERE r.id = :id")
     void updateUserId(@Param("id") Long id, @Param("userId") Long userId);
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.vo.MyReservation(
+                r.id,
+                r.date.value,
+                rt,
+                t,
+                0,
+                p.paymentKey,
+                p.amount.value
+            )
+            FROM Reservation r
+            JOIN r.time rt
+            JOIN r.theme t
+            LEFT JOIN Payment p ON p.reservation = r
+            WHERE r.userId = :userId
+            """)
+    List<MyReservation> findMyReservationsByUserId(@Param("userId") Long userId);
+
+    Optional<Reservation> findByDateAndTime_IdAndTheme_Id(ReservationDate date, Long time_id, Long theme_id);
 }
 

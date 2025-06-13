@@ -1,6 +1,5 @@
-package roomescape.reservation.infrastructure.vo;
+package roomescape.reservation.domain.vo;
 
-import roomescape.reservation.domain.BookedCount;
 import roomescape.theme.domain.Theme;
 
 public record ThemeBookingCount(Theme theme, BookedCount bookedCount) {

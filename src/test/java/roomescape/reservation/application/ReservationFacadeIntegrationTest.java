@@ -11,9 +11,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.Email;
-import roomescape.payment.client.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
@@ -64,6 +66,9 @@ class ReservationFacadeIntegrationTest {
 
     @Autowired
     private WaitingReservationRepository waitingReservationRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -157,8 +162,33 @@ class ReservationFacadeIntegrationTest {
                 .isEqualTo(waitingReservation.getUserId());
     }
 
+    @Test
+    @DisplayName("예약 생성 및 결제 내역을 저장한다.")
+    void createWithPayment() {
+        // given
+        CreateReservationWithUserIdWebRequest request = createReservationRequest();
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
+                1000,
+                "orderId");
+        PaymentResult paymentResult = new PaymentResult("paymentKey",
+                1000,
+                "orderId");
+
+        given(paymentClient.confirmPayment(any())).willReturn(paymentResult);
+
+        //when
+        reservationFacade.createWithPayment(request, paymentRequest);
+
+        //then
+        assertThat(reservationRepository.findAllByUserId(user.getId()).getFirst().getTheme().getId())
+                .isEqualTo(theme.getId());
+        assertThat(reservationRepository.findAllByUserId(user.getId()).getFirst().getTime().getId())
+                .isEqualTo(time.getId());
+        assertThat(paymentRepository.findAll().size()).isEqualTo(1);
+    }
+
     @Nested
-    @DisplayName("예약 생성 및 결제 시 트랜잭션 롤백 테스트 ")
+    @DisplayName("예약 생성 중 결제 실패 시 롤백 테스트 ")
     class CreateWithMockPaymentClient {
 
         @Test
@@ -180,8 +210,8 @@ class ReservationFacadeIntegrationTest {
             // then
             assertThatThrownBy(() ->
                     reservationFacade.createWithPayment(reservationRequest, paymentRequest))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
+                    .isInstanceOf(PaymentInternalServerException.class)
+                    .hasMessage("결제 승인 API 호출 실패했습니다. 결제 승인 검증에 실패했습니다.");
 
             int finalReservationCount = countReservations();
             assertThat(finalReservationCount).isEqualTo(initialReservationCount);
@@ -190,7 +220,7 @@ class ReservationFacadeIntegrationTest {
         }
 
         @Test
-        @DisplayName("결제 클라이언트 호출 자체가 실패하는 경우에도 예약이 롤백된다")
+        @DisplayName("결제 클라이언트 호출 자체가 실패하는 경우에도 예약이 취소된다")
         void createWithPaymentWhenPaymentClientThrowsException() {
             CreateReservationWithUserIdWebRequest reservationRequest = createReservationRequest();
             PaymentRequest paymentRequest = mock(PaymentRequest.class);
@@ -212,17 +242,17 @@ class ReservationFacadeIntegrationTest {
             assertThat(reservationRepository.findAllByUserId(user.getId())).isEmpty();
         }
 
-        private CreateReservationWithUserIdWebRequest createReservationRequest() {
-            return new CreateReservationWithUserIdWebRequest(
-                    LocalDate.now().plusDays(1),
-                    time.getId(),
-                    theme.getId(),
-                    user.getId()
-            );
-        }
-
         private int countReservations() {
             return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reservations", Integer.class);
         }
+    }
+
+    private CreateReservationWithUserIdWebRequest createReservationRequest() {
+        return new CreateReservationWithUserIdWebRequest(
+                LocalDate.now().plusDays(1),
+                time.getId(),
+                theme.getId(),
+                user.getId()
+        );
     }
 }

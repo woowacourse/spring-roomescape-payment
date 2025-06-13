@@ -3,16 +3,13 @@ package roomescape.reservation.infrastructure;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationView;
+import roomescape.reservation.infrastructure.entity.ReservationView;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface JpaReservationViewRepository extends JpaRepository<ReservationView, String> {
 
     boolean existsByDateAndTimeIdAndThemeIdAndUserId(ReservationDate date, Long timeId, Long themeId, Long userId);
-
-    List<ReservationView> findAllByUserId(Long userId);
 
     @Query(value = """
             SELECT wr.id FROM reservations r 

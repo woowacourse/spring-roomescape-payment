@@ -1,4 +1,4 @@
-package roomescape.payment.client;
+package roomescape.payment.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -11,10 +11,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.payment.client.config.TestPaymentConfiguration;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.config.TestPaymentConfiguration;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Import(TestPaymentConfiguration.class)
 class PaymentClientMockRestServiceServerTest {
 
-    private static final String PATH = "/payments/confirm";
+    private static final String PATH = "/test-payment-path-not-real";
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -36,17 +37,18 @@ class PaymentClientMockRestServiceServerTest {
     @Autowired
     private PaymentClient paymentClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Value("${toss.payment.base-url}")
     private String URL;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DisplayName("정상 결제 응답 반환한다")
     void confirmPayment() throws Exception {
         // given
         PaymentRequest request = getRequest("paymentKey123");
-        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123", "DONE");
+        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123");
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -64,9 +66,8 @@ class PaymentClientMockRestServiceServerTest {
         // then
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(result.paymentKey()).isEqualTo("paymentKey123");
-        assertThat(result.amount()).isEqualTo(1000);
+        assertThat(result.totalAmount()).isEqualTo(1000);
         assertThat(result.orderId()).isEqualTo("orderId123");
-        assertThat(result.paymentType()).isEqualTo("DONE");
 
         mockServer.verify();
     }
@@ -97,6 +98,6 @@ class PaymentClientMockRestServiceServerTest {
     }
 
     private PaymentRequest getRequest(String paymentKey) {
-        return new PaymentRequest(paymentKey, 1000, "orderId123", "paymentType");
+        return new PaymentRequest(paymentKey, 1000, "orderId123");
     }
 }

@@ -1,6 +1,6 @@
 package roomescape.reservation.application;
 
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.dto.SimpleWaitingReservationResponse;
 import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;

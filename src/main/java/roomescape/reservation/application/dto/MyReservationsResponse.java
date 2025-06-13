@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.reservation.domain.ReservationView;
+import roomescape.reservation.domain.vo.MyReservation;
 import roomescape.theme.ui.dto.ThemeResponse;
 import roomescape.time.domain.ReservationTime;
 
@@ -15,19 +15,24 @@ public record MyReservationsResponse(long id,
                                      LocalDate date,
                                      ReservationTime time,
                                      ThemeResponse theme,
-                                     int sequence) {
+                                     int sequence,
+                                     String paymentKey,
+                                     int amount
+) {
 
     public MyReservationsResponse {
-        validate(id, date, time, theme, sequence);
+        validate(id, date, time, theme, sequence, paymentKey, amount);
     }
 
-    public static MyReservationsResponse from(final ReservationView domain) {
+    public static MyReservationsResponse from(final MyReservation domain) {
         return new MyReservationsResponse(
-                domain.getId(),
-                domain.getDate().getValue(),
-                domain.getTime(),
-                ThemeResponse.from(domain.getTheme()),
-                domain.getWaitingOrder()
+                domain.id(),
+                domain.date(),
+                domain.time(),
+                ThemeResponse.from(domain.theme()),
+                domain.sequence(),
+                domain.paymentKey(),
+                domain.amount()
         );
     }
 
@@ -35,12 +40,17 @@ public record MyReservationsResponse(long id,
                           final LocalDate date,
                           final ReservationTime time,
                           final ThemeResponse themeResponse,
-                          final int sequence) {
+                          final int sequence,
+                          final String paymentKey,
+                          final int amount
+    ) {
         Validator.of(MyReservationsResponse.class)
                 .validateNotNull(Fields.id, id, DomainTerm.RESERVATION_WAITING_Id.label())
                 .validateNotNull(Fields.date, date, DomainTerm.RESERVATION_DATE.label())
                 .validateNotNull(Fields.time, time, DomainTerm.RESERVATION_TIME.label())
                 .validateNotNull(Fields.theme, themeResponse, DomainTerm.THEME.label())
-                .validateNotNull(Fields.sequence, sequence, DomainTerm.RESERVATION_WAITING_ORDER.label());
+                .validateNotNull(Fields.sequence, sequence, DomainTerm.RESERVATION_WAITING_ORDER.label())
+                .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
+                .validateNonNegative(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label());
     }
 }

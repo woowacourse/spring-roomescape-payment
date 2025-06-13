@@ -28,19 +28,14 @@ public class ReservationCommandService {
     private final TimeProvider timeProvider;
 
     public Reservation create(final CreateReservationServiceRequest request) {
-        if (isExistsByParams(request.date(), request.timeId(), request.themeId())) {
+        if (isExistsBySlot(request.date(), request.timeId(), request.themeId())) {
             throw new DuplicateException(
                     DomainTerm.RESERVATION,
                     request.date(),
                     request.timeId(),
                     request.themeId());
         }
-        final ReservationTime reservationTime = reservationTimeQueryService.get(request.timeId());
-
-        final Theme theme = themeQueryService.get(request.themeId());
-
-        final Reservation reservation = request.toDomain(reservationTime, theme);
-        reservation.validatePast(timeProvider.now());
+        final Reservation reservation = mapReservationByRequest(request);
         return reservationRepository.save(reservation);
     }
 
@@ -53,17 +48,27 @@ public class ReservationCommandService {
         throw new NotFoundException(DomainTerm.RESERVATION, id);
     }
 
+    public void deleteForRollback(final Long id) {
+        reservationRepository.deleteById(id);
+    }
+
     public void updateUserId(final Long id, final Long userId) {
         reservationRepository.updateUserId(id, userId);
     }
 
-    private boolean isExistsByParams(final ReservationDate date,
-                                     final Long timeId,
-                                     final Long themeId) {
-        return reservationQueryService.existsByParams(
-                date,
-                timeId,
-                themeId
-        );
+    private boolean isExistsBySlot(final ReservationDate date,
+                                   final Long timeId,
+                                   final Long themeId) {
+        return reservationQueryService.existsByParams(date, timeId, themeId);
+    }
+
+    private Reservation mapReservationByRequest(final CreateReservationServiceRequest request) {
+        final ReservationTime reservationTime = reservationTimeQueryService.get(request.timeId());
+
+        final Theme theme = themeQueryService.get(request.themeId());
+
+        final Reservation reservation = request.toDomain(reservationTime, theme);
+        reservation.validatePast(timeProvider.now());
+        return reservation;
     }
 }

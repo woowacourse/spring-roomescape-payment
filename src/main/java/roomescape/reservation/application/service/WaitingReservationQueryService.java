@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.NotFoundException;
+import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
 
@@ -25,5 +26,12 @@ public class WaitingReservationQueryService {
         return waitingReservationRepository.findUserIdById(id).orElseThrow(
                 () -> new NotFoundException(DomainTerm.USER_ID, id)
         );
+    }
+
+    public List<MyReservationsResponse> findMyReservationsByUserId(final Long userId) {
+        return waitingReservationRepository.findMyReservationsByUserId(userId)
+                .stream()
+                .map(MyReservationsResponse::from)
+                .toList();
     }
 }

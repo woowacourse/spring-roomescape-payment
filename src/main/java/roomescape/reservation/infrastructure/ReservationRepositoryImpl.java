@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
+import roomescape.reservation.domain.vo.MyReservation;
+import roomescape.reservation.domain.vo.ThemeBookingCount;
 import roomescape.time.domain.ReservationTime;
 
 import java.util.List;
@@ -43,6 +44,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public Optional<Reservation> findById(final Long id) {
         return jpaReservationRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Reservation> findBySlot(final ReservationDate date, final Long timeId, final Long themeId) {
+        return jpaReservationRepository.findByDateAndTime_IdAndTheme_Id(date, timeId, themeId);
     }
 
     @Override
@@ -85,5 +91,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 .and(ReservationSpecs.isThemeReservation(themeId))
                 .and(ReservationSpecs.isReservationByPeriod(from, to));
         return jpaReservationRepository.findAll(spec);
+    }
+
+    @Override
+    public List<MyReservation> findMyReservationsByUserId(final Long userId) {
+        return jpaReservationRepository.findMyReservationsByUserId(userId);
     }
 }

@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 
 import java.time.LocalDate;
 
@@ -14,12 +14,11 @@ public record CreateReservationWebRequest(LocalDate date,
                                           Long themeId,
                                           String paymentKey,
                                           String orderId,
-                                          int amount,
-                                          String paymentType
+                                          int amount
 ) {
 
     public CreateReservationWebRequest {
-        validate(date, timeId, themeId, paymentKey, orderId, amount, paymentType);
+        validate(date, timeId, themeId);
     }
 
     public CreateReservationWithUserIdWebRequest toRequestWithUserId(final Long userId) {
@@ -31,20 +30,15 @@ public record CreateReservationWebRequest(LocalDate date,
         );
     }
 
-    private void validate(final LocalDate date, final Long timeId, final Long themeId,
-                          final String paymentKey, final String orderId, final int amount, final String paymentType) {
+    private void validate(final LocalDate date, final Long timeId, final Long themeId) {
         Validator.of(CreateReservationWithUserIdWebRequest.class)
                 .validateNotNull(Fields.date, date, DomainTerm.RESERVATION_DATE.label())
                 .validateNotNull(Fields.timeId, timeId, DomainTerm.RESERVATION_TIME_ID.label())
-                .validateNotNull(Fields.themeId, themeId, DomainTerm.THEME_ID.label())
-                .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
-                .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
-                .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
-                .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label());
+                .validateNotNull(Fields.themeId, themeId, DomainTerm.THEME_ID.label());
 
     }
 
     public PaymentRequest toPaymentRequest() {
-        return new PaymentRequest(paymentKey, amount, orderId, paymentType);
+        return new PaymentRequest(paymentKey, amount, orderId);
     }
 }

@@ -115,7 +115,7 @@ class ReservationTest {
         Long userId = 1L;
         ReservationDate todayDate = ReservationDate.from(LocalDate.now());
         LocalDateTime now = LocalDateTime.now();
-        ReservationTime pastTime = ReservationTime.from(now.toLocalTime().minusHours(1));
+        ReservationTime pastTime = ReservationTime.from(now.toLocalTime().minusMinutes(1));
         Theme theme = createTheme();
         Reservation reservation = Reservation.of(userId, todayDate, pastTime, theme);
 

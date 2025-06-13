@@ -1,5 +1,6 @@
 package roomescape.theme.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,16 +28,19 @@ public class ThemeController {
     private final ThemeFacade themeFacade;
 
     @GetMapping
+    @Operation(summary = "테마 전체 조회")
     public ResponseEntity<List<ThemeResponse>> getAll() {
         return ResponseEntity.ok(themeFacade.getAll());
     }
 
     @GetMapping("/ranking")
+    @Operation(summary = "테마 랭킹 조회")
     public ResponseEntity<List<ThemeResponse>> getRanking() {
         return ResponseEntity.ok(themeFacade.getRanking());
     }
 
     @PostMapping
+    @Operation(summary = "테마 생성")
     public ResponseEntity<ThemeResponse> create(@RequestBody final CreateThemeWebRequest createThemeWebRequest) {
         final ThemeResponse themeResponse = themeFacade.create(createThemeWebRequest);
         final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(themeResponse.id()));
@@ -45,6 +49,7 @@ public class ThemeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "테마 삭제")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
         themeFacade.delete(id);
         return ResponseEntity.noContent().build();
