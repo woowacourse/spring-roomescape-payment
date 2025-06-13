@@ -1,5 +1,9 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -17,6 +21,7 @@ import roomescape.entity.Member;
 import roomescape.global.Role;
 import roomescape.service.MemberService;
 
+@Tag(name = "회원", description = "회원 관리 API")
 @RestController
 @RequestMapping("/members")
 public class MemberController {
@@ -27,6 +32,10 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    @Operation(summary = "회원 목록 조회", description = "관리자 권한으로 모든 회원 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "회원 목록 조회 성공")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @GetMapping
     @CheckRole(Role.ADMIN)
     public ResponseEntity<List<MemberResponse>> getMembers() {
@@ -38,8 +47,13 @@ public class MemberController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "회원 가입", description = "새로운 회원을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "회원 가입 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    @ApiResponse(responseCode = "500", description = "내부 서버 에러")
     @PostMapping
-    public ResponseEntity<MemberResponse> signUp(@RequestBody @Valid SignupRequest request) {
+    public ResponseEntity<MemberResponse> signUp(
+            @Parameter(description = "회원 가입 요청") @RequestBody @Valid SignupRequest request) {
         Member member = memberService.addMember(request);
         MemberResponse response = MemberResponse.from(member);
 

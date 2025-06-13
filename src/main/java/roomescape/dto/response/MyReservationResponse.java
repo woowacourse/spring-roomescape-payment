@@ -2,24 +2,34 @@ package roomescape.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.ReservationWithRank;
+import roomescape.dto.internal.ReservationDetail;
+import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 
-public record MyReservationResponse(Long id,
-                                    String theme,
-                                    LocalDate date,
-                                    LocalTime time,
-                                    String status) {
+public record MyReservationResponse(
+        Long id,
+        String theme,
+        LocalDate date,
+        LocalTime time,
+        String status,
+        String paymentKey,
+        int amount
+) {
 
-    public static MyReservationResponse from(ReservationWithRank reservationWithRank) {
+    public static MyReservationResponse from(ReservationDetail reservationDetail) {
 
-        Reservation reservation = reservationWithRank.getReservation();
+        Payment payment = reservationDetail.payment();
+        Reservation reservation = reservationDetail.reservation();
+
 
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                reservation.getStatus().renderText(reservationWithRank.getRank()));
+                reservation.getStatus().renderText(reservationDetail.rank()),
+                payment != null ? payment.getPaymentKey() : null,
+                payment != null ? payment.getAmount() : 0
+        );
     }
 }

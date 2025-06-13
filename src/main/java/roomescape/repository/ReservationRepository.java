@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.domain.ReservationWithRank;
+import roomescape.dto.internal.ReservationWithRank;
 import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
@@ -50,7 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByThemeId(Long themeId);
 
     @Query(value = """
-            select new roomescape.domain.ReservationWithRank(r,
+            select new roomescape.dto.internal.ReservationWithRank(r,
                         (select count(rw)
                          from Reservation rw
                          where rw.theme = r.theme

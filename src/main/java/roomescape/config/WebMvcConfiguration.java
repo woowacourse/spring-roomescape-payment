@@ -3,6 +3,7 @@ package roomescape.config;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.config.interceptor.AdminHandlerInterceptor;
@@ -17,8 +18,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final CheckRoleHandlerInterceptor checkRoleHandlerInterceptor;
 
     public WebMvcConfiguration(LoginMemberArgumentResolver loginMemberArgumentResolver,
-                               AdminHandlerInterceptor adminHandlerInterceptor,
-                               CheckRoleHandlerInterceptor checkRoleHandlerInterceptor) {
+            AdminHandlerInterceptor adminHandlerInterceptor,
+            CheckRoleHandlerInterceptor checkRoleHandlerInterceptor) {
         this.loginMemberArgumentResolver = loginMemberArgumentResolver;
         this.adminHandlerInterceptor = adminHandlerInterceptor;
         this.checkRoleHandlerInterceptor = checkRoleHandlerInterceptor;

@@ -119,7 +119,7 @@ class AvailableReservationTimeTest {
                 todayDate, timeId, themeId
         );
 
-        reservationService.addReservation(reservation, loginMemberRequest);
+        reservationService.addReservationByMember(reservation, loginMemberRequest);
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

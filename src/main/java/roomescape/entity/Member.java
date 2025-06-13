@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import roomescape.domain.ReservationWithRank;
+import roomescape.dto.internal.ReservationWithRank;
 import roomescape.exception.custom.InvalidReservationException;
 import roomescape.global.ReservationStatus;
 import roomescape.global.Role;

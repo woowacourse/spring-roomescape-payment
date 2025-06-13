@@ -105,8 +105,8 @@ class ReservationIntegrateTest {
         );
 
         // when
-        when(paymentService.confirmPayment(any())).thenReturn(new ConfirmPaymentResponse(
-                "paymentKey", "orderId", 1000
+        when(paymentService.confirmPayment(any(), any())).thenReturn(new ConfirmPaymentResponse(
+                "paymentKey", "orderId", 1000, "paymentKey"
         ));
         // then
         RestAssured.given().log().all()
@@ -133,7 +133,7 @@ class ReservationIntegrateTest {
                 tomorrow, reservationTime.getId(), theme.getId());
 
         LoginMemberRequest loginMemberRequest = authService.getLoginMemberByToken(token);
-        reservationService.addReservation(reservationRequest, loginMemberRequest);
+        reservationService.addReservationByMember(reservationRequest, loginMemberRequest);
 
         Reservation reservation = reservationRepository.findById(1L).get();
 
