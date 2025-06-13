@@ -1,4 +1,4 @@
-package roomescape.login.ui;
+package roomescape.login.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;

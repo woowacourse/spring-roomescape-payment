@@ -13,7 +13,7 @@ import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.common.infra.RestClientLoggingInterceptor;
+import roomescape.common.log.RestClientLoggingInterceptor;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.config.TossPaymentProperties;

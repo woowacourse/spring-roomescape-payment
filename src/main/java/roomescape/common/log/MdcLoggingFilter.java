@@ -1,4 +1,4 @@
-package roomescape.common.filter;
+package roomescape.common.log;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
