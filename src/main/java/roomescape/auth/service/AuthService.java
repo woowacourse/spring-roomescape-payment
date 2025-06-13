@@ -1,7 +1,7 @@
 package roomescape.auth.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.dto.LoginResponse;
@@ -12,6 +12,7 @@ import roomescape.member.domain.MemberId;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -29,6 +30,7 @@ public class AuthService {
         ).orElseThrow(() -> new LoginFailException("이메일 또는 비밀번호가 잘못 되었습니다."));
 
         String tokenValue = jwtTokenHandler.createToken(member);
+        log.info("로그인 성공: memberId={}, email={}", member.getId(), member.getEmail());
         return new LoginResponse(tokenValue);
     }
 

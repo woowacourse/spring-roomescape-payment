@@ -2,6 +2,7 @@ package roomescape.member.service;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.custom.EntityNotFoundException;
@@ -13,6 +14,7 @@ import roomescape.member.dto.MemberCreateRequest;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 
+@Slf4j
 @Service
 public class MemberService {
 
@@ -30,7 +32,8 @@ public class MemberService {
                 request.password(),
                 Role.MEMBER
         );
-        memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
+        log.info("멤버 저장 완료: memberId={}", savedMember.getId());
     }
 
     public Member getMemberByEmailAndPassword(final String email, final String password) {

@@ -1,9 +1,5 @@
 package roomescape.reservation.domain;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Objects;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -13,11 +9,17 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTime;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation {
 
     @EmbeddedId
@@ -42,7 +44,8 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    protected Reservation() {}
+//    protected Reservation() {
+//    }
 
     public Reservation(
             final Long id,

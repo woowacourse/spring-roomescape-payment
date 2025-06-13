@@ -17,8 +17,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.service.PaymentService;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")

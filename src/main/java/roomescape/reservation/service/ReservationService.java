@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -19,6 +20,8 @@ import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
@@ -26,20 +29,20 @@ import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeResponse;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.service.PaymentService;
+import roomescape.reservation.dto.response.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.reservation.waiting.domain.Waiting;
-import roomescape.reservation.waiting.domain.WaitingWithRank;
+import roomescape.reservation.waiting.dto.response.WaitingWithRank;
 import roomescape.reservation.waiting.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTimeId;
+import roomescape.time.dto.response.ReservationTimeResponse;
+import roomescape.time.repository.ReservationTimeRepository;
 
+@Slf4j
 @Service
 public class ReservationService {
 
@@ -56,8 +59,7 @@ public class ReservationService {
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository
-    ) {
+            final WaitingRepository waitingRepository) {
         this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -73,6 +75,7 @@ public class ReservationService {
         Reservation reservation = createReservation(request, request.loginMember());
         validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         Reservation savedReservation = reservationRepository.save(reservation);
+        log.info("예약 저장 완료: reservationId={}", savedReservation.getId());
 
         return ReservationResponse.from(savedReservation);
     }
@@ -87,6 +90,7 @@ public class ReservationService {
         Reservation reservation = createReservation(request, request.loginMember());
         validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         Reservation savedReservation = reservationRepository.save(reservation);
+        log.info("예약 저장 완료: reservationId={}", savedReservation.getId());
 
         paymentService.create(savedReservation.getId(), paymentRequest);
 
@@ -121,14 +125,11 @@ public class ReservationService {
     }
 
     public List<MyReservationsResponse> getAllMyReservations(final LoginMember loginMember) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(new MemberId(loginMember.id()))
-                .stream()
-                .toList();
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findAllWaitingWithRankByMemberId(
-                        new MemberId(loginMember.id()))
-                .stream()
-                .toList();
-        return toMyReservationResponses(reservations, waitingWithRanks);
+                new MemberId(loginMember.id()));
+        List<ReservationWithPayment> reservationsWithPayment = reservationRepository.findReservationsWithPayment(
+                new MemberId(loginMember.id()));
+        return toMyReservationResponses(reservationsWithPayment, waitingWithRanks);
     }
 
     public List<BookedReservationTimeResponse> getSortedAvailableTimes(final LocalDate date, final Long themeId) {
@@ -147,8 +148,10 @@ public class ReservationService {
         ReservationId reservationId = new ReservationId(id);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
-        reservationRepository.deleteById(reservationId);
 
+        paymentService.delete(reservationId);
+        reservationRepository.deleteById(reservationId);
+        log.info("예약 삭제 완료: reservationId={}", reservationId);
         approveFirstWaiting(reservation);
     }
 
@@ -165,6 +168,7 @@ public class ReservationService {
         LocalDateTime dateTime = LocalDateTime.of(date, time);
 
         if (now.isAfter(dateTime)) {
+            log.warn("지난 날짜, 시간에 예약 시도: now={}, requestDateTime={}", now, dateTime);
             throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
         }
     }
@@ -179,16 +183,20 @@ public class ReservationService {
             reservationRepository.save(new Reservation(
                     value.getMember(), value.getDate(), value.getTime(), value.getTheme()
             ));
+            log.info("대기 1순위 승인 완료: memberId={}, date={}, timeId={}, themeId={}",
+                    value.getMember().getId(), value.getDate(), value.getTime().getId(), value.getTheme().getId());
             waitingRepository.delete(value);
+            log.info("대기 1순위 삭제 완료: memberId={}, date={}, timeId={}, themeId={}",
+                    value.getMember().getId(), value.getDate(), value.getTime().getId(), value.getTheme().getId());
         });
     }
 
     private List<MyReservationsResponse> toMyReservationResponses(
-            final List<Reservation> reservations,
+            final List<ReservationWithPayment> reservations,
             final List<WaitingWithRank> waitingWithRanks
     ) {
         List<MyReservationsResponse> responses = new ArrayList<>();
-        for (Reservation reservation : reservations) {
+        for (ReservationWithPayment reservation : reservations) {
             responses.add(MyReservationsResponse.from(reservation));
         }
         for (WaitingWithRank waitingWithRank : waitingWithRanks) {
@@ -231,19 +239,28 @@ public class ReservationService {
     private Theme getTheme(final ReservationCreateRequest request) {
         Long themeId = request.themeId();
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new EntityNotFoundException("theme not found id =" + themeId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 테마 조회 시도: themeId={}", themeId);
+                    return new EntityNotFoundException("존재하지 않는 테마입니다");
+                });
     }
 
     private ReservationTime getReservationTime(final ReservationCreateRequest request) {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(new ReservationTimeId(timeId))
-                .orElseThrow(() -> new EntityNotFoundException("reservationsTime not found id =" + timeId));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 시간 조회 시도: timeId={}", timeId);
+                    return new EntityNotFoundException("존재하지 않는 시간입니다");
+                });
     }
 
     private Member getMember(LoginMember loginMember) {
         MemberId memberId = new MemberId(loginMember.id());
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
+                .orElseThrow(() -> {
+                    log.warn("존재하지 않는 회원 조회 시도: memberId={}", memberId);
+                    return new EntityNotFoundException("등록되지 않은 회원입니다.");
+                });
     }
 
     private Set<ReservationTime> getAlreadyBookedTimes(final LocalDate date, final Long themeId) {

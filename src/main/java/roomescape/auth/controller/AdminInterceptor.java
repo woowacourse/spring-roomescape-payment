@@ -1,16 +1,17 @@
 package roomescape.auth.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import roomescape.auth.annotation.RequiredAdmin;
 import roomescape.auth.service.JwtTokenHandler;
 import roomescape.common.exception.custom.AuthenticationException;
 import roomescape.member.domain.Role;
 
+@Slf4j
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 
@@ -46,6 +47,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         if (role == Role.ADMIN) {
             return true;
         }
+        log.warn("관리자 권한 아님: role={}, URI={}", role, request.getRequestURI());
         throw new AuthenticationException("권한이 존재하지 않습니다.");
     }
 }

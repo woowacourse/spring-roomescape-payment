@@ -6,12 +6,9 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
 public record LoginMember(
-        @NotNull
-        Long id,
-        @NotBlank
-        String name,
-        @NotNull
-        Role role
+        @NotNull Long id,
+        @NotBlank String name,
+        @NotNull Role role
 ) {
 
     public static LoginMember of(final Member member) {

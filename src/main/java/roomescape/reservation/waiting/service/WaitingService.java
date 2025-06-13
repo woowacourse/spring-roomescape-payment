@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.custom.AlreadyInUseException;
@@ -11,19 +12,20 @@ import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.dto.request.WaitingCreateRequest;
-import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.domain.WaitingId;
+import roomescape.reservation.waiting.dto.request.WaitingCreateRequest;
+import roomescape.reservation.waiting.dto.response.WaitingResponse;
 import roomescape.reservation.waiting.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTimeId;
+import roomescape.time.repository.ReservationTimeRepository;
 
+@Slf4j
 @Service
 public class WaitingService {
 
@@ -62,8 +64,10 @@ public class WaitingService {
         Waiting waiting = getWaiting(request);
         LocalDateTime now = LocalDateTime.now();
         validateDateTime(now, waiting.getDate(), waiting.getTime().getStartAt());
-
         Waiting savedWaiting = waitingRepository.save(waiting);
+        log.info("대기 등록 완료: waitingId={}, memberId={}, date={}, timeId={}, themeId={}",
+                savedWaiting.getId(), savedWaiting.getMember().getId(),
+                savedWaiting.getDate(), savedWaiting.getTime().getId(), savedWaiting.getTheme().getId());
         return WaitingResponse.from(savedWaiting);
     }
 
@@ -74,14 +78,6 @@ public class WaitingService {
                 .toList();
     }
 
-    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
-        LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
-
-        if (now.isAfter(reservationDateTime)) {
-            throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
-        }
-    }
-
     @Transactional
     public void deleteWaiting(final Long id) {
         WaitingId waitingId = new WaitingId(id);
@@ -89,6 +85,16 @@ public class WaitingService {
             throw new EntityNotFoundException("존재하지 않는 예약 대기입니다.");
         }
         waitingRepository.deleteById(waitingId);
+        log.info("대기 삭제 완료: waitingId={}", id);
+    }
+
+    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
+        LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
+
+        if (now.isAfter(reservationDateTime)) {
+            log.warn("지난 날짜에 대기 등록 시도: now={}, requestDateTime={}", now, reservationDateTime);
+            throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
+        }
     }
 
     private boolean hasAlreadyWaiting(final WaitingCreateRequest request) {
