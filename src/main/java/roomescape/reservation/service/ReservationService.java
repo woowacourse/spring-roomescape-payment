@@ -1,18 +1,17 @@
 package roomescape.reservation.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.dto.response.TossPaymentResponse;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
@@ -21,87 +20,64 @@ import roomescape.theme.domain.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 
-import java.util.Comparator;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final DateTime dateTime;
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(final DateTime dateTime, final PaymentService paymentService, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
-        this.dateTime = dateTime;
-        this.paymentService = paymentService;
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.memberRepository = memberRepository;
-        this.waitingRepository = waitingRepository;
-    }
-
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+    @LogExecution
+    public ReservationResponse createPendingReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
+        validateRequestAmount(request.amount(), theme.getCurrentPrice());
+        checkDuplicateReservation(request.date(), time.getStartAt(), request.themeId());
 
+        Reservation reservation = Reservation.createPendingWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
+        Reservation saveReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(saveReservation);
+    }
+
+    private void validateRequestAmount(final long amount, final long themePrice) {
+        if(amount != themePrice){
+            throw new IllegalArgumentException("요청된 가격이 올바르지 않습니다.");
+        }
+    }
+
+    private void checkDuplicateReservation(final LocalDate date, final LocalTime startAt, final long themeId){
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                reservation.getDate(),
-                reservation.getReservationTime(),
-                reservation.getThemeId()
+                date,
+                startAt,
+                themeId
         )) {
             throw new IllegalArgumentException("이미 예약이 존재합니다.");
         }
-
-        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-
-        Reservation save = reservationRepository.save(reservation);
-        TossPaymentResponse paymentResponse = paymentService.confirm(tossPaymentConfirmRequest);
-        paymentService.save(paymentResponse, save.getId());
-        return ReservationResponse.from(save);
     }
 
-    @Transactional
-    public ReservationResponse createReservationWithoutPayment(final ReservationRequest request, final Long memberId) {
-        ReservationTime time = findReservationTime(request.timeId());
-        Theme theme = findTheme(request.themeId());
-        Member findMember = findMember(memberId);
-
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
-
-        if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                reservation.getDate(),
-                reservation.getReservationTime(),
-                reservation.getThemeId()
-        )) {
-            throw new IllegalArgumentException("이미 예약이 존재합니다.");
-        }
-
-        Reservation save = reservationRepository.save(reservation);
-
-        return ReservationResponse.from(save);
-    }
-
-    private ReservationTime findReservationTime(final long timeId){
+    private ReservationTime findReservationTime(final long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
     }
 
-    private Theme findTheme(final long themeId){
+    private Theme findTheme(final long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
     }
 
-    private Member findMember(final long memberId){
+    private Member findMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
@@ -121,6 +97,7 @@ public class ReservationService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteReservationById(final Long id) {
         Reservation reservation = findReservation(id);
 
@@ -139,18 +116,20 @@ public class ReservationService {
 
     private Reservation findReservation(final Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
     }
 
+    @LogExecution
     private void approveWaiting(final List<Waiting> waitings) {
         Waiting firstWaiting = waitings.get(0);
 
-        Reservation newReservation = Reservation.createWithoutId(
+        Reservation newReservation = Reservation.createPendingWithoutId(
                 dateTime.now(),
                 firstWaiting.getMember(),
                 firstWaiting.getDate(),
                 firstWaiting.getTime(),
-                firstWaiting.getTheme()
+                firstWaiting.getTheme(),
+                null
         );
         reservationRepository.save(newReservation);
 
@@ -158,22 +137,21 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> getMyReservations(final Long id) {
+    public List<MyReservationAndWaitingResponse> getMyReservations(final Long id) {
         List<Reservation> confirmedReservations = reservationRepository.findByMemberId(id);
-        List<MyReservationResponse> confirmedResponses = confirmedReservations.stream()
-                .map(MyReservationResponse::from)
+        List<MyReservationAndWaitingResponse> confirmedResponses = confirmedReservations.stream()
+                .map(MyReservationAndWaitingResponse::from)
                 .toList();
 
         List<Waiting> waitingReservations = waitingRepository.findByMemberId(id);
-        List<MyReservationResponse> waitingResponses = waitingReservations.stream()
+        List<MyReservationAndWaitingResponse> waitingResponses = waitingReservations.stream()
                 .map(waiting -> {
                     long rank = calculateWaitingRank(waiting);
-                    return MyReservationResponse.fromWaiting(waiting, rank);
+                    return MyReservationAndWaitingResponse.fromWaiting(waiting, rank);
                 })
                 .toList();
 
         return Stream.concat(confirmedResponses.stream(), waitingResponses.stream())
-                .sorted(Comparator.comparing(MyReservationResponse::date))
                 .toList();
     }
 

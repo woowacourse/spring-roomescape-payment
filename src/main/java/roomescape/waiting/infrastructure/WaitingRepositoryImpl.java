@@ -1,20 +1,19 @@
 package roomescape.waiting.infrastructure;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
+@RequiredArgsConstructor
 public class WaitingRepositoryImpl implements WaitingRepository {
 
     private JpaWaitingRepository jpaWaitingRepository;
-
-    public WaitingRepositoryImpl(JpaWaitingRepository jpaWaitingRepository) {
-        this.jpaWaitingRepository = jpaWaitingRepository;
-    }
 
     @Override
     public Waiting save(Waiting waiting) {

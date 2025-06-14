@@ -1,13 +1,10 @@
 package roomescape.theme.infrastructure;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
 import jakarta.persistence.EntityManager;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -18,10 +15,13 @@ import roomescape.reservation.domain.ReservationPeriod;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @DataJpaTest
 @Import(ThemeRepositoryImpl.class)
@@ -129,23 +129,26 @@ public class JpaThemeRepositoryTest {
         Theme savedTheme1 = em.find(Theme.class, theme1.getId());
         Theme savedTheme2 = em.find(Theme.class, theme2.getId());
 
-        Reservation reservation1 = Reservation.createWithoutId(
+        Reservation reservation1 = Reservation.createPendingWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 2),
                 savedTime1,
-                savedTheme2);
+                savedTheme2,
+                null);
 
-        Reservation reservation2 = Reservation.createWithoutId(
+        Reservation reservation2 = Reservation.createPendingWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 savedTime2,
-                savedTheme1);
+                savedTheme1,
+                null);
 
-        Reservation reservation3 = Reservation.createWithoutId(
+        Reservation reservation3 = Reservation.createPendingWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 savedTime1,
-                savedTheme2);
+                savedTheme2,
+                null);
 
         em.persist(reservation1);
         em.persist(reservation2);
@@ -185,22 +188,26 @@ public class JpaThemeRepositoryTest {
 
         em.persist(member);
 
-        Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+        Reservation reservation1 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 2),
                 reservationTime1,
-                theme1);
-        Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme1,
+                null);
+        Reservation reservation2 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime2,
-                theme1);
-        Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme1,
+                null);
+        Reservation reservation3 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime1,
-                theme2);
-        Reservation reservation4 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme2,
+                null);
+        Reservation reservation4 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 4),
                 reservationTime1,
-                theme2);
+                theme2,
+                null);
         em.persist(reservation1);
         em.persist(reservation2);
         em.persist(reservation3);
@@ -241,22 +248,26 @@ public class JpaThemeRepositoryTest {
 
         em.persist(member);
 
-        Reservation reservation1 = Reservation.createWithoutId(
+        Reservation reservation1 = Reservation.createPendingWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member, LocalDate.of(2000, 11, 2),
                 reservationTime1,
-                theme1);
-        Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme1,
+                null);
+        Reservation reservation2 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime2,
-                theme1);
-        Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme1,
+                null);
+        Reservation reservation3 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime1,
-                theme2);
-        Reservation reservation4 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+                theme2,
+                null);
+        Reservation reservation4 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 4),
                 reservationTime1,
-                theme2);
+                theme2,
+                null);
         em.persist(reservation1);
         em.persist(reservation2);
         em.persist(reservation3);

@@ -1,8 +1,9 @@
 package roomescape.reservationTime.service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -12,19 +13,17 @@ import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
 import roomescape.reservationTime.dto.response.TimeConditionResponse;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class ReservationTimeService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
 
-    public ReservationTimeService(final ReservationRepository reservationRepository,
-                                  final ReservationTimeRepository reservationTimeRepository) {
-        this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-    }
-
     @Transactional
+    @LogExecution
     public ReservationTimeResponse createReservationTime(final ReservationTimeRequest request) {
         ReservationTime reservationTime = ReservationTime.createWithoutId(request.startAt());
         ReservationTime save = reservationTimeRepository.save(reservationTime);
@@ -33,6 +32,7 @@ public class ReservationTimeService {
     }
 
     @Transactional
+    @LogExecution
     public void deleteReservationTimeById(final Long id) {
         if (reservationRepository.existsByTimeId(id)) {
             throw new IllegalArgumentException("삭제할 수 없는 예약 시간입니다.");
@@ -40,14 +40,12 @@ public class ReservationTimeService {
         reservationTimeRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     public List<ReservationTimeResponse> getReservationTimes() {
         return reservationTimeRepository.findAll().stream()
                 .map(ReservationTimeResponse::from)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<TimeConditionResponse> getTimesWithCondition(final TimeConditionRequest request) {
         List<Reservation> reservations = reservationRepository.findByDateAndThemeId(request.date(), request.themeId());
         List<ReservationTime> times = reservationTimeRepository.findAll();
@@ -60,7 +58,7 @@ public class ReservationTimeService {
     private TimeConditionResponse toTimeConditionResponse(final ReservationTime time,
                                                           final List<Reservation> reservations) {
         boolean hasTime = reservations.stream()
-                .anyMatch(reservation -> reservation.isSameTime(time));
+                .anyMatch(reservation -> reservation.getReservationTime().equals(time.getStartAt()));
         return new TimeConditionResponse(time.getId(), time.getStartAt(), hasTime);
     }
 }

@@ -1,40 +1,24 @@
 package roomescape.payment.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.dto.response.TossPaymentResponse;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentStatus;
-import roomescape.payment.infrastructure.JpaPaymentRepository;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationRepository;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
-    private final JpaPaymentRepository paymentRepository;
-    private final ReservationRepository reservationRepository;
     private final TossPaymentClient paymentClient;
+    private final PaymentTransactionService paymentTransactionService;
 
-    public PaymentService(final JpaPaymentRepository paymentRepository, final ReservationRepository reservationRepository, final TossPaymentClient paymentClient) {
-        this.paymentRepository = paymentRepository;
-        this.reservationRepository = reservationRepository;
-        this.paymentClient = paymentClient;
-    }
-
-    @Transactional
-    public TossPaymentResponse confirm(TossPaymentConfirmRequest request) {
-        return paymentClient.confirmPayment(request);
-    }
-
-    @Transactional
-    public Payment save(final TossPaymentResponse response, final long reservationId) {
-        Reservation findReservation = reservationRepository.findById(reservationId)
-                .orElseThrow();
-
-        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, findReservation);
-        return paymentRepository.save(payment);
+    @LogExecution
+    public void confirmAndSavePayment(TossPaymentConfirmRequest request, long reservationId) {
+        TossPaymentResponse tossPaymentResponse = paymentClient.confirmPayment(request);
+        Payment payment = paymentTransactionService.savePayment(tossPaymentResponse);
+        paymentTransactionService.confirmReservation(reservationId, payment);
     }
 }

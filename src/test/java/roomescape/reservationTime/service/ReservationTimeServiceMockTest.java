@@ -1,13 +1,8 @@
 package roomescape.reservationTime.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,9 +17,14 @@ import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.TimeConditionResponse;
 import roomescape.theme.domain.Theme;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceMockTest {
@@ -57,11 +57,12 @@ class ReservationTimeServiceMockTest {
         Mockito.when(reservationRepository.findByDateAndThemeId(localDate, themeId))
                 .thenReturn(
                         List.of(
-                                Reservation.createWithoutId(
+                                Reservation.createPendingWithoutId(
                                         LocalDateTime.of(2025, 9, 25, 10, 0),
                                         member1, localDate,
                                         ReservationTime.createWithoutId(LocalTime.of(10, 0)),
-                                        Theme.createWithoutId("a", "a", "a"))
+                                        Theme.createWithoutId("a", "a", "a")
+                                        , null)
                         )
                 );
         Mockito.when(reservationTimeRepository.findAll())

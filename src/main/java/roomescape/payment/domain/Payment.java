@@ -1,59 +1,42 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.*;
-import roomescape.reservation.domain.Reservation;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     private String orderId;
 
+    @Getter
     private LocalDateTime paymentDateTime;
 
     private Long amount;
 
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private Reservation reservation;
+    private String paymentKey;
 
-    public Payment(final String orderId, final LocalDateTime paymentDateTime, final Long amount, final PaymentStatus status, Reservation reservation) {
+    public Payment(final String orderId, final LocalDateTime paymentDateTime, final Long amount, final PaymentStatus status, final String paymentKey) {
         this.orderId = orderId;
         this.paymentDateTime = paymentDateTime;
         this.amount = amount;
         this.status = status;
-        this.reservation = reservation;
-    }
-
-    public Payment() {
-    }
-
-    public void cancel() {
-        this.status = PaymentStatus.CANCEL;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public LocalDateTime getPaymentDateTime() {
-        return paymentDateTime;
-    }
-
-    public Long getAmount() {
-        return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
-    }
-
-    public PaymentStatus getStatus() {
-        return status;
+        this.paymentKey = paymentKey;
     }
 }

@@ -1,15 +1,18 @@
 package roomescape.reservation.presentation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
+import roomescape.theme.dto.response.ThemeResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -17,18 +20,17 @@ import java.util.List;
 import static roomescape.reservation.presentation.ReservationController.RESERVATION_BASE_URL;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(RESERVATION_BASE_URL)
-public class ReservationController {
+public class ReservationController implements ReservationControllerDocs {
 
     public static final String RESERVATION_BASE_URL = "/reservations";
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
-    }
-
+    @Override
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations(
             @ModelAttribute final ReservationConditionRequest request) {
@@ -36,33 +38,32 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody final ReservationRequest request,
             @Login final LoginMember loginMember
     ) {
-
-        TossPaymentConfirmRequest confirmRequest = new TossPaymentConfirmRequest(
-                request.orderId(),
-                request.amount(),
-                request.paymentKey()
-        );
-
-        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
+        ReservationResponse response = reservationService.createPendingReservation(request, loginMember.id());
+        ThemeResponse themeResponse = response.theme();
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), themeResponse.amount(), request.paymentKey());
+        paymentService.confirmAndSavePayment(tossPaymentConfirmRequest, response.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationById(@PathVariable("id") final Long id) {
         reservationService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {
-        List<MyReservationResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
+    public ResponseEntity<List<MyReservationAndWaitingResponse>> getMyReservations(@Login LoginMember loginMember) {
+        List<MyReservationAndWaitingResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
         return ResponseEntity.ok().body(myReservationResponses);
     }
 }

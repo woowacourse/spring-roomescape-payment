@@ -10,7 +10,9 @@ INSERT INTO member (id, name, email, password, role) VALUES (1,'코기','ind0715
 INSERT INTO member (id, name, email, password, role) VALUES (2,'율무','ind07162@naver.com','asd','user');
 INSERT INTO member (id, name, email, password, role) VALUES (3,'ADMIN','admin@naver.com','1234','admin');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id) VALUES (2, '2025-04-18', 1, 2);
-INSERT INTO reservation (member_id, date, time_id, theme_id) VALUES (1, '2025-04-26', 1, 3);
-INSERT INTO reservation (member_id, date, time_id, theme_id) VALUES (1, '2025-04-28', 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id) VALUES (1, '2025-04-28', 2, 1);
+
+
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id) VALUES (2, '2025-04-18', 1, 2, null);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id) VALUES (1, '2025-04-26', 1, 3, null);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id) VALUES (1, '2025-04-28', 1, 1, null);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id) VALUES (1, '2025-04-28', 2, 1, null);

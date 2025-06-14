@@ -1,6 +1,6 @@
 package roomescape.common.config;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,18 +9,15 @@ import roomescape.common.argumentResolver.LoginArgumentResolver;
 import roomescape.common.interceptor.AdminInterceptor;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
-import roomescape.member.service.LoginService;
+
+import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class ReservationConfig implements WebMvcConfigurer {
 
     private final TokenCookieManager tokenCookieManager;
     private final JwtTokenContainer jwtTokenContainer;
-
-    public ReservationConfig(final TokenCookieManager tokenCookieManager, final JwtTokenContainer jwtTokenContainer) {
-        this.tokenCookieManager = tokenCookieManager;
-        this.jwtTokenContainer = jwtTokenContainer;
-    }
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {

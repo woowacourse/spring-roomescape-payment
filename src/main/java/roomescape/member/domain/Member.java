@@ -1,8 +1,13 @@
 package roomescape.member.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Member {
 
     @Id
@@ -21,38 +26,18 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private Member(final String name, final String email, final String password, final Role role) {
-        this.name = new MemberName(name);
+    private Member(MemberName name, String email, String password, Role role) {
+        this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    protected Member() {
-
-    }
-
     public static Member createWithoutId(final String name, final String email, final String password, final Role role) {
-        return new Member(name, email, password, role);
+        return new Member(new MemberName(name), email, password, role);
     }
-
+    
     public String getName() {
-        return name.getName();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getRole() {
-        return role.getRole();
-    }
-
-    public Long getId() {
-        return id;
+        return this.name.getName();
     }
 }

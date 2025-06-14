@@ -1,14 +1,18 @@
 package roomescape.reservationTime.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
+@Getter
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationTime {
 
     @Id
@@ -23,10 +27,6 @@ public class ReservationTime {
         this.startAt = startAt;
     }
 
-    protected ReservationTime() {
-
-    }
-
     public static ReservationTime createWithoutId(final LocalTime startAt) {
         return new ReservationTime(null, startAt);
     }
@@ -36,18 +36,10 @@ public class ReservationTime {
     }
 
     public boolean isSameTime(final ReservationTime time) {
-        return startAt.equals(time.startAt);
+        return this.startAt.equals(time.startAt);
     }
 
     public boolean isBeforeTime(final LocalTime time) {
         return startAt.isBefore(time);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalTime getStartAt() {
-        return startAt;
     }
 }

@@ -1,16 +1,23 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
+import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
-import roomescape.member.domain.Member;
-import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 public class Reservation {
 
     @Id
@@ -28,24 +35,27 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
-    protected Reservation() {
-    }
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
 
-    private Reservation(final Member member, final LocalDate date,
-                        final ReservationTime time, final Theme theme
-    ) {
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
+
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment, final ReservationStatus reservationStatus) {
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
+        this.reservationStatus = reservationStatus;
     }
 
-    public static Reservation createWithoutId(final LocalDateTime now, final Member member,
-                                              final LocalDate reservationDate,
-                                              final ReservationTime time, final Theme theme
+    public static Reservation createPendingWithoutId(final LocalDateTime now, final Member member,
+                                                     final LocalDate reservationDate,
+                                                     final ReservationTime time, final Theme theme, final Payment payment
     ) {
         validateReservationDateTime(now, reservationDate, time);
-        return new Reservation(member, reservationDate, time, theme);
+        return new Reservation(member, reservationDate, time, theme, payment, ReservationStatus.PENDING);
     }
 
     private static void validateReservationDateTime(final LocalDateTime now, final LocalDate reservationDate,
@@ -65,16 +75,16 @@ public class Reservation {
         return this.time.isSameTime(time);
     }
 
-    public Long getId() {
-        return id;
+    public void changePendingToPaid(Payment payment) {
+        if (this.reservationStatus != ReservationStatus.PENDING) {
+            throw new IllegalStateException("현재 예약의 상태를 변경할 수 없습니다. 현재 상태 : " + this.reservationStatus);
+        }
+        this.payment = payment;
+        this.reservationStatus = ReservationStatus.PAID;
     }
 
     public String getName() {
         return member.getName();
-    }
-
-    public LocalDate getDate() {
-        return date;
     }
 
     public Long getTimeId() {
@@ -105,21 +115,5 @@ public class Reservation {
         return theme.getThumbnail();
     }
 
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Reservation that)) {
-            return false;
-        }
-
-        if (getId() == null && that.getId() == null) {
-            return false;
-        }
-
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
+    public long getAmount(){return theme.getCurrentPrice();}
 }
