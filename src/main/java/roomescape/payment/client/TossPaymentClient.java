@@ -18,9 +18,12 @@ import roomescape.payment.dto.response.PaymentErrorResponse;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient) {
         this.restClient = restClient;
+        this.objectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Override
@@ -29,8 +32,6 @@ public class TossPaymentClient implements PaymentClient {
                 .body(new PaymentConfirmRequest(paymentKey, orderId, amount))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                            ObjectMapper objectMapper = new ObjectMapper()
-                                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                             PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
                                     response.getBody(),
                                     PaymentErrorResponse.class
@@ -39,8 +40,6 @@ public class TossPaymentClient implements PaymentClient {
                         }
                 )
                 .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                            ObjectMapper objectMapper = new ObjectMapper()
-                                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                             PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
                                     response.getBody(),
                                     PaymentErrorResponse.class
