@@ -4,12 +4,15 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ConflictException;
+import roomescape.exception.ErrorCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
@@ -38,7 +41,9 @@ public class ReservationService {
     @Transactional
     public ReservationResponse addReservation(long memberId, ReservationPaymentRequest request) {
         Reservation reservation = saveReservation(memberId, request.timeId(), request.themeId(), request.date());
-        paymentService.approvePayment(request.orderId(), request.paymentKey(), request.amount(), reservation);
+        Payment payment = paymentService.approvePayment(request.orderId(), request.paymentKey(), request.amount(),
+                reservation);
+        reservation.setPayment(payment);
         return ReservationResponse.from(reservation);
     }
 
@@ -60,17 +65,17 @@ public class ReservationService {
 
     private ReservationTheme findThemeById(long themeId) {
         return reservationThemeRepository.findById(themeId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.THEME_NOT_FOUND));
     }
 
     private ReservationTime findTimeById(long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약 시간 입니다."));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.TIME_NOT_FOUND));
     }
 
     private Member findMemberById(long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 사용자 입니다."));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     public List<ReservationResponse> getAllReservations() {
@@ -137,13 +142,13 @@ public class ReservationService {
 
     private void validateDuplicateReservation(LocalDate localDate, long timeId, long themeId) {
         if (reservationRepository.existByDateAndTimeIdAndThemeId(localDate, timeId, themeId)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 예약 입니다.");
+            throw new ConflictException(ErrorCode.RESERVATION_ALREADY_EXISTS);
         }
     }
 
     private void validateExistsById(long id) {
         if (!reservationRepository.existById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 예약 입니다.");
+            throw new BadRequestException(ErrorCode.RESERVATION_NOT_FOUND);
         }
     }
 }

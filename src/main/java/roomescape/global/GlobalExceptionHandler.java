@@ -26,9 +26,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoomEscapeException(final RoomEscapeException e) {
         return ResponseEntity.status(e.getHttpStatus()).body(ErrorResponse.from(e));
     }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public String handleAuthenticationException(final AuthenticationException e) {
-        return "login";
-    }
 }

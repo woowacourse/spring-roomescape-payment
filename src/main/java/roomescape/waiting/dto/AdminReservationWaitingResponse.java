@@ -14,6 +14,7 @@ public record AdminReservationWaitingResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime startAt
 ) {
+
     public static AdminReservationWaitingResponse from(ReservationWaiting reservationWaiting) {
         return new AdminReservationWaitingResponse(
                 reservationWaiting.getId(),

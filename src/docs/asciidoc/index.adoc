@@ -1,0 +1,36 @@
+= Reservations API Documentation
+:toc: left
+:source-highlighter: highlightjs
+:sectlinks:
+
+== 예약
+=== 예약 생성
+==== HTTP 요청
+include::{snippets}/reservations/post/http-request.adoc[]
+include::{snippets}/reservations/post/request-fields.adoc[]
+
+==== HTTP 응답
+include::{snippets}/reservations/post/http-response.adoc[]
+include::{snippets}/reservations/post/response-fields.adoc[]
+
+'''
+
+=== 예약 시간 조회
+==== HTTP 요청
+include::{snippets}/times/available-times/http-request.adoc[]
+include::{snippets}/times/available-times/query-parameters.adoc[]
+
+==== HTTP 응답
+include::{snippets}/times/available-times/http-response.adoc[]
+include::{snippets}/times/available-times/response-fields.adoc[]
+
+'''
+
+=== 예약 대기 생성
+==== HTTP 요청
+include::{snippets}/reservations-waiting/post/http-request.adoc[]
+include::{snippets}/reservations-waiting/post/request-fields.adoc[]
+
+==== HTTP 응답
+include::{snippets}/reservations-waiting/post/http-response.adoc[]
+include::{snippets}/reservations-waiting/post/response-fields.adoc[]

@@ -20,8 +20,8 @@ import roomescape.exception.BadRequestException;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InternalServerException;
 import roomescape.exception.UnauthorizedException;
-import roomescape.payment.toss.PaymentErrorHandler;
-import roomescape.payment.toss.TossErrorMapper;
+import roomescape.payment.toss.exception.PaymentErrorHandler;
+import roomescape.payment.toss.exception.TossErrorMapper;
 
 class PaymentErrorHandlerTest {
     private PaymentErrorHandler paymentErrorHandler;

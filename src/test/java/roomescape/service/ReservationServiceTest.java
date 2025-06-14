@@ -17,6 +17,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ConflictException;
+import roomescape.exception.NotFoundException;
 import roomescape.member.dto.MemberRegisterRequest;
 import roomescape.member.service.MemberService;
 import roomescape.payment.FakePaymentRestClientConfig;
@@ -113,10 +116,10 @@ class ReservationServiceTest {
         assertAll(
                 () -> assertThatThrownBy(
                         () -> reservationService.addReservation(memberId, reservationRequest1)
-                ).isInstanceOf(NoSuchElementException.class),
+                ).isInstanceOf(BadRequestException.class),
                 () -> assertThatThrownBy(
                         () -> reservationService.addReservation(memberId, reservationRequest2)
-                ).isInstanceOf(NoSuchElementException.class)
+                ).isInstanceOf(BadRequestException.class)
         );
     }
 
@@ -152,10 +155,10 @@ class ReservationServiceTest {
         assertAll(
                 () -> assertThatThrownBy(
                         () -> reservationService.addReservation(memberId, reservationRequest1)
-                ).isInstanceOf(IllegalArgumentException.class),
+                ).isInstanceOf(BadRequestException.class),
                 () -> assertThatThrownBy(
                         () -> reservationService.addReservation(memberId, reservationRequest2)
-                ).isInstanceOf(IllegalArgumentException.class)
+                ).isInstanceOf(BadRequestException.class)
         );
     }
 
@@ -182,7 +185,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.addReservation(memberId, reservationRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ConflictException.class);
     }
 
     @Test

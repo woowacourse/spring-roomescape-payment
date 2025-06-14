@@ -1,8 +1,9 @@
 package roomescape.theme.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ErrorCode;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.ReservationTheme;
 import roomescape.theme.dto.ReservationThemeRequest;
@@ -51,24 +52,24 @@ public class ReservationThemeService {
 
     public ReservationTheme getById(final long id) {
         return reservationThemeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 테마를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.THEME_NOT_FOUND));
     }
 
     private void validateExistTheme(final long id) {
         if (!reservationThemeRepository.existsById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다.");
+            throw new BadRequestException(ErrorCode.THEME_NOT_FOUND);
         }
     }
 
     private void validateExistReservation(final long id) {
         if (reservationRepository.existByThemeId(id)) {
-            throw new IllegalArgumentException("[ERROR] 예약이 존재하는 테마이므로 삭제할 수 없습니다.");
+            throw new BadRequestException(ErrorCode.THEME_HAS_RESERVATION);
         }
     }
 
     private void validateUniqueThemes(final ReservationTheme reservationTheme) {
         if (reservationThemeRepository.existsByName(reservationTheme.getName())) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 테마 입니다.");
+            throw new BadRequestException(ErrorCode.THEME_ALREADY_EXISTS);
         }
     }
 }

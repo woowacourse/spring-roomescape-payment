@@ -3,18 +3,16 @@ package roomescape.waiting.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.waiting.domain.ReservationWaiting;
 
 @Repository
+@RequiredArgsConstructor
 public class ReservationWaitingRepositoryImpl implements
         ReservationWaitingRepository {
 
     private final ReservationWaitingJpaRepository reservationWaitingJpaRepository;
-
-    public ReservationWaitingRepositoryImpl(final ReservationWaitingJpaRepository reservationWaitingJpaRepository) {
-        this.reservationWaitingJpaRepository = reservationWaitingJpaRepository;
-    }
 
     @Override
     public ReservationWaiting save(final ReservationWaiting reservationWaiting) {

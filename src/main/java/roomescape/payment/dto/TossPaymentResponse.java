@@ -8,4 +8,5 @@ public record TossPaymentResponse(
         long totalAmount,
         PaymentType type
 ) {
+
 }

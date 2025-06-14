@@ -11,6 +11,7 @@ public record ReservationWaitingResponse(
         ReservationTimeResponse time,
         ReservationThemeResponse theme
 ) {
+
     public static ReservationWaitingResponse from(final ReservationWaiting reservationWaiting) {
         return new ReservationWaitingResponse(
                 reservationWaiting.getId(),

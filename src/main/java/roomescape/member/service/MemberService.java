@@ -3,6 +3,9 @@ package roomescape.member.service;
 import java.util.Base64;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import roomescape.exception.ConflictException;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.dto.MemberRegisterRequest;
@@ -21,7 +24,6 @@ public class MemberService {
 
     public MemberRegisterResponse addMember(final MemberRegisterRequest request) {
         validateDuplicateEmail(request.email());
-        validateDuplicateName(request.name());
         final Member newMember = Member.builder()
                 .email(request.email())
                 .name(request.name())
@@ -38,18 +40,12 @@ public class MemberService {
     }
 
     public Member getMemberById(final long id) {
-        return memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("[ERROR] 사용자가 존재하지 않습니다."));
+        return memberRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private void validateDuplicateEmail(final String email) {
         if (memberRepository.existByEmail(email)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일 입니다.");
-        }
-    }
-
-    private void validateDuplicateName(final String name) {
-        if (memberRepository.existByName(name)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름 입니다.");
+            throw new ConflictException(ErrorCode.MEMBER_ALREADY_EXISTS);
         }
     }
 

@@ -2,17 +2,15 @@ package roomescape.theme.repository;
 
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.theme.domain.ReservationTheme;
 
 @Repository
+@RequiredArgsConstructor
 public class ReservationThemeRepositoryImpl implements ReservationThemeRepository {
 
     private final ReservationThemeJpaRepository reservationThemeJpaRepository;
-
-    public ReservationThemeRepositoryImpl(final ReservationThemeJpaRepository reservationThemeJpaRepository) {
-        this.reservationThemeJpaRepository = reservationThemeJpaRepository;
-    }
 
     @Override
     public Optional<ReservationTheme> findById(final Long id) {

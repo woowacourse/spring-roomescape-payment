@@ -1,6 +1,7 @@
 package roomescape.member.controller;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -9,20 +10,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginRequest;
+import roomescape.member.dto.LoginResponse;
 import roomescape.member.service.AuthService;
 import roomescape.member.service.MemberService;
 
 @Controller
+@RequiredArgsConstructor
 public class LoginController {
 
     private static final String SESSION_KEY = "id";
+
     private final AuthService authService;
     private final MemberService memberService;
-
-    public LoginController(final AuthService authService, final MemberService memberService) {
-        this.authService = authService;
-        this.memberService = memberService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody final LoginRequest loginRequest, final HttpSession session) {
@@ -46,10 +45,5 @@ public class LoginController {
         }
         final long id = (long) session.getAttribute(SESSION_KEY);
         return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(memberService.getMemberById(id).getName()));
-    }
-
-    record LoginResponse(
-            String name
-    ) {
     }
 }
