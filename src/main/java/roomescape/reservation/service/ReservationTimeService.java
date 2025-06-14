@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.reservation.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservation.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
@@ -59,7 +59,7 @@ public class ReservationTimeService {
 
     private void validateOperatingTime(ReservationTime reservationTime) {
         if (!reservationTime.isAvailable()) {
-            throw new BadRequestException("운영 시간 이외의 날짜는 예약할 수 없습니다.");
+            throw new InvalidReservationException("운영 시간 이외의 날짜는 예약할 수 없습니다.");
         }
     }
 
@@ -72,7 +72,7 @@ public class ReservationTimeService {
 
     private void validateExistReservedReservation(Long timeId) {
         if (reservationRepository.existsByTimeId(timeId)) {
-            throw new BadRequestException("해당 시간에 예약된 내역이 존재하므로 삭제할 수 없습니다.");
+            throw new InvalidReservationException("해당 시간에 예약된 내역이 존재하므로 삭제할 수 없습니다.");
         }
     }
 }

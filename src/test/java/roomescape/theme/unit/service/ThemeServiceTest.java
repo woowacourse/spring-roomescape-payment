@@ -4,23 +4,48 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import fixture.MemberFixture;
+import fixture.PaymentFixture;
+import fixture.ReservationFixture;
+import fixture.ReservationTimeFixture;
+import fixture.ThemeFixture;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.member.entity.Member;
+import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.entity.Reservation;
+import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.dto.request.ThemeCreateRequest;
+import roomescape.theme.dto.response.ThemeResponse;
+import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.theme.service.ThemeService;
 
 @DataJpaTest
 class ThemeServiceTest {
 
-    private ThemeService themeService;
-
     @Autowired
     private ThemeRepository themeRepository;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    private ThemeService themeService;
 
     @BeforeEach
     void setUp() {
@@ -28,30 +53,48 @@ class ThemeServiceTest {
     }
 
     @Test
-    @DisplayName("테마를 생성한다.")
+    @DisplayName("테마 생성 - 성공")
     void createTheme() {
         // given
-        var request = new ThemeCreateRequest("테마1", "테마1 설명", "테마1 썸네일");
+        Theme theme = ThemeFixture.createDefault();
+        var request = new ThemeCreateRequest(theme.getName(), theme.getDescription(), theme.getThumbnail());
 
         // when
         var response = themeService.createTheme(request);
 
         // then
         assertAll(
-                () -> assertThat(response.name()).isEqualTo("테마1"),
-                () -> assertThat(response.description()).isEqualTo("테마1 설명"),
-                () -> assertThat(response.thumbnail()).isEqualTo("테마1 썸네일")
+                () -> assertThat(response.name()).isEqualTo(theme.getName()),
+                () -> assertThat(response.description()).isEqualTo(theme.getDescription()),
+                () -> assertThat(response.thumbnail()).isEqualTo(theme.getThumbnail())
         );
     }
 
     @Test
-    @DisplayName("모든 테마를 조회한다.")
+    @DisplayName("테마 생성 - 중복 이름으로 실패")
+    void createThemeFailWhenNameDuplicate() {
+        // given
+        Theme theme = ThemeFixture.createDefault();
+        var request = new ThemeCreateRequest(theme.getName(), theme.getDescription(), theme.getThumbnail());
+        themeService.createTheme(request);
+
+        var duplicatedThemeNameRequest = new ThemeCreateRequest(
+                theme.getName(),
+                theme.getDescription() + "diff",
+                theme.getThumbnail() + "diff"
+        );
+
+        // when & then
+        assertThatThrownBy(() -> themeService.createTheme(duplicatedThemeNameRequest))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    @DisplayName("모든 테마 조회")
     void getAllThemes() {
         // given
-        var request1 = new ThemeCreateRequest("테마1", "테마1 설명", "테마1 썸네일");
-        var request2 = new ThemeCreateRequest("테마2", "테마2 설명", "테마2 썸네일");
-        themeService.createTheme(request1);
-        themeService.createTheme(request2);
+        List<Theme> themes = ThemeFixture.createDefaultList(2);
+        themeRepository.saveAll(themes);
 
         // when
         var responses = themeService.getAllThemes();
@@ -59,53 +102,59 @@ class ThemeServiceTest {
         // then
         assertAll(
                 () -> assertThat(responses).hasSize(2),
-                () -> assertThat(responses.get(0).name()).isEqualTo("테마1"),
-                () -> assertThat(responses.get(1).name()).isEqualTo("테마2")
+                () -> assertThat(responses.get(0).name()).isEqualTo(themes.get(0).getName()),
+                () -> assertThat(responses.get(1).name()).isEqualTo(themes.get(1).getName())
         );
     }
 
     @Test
-    @DisplayName("인기 테마를 조회한다.")
+    @DisplayName("인기 테마 조회 요청 - 인기순 정렬 확인")
     void getPopularThemes() {
         // given
-        var request1 = new ThemeCreateRequest("테마1", "테마1 설명", "테마1 썸네일");
-        var request2 = new ThemeCreateRequest("테마2", "테마2 설명", "테마2 썸네일");
-        themeService.createTheme(request1);
-        themeService.createTheme(request2);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        ReservationTime reservationTime = ReservationTimeFixture.createDefault();
+        reservationTimeRepository.save(reservationTime);
+
+        List<Theme> themes = ThemeFixture.createDefaultList(2);
+        themeRepository.saveAll(themes);
+
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+
+        Payment payment = PaymentFixture.createDefault();
+        paymentRepository.save(payment);
+
+        Reservation reservation = ReservationFixture.create(yesterday, reservationTime, themes.get(1), member, payment);
+        reservationRepository.save(reservation);
 
         // when
-        var responses = themeService.getPopularThemes(2);
+        List<ThemeResponse> popularThemes = themeService.getPopularThemes(2);
 
         // then
-        assertThat(responses).hasSize(2);
+        assertAll(
+                () -> assertThat(popularThemes).hasSize(2),
+                () -> assertThat(popularThemes.get(0).name()).isEqualTo(themes.get(1).getName()),
+                () -> assertThat(popularThemes.get(1).name()).isEqualTo(themes.get(0).getName())
+        );
     }
 
     @Test
-    @DisplayName("테마를 삭제한다.")
+    @DisplayName("테마 삭제")
     void deleteTheme() {
         // given
-        var request = new ThemeCreateRequest("테마1", "테마1 설명", "테마1 썸네일");
-        var theme = themeService.createTheme(request);
+        Theme theme = ThemeFixture.createDefault();
+        var request = new ThemeCreateRequest(
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
+        );
+        var createdTheme = themeService.createTheme(request);
 
         // when
-        themeService.deleteTheme(theme.id());
+        themeService.deleteTheme(createdTheme.id());
 
         // then
         assertThat(themeService.getAllThemes()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("중복되는 테마 이름이 있을 경우 생성할 수 없다.")
-    void createThemeWithDuplicateName() {
-        // given
-        var request1 = new ThemeCreateRequest("테마1", "테마1 설명", "테마1 썸네일");
-        themeService.createTheme(request1);
-
-        var request2 = new ThemeCreateRequest("테마1", "테마2 설명", "테마2 썸네일");
-
-        // when & then
-        assertThatThrownBy(() -> themeService.createTheme(request2))
-                .isInstanceOf(ConflictException.class)
-                .hasMessage("이미 존재하는 테마 이름입니다.");
     }
 }

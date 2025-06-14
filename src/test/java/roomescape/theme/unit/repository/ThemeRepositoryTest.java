@@ -3,9 +3,12 @@ package roomescape.theme.unit.repository;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import jakarta.persistence.EntityManager;
+import fixture.MemberFixture;
+import fixture.PaymentFixture;
+import fixture.ReservationFixture;
+import fixture.ReservationTimeFixture;
+import fixture.ThemeFixture;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +17,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.member.entity.Member;
-import roomescape.member.entity.RoleType;
+import roomescape.member.repository.MemberRepository;
 import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
@@ -26,51 +32,53 @@ import roomescape.theme.repository.ThemeRepository;
 class ThemeRepositoryTest {
 
     @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
     private ThemeRepository themeRepository;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Test
-    @DisplayName("")
+    @DisplayName("인기 테마 DB 조회")
     void findPopularDescendingUpTo() {
         // given
-        var reservationTime1 = new ReservationTime(LocalTime.of(10, 0));
-        var reservationTime2 = new ReservationTime(LocalTime.of(11, 0));
-        var theme1 = new Theme("테마1", "설명1", "썸네일1");
-        var theme2 = new Theme("테마2", "설명2", "썸네일2");
-        var member1 = new Member("미소", "miso@email.com", "miso", RoleType.USER);
-        var member2 = new Member("훌라", "hula@email.com", "hula", RoleType.USER);
-        var date = LocalDate.now().plusDays(1);
-        var payment1 = new Payment("any", "any", 1L, "any");
-        var payment2 = new Payment("any", "any", 1L, "any");
-        var payment3 = new Payment("any", "any", 1L, "any");
-        var reservation1 = new Reservation(date, reservationTime1, theme2, member1, payment1);
-        var reservation2 = new Reservation(date, reservationTime2, theme2, member2, payment2);
-        var reservation3 = new Reservation(date, reservationTime2, theme1, member2, payment3);
-        entityManager.persist(reservationTime1);
-        entityManager.persist(reservationTime2);
-        entityManager.persist(theme1);
-        entityManager.persist(theme2);
-        entityManager.persist(member1);
-        entityManager.persist(member2);
-        entityManager.persist(payment1);
-        entityManager.persist(payment2);
-        entityManager.persist(payment3);
-        entityManager.persist(reservation1);
-        entityManager.persist(reservation2);
-        entityManager.persist(reservation3);
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        List<ReservationTime> reservationTimes = ReservationTimeFixture.createDefaultList(2);
+        reservationTimeRepository.saveAll(reservationTimes);
+
+        List<Theme> themes = ThemeFixture.createDefaultList(2);
+        themeRepository.saveAll(themes);
+
+        List<Member> members = MemberFixture.createDefaultList(2);
+        memberRepository.saveAll(members);
+
+        List<Payment> payments = PaymentFixture.createDefaultList(3);
+        paymentRepository.saveAll(payments);
+
+        Reservation reservation1 = ReservationFixture.create(
+                yesterday, reservationTimes.get(0), themes.get(1), members.get(0), payments.get(0));
+        Reservation reservation2 = ReservationFixture.create(
+                yesterday, reservationTimes.get(1), themes.get(1), members.get(1), payments.get(1));
+        Reservation reservation3 = ReservationFixture.create(
+                yesterday, reservationTimes.get(1), themes.get(0), members.get(1), payments.get(2));
+        reservationRepository.saveAll(List.of(reservation1, reservation2, reservation3));
 
         // when
-        List<Theme> themes = themeRepository.findPopularDescendingUpTo(
-                LocalDate.now().minusDays(2),
-                LocalDate.now().plusDays(2), 10
+        List<Theme> resultThemes = themeRepository.findPopularDescendingUpTo(
+                LocalDate.now().minusWeeks(1),
+                LocalDate.now(),
+                10
         );
 
         // then
         assertAll(
-                () -> assertThat(themes.get(0)).isEqualTo(theme2),
-                () -> assertThat(themes.get(1)).isEqualTo(theme1)
+                () -> assertThat(resultThemes.get(0)).isEqualTo(themes.get(1)),
+                () -> assertThat(resultThemes.get(1)).isEqualTo(themes.get(0))
         );
     }
 }

@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import fixture.PaymentFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,87 +16,154 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.global.error.exception.BadRequestException;
-import roomescape.global.error.exception.ServerException;
+import roomescape.global.error.exception.BadPaymentRequestException;
+import roomescape.global.error.exception.ExternalApiClientException;
+import roomescape.global.error.exception.ExternalApiServerException;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
 import roomescape.payment.entity.Payment;
+import roomescape.payment.entity.PaymentRequestInfo;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.repository.PaymentRequestInfoRepository;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
 
-    private PaymentService paymentService;
-
     @Mock
     private PaymentRepository paymentRepository;
-
+    @Mock
+    private PaymentRequestInfoRepository paymentRequestInfoRepository;
     @Mock
     private PaymentClient paymentClient;
 
+    private PaymentService paymentService;
+
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(paymentClient, paymentRepository);
+        paymentService = new PaymentService(paymentClient, paymentRepository, paymentRequestInfoRepository);
     }
 
     @Test
-    @DisplayName("결제 승인 API를 호출한다.")
+    @DisplayName("결제 승인 - 성공")
     void confirmPayment_Success() {
         // given
-        String paymentKey = "paymentKey";
-        String orderId = "orderId";
-        Long amount = 1000L;
-        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
-                .willReturn(new PaymentConfirmResponse(paymentKey, orderId, amount, "NORMAL"));
+        Payment payment = PaymentFixture.createDefault();
+        given(paymentClient.requestPaymentConfirm(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
+                .willReturn(new PaymentConfirmResponse(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                ));
+
+        given(paymentRequestInfoRepository.findByOrderId(payment.getOrderId()))
+                .willReturn(java.util.Optional.of(new PaymentRequestInfo(
+                        payment.getOrderId(),
+                        "테스트 방탈출 예약 결제 1건",
+                        payment.getAmount()
+                )));
 
         // when
-        paymentService.confirmPayment(paymentKey, orderId, amount);
+        paymentService.confirmPayment(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount());
 
         // then
         ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(captor.capture());
         Payment saved = captor.getValue();
         assertAll(
-                () -> assertThat(saved.getPaymentKey()).isEqualTo(paymentKey),
-                () -> assertThat(saved.getOrderId()).isEqualTo(orderId),
-                () -> assertThat(saved.getAmount()).isEqualTo(amount),
-                () -> assertThat(saved.getPaymentType()).isEqualTo("NORMAL")
+                () -> assertThat(saved.getPaymentKey()).isEqualTo(payment.getPaymentKey()),
+                () -> assertThat(saved.getOrderId()).isEqualTo(payment.getOrderId()),
+                () -> assertThat(saved.getAmount()).isEqualTo(payment.getAmount()),
+                () -> assertThat(saved.getPaymentType()).isEqualTo(payment.getPaymentType())
         );
     }
 
     @Test
-    @DisplayName("결제 승인 API를 호출해서 400 예외가 터진다.")
+    @DisplayName("결제 승인 - 실패 - 결제 금액 변조")
+    void confirmPayment_Fail_AmountTampered() {
+        // given
+        Payment payment = PaymentFixture.createDefault();
+        given(paymentRequestInfoRepository.findByOrderId(payment.getOrderId()))
+                .willReturn(java.util.Optional.of(new PaymentRequestInfo(
+                        payment.getOrderId(),
+                        "테스트 방탈출 예약 결제 1건",
+                        payment.getAmount()
+                )));
+        Long tamperedAmount = payment.getAmount() - 1000L;
+
+        // when & then
+        assertThatThrownBy(
+                () -> paymentService.confirmPayment(payment.getPaymentKey(), payment.getOrderId(), tamperedAmount))
+                .isInstanceOf(BadPaymentRequestException.class);
+    }
+
+    @Test
+    @DisplayName("결제 승인 - 400 예외 실패")
     void confirmPayment_ThrowsBadRequestException() {
         // given
-        String paymentKey = "paymentKey";
-        String orderId = "orderId";
-        Long amount = 1000L;
-        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
-                .willThrow(new BadRequestException("API 오류"));
+        Payment payment = PaymentFixture.createDefault();
+        given(paymentClient.requestPaymentConfirm(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
+                .willThrow(new ExternalApiClientException("잘못된 사용자 결제 요청입니다."));
+
+        given(paymentRequestInfoRepository.findByOrderId(payment.getOrderId()))
+                .willReturn(java.util.Optional.of(new PaymentRequestInfo(
+                        payment.getOrderId(),
+                        "테스트 방탈출 예약 결제 1건",
+                        payment.getAmount()
+                )));
 
         // when & then
         assertAll(
-                () -> assertThatThrownBy(() -> paymentService.confirmPayment(paymentKey, orderId, amount))
-                        .isInstanceOf(BadRequestException.class),
+                () -> assertThatThrownBy(() -> paymentService.confirmPayment(
+                        payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
+                        .isInstanceOf(ExternalApiClientException.class),
                 () -> verify(paymentRepository, never()).save(any())
         );
     }
 
     @Test
-    @DisplayName("결제 승인 API를 호출해서 500 예외가 터진다.")
+    @DisplayName("결제 승인 - 500 예외 실패")
     void confirmPayment_ThrowsInternalServerError() {
         // given
-        String paymentKey = "paymentKey";
-        String orderId = "orderId";
-        Long amount = 1000L;
-        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
-                .willThrow(new ServerException("API 오류"));
+        Payment payment = PaymentFixture.createDefault();
+        given(paymentClient.requestPaymentConfirm(payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
+                .willThrow(new ExternalApiServerException("현재 외부 서비스에 문제가 발생하여 요청을 처리할 수 없습니다. 잠시 후 다시 시도해주세요."));
+
+        given(paymentRequestInfoRepository.findByOrderId(payment.getOrderId()))
+                .willReturn(java.util.Optional.of(new PaymentRequestInfo(
+                        payment.getOrderId(),
+                        "테스트 방탈출 예약 결제 1건",
+                        payment.getAmount()
+                )));
 
         // when & then
         assertAll(
-                () -> assertThatThrownBy(() -> paymentService.confirmPayment(paymentKey, orderId, amount))
-                        .isInstanceOf(ServerException.class),
+                () -> assertThatThrownBy(() -> paymentService.confirmPayment(
+                        payment.getPaymentKey(), payment.getOrderId(), payment.getAmount()))
+                        .isInstanceOf(ExternalApiServerException.class),
                 () -> verify(paymentRepository, never()).save(any())
+        );
+    }
+
+    @Test
+    @DisplayName("결제 요청 정보 생성 - 성공")
+    void createPaymentRequestInfo_Success() {
+        // given
+        String orderId = "ROOM_12345";
+        String orderName = "테스트 방탈출 예약 결제 1건";
+        Long amount = 5000L;
+
+        given(paymentRequestInfoRepository.save(any()))
+                .willReturn(new PaymentRequestInfo(orderId, orderName, amount));
+
+        // when
+        var response = paymentService.createPaymentRequestInfo(orderName, amount);
+
+        // then
+        assertAll(
+                () -> assertThat(response.orderName()).isEqualTo(orderName),
+                () -> assertThat(response.amount()).isEqualTo(amount),
+                () -> verify(paymentRequestInfoRepository).save(any(PaymentRequestInfo.class))
         );
     }
 }

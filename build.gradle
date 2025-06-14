@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
     id 'java'
 }
 
@@ -14,6 +15,14 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+configurations {
+    asciidoctorExtensions
 }
 
 dependencies {
@@ -34,19 +43,42 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
-//    // JWT
-//    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-//    implementation 'io.jsonwebtoken:jjwt-gson:0.11.2'
-
     // h2
     runtimeOnly 'com.h2database:h2'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    // Rest-docs
+    // if you want rest-docs, read the following example
+    // https://github.com/spring-projects/spring-restdocs-samples/blob/main/rest-assured/src/docs/asciidoc/index.adoc
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+
+    // Logging
+    // Logback JSON 형식 로깅을 위한 Logstash Logback Encoder
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+    // 예외 스택 트레이스를 문자열로 깔끔하게 변환하기 위한 라이브러리
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    configurations "asciidoctorExtensions"
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }

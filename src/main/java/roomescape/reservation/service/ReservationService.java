@@ -7,8 +7,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.global.error.exception.InvalidReservationException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
@@ -170,7 +170,7 @@ public class ReservationService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime reservationDateTime = reservation.getDateTime();
         if (reservationDateTime.isBefore(now)) {
-            throw new BadRequestException("과거 날짜는 예약할 수 없습니다.");
+            throw new InvalidReservationException("과거 날짜는 예약할 수 없습니다.");
         }
     }
 

@@ -3,8 +3,11 @@ package roomescape.reservation.acceptance;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import fixture.MemberFixture;
+import fixture.ReservationTimeFixture;
 import io.restassured.RestAssured;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,66 +22,70 @@ import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.dto.request.ReservationTimeCreateRequest;
+import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.ReservationTimeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationTimeAcceptanceTest {
 
-    private static final String DEFAULT_EMAIL = "miso@email.com";
-    private static final String DEFAULT_PASSWORD = "miso";
-    private static final String DEFAULT_NAME = "미소";
-
     @LocalServerPort
     private int port;
-
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    private Member member;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
+        member = MemberFixture.create(RoleType.ADMIN);
         memberRepository.save(member);
     }
 
     @Test
-    @DisplayName("예약 시간을 생성한다.")
+    @DisplayName("예약 시간 생성 - 성공")
     void createTime() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(10, 0));
+        var timeRequest = new ReservationTimeCreateRequest(time.getStartAt());
 
         // when & then
         TestHelper.postWithToken("/admin/times", timeRequest, token)
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("id", equalTo(1))
-                .body("startAt", equalTo("10:00"));
+                .body("startAt", equalTo(time.getStartAt().toString()));
     }
 
     @Test
-    @DisplayName("모든 예약 시간을 조회한다.")
+    @DisplayName("모든 예약 시간 조회")
     void getAllTimes() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
-        TestHelper.postWithToken("/admin/times", timeRequest, token);
+        List<ReservationTime> times = List.of(
+                ReservationTimeFixture.create(LocalTime.of(10, 0)),
+                ReservationTimeFixture.create(LocalTime.of(12, 0))
+        );
+        reservationTimeRepository.saveAll(times);
 
         // when & then
         TestHelper.get("/times")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("$", hasSize(1))
-                .body("[0].id", equalTo(1))
-                .body("[0].startAt", equalTo("10:00"));
+                .body("$", hasSize(2));
     }
 
     @Test
-    @DisplayName("예약 가능한 시간을 조회한다.")
+    @DisplayName("예약 가능 시간 조회 - 성공")
     void getAvailableTimes() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(10, 0));
+        var timeRequest = new ReservationTimeCreateRequest(time.getStartAt());
         TestHelper.postWithToken("/admin/times", timeRequest, token);
 
         // when & then
@@ -86,17 +93,18 @@ class ReservationTimeAcceptanceTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$", hasSize(1))
-                .body("[0].id", equalTo(1))
-                .body("[0].startAt", equalTo("10:00"))
+                .body("[0].startAt", equalTo(time.getStartAt().toString()))
                 .body("[0].alreadyBooked", equalTo(false));
     }
 
     @Test
-    @DisplayName("예약 시간을 삭제한다.")
+    @DisplayName("예약 시간 삭제")
     void deleteTime() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(10, 0));
+        var timeRequest = new ReservationTimeCreateRequest(time.getStartAt());
         TestHelper.postWithToken("/admin/times", timeRequest, token);
 
         // when & then
@@ -111,11 +119,14 @@ class ReservationTimeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("운영 시간 이외의 시간은 생성할 수 없다.")
+    @DisplayName("예약 시간 생성 - 운영 시간 이외 불가능으로 실패")
     void createTimeOutsideOperatingHours() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest = new ReservationTimeCreateRequest(LocalTime.of(9, 0));
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(9, 0));
+        var timeRequest = new ReservationTimeCreateRequest(time.getStartAt());
+        TestHelper.postWithToken("/admin/times", timeRequest, token);
 
         // when & then
         TestHelper.postWithToken("/admin/times", timeRequest, token)
@@ -124,17 +135,20 @@ class ReservationTimeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("러닝 타임이 겹치는 시간은 생성할 수 없다.")
+    @DisplayName("예약 시간 생성 - running time 겹치는 시간으로 실패")
     void createTimeWithOverlappingRunningTime() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var timeRequest1 = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
-        var timeRequest2 = new ReservationTimeCreateRequest(LocalTime.of(11, 0));
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
 
-        TestHelper.postWithToken("/admin/times", timeRequest1, token);
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(10, 0));
+        var timeRequest = new ReservationTimeCreateRequest(time.getStartAt());
+        TestHelper.postWithToken("/admin/times", timeRequest, token);
+
+        ReservationTime failTime = ReservationTimeFixture.create(LocalTime.of(11, 0));
+        var failTimeRequest = new ReservationTimeCreateRequest(failTime.getStartAt());
 
         // when & then
-        TestHelper.postWithToken("/admin/times", timeRequest2, token)
+        TestHelper.postWithToken("/admin/times", failTimeRequest, token)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value());
     }

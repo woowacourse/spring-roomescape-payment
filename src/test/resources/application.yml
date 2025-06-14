@@ -27,3 +27,13 @@ toss:
 restclient:
   connection-timeout: 3000
   read-timeout: 5000
+
+logging:
+  level:
+    root: INFO
+    roomescape: DEBUG
+    org.springframework: INFO
+    roomescape.filter.MDCFilter: DEBUG
+  file:
+    name: logs/application.json
+
