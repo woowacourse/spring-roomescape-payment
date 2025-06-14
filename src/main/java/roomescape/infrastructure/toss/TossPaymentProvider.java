@@ -6,6 +6,7 @@ import static roomescape.domain.payment.TransactionStatusCode.INVALID_AUTH_CREDE
 
 import java.io.IOException;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
@@ -16,7 +17,10 @@ import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.TransactionStatus;
 import roomescape.domain.payment.TransactionStatusCode;
 
+@Slf4j
 public class TossPaymentProvider implements PaymentProvider {
+
+    public static final String CONFIRM_ENDPOINT = "/v1/payments/confirm";
 
     private final RestClient tossRestClient;
     private final String authorizationValue;
@@ -30,9 +34,14 @@ public class TossPaymentProvider implements PaymentProvider {
 
     @Override
     public PaymentExecutionResult confirm(final PaymentRequest paymentRequest) {
-        var confirmUri = "/v1/payments/confirm";
+        log.info("토스 페이먼츠에 결제 승인 요청 시작. orderId: {}, paymentKey: {}, amount: {}",
+                paymentRequest.orderId(),
+                paymentRequest.paymentKey(),
+                paymentRequest.amount()
+        );
+
         return tossRestClient.post()
-                .uri(confirmUri)
+                .uri(CONFIRM_ENDPOINT)
                 .header("Authorization", authorizationValue)
                 .header("Content-Type", "application/json")
                 .body(paymentRequest)
@@ -41,16 +50,19 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private PaymentExecutionResult convertToDetails(final ConvertibleClientHttpResponse response) throws IOException {
         if (HttpStatus.OK == response.getStatusCode()) {
+            log.info("결제 승인 성공 응답 반환됨");
             var confirmation = response.bodyTo(PaymentConfirmation.class);
             return new PaymentExecutionResult(confirmation);
         }
         var tossResponse = response.bodyTo(FailureResponse.class);
+        log.error("결제 승인 실패 응답 반환됨. 응답 상태코드: {}, 토스 에러코드: {}", response.getStatusCode(), tossResponse.code());
         var status = convertToStatus(tossResponse);
         return new PaymentExecutionResult(status);
     }
 
     private TransactionStatus convertToStatus(final FailureResponse tossResponse) {
         var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(), FAILED_PAYMENT);
+        log.info("결제 트랜잭션 결과 상태 코드: {}", failureCode);
         return TransactionStatus.fail(failureCode, tossResponse.message());
     }
 

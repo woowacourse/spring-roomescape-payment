@@ -4,6 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicLong;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.OrderId;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentKey;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.theme.Description;
@@ -73,6 +77,24 @@ public class TestFixtures {
                 anyThemeWithNewId()
             ),
             ReservationStatus.RESERVED
+        );
+    }
+
+    public static PaymentKey anyPaymentKey() {
+        return new PaymentKey("paymentKey");
+    }
+
+    public static OrderId anyOrderId() {
+        return new OrderId("orderId");
+    }
+
+    public static Payment anyPaymentWithNewId() {
+        return new Payment(
+                ID_GENERATOR.incrementAndGet(),
+                anyPaymentKey(),
+                anyOrderId(),
+                1000,
+                PaymentStatus.DONE
         );
     }
 }

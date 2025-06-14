@@ -1,33 +1,5 @@
 # 방탈출 예약 관리 프로그램
 
-## 📌 페이지 응답
-
-**어드민 페이지**
-
-- `/admin`요청 시 어드민 메인 페이지를 응답한다.
-    - 어드민 메인 페이지는 `templates/admin/index.html` 파일을 이용한다.
-- `/admin/time` 요청 시 시간 관리 페이지를 응답한다.
-    - 시간 관리 페이지는 `templates/admin/time.html` 파일을 이용한다.
-- `/admin/theme`요청 시 테마 관리 페이지를 응답한다.
-    - 테마 관리 페이지는 `templates/admin/theme.html`파일을 이용한다.
-- `/admin/reservation`요청 시 예약 관리 페이지를 응답한다.
-    - 예약 관리 페이지는 `templates/admin/reservation-new.html`파일을 이용한다.
-- `/admin/waiting`요청 시 예약 관리 페이지를 응답한다.
-  - 예약 관리 페이지는 `templates/admin/waiting.html`파일을 이용한다.
-
-**사용자 페이지**
-
-- `/`요청 시 인기 테마 페이지를 응답한다.
-    - 인기 테마 페이지는`templates/index.html`파일을 이용한다.
-- `/login` 요청 시 로그인 폼 페이지를 응답한다.
-    - 로그인 폼 페이지는 `templates/login.html` 파일을 이용한다.
-- `/signup`요청 시 회원 가입 페이지를 응답한다.
-    - 회원 가입 페이지는 `templates/signup.html`파일을 이용한다.
-- `/reservation`요청 시 사용자 예약 페이지를 응답한다.
-    - 사용자 예약 페이지는`templates/reservation.html`파일을 이용한다.
-- `/reservation-mine`요청 시 내 예약 페이지를 응답한다.
-    - 내 예약 페이지는`templates/reservation-mine.html`파일을 이용한다.
-
 ## 📌 기능
 
 **로그인**
@@ -54,10 +26,10 @@
     - 과거의 날짜는 예약할 수 없다.
 - 사용자는 예약 가능한 시간을 확인하고, 원하는 시간에 예약을 할 수 있다.
     - 시간을 선택하고 예약하기 버튼을 누르면 결제 후 예약이 완료된다.
-- 사용자는 예약 가능한 시간을 확인하고, 원하는 시간에 예약 대기를 할 수 있다.
-  - 시간을 선택하고 예약자 명을 기입한 후 예약 대기 버튼을 누르면 예약 대기가 완료된다.
-- 사용자는 본인의 예약을 확인할 수 있다.
-    - 본인 예약 조회 시, 예약 날짜, 예약 시간, 방탈출 테마, 예약 상태가 표기 된다.
+- 사용자는 예약 불가능한 시간을 확인하고, 원하는 시간에 예약 대기를 할 수 있다.
+    - 시간을 선택하고 예약 대기 버튼을 누르면 예약 대기가 완료된다.
+- 사용자는 본인의 예약과 예약 대기를 확인할 수 있다.
+    - 본인 예약 조회 시, 예약 날짜, 예약 시간, 방탈출 테마, 예약 상태, 결제 키 값, 결제 금액이 표기 된다.
 
 **어드민 예약 관리**
 
@@ -73,6 +45,42 @@
 - 어드민 테마 관리 페이지에서 각각 추가, 삭제 기능을 사용할 수 있다.
     - 테마 이름은 10자 이하여야 한다.
     - 테마 설명은 50자 이하여야 한다.
+
+## 📌 페이지 응답
+
+**어드민 페이지**
+
+- `/admin`요청 시 어드민 메인 페이지를 응답한다.
+    - 어드민 메인 페이지는 `templates/admin/index.html` 파일을 이용한다.
+- `/admin/time` 요청 시 시간 관리 페이지를 응답한다.
+    - 시간 관리 페이지는 `templates/admin/time.html` 파일을 이용한다.
+- `/admin/theme`요청 시 테마 관리 페이지를 응답한다.
+    - 테마 관리 페이지는 `templates/admin/theme.html`파일을 이용한다.
+- `/admin/reservation`요청 시 예약 관리 페이지를 응답한다.
+    - 예약 관리 페이지는 `templates/admin/reservation-new.html`파일을 이용한다.
+- `/admin/waiting`요청 시 예약 관리 페이지를 응답한다.
+    - 예약 관리 페이지는 `templates/admin/waiting.html`파일을 이용한다.
+
+**사용자 페이지**
+
+- `/`요청 시 인기 테마 페이지를 응답한다.
+    - 인기 테마 페이지는`templates/index.html`파일을 이용한다.
+- `/login` 요청 시 로그인 폼 페이지를 응답한다.
+    - 로그인 폼 페이지는 `templates/login.html` 파일을 이용한다.
+- `/signup`요청 시 회원 가입 페이지를 응답한다.
+    - 회원 가입 페이지는 `templates/signup.html`파일을 이용한다.
+- `/reservation`요청 시 사용자 예약 페이지를 응답한다.
+    - 사용자 예약 페이지는`templates/reservation.html`파일을 이용한다.
+- `/reservation-mine`요청 시 내 예약 페이지를 응답한다.
+    - 내 예약 페이지는`templates/reservation-mine.html`파일을 이용한다.
+
+## 📌 API 문서
+
+[API 문서 페이지](http://localhost:8080/swagger-ui/index.html)
+
+## 📌 ER Diagram
+
+<img src="./img/ERD.png" width="320px" height="342px" title="ERD"/>
 
 ## 📌 예외 처리
 

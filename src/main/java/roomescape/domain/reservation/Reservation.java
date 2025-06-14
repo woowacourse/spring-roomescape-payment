@@ -10,11 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.lang.Nullable;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
@@ -37,6 +39,8 @@ public class Reservation {
     private RoomescapeSchedule reservedSchedule;
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+    @Nullable
+    private Long paymentId;
     private final Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     public Reservation(final long id, final User user, final RoomescapeSchedule schedule, final ReservationStatus status) {
@@ -44,6 +48,7 @@ public class Reservation {
         this.user = user;
         this.reservedSchedule = schedule;
         this.status = status;
+        this.paymentId = null;
     }
 
     public Reservation(final User user, final RoomescapeSchedule schedule) {
@@ -80,6 +85,10 @@ public class Reservation {
         this.status = ReservationStatus.CANCELED;
     }
 
+    public void updatePaymentId(final Long paymentId) {
+        this.paymentId = paymentId;
+    }
+
     public LocalDate date() {
         return reservedSchedule.date();
     }
@@ -92,6 +101,10 @@ public class Reservation {
         return reservedSchedule.theme();
     }
 
+    public Optional<Long> paymentId() {
+        return Optional.ofNullable(paymentId);
+    }
+
     @Override
     public String toString() {
         return "Reservation{" +
@@ -102,4 +115,3 @@ public class Reservation {
                '}';
     }
 }
-

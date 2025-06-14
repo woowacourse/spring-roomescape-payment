@@ -2,6 +2,8 @@ package roomescape.presentation.response;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.lang.Nullable;
+import roomescape.domain.reservation.ReservationDetail;
 import roomescape.domain.reservation.ReservationWithOrder;
 
 public record UserReservationResponse(
@@ -9,17 +11,21 @@ public record UserReservationResponse(
     LocalDate date,
     TimeSlotResponse time,
     ThemeResponse theme,
-    String status
+    String status,
+    @Nullable String paymentKey,
+    @Nullable Long amount
 ) {
 
-    public static UserReservationResponse from(final ReservationWithOrder waiting) {
-        var reservation = waiting.reservation();
+    public static UserReservationResponse from(final ReservationDetail detail) {
+        var reservation = detail.waitingInfo().reservation();
         return new UserReservationResponse(
             reservation.id(),
             reservation.date(),
             TimeSlotResponse.from(reservation.timeSlot()),
             ThemeResponse.from(reservation.theme()),
-            writeDescription(waiting)
+            writeDescription(detail.waitingInfo()),
+            writePaymentKey(detail),
+            detail.amount()
         );
     }
 
@@ -31,8 +37,15 @@ public record UserReservationResponse(
         return reservation.status().description();
     }
 
-    public static List<UserReservationResponse> from(final List<ReservationWithOrder> waitings) {
-        return waitings.stream()
+    private static String writePaymentKey(final ReservationDetail detail) {
+        if (detail.paymentKey() == null) {
+            return null;
+        }
+        return detail.paymentKey().value();
+    }
+
+    public static List<UserReservationResponse> from(final List<ReservationDetail> details) {
+        return details.stream()
             .map(UserReservationResponse::from)
             .toList();
     }

@@ -30,24 +30,22 @@ public class Payment {
     private long totalAmount;
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
-    private long reservationId;
 
     public Payment(
             final long id,
             final PaymentKey paymentKey,
-            final OrderId orderId, final long totalAmount,
-            final PaymentStatus status,
-            final long reservationId
+            final OrderId orderId,
+            final long totalAmount,
+            final PaymentStatus status
     ) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
         this.status = status;
-        this.reservationId = reservationId;
     }
 
-    public Payment(final PaymentKey key, final OrderId orderId, final long totalAmount, final PaymentStatus status, final long reservationId) {
-        this(0L, key, orderId, totalAmount, status, reservationId);
+    public Payment(final PaymentKey key, final OrderId orderId, final long totalAmount, final PaymentStatus status) {
+        this(0L, key, orderId, totalAmount, status);
     }
 }

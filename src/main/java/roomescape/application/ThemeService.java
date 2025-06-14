@@ -6,6 +6,7 @@ import static roomescape.infrastructure.ReservationSpecs.byThemeId;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.theme.Description;
@@ -15,6 +16,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.domain.theme.Thumbnail;
 import roomescape.exception.InUseException;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ThemeService {
@@ -33,6 +35,7 @@ public class ThemeService {
 
     public void removeById(final long id) {
         if (reservationRepository.exists(byThemeId(id))) {
+            log.warn("[예외 발생] 삭제할 수 없는 테마 id: {}", id);
             throw new InUseException("삭제하려는 테마를 사용하는 예약이 있습니다.");
         }
 

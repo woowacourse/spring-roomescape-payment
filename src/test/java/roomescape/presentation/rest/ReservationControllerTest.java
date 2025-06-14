@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static roomescape.TestFixtures.anyPaymentWithNewId;
 import static roomescape.TestFixtures.anyReservationWithNewId;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.application.RoomescapeService;
+import roomescape.application.UserService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
@@ -38,7 +40,8 @@ class ReservationControllerTest {
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
     private final PaymentService paymentService = Mockito.mock(PaymentService.class);
-    private final RoomescapeService roomescapeService = new RoomescapeService(reservationService, paymentService);
+    private final UserService userService = Mockito.mock(UserService.class);
+    private final RoomescapeService roomescapeService = new RoomescapeService(reservationService, paymentService, userService);
     private final MockMvc mockMvc = MockMvcBuilders
         .standaloneSetup(new ReservationController(reservationService, roomescapeService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))
@@ -50,6 +53,8 @@ class ReservationControllerTest {
     void reserve() throws Exception {
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
+        Mockito.when(paymentService.pay(anyString(), anyString(), anyLong()))
+                        .thenReturn(anyPaymentWithNewId());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,8 +63,8 @@ class ReservationControllerTest {
                         "date": "3000-03-17",
                         "timeId": "1",
                         "themeId": "1",
-                        "paymentKey": "a",
-                        "orderId": "1",
+                        "paymentKey": "paymentKey",
+                        "orderId": "orderId",
                         "amount": 1000
                     }
                     """))
@@ -74,7 +79,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new RuntimeException("결제 실패"))
-            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +103,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new PaymentFailedException("결제에 실패했습니다."))
-            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +127,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new PaymentInternalException("결제에 실패했습니다."))
-            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)

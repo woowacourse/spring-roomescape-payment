@@ -3,8 +3,10 @@ package roomescape.domain;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.NoRepositoryBean;
 import roomescape.exception.NotFoundException;
 
+@NoRepositoryBean
 public interface BaseRepository<T, ID> {
 
     T save(T entity);

@@ -36,7 +36,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatCode(() -> paymentService.pay("a", "123456", 1000, 1)).doesNotThrowAnyException();
+        assertThatCode(() -> paymentService.pay("a", "123456", 1000)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
@@ -50,7 +50,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay("a", "123456", 1000, 1)).isInstanceOf(expectedException);
+        assertThatThrownBy(() -> paymentService.pay("a", "123456", 1000)).isInstanceOf(expectedException);
     }
 
     private static Stream<Arguments> failToPaySource() {
