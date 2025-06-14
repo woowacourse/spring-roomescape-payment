@@ -39,6 +39,7 @@ import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.response.PaymentRequestInfoResponse;
 import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
@@ -283,6 +284,34 @@ class ReservationAcceptanceTest {
                 .body("[0].date", equalTo(tomorrow.toString()))
                 .body("[0].time", equalTo(reservationTime.getStartAt().toString()))
                 .body("[0].status", equalTo("예약"));
+    }
+
+    @Test
+    @DisplayName("결제 요청 정보 생성 - 성공")
+    void createPaymentRequestInfo_Success() {
+        // given
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+        Long amount = 5000L; // 결제 금액
+        given(paymentService.createPaymentRequestInfo(any(), any()))
+                .willReturn(new PaymentRequestInfoResponse("orderID", "orderName", amount));
+
+        // when & then
+        RestAssured
+                .given(this.documentationSpec)
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .filter(document("reservations-payment-request-info-get-success",
+                        responseFields(
+                                fieldWithPath("orderId").description("주문 ID (Toss Payments)"),
+                                fieldWithPath("orderName").description("주문 품목 이름"),
+                                fieldWithPath("amount").description("결제 금액 (Toss Payments)")
+                        )
+                ))
+                .when()
+                .post("/reservations/payment-request-info")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("amount", equalTo(amount.intValue()));
     }
 
     @Test
