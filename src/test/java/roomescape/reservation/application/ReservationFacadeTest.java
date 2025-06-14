@@ -1,5 +1,18 @@
 package roomescape.reservation.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.times;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +23,9 @@ import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.payment.resolver.PaymentClient;
+import roomescape.reservation.application.dto.CreateReservationWithPaymentServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
@@ -25,6 +40,7 @@ import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
@@ -35,20 +51,6 @@ import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
 import roomescape.user.domain.UserName;
 import roomescape.user.domain.UserRole;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationFacadeTest {
@@ -148,6 +150,8 @@ class ReservationFacadeTest {
                 reservations.get(0).getTime(),
                 reservations.get(0).getTheme(),
                 ReservationStatus.CONFIRMED,
+                0,
+                "",
                 0
         ));
         given(userQueryService.getById(any())).willReturn(user);
@@ -201,14 +205,14 @@ class ReservationFacadeTest {
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
-        given(reservationCommandService.create(any())).willReturn(reservation);
-        given(paymentClient.confirmPayment(any())).willReturn(null);
+        given(reservationCommandService.createWithPayment(any())).willReturn(reservation);
+        given(paymentClient.confirmPayment(any())).willReturn(new PaymentInfo("", 0));
         //when
-        ReservationResponse result = reservationFacade.create(request);
+        ReservationWithPaymentInfoResponse result = reservationFacade.create(request);
 
         //then
         assertThat(result).isNotNull();
-        then(reservationCommandService).should(times(1)).create(any());
+        then(reservationCommandService).should(times(1)).createWithPayment(any());
     }
 
     @Test
@@ -216,7 +220,7 @@ class ReservationFacadeTest {
     void createWithNonExistentThemeId() {
         //given
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
-        given(reservationCommandService.create(any()))
+        given(reservationCommandService.createWithPayment(any()))
                 .willThrow(new NotFoundException(DomainTerm.THEME));
 
         //when
@@ -231,7 +235,7 @@ class ReservationFacadeTest {
     void createWithNonExistentTimeId() {
         //given
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
-        given(reservationCommandService.create(any()))
+        given(reservationCommandService.createWithPayment(any()))
                 .willThrow(new NoSuchElementException());
 
         //when
@@ -245,7 +249,7 @@ class ReservationFacadeTest {
     void createWithNonExistentUserId() {
         //when
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
-        given(reservationCommandService.create(any()))
+        given(reservationCommandService.createWithPayment(any()))
                 .willThrow(new NotFoundException(DomainTerm.USER_ID));
 
         //when
@@ -316,7 +320,7 @@ class ReservationFacadeTest {
                         ThemeDescription.from("설명"),
                         ThemeThumbnail.from("thumbnail.jpg")
                 )
-        );
+        ).withPaymentInfo(new PaymentInfo("", 0));
     }
 
     private WaitingReservation createWaiting(Long id, int waitingNumber) {
@@ -361,4 +365,11 @@ class ReservationFacadeTest {
                 1L, 1L, 1L, "", "", 0, ""
         );
     }
+
+    private CreateReservationWithPaymentServiceRequest createCreatePaymentRequest() {
+        return new CreateReservationWithPaymentServiceRequest(
+                1L, ReservationDate.from(LocalDate.now().plusDays(1)),
+                1L, 1L, "", 0);
+    }
+
 }

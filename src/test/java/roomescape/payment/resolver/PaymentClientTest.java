@@ -21,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +42,7 @@ class PaymentClientTest {
     void confirmPayment() {
         // given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
-        PaymentResponse expectedResponse = new PaymentResponse("success", 1000, "orderId123", "paymentKey123");
+        PaymentInfo expectedResponse = new PaymentInfo("paymentKey123", 1000);
 
         RequestBodyUriSpec uriSpec = mock(RequestBodyUriSpec.class);
         RequestBodySpec bodySpec = mock(RequestBodySpec.class);
@@ -52,9 +52,9 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenReturn(expectedResponse);
+        when(responseSpec.body(PaymentInfo.class)).thenReturn(expectedResponse);
 
-        PaymentResponse result = paymentClient.confirmPayment(request);
+        PaymentInfo result = paymentClient.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -88,7 +88,7 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentInfo.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
@@ -125,7 +125,7 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentInfo.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
@@ -161,7 +161,7 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentInfo.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))

@@ -58,7 +58,7 @@ public class SignInUseCaseImpl implements SignInUseCase {
     private Cookie buildCookie(final Jwt accessToken) {
         final Cookie cookie = new Cookie(TokenType.ACCESS.getDescription(), accessToken.getValue());
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        // cookie.setSecure(true); // FIXME: 배포환경(http) 쿠키전송을 위한 임시조치
         cookie.setPath("/");
         cookie.setMaxAge(TokenType.ACCESS.getPeriodInSeconds());
         return cookie;

@@ -1,6 +1,10 @@
 package roomescape.reservation.ui;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +23,10 @@ import roomescape.reservation.application.dto.SimpleWaitingReservationResponse;
 import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ReservationController.BASE_PATH)
@@ -37,6 +39,7 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationsResponse>> getMine(@UserSession final Session session) {
+        log.info("[RESERVATION] 내 예약 목록 조회 요청: userId={}", session.userId());
         final List<MyReservationsResponse> reservations = reservationFacade.getAllByUserId(session.userId());
         return ResponseEntity.ok(reservations);
     }
@@ -45,15 +48,17 @@ public class ReservationController {
     public ResponseEntity<List<AvailableReservationTimeWebResponse>> getAvailable(
             @RequestParam final LocalDate date,
             @RequestParam final Long themeId) {
+        log.info("[RESERVATION] 예약 가능 시간 조회 요청: date={}, themeId={}", date, themeId);
         final List<AvailableReservationTimeWebResponse> reservations = reservationFacade.getAvailable(date, themeId);
         return ResponseEntity.ok(reservations);
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
+    public ResponseEntity<ReservationWithPaymentInfoResponse> create(
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session) {
-        final ReservationResponse reservationResponse = reservationFacade.create(
+        log.info("[RESERVATION] 예약 생성 요청: userId={}, request={}", session.userId(), request);
+        final ReservationWithPaymentInfoResponse reservationResponse = reservationFacade.create(
                 request.toRequestWithUserId(session.userId()));
         final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
         return ResponseEntity.created(location)
@@ -62,12 +67,14 @@ public class ReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
+        log.info("[RESERVATION] 예약 삭제 요청: id={}", id);
         reservationFacade.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/waiting")
     public ResponseEntity<List<WaitingReservationResponse>> getWaiting() {
+        log.info("[RESERVATION] 대기 예약 목록 조회 요청");
         final List<WaitingReservationResponse> reservations = reservationFacade.getAllWaiting();
         return ResponseEntity.ok(reservations);
     }
@@ -77,6 +84,7 @@ public class ReservationController {
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session
     ) {
+        log.info("[RESERVATION] 대기 예약 추가 요청: userId={}, request={}", session.userId(), request);
         final SimpleWaitingReservationResponse reservationResponse = reservationFacade.addWaiting(
                 request.toRequestWithUserId(session.userId())
         );
@@ -87,6 +95,7 @@ public class ReservationController {
 
     @DeleteMapping("/waiting/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable final Long id) {
+        log.info("[RESERVATION] 대기 예약 삭제 요청: id={}", id);
         reservationFacade.deleteWaiting(id);
         return ResponseEntity.noContent().build();
     }
@@ -97,6 +106,7 @@ public class ReservationController {
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session
     ) {
+        log.info("[RESERVATION] 대기 예약 승급 요청: waitingId={}, userId={}, request={}", id, session.userId(), request);
         final ReservationResponse reservationResponse = reservationFacade.promotionWaiting(
                 id, request.toRequestWithUserId(session.userId())
         );

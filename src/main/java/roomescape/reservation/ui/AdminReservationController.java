@@ -1,6 +1,10 @@
 package roomescape.reservation.ui;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +22,10 @@ import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.user.domain.UserRole;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequiredRoles(UserRole.ADMIN)
@@ -36,6 +38,7 @@ public class AdminReservationController {
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAll() {
+        log.info("[ADMIN-RESERVATION] 전체 예약 목록 조회 요청");
         final List<ReservationResponse> reservations = reservationFacade.getAll();
         return ResponseEntity.ok(reservations);
     }
@@ -44,6 +47,7 @@ public class AdminReservationController {
     public ResponseEntity<List<AvailableReservationTimeWebResponse>> getAvailable(
             @RequestParam final LocalDate date,
             @RequestParam final Long themeId) {
+        log.info("[ADMIN-RESERVATION] 예약 가능 시간 조회 요청: date={}, themeId={}", date, themeId);
         final List<AvailableReservationTimeWebResponse> reservations = reservationFacade.getAvailable(date, themeId);
         return ResponseEntity.ok(reservations);
     }
@@ -51,15 +55,17 @@ public class AdminReservationController {
     @GetMapping("/search")
     public ResponseEntity<List<ReservationResponse>> searchReservations(
             @ModelAttribute final ReservationSearchWebRequest request) {
+        log.info("[ADMIN-RESERVATION] 예약 검색 요청: {}", request);
         return ResponseEntity.ok(
                 reservationFacade.getByParams(request));
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
+    public ResponseEntity<ReservationWithPaymentInfoResponse> create(
             @RequestBody final CreateReservationWithUserIdWebRequest request
     ) {
-        final ReservationResponse reservationResponse = reservationFacade.create(request);
+        log.info("[ADMIN-RESERVATION] 예약 생성 요청: {}", request);
+        ReservationWithPaymentInfoResponse reservationResponse = reservationFacade.create(request);
         final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
         return ResponseEntity.created(location)
                 .body(reservationResponse);
@@ -67,6 +73,7 @@ public class AdminReservationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {
+        log.info("[ADMIN-RESERVATION] 예약 삭제 요청: id={}", id);
         reservationFacade.delete(id);
         return ResponseEntity.noContent().build();
     }

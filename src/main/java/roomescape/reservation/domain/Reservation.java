@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.reservation.exception.PastDateReservationException;
 import roomescape.reservation.exception.PastTimeReservationException;
 import roomescape.theme.domain.Theme;
@@ -48,6 +49,9 @@ public class Reservation {
     @ManyToOne
     private Theme theme;
 
+    @Embedded
+    private PaymentInfo paymentInfo;
+
     public Reservation(final Long userId,
                        final ReservationDate date,
                        final ReservationTime time,
@@ -75,6 +79,22 @@ public class Reservation {
         this.theme = theme;
     }
 
+    public Reservation(final Long id,
+                       final Long userId,
+                       final ReservationDate date,
+                       final ReservationTime time,
+                       final Theme theme,
+                       final PaymentInfo paymentInfo) {
+        validate(id);
+        validate(userId, date, time, theme);
+        this.id = id;
+        this.userId = userId;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+        this.paymentInfo = paymentInfo;
+    }
+
     public static Reservation withId(final Long id,
                                      final Long userId,
                                      final ReservationDate date,
@@ -88,6 +108,10 @@ public class Reservation {
                                         final ReservationTime time,
                                         final Theme theme) {
         return new Reservation(userId, date, time, theme);
+    }
+
+    public Reservation withPaymentInfo(final PaymentInfo paymentInfo) {
+        return new Reservation(this.id, this.userId, this.date, this.time, this.theme, paymentInfo);
     }
 
     private static void validate(final Long userId,

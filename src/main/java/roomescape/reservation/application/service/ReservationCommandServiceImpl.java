@@ -7,7 +7,9 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
 import roomescape.common.exception.NotFoundException;
 import roomescape.common.time.TimeProvider;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
+import roomescape.reservation.application.dto.CreateReservationWithPaymentServiceRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
@@ -41,6 +43,25 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         final Theme theme = themeQueryService.get(request.themeId());
 
         final Reservation reservation = request.toDomain(reservationTime, theme);
+        reservation.validatePast(timeProvider.now());
+        return reservationRepository.save(reservation);
+    }
+
+    @Override
+    public Reservation createWithPayment(final CreateReservationWithPaymentServiceRequest request) {
+        if (isExistsByParams(request.date(), request.timeId(), request.themeId())) {
+            throw new DuplicateException(
+                    DomainTerm.RESERVATION,
+                    request.date(),
+                    request.timeId(),
+                    request.themeId());
+        }
+        final ReservationTime reservationTime = reservationTimeQueryService.get(request.timeId());
+
+        final Theme theme = themeQueryService.get(request.themeId());
+
+        final Reservation reservation = request.toDomain(reservationTime, theme)
+                .withPaymentInfo(new PaymentInfo(request.paymentKey(), request.totalAmount()));
         reservation.validatePast(timeProvider.now());
         return reservationRepository.save(reservation);
     }

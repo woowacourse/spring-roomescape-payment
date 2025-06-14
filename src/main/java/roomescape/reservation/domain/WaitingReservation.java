@@ -47,6 +47,12 @@ public class WaitingReservation {
     @ManyToOne
     private Theme theme;
 
+    @Column
+    private String paymentKey;
+
+    @Column
+    private int totalAmount;
+
     public WaitingReservation(final Long userId,
                               final int waitingOrder,
                               final ReservationDate date,

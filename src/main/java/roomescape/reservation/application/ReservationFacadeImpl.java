@@ -5,10 +5,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.resolver.PaymentClient;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
@@ -27,10 +29,12 @@ import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationFacadeImpl implements ReservationFacade {
@@ -50,7 +54,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final List<Long> userIds = reservations.stream()
                 .map(Reservation::getUserId)
                 .toList();
-
         final List<User> users = userQueryService.getAllByIds(userIds);
         return ReservationResponse.from(reservations, users);
     }
@@ -60,7 +63,6 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final AvailableReservationTimeServiceRequest request = new AvailableReservationTimeServiceRequest(
                 ReservationDate.from(date),
                 themeId);
-
         return reservationQueryService.getTimesWithAvailability(request).stream()
                 .map(AvailableReservationTimeWebResponse::from)
                 .toList();
@@ -72,9 +74,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final List<Long> userIds = reservations.stream()
                 .map(Reservation::getUserId)
                 .toList();
-
         final List<User> users = userQueryService.getAllByIds(userIds);
-
         return ReservationResponse.from(reservations, users);
     }
 
@@ -90,24 +90,26 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     @Transactional
-    public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
+    public ReservationWithPaymentInfoResponse create(final CreateReservationWithUserIdWebRequest request) {
+        log.info("[RESERVATION] 예약 생성 요청: {}", request);
         final User user = userQueryService.getById(request.userId());
-        final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest());
-
-        paymentClient.confirmPayment(
+        final Reservation reservation = reservationCommandService.createWithPayment(request.toPaymentServiceRequest());
+        log.info("[RESERVATION] 결제 확인 시도: paymentKey={}, amount={}", request.paymentKey(), request.amount());
+        PaymentInfo paymentInfo = paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),
                         request.paymentType())
         );
-
-        return ReservationResponse.from(reservation, user);
+        paymentInfo.checkPaymentInfoMatch(request.paymentKey(), request.amount());
+        log.info("[RESERVATION] 예약 및 결제 성공: reservationId={}, userId={}", reservation.getId(), user.getId());
+        return ReservationWithPaymentInfoResponse.from(reservation, user, paymentInfo);
     }
 
     @Override
     @Transactional
     public void delete(final Long id) {
+        log.info("[RESERVATION] 예약 삭제 요청: id={}", id);
         Optional<Long> waitingId = reservationViewQueryService.findFirstWaitingByReservationId(id);
         waitingId.ifPresentOrElse(
                 waiting -> promotionWaiting(id, waiting),
@@ -121,17 +123,17 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final List<Long> userIds = waiting.stream()
                 .map(WaitingReservation::getUserId)
                 .toList();
-
         final List<User> users = userQueryService.getAllByIds(userIds);
         return WaitingReservationResponse.from(waiting, users);
     }
 
     @Override
     public SimpleWaitingReservationResponse addWaiting(final CreateReservationWithUserIdWebRequest request) {
+        log.info("[RESERVATION] 대기 예약 추가 요청: {}", request);
         final User user = userQueryService.getById(request.userId());
         final CreateReservationServiceRequest serviceRequest = request.toServiceRequest();
-
         if (reservationViewQueryService.existsByParams(serviceRequest, user.getId())) {
+            log.warn("[RESERVATION] 중복 대기 예약 시도: userId={}, date={}, themeId={}, timeId={}", user.getId(), request.date(), request.themeId(), request.timeId());
             throw new DuplicateException(DomainTerm.RESERVATION,
                     request.date(),
                     DomainTerm.THEME_ID,
@@ -139,21 +141,21 @@ public class ReservationFacadeImpl implements ReservationFacade {
                     DomainTerm.USER_ID
             );
         }
-
         final WaitingReservation waitingReservation
                 = waitingReservationCommandService.create(serviceRequest);
-
         return SimpleWaitingReservationResponse.from(waitingReservation, user);
     }
 
     @Override
     public void deleteWaiting(final Long id) {
+        log.info("[RESERVATION] 대기 예약 삭제 요청: id={}", id);
         waitingReservationCommandService.delete(id);
     }
 
     @Override
     @Transactional
     public ReservationResponse promotionWaiting(final Long id, final CreateReservationWithUserIdWebRequest request) {
+        log.info("[RESERVATION] 대기 예약 승급 요청: waitingId={}, request={}", id, request);
         final User user = userQueryService.getById(request.userId());
         final Reservation reservation = reservationCommandService.create(request.toServiceRequest());
         waitingReservationCommandService.delete(id);
@@ -161,6 +163,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
     }
 
     private void promotionWaiting(final Long id, final Long waiting) {
+        log.info("[RESERVATION] 대기 예약 승급(내부) 요청: id={}, waitingId={}", id, waiting);
         final Long userId = waitingReservationQueryService.findUserIdById(waiting);
         reservationCommandService.updateUserId(id, userId);
         waitingReservationCommandService.delete(waiting);

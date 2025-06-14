@@ -21,6 +21,8 @@ function render(data) {
         const date = item.date;
         const time = item.time.startAt;
         const status = item.sequence === 0 ? '예약' : item.sequence + '번째 예약 대기'; // 예약 대기 상태일 때 sequence 값이 0, 예약 완료 상태일 때 sequence 값이 1 이상
+        const paymentKey = item.paymentKey || '결제 정보 없음';
+        const totalAmount = item.totalAmount || '결제 금액 없음';
 
         row.insertCell(0).textContent = theme;
         row.insertCell(1).textContent = date;
@@ -37,14 +39,20 @@ function render(data) {
             };
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
-            const cancelCell = row.insertCell(4);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '예약 취소';
             cancelButton.className = 'btn btn-danger';
             cancelButton.onclick = function () {
                 requestDelete(item.id).then(() => window.location.reload());
             };
-            cancelCell.appendChild(cancelButton);
+            row.insertCell(4).appendChild(cancelButton);
+            /*
+               TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+               예약 완료 상태일 때 결제 정보를 함께 보여주기
+               결제 정보 필드명은 자신의 response 에 맞게 변경하기
+            */
+            row.insertCell(5).textContent = paymentKey;
+            row.insertCell(6).textContent = totalAmount;
         }
     });
 }
