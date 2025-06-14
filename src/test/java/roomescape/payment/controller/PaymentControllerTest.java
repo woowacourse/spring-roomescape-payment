@@ -31,6 +31,7 @@ import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.custom.PaymentBadRequestException;
 import roomescape.payment.exception.custom.PaymentException;
 import roomescape.payment.exception.custom.PaymentServerException;
+import roomescape.payment.exception.custom.PaymentTimeoutException;
 import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.util.IdempotencyKeyGenerator;
 
@@ -106,59 +107,58 @@ class PaymentControllerTest extends IntegrationTest {
                 .isInstanceOf(PaymentBadRequestException.class);
     }
 
-    // 배포할 때는 해당 값이 변경되기에 불필요한 테스트 - 개발서버에서만 사용
-//    @Test
-//    void 타임아웃_시간내_응답_시_정상_응답_확인() {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(createNormalBody())
-//                        .withFixedDelay(4_000)
-//                ));
-//
-//
-//        String paymentKey = "test_key";
-//        String orderId = "a4CWyWY5m89PNh7xJwhk1";
-//        Long amount = 1000L;
-//        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
-//        String idempotencyKey = IdempotencyKeyGenerator.generate();
-//
-//
-//        // when
-//        TossPaymentResponse response = tossRestClient.confirm(request, idempotencyKey);
-//
-//        // then
-//        SoftAssertions.assertSoftly(soft -> {
-//            assertThat(response.paymentKey()).isEqualTo("test_key");
-//            assertThat(response.status()).isEqualTo("DONE");
-//        });
-//    }
-//
-//    @Test
-//    void 타임아웃_시간외_응답_시_예외_처리() {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(createNormalBody())
-//                        .withFixedDelay(5_000)
-//                ));
-//
-//
-//        String paymentKey = "test_key";
-//        String orderId = "a4CWyWY5m89PNh7xJwhk1";
-//        Long amount = 1000L;
-//        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
-//        String idempotencyKey = IdempotencyKeyGenerator.generate();
-//
-//        // when
-//        // then
-//        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
-//                .isInstanceOf(PaymentTimeoutException.class);
-//    }
+    @Test
+    void 타임아웃_시간내_응답_시_정상_응답_확인() {
+        // given
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(createNormalBody())
+                        .withFixedDelay(4_000)
+                ));
+
+
+        String paymentKey = "test_key";
+        String orderId = "a4CWyWY5m89PNh7xJwhk1";
+        Long amount = 1000L;
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
+
+        // when
+        TossPaymentResponse response = tossRestClient.confirm(request, idempotencyKey);
+
+        // then
+        SoftAssertions.assertSoftly(soft -> {
+            assertThat(response.paymentKey()).isEqualTo("test_key");
+            assertThat(response.status()).isEqualTo("DONE");
+        });
+    }
+
+    @Test
+    void 타임아웃_시간외_응답_시_예외_처리() {
+        // given
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(createNormalBody())
+                        .withFixedDelay(5_000)
+                ));
+
+
+        String paymentKey = "test_key";
+        String orderId = "a4CWyWY5m89PNh7xJwhk1";
+        Long amount = 1000L;
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
+        // when
+        // then
+        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
+                .isInstanceOf(PaymentTimeoutException.class);
+    }
 
     @Test
     void payment_저장_및_reservation_저장() {
