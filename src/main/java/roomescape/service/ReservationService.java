@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentInfo;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -17,8 +17,9 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
-import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
+import roomescape.dto.response.PaymentResponse;
+import roomescape.dto.response.ReservationForMemberResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.exception.ExistedReservationException;
@@ -67,15 +68,18 @@ public class ReservationService {
     }
 
     private List<ReservationWithStatusResponse> findReservationByMemberId(Long memberId) {
-        return reservationRepository.findByMemberId(memberId).stream()
-                .map(ReservationWithStatusResponse::from)
-                .toList();
+        return reservationRepository.findAllWithPaymentByMemberId(memberId).stream()
+                .map(reservationWithPayment -> {
+                    Reservation reservation = reservationWithPayment.reservation();
+                    Payment payment = reservationWithPayment.payment();
+                    return ReservationWithStatusResponse.of(reservation, payment);
+                }).toList();
     }
 
     private List<ReservationWithStatusResponse> findWaitingByMemberId(Long memberId) {
         return waitingRepository.findByMemberIdSortedByCreateAt(memberId)
                 .stream()
-                .map(ReservationWithStatusResponse::from)
+                .map(ReservationWithStatusResponse::of)
                 .toList();
     }
 
@@ -94,21 +98,13 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    public ReservationResponse processReservationForMember(Long memberId,
+    @Transactional
+    public ReservationForMemberResponse reserveWithPayment(Long memberId,
                                                            Long timeId,
                                                            Long themeId,
                                                            LocalDate date,
-                                                           PaymentRequest request) {
-        PaymentInfo paymentInfo = paymentService.createPaymentInfo(request);
-        return createReservationForMember(memberId, timeId, themeId, date, paymentInfo);
-    }
-
-    @Transactional
-    public ReservationResponse createReservationForMember(Long memberId,
-                                                          Long timeId,
-                                                          Long themeId,
-                                                          LocalDate date,
-                                                          PaymentInfo paymentInfo) {
+                                                           PaymentResponse paymentResponse
+    ) {
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
@@ -119,7 +115,9 @@ public class ReservationService {
         validateDuplicate(date, reservationTime, theme);
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(savedReservation);
+        Payment payment = paymentService.createPaymentWithReservation(paymentResponse, savedReservation);
+        paymentService.save(payment);
+        return ReservationForMemberResponse.of(savedReservation, payment);
     }
 
     private void validateDuplicate(LocalDate date, ReservationTime time, Theme theme) {

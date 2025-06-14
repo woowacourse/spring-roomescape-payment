@@ -1,7 +1,11 @@
 package roomescape.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,26 +18,40 @@ import roomescape.dto.request.WaitingCreateRequest;
 import roomescape.dto.response.WaitingResponse;
 import roomescape.service.WaitingService;
 
+@Tag(name = "예약 대기 API", description = "예약 대기 API 입니다.")
 @RestController
 @RequestMapping(value = "/api/waiting")
 public class WaitingController {
+
+    private static final Logger logger = LoggerFactory.getLogger(WaitingController.class);
+
     private final WaitingService waitingService;
 
     public WaitingController(final WaitingService waitingService) {
         this.waitingService = waitingService;
     }
 
+    @Operation(summary = "예약 대기 생성", description = "새 예약 대기를 생성합니다.")
     @PostMapping
     public ResponseEntity<WaitingResponse> createNewWaiting(
             @Authenticated Long memberId,
             @Valid @RequestBody WaitingCreateRequest request) {
         WaitingResponse waitingResponse = waitingService.createWaiting(
                 memberId, request.timeId(), request.themeId(), request.date());
+
+        logger.info("예약 대기 생성 완료: 예약 대기 Id={}, 회원 Id={}, 테마 Id={}, 시간 Id={}, 날짜={}",
+                waitingResponse.id(),
+                memberId,
+                request.themeId(),
+                request.timeId(),
+                request.date());
+
         return ResponseEntity
                 .created(URI.create("/reservations/waitings/" + waitingResponse.id()))
                 .body(waitingResponse);
     }
 
+    @Operation(summary = "예약 대기 삭제", description = "특정 예약 대기를 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable Long id) {
         waitingService.deleteWaitingById(id);

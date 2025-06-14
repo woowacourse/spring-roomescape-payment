@@ -6,6 +6,7 @@ import java.util.Optional;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
+import roomescape.dto.ReservationWithPayment;
 import roomescape.dto.request.ReservationCondition;
 
 public interface ReservationRepository {
@@ -30,4 +31,6 @@ public interface ReservationRepository {
     List<Reservation> findByCondition(ReservationCondition condition);
 
     List<Reservation> findByMemberId(Long memberId);
+
+    List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId);
 }

@@ -8,6 +8,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,13 +20,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.PaymentInfo;
+import roomescape.auth.Role;
+import roomescape.domain.Member;
+import roomescape.domain.Payment;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
 import roomescape.dto.request.PaymentRequest;
+import roomescape.dto.response.PaymentResponse;
 import roomescape.exception.FilteredPaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.PaymentResponseErrorHandler;
 
 public class PaymentClientTest {
+
+    private static final Member member = Member.createWithoutId("이름", "email", "123", Role.MEMBER);
+    private static final ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+    private static final Theme theme = Theme.createWithoutId("이름", "설명", "섬네일");
 
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
@@ -32,15 +45,18 @@ public class PaymentClientTest {
     private final PaymentResponseErrorHandler paymentResponseErrorHandler = new PaymentResponseErrorHandler();
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
-    private PaymentClient clientController = new PaymentClient(testBuilder.build(),
+    private PaymentClient paymentClient = new PaymentClient(testBuilder.build(),
             paymentResponseErrorHandler);
 
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {
         //given
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        String paymentInfoJson = objectMapper.writeValueAsString(paymentInfo);
+        objectMapper.registerModule(new JavaTimeModule());
+
+        Reservation reservation = Reservation.createWithoutId(member, LocalDate.of(2026, 8, 8), time, theme);
+        Payment payment = Payment.createPaymentWithoutId("10", reservation, "1", 1000);
+        String paymentInfoJson = objectMapper.writeValueAsString(payment);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -48,9 +64,9 @@ public class PaymentClientTest {
 
         //when
         PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
-        PaymentInfo result = clientController.postPaymentInfo(paymentRequest);
+        PaymentResponse result = paymentClient.approve(paymentRequest);
 
-        assertThat(paymentInfo).isEqualTo(result);
+        assertThat(payment.getPaymentKey()).isEqualTo(result.paymentKey());
     }
 
     @ParameterizedTest
@@ -69,7 +85,7 @@ public class PaymentClientTest {
 
         //when
         PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
-        assertThatThrownBy(() -> clientController.postPaymentInfo(paymentRequest))
+        assertThatThrownBy(() -> paymentClient.approve(paymentRequest))
                 .isInstanceOf(FilteredPaymentException.class)
                 .hasMessage("결제가 실패했습니다. 고객센터로 문의해 주세요.");
     }

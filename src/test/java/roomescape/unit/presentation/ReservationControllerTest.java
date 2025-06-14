@@ -20,20 +20,29 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.AuthorizationExtractor;
-import roomescape.domain.PaymentInfo;
+import roomescape.auth.Role;
+import roomescape.domain.Member;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCreateRequest;
-import roomescape.dto.response.ReservationResponse;
+import roomescape.dto.response.PaymentResponse;
+import roomescape.dto.response.ReservationForMemberResponse;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.infrastructure.JwtTokenProvider;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.presentation.ReservationController;
 import roomescape.service.PaymentService;
+import roomescape.service.ReservationFacade;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(value = {ReservationController.class, AuthorizationExtractor.class})
 class ReservationControllerTest {
+
+    private static final Member member = Member.createWithoutId("이름", "email", "123", Role.MEMBER);
+    private static final ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+    private static final Theme theme = Theme.createWithoutId("이름", "설명", "섬네일");
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,22 +60,35 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockitoBean
+    private ReservationFacade reservationFacade;
+
+    @MockitoBean
     private JwtTokenProvider tokenProvider;
 
     @Test
     void 사용자가_예약을_생성한다() throws Exception {
         // given
-        ReservationCreateRequest request = new ReservationCreateRequest(LocalDate.of(2025, 1, 1), 1L, 1L, "1", "1",
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                LocalDate.of(2025, 1, 1),
+                1L,
+                1L,
+                "1",
+                "1",
                 1000);
-        ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
-                new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "1");
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentResponse paymentResponse = new PaymentResponse("10", "1", 1000);
+        ReservationForMemberResponse response = new ReservationForMemberResponse(
+                1L,
+                "memberName1",
+                LocalDate.of(2025, 1, 1),
+                new ReservationTimeResponse(1L, LocalTime.of(9, 0)),
+                "themeName1",
+                paymentResponse);
 
-        given(paymentService.createPaymentInfo(any())).willReturn(paymentInfo);
-        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
-                paymentInfo)).willReturn(response);
-        given(reservationService.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
+        given(paymentService.approve(any())).willReturn(paymentResponse);
+        given(reservationService.reserveWithPayment(1L, request.timeId(), request.themeId(),
+                request.date(), paymentResponse)).willReturn(response);
+        given(reservationFacade.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
                 paymentRequest)).willReturn(response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then
@@ -81,9 +103,14 @@ class ReservationControllerTest {
     @Test
     void 사용자가_예약을_조회한다() throws Exception {
         // given
-        ReservationWithStatusResponse response = new ReservationWithStatusResponse(1L, "memberName1",
+        ReservationWithStatusResponse response = new ReservationWithStatusResponse(
+                1L,
+                "memberName1",
                 LocalDate.of(2025, 1, 1),
-                new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1", "예약");
+                new ReservationTimeResponse(1L, LocalTime.of(9, 0)),
+                "themeName1",
+                "예약",
+                new PaymentResponse("1", "1", 1_000));
 
         given(reservationService.findBookingHistory(1L)).willReturn(List.of(response));
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
