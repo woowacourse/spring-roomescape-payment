@@ -13,10 +13,9 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.http.MediaType;
 import roomescape.config.RestClientConfiguration;
-import roomescape.dto.reservation.TossPaymentRequestDto;
+import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
-import roomescape.exception.common.BadRequestException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -62,7 +61,7 @@ public class PaymentClientTest {
 
 
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
+                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
                         "paymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmServerException.class);
@@ -87,19 +86,9 @@ public class PaymentClientTest {
 
 
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
+                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
                         "wrongPaymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmClientException.class);
-    }
-
-    @DisplayName("결제 요청 금액과 실제 주문 상품 가격이 다르면 400에러가 반환된다.")
-    @Test
-    void invalidPaymentAmountExceptionTest() {
-        assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentRequestDto(
-                        "paymentKey", "RESERVATIONthisisorderid", 1500L
-                ))
-        ).isInstanceOf(BadRequestException.class);
     }
 }

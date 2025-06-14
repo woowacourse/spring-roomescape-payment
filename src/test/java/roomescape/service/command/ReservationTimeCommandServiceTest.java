@@ -19,7 +19,7 @@ import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.dto.time.ReservationTimeCreateRequestDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.exception.DuplicateContentException;
-import roomescape.exception.common.ForbiddenException;
+import roomescape.exception.common.BadRequestException;
 import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
@@ -99,7 +99,7 @@ public class ReservationTimeCommandServiceTest {
         when(reservationTimeRepository.existsById(any(Long.class))).thenReturn(true);
 
         // when & then
-        assertThrows(ForbiddenException.class, () -> reservationTimeCommandService.deleteReservationTimeById(timeId));
+        assertThrows(BadRequestException.class, () -> reservationTimeCommandService.deleteReservationTimeById(timeId));
         verify(reservationTimeRepository, never()).deleteById(timeId);
     }
 

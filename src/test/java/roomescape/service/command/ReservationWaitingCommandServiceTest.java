@@ -25,16 +25,15 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.ReservationWaitingForbiddenException;
 import roomescape.exception.common.NotFoundException;
-import roomescape.exception.common.UnauthorizedException;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 public class ReservationWaitingCommandServiceTest {
 
@@ -73,7 +72,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 999L;
         Long themeId = 1L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.empty());
         
@@ -89,7 +88,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 999L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
@@ -114,7 +113,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 999L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
@@ -141,7 +140,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
