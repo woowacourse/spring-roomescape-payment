@@ -11,10 +11,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
-import roomescape.business.dto.ReservationWithAheadDto;
+import roomescape.business.dto.UserReservationDetailDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
@@ -27,44 +26,52 @@ import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
-import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
 import roomescape.presentation.dto.response.ReservationResponse;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ReservationService {
-    private final WaitingService waitingService;
 
-    private final UserRepository userRepository;
+    private final WaitingService waitingService;
+    private final PaymentService paymentService;
+
     private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
 
-    private final TossPaymentClient paymentClient;
-
     public ReservationDto addAndGet(final ReservationSpecDto reservationSpecDto,
-                                    final PaymentApproveDto paymentApproveDto) {
+                                    final PaymentApproveRequestDto paymentApproveRequestDto) {
         User user = getUser(reservationSpecDto.userIdValue());
         ReservationTime reservationTime = getReservationTime(reservationSpecDto.timeIdValue());
         Theme theme = getTheme(reservationSpecDto.themeIdValue());
         ReservationStatus reservationStatus = reservationSpecDto.reservationStatus();
 
+        validDuplicatedReservation(reservationSpecDto, reservationStatus, reservationTime, theme);
+        Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
+                reservationStatus, LocalDateTime.now());
+        reservationRepository.save(reservation);
+        pay(paymentApproveRequestDto, reservationStatus, reservation);
+        return ReservationDto.fromEntity(reservation);
+    }
+
+    private void validDuplicatedReservation(ReservationSpecDto reservationSpecDto, ReservationStatus reservationStatus,
+                                            ReservationTime reservationTime, Theme theme) {
         if (reservationStatus == ReservationStatus.RESERVED &&
                 reservationRepository.isDuplicateDateAndTimeAndTheme(reservationSpecDto.date(),
                         reservationTime.startTimeValue(),
                         theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
-        Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
-                reservationStatus,
-                LocalDateTime.now());
-        if (reservationStatus == ReservationStatus.RESERVED && paymentApproveDto != null) {
-            paymentClient.approvePayment(paymentApproveDto);
+    }
+
+    private void pay(PaymentApproveRequestDto paymentApproveRequestDto, ReservationStatus reservationStatus,
+                     Reservation reservation) {
+        if (reservationStatus == ReservationStatus.RESERVED && paymentApproveRequestDto != null) {
+            paymentService.pay(reservation, paymentApproveRequestDto);
         }
-        reservationRepository.save(reservation);
-        waitingService.updateWaitingReservations(reservation);
-        return ReservationDto.fromEntity(reservation);
     }
 
     public ReservationDto addAndGetWithoutPayment(final ReservationSpecDto reservationSpecDto) {
@@ -72,21 +79,18 @@ public class ReservationService {
     }
 
     private Theme getTheme(String themeIdValue) {
-        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+        return themeRepository.findById(Id.create(themeIdValue))
                 .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
-        return theme;
     }
 
     private ReservationTime getReservationTime(String timeIdValue) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
+        return reservationTimeRepository.findById(Id.create(timeIdValue))
                 .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
-        return reservationTime;
     }
 
     private User getUser(String userIdValue) {
-        User user = userRepository.findById(Id.create(userIdValue))
+        return userRepository.findById(Id.create(userIdValue))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return user;
     }
 
     @Transactional(readOnly = true)
@@ -110,9 +114,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationWithAheadDto> getMyReservations(final String userIdValue) {
+    public List<UserReservationDetailDto> getReservationDetails(final String userIdValue) {
         Id userId = Id.create(userIdValue);
-        return reservationRepository.findReservationsWithAhead(userId);
+        return reservationRepository.findAllReservationDetailByUserId(userId);
     }
 
     @Transactional(readOnly = true)

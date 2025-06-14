@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
-import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
-import roomescape.business.dto.ReservationWithAheadDto;
+import roomescape.business.dto.UserReservationDetailDto;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationService;
 import roomescape.presentation.dto.request.AdminReservationRequest;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
 import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationMineResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
@@ -41,7 +41,7 @@ public class ReservationApiController {
         ReservationDto reservationDto = reservationService.addAndGet(
                 ReservationSpecDto.of(request.date(), request.timeId(),
                         request.themeId(), loginInfo.id(), request.reservationStatus()),
-                PaymentApproveDto.of(request.paymentKey(), request.orderId(),
+                PaymentApproveRequestDto.of(request.paymentKey(), request.orderId(),
                         request.amount()));
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
@@ -83,7 +83,8 @@ public class ReservationApiController {
     @GetMapping("/reservations/mine")
     @AuthRequired
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(LoginInfo loginInfo) {
-        List<ReservationWithAheadDto> myReservationsWithAhead = reservationService.getMyReservations(loginInfo.id());
+        List<UserReservationDetailDto> myReservationsWithAhead = reservationService.getReservationDetails(
+                loginInfo.id());
         List<ReservationMineResponse> responses = ReservationMineResponse.from(myReservationsWithAhead);
         return ResponseEntity.ok(responses);
     }

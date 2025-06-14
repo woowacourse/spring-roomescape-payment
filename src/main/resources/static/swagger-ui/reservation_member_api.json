@@ -1,0 +1,440 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "spring_roomescape_user_reservation_API",
+    "description": "spring_roomescape_user_reservation_API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://ec2-3-35-166-240.ap-northeast-2.compute.amazonaws.com:8080"
+    }
+  ],
+  "paths": {
+    "/reservations": {
+      "post": {
+        "summary": "POST reservations",
+        "operationId": "createReservation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "nullable": true
+                  },
+                  "timeId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "themeId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "reservationStatus": {
+                    "type": "string",
+                    "nullable": true,
+                    "enum": [
+                      "RESERVED",
+                      "WAITING"
+                    ]
+                  },
+                  "paymentKey": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "orderId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "format": "int64",
+                    "nullable": true
+                  },
+                  "paymentType": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "email": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "nullable": true
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "startAt": {
+                          "type": "string",
+                          "format": "partial-time",
+                          "nullable": true
+                        }
+                      },
+                      "nullable": true
+                    },
+                    "theme": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "description": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "thumbnail": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/times/possible": {
+      "get": {
+        "summary": "GET possible times",
+        "operationId": "getAvailableReservationTimes",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "themeId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "startAt": {
+                        "type": "string",
+                        "format": "partial-time",
+                        "nullable": true
+                      },
+                      "alreadyBooked": {
+                        "type": "boolean",
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/themes": {
+      "get": {
+        "summary": "GET themes",
+        "operationId": "getThemes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "name": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "thumbnail": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "ReservationRequest": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "timeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "themeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "reservationStatus": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "RESERVED",
+              "WAITING"
+            ]
+          },
+          "paymentKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderId": {
+            "type": "string",
+            "nullable": true
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "paymentType": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ReservationTimeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "startAt": {
+            "type": "string",
+            "format": "partial-time",
+            "nullable": true
+          }
+        }
+      },
+      "ThemeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "thumbnail": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ReservationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "nullable": true
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "time": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "nullable": true
+              },
+              "startAt": {
+                "type": "string",
+                "format": "partial-time",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          },
+          "theme": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "nullable": true
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "description": {
+                "type": "string",
+                "nullable": true
+              },
+              "thumbnail": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "nullable": true
+          }
+        }
+      },
+      "BookedReservationTimeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "startAt": {
+            "type": "string",
+            "format": "partial-time",
+            "nullable": true
+          },
+          "alreadyBooked": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BasicAuth": []
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.auth.AuthenticationException;
@@ -36,6 +37,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handle(PaymentApproveException e) {
         logger.warn("Handled PaymentApproveException: {}", e.getMessage());
         return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.getMessage()).toResponseEntity();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
+        logger.warn("Handled MethodArgumentNotValidException: {}", e.getMessage());
+        return ErrorResponse.securedResponse(HttpStatus.BAD_REQUEST, ErrorCode.RESERVATION_DATE_PAST.message())
+                .toResponseEntity();
     }
 
     @ExceptionHandler(Exception.class)
