@@ -13,6 +13,7 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.ReservationWaitingForbiddenException;
@@ -22,7 +23,6 @@ import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 @Service
 @Transactional
@@ -48,7 +48,7 @@ public class ReservationWaitingCommandService {
         this.clock = clock;
     }
 
-    public ReservationResponseDto createReservationWaiting(ReservationCreateDto request) {
+    public ReservationResponseDto createReservationWaiting(ReservationCreateCommonRequestDto request) {
         ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NotFoundException("예약 시간", request.timeId()));
         Theme theme = themeRepository.findById(request.themeId())

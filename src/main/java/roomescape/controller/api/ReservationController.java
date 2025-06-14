@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import roomescape.controller.annotation.AdminOnly;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.ReservationCreateRequestDto;
+import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.PaymentCommandService;
@@ -51,15 +51,12 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public ReservationResponseDto addReservation(
-            @CurrentMember LoginInfo loginInfo,
-            @RequestBody ReservationCreateRequestDto requestDto
+            @RequestBody MemberReservationCreateRequestDto requestDto,
+            @CurrentMember LoginInfo loginInfo
     ) {
         ReservationResponseDto reservationResponse = reservationCommandService.bookReservation(
-                requestDto, loginInfo);
-        paymentCommandService.createPayment(
-                reservationResponse.id(),
-                requestDto.toTossPaymentDto()
-        );
+                requestDto.toCommonCreateRequestDtoWith(loginInfo.id()));
+        paymentCommandService.createPayment(reservationResponse.id(), requestDto.toTossPaymentDto());
         return reservationResponse;
     }
 }
