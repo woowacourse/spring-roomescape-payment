@@ -11,7 +11,6 @@ import roomescape.exception.auth.AuthenticationException;
 import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.payment.PaymentException;
 import roomescape.exception.resource.AlreadyExistException;
-import roomescape.exception.resource.InCorrectResultSizeException;
 import roomescape.exception.resource.ResourceNotFoundException;
 
 @RestControllerAdvice
@@ -26,44 +25,78 @@ public class GlobalExceptionHandler {
                 .body(problemDetail);
     }
 
-    @ExceptionHandler(InCorrectResultSizeException.class)
-    public ResponseEntity<Void> handleInCorrectResultSizeException(final InCorrectResultSizeException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-    }
-
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Void> handleResourceNotFoundException(final ResourceNotFoundException e) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<ProblemDetail> handleResourceNotFoundException(final ResourceNotFoundException e) {
+        final HttpStatus responseStatus = HttpStatus.NOT_FOUND;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(AlreadyExistException.class)
-    public ResponseEntity<Void> handleAlreadyExistException(final AlreadyExistException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    public ResponseEntity<ProblemDetail> handleAlreadyExistException(final AlreadyExistException e) {
+        final HttpStatus responseStatus = HttpStatus.CONFLICT;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(AuthTokenNotFoundException.class)
-    public ResponseEntity<Void> handleAuthTokenNotFoundException(final AuthTokenNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<ProblemDetail> handleAuthTokenNotFoundException(final AuthTokenNotFoundException e) {
+        final HttpStatus responseStatus = HttpStatus.UNAUTHORIZED;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Void> handleAuthenticationException(final AuthenticationException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<ProblemDetail> handleAuthenticationException(final AuthenticationException e) {
+        final HttpStatus responseStatus = HttpStatus.UNAUTHORIZED;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<Void> handleAuthorizationException(final AuthorizationException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public ResponseEntity<ProblemDetail> handleAuthorizationException(final AuthorizationException e) {
+        final HttpStatus responseStatus = HttpStatus.FORBIDDEN;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Void> handleIllegalArgumentException(final IllegalArgumentException e) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<ProblemDetail> handleIllegalArgumentException(final IllegalArgumentException e) {
+        final HttpStatus responseStatus = HttpStatus.BAD_REQUEST;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Void> handleException(final Exception e) {
+    public ResponseEntity<ProblemDetail> handleException(final Exception e) {
+        final Throwable root = getRootCause(e);
         log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        log.error("[ROOT CAUSE] {}: {}", root.getClass().getSimpleName(), root.getMessage());
+
+        final HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
+
+        return ResponseEntity.status(responseStatus)
+                .body(problemDetail);
+    }
+
+    private Throwable getRootCause(final Throwable throwable) {
+        Throwable cause = throwable.getCause();
+        while (cause != null && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return (cause != null) ? cause : throwable;
     }
 }

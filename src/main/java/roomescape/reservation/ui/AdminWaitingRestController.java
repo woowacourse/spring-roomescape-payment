@@ -3,6 +3,8 @@ package roomescape.reservation.ui;
 
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -25,11 +27,13 @@ import roomescape.reservation.ui.dto.response.WaitingWithRankResponse;
 @RequestMapping("/admin/waitings")
 @RequiresRole(authRoles = {ADMIN})
 @RequiredArgsConstructor
+@Tag(name = "관리자 권한 예약 대기 관리", description = "관리자 권한 예약 대기 관리 API")
 public class AdminWaitingRestController {
 
     private final AdminWaitingService adminWaitingService;
 
     @PostMapping
+    @Operation(summary = "관리자 권한 예약 대기 추가")
     public ResponseEntity<WaitingResponse> create(
             @RequestBody @Valid final CreateWaitingRequest request
     ) {
@@ -40,6 +44,7 @@ public class AdminWaitingRestController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "관리자 권한의 예약 대기 삭제")
     public ResponseEntity<Void> deny(
             @PathVariable final Long id
     ) {
@@ -49,6 +54,7 @@ public class AdminWaitingRestController {
     }
 
     @GetMapping
+    @Operation(summary = "관리자 권한의 모든 예약 대기 목록 조회")
     public ResponseEntity<List<WaitingWithRankResponse>> findAllWaitingWithRank() {
         final List<WaitingWithRankResponse> responses = adminWaitingService.findAllWaitingWithRank();
 

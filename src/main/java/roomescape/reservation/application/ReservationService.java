@@ -14,8 +14,8 @@ import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.resource.AlreadyExistException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentDomainService;
-import roomescape.payment.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
@@ -43,26 +43,26 @@ public class ReservationService {
             final CreateBookedReservationWithPaymentRequest request,
             final Long memberId
     ) {
-        paymentDomainService.approvePayment(
-                new PaymentInfo(
-                        request.paymentKey(),
-                        request.orderId(),
-                        request.amount()
-                )
-        );
-
         final ReservationTime time = getReservationTime(request.date(), request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
         final Member member = memberRepository.getById(memberId);
+        final Payment payment = Payment.of(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
+        );
+        paymentDomainService.approvePayment(payment);
+        final Reservation reservation = createReservedReservation(request.date(), time, theme, member, payment);
 
-        return ReservationResponse.from(createReservedReservation(request.date(), time, theme, member));
+        return ReservationResponse.from(reservation);
     }
 
     private Reservation createReservedReservation(
             final LocalDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final Payment payment
     ) {
         final ReservationSlot reservationSlot = ReservationSlot.of(date, time, theme);
 
@@ -70,7 +70,7 @@ public class ReservationService {
             throw new AlreadyExistException("해당 예약 슬롯에 예약이 있습니다.");
         }
 
-        final Reservation reservation = Reservation.of(reservationSlot, member, BOOKED);
+        final Reservation reservation = Reservation.of(reservationSlot, member, payment, BOOKED);
 
         return reservationRepository.save(reservation);
     }

@@ -13,7 +13,7 @@ import roomescape.auth.ui.MemberAuthInfoArgumentResolver;
 
 @Configuration
 @RequiredArgsConstructor
-public class WebMvcConfig implements WebMvcConfigurer {
+public class AuthWebMvcConfig implements WebMvcConfigurer {
 
     private final AuthTokenExtractor<String> authTokenExtractor;
     private final AuthTokenProvider authTokenProvider;

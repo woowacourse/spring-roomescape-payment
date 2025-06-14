@@ -60,7 +60,7 @@ public class AdminReservationService {
             throw new AlreadyExistException("해당 예약 슬롯에 예약이 있습니다.");
         }
 
-        final Reservation reservation = Reservation.of(reservationSlot, member, BOOKED);
+        final Reservation reservation = Reservation.offlinePaid(reservationSlot, member, BOOKED);
 
         return reservationRepository.save(reservation);
     }

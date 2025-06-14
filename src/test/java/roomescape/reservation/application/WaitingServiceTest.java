@@ -263,6 +263,6 @@ class WaitingServiceTest {
             final ReservationSlot slot,
             final Member member
     ) {
-        reservationRepository.save(Reservation.of(slot, member, BOOKED));
+        reservationRepository.save(Reservation.offlinePaid(slot, member, BOOKED));
     }
 }

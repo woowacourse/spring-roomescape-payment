@@ -30,6 +30,8 @@ public record ReservationResponse(
             LocalDate date,
             ReservationTimeResponse time,
             ThemeResponse theme,
+            String paymentKey,
+            Long amount,
             String status
     ) {
 
@@ -39,6 +41,8 @@ public record ReservationResponse(
                     reservation.getReservationSlot().getDate(),
                     ReservationTimeResponse.from(reservation.getReservationSlot().getTime()),
                     ThemeResponse.from(reservation.getReservationSlot().getTheme()),
+                    reservation.getPayment().getPaymentKey(),
+                    reservation.getPayment().getAmount(),
                     reservation.getStatus().getDescription()
             );
         }

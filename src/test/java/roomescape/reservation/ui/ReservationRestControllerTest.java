@@ -34,7 +34,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.ui.dto.LoginRequest;
 import roomescape.member.ui.dto.SignUpRequest;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentRequest;
 import roomescape.reservation.ui.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.ui.dto.response.ReservationTimeResponse;
@@ -57,7 +57,7 @@ class ReservationRestControllerTest {
     void setUp() {
         doNothing()
                 .when(paymentClient)
-                .approvePayment(any(PaymentInfo.class));
+                .approvePayment(any(Payment.class));
 
         final Map<String, String> adminCookies = adminLoginAndGetCookies();
         // 관리자 권한으로 예약 시간 추가 (3개)

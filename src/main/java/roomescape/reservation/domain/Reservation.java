@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -10,12 +11,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 
 @Entity
 @Table(name = "reservations")
@@ -35,6 +38,10 @@ public class Reservation {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
@@ -42,23 +49,43 @@ public class Reservation {
     private Reservation(
             final ReservationSlot reservationSlot,
             final Member member,
+            final Payment payment,
             final ReservationStatus status
     ) {
         validateReservationSlot(reservationSlot);
         validateMember(member);
+        validatePayment(payment);
         validateStatus(status);
 
         this.reservationSlot = reservationSlot;
         this.member = member;
+        this.payment = payment;
         this.status = status;
+    }
+
+    public static Reservation offlinePaid(
+            final ReservationSlot reservationSlot,
+            final Member member,
+            final ReservationStatus status
+    ) {
+        return new Reservation(
+                reservationSlot,
+                member,
+                Payment.ofOfflinePayment(),
+                status);
     }
 
     public static Reservation of(
             final ReservationSlot reservationSlot,
             final Member member,
+            final Payment payment,
             final ReservationStatus status
     ) {
-        return new Reservation(reservationSlot, member, status);
+        return new Reservation(
+                reservationSlot,
+                member,
+                payment,
+                status);
     }
 
     public void updateMember(final Member member) {
@@ -74,6 +101,12 @@ public class Reservation {
     private void validateMember(final Member member) {
         if (member == null) {
             throw new IllegalArgumentException("멤버는 null이면 안됩니다.");
+        }
+    }
+
+    private void validatePayment(Payment payment) {
+        if (payment == null) {
+            throw new IllegalArgumentException("결제 정보는 null이면 안됩니다.");
         }
     }
 

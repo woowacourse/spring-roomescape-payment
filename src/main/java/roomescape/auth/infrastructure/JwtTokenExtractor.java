@@ -10,6 +10,13 @@ import roomescape.exception.auth.AuthTokenNotFoundException;
 @Component
 public class JwtTokenExtractor implements AuthTokenExtractor<String> {
 
+    @Override
+    public boolean isCookiesExist(final HttpServletRequest request) {
+        final Cookie[] cookies = request.getCookies();
+        
+        return cookies != null;
+    }
+
     public String extract(final HttpServletRequest request) {
         final Cookie[] cookies = request.getCookies();
         if (cookies == null) {

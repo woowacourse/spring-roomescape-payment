@@ -1,19 +1,16 @@
-package roomescape.payment.infrastructure;
+package roomescape.payment.infrastructure.toss;
 
-import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
+import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
 import java.util.Base64;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.UnknownContentTypeException;
 import roomescape.exception.payment.PaymentException;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.domain.PaymentInfo;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -31,8 +28,8 @@ public class TossPaymentClient implements PaymentClient {
         this.restClient = restClient;
     }
 
-    public void approvePayment(final PaymentInfo paymentInfo) {
-        final TossPaymentApproveRequest request = TossPaymentApproveRequest.from(paymentInfo);
+    public void approvePayment(final Payment payment) {
+        final TossPaymentApproveRequest request = TossPaymentApproveRequest.from(payment);
         final String encodedSecretKey = getEncodedSecretKey();
 
         try {
@@ -61,5 +58,3 @@ public class TossPaymentClient implements PaymentClient {
                 .encodeToString((secretKey + ":").getBytes());
     }
 }
-
-

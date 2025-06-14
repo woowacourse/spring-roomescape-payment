@@ -34,7 +34,7 @@ import roomescape.fixture.ui.LoginApiFixture;
 import roomescape.member.ui.dto.MemberResponse;
 import roomescape.member.ui.dto.SignUpRequest;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.ui.dto.request.CreateBookedReservationRequest;
 import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentRequest;
@@ -60,7 +60,7 @@ class AdminReservationRestControllerTest {
     void setUp() {
         doNothing()
                 .when(paymentClient)
-                .approvePayment(any(PaymentInfo.class));
+                .approvePayment(any(Payment.class));
 
         final Map<String, String> adminCookies = adminLoginAndGetCookies();
         // 관리자 권한으로 예약 시간 추가 (3개)

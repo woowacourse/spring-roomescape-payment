@@ -3,6 +3,8 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -25,12 +27,14 @@ import roomescape.reservation.ui.dto.response.WaitingWithRankResponse;
 @RestController
 @RequestMapping("/waitings")
 @RequiredArgsConstructor
+@Tag(name = "예약 대기", description = "예약 대기 관련 API")
 public class WaitingRestController {
 
     private final WaitingService waitingService;
 
     @PostMapping
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 예약 대기 추가")
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody @Valid final CreateWaitingRequest.ForMember request,
             final MemberAuthInfo memberAuthInfo
@@ -43,6 +47,7 @@ public class WaitingRestController {
 
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 예약 대기 삭제")
     public ResponseEntity<Void> deleteWaiting(
             @PathVariable final Long id,
             final MemberAuthInfo memberAuthInfo
@@ -54,6 +59,7 @@ public class WaitingRestController {
 
     @GetMapping("/mine")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 내 예약 대기 목록 조회")
     public ResponseEntity<List<WaitingWithRankResponse.ForMember>> findAllWaitingWithRankByMemberId(
             final MemberAuthInfo memberAuthInfo
     ) {

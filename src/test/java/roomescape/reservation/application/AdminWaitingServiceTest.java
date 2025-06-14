@@ -231,7 +231,7 @@ class AdminWaitingServiceTest {
             final Member member
     ) {
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date, time, theme), member, BOOKED)
+                Reservation.offlinePaid(ReservationSlot.of(date, time, theme), member, BOOKED)
         );
     }
 }

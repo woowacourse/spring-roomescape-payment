@@ -3,6 +3,8 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -27,12 +29,14 @@ import roomescape.reservation.ui.dto.response.ReservationResponse;
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
+@Tag(name = "예약", description = "예약 관련 API")
 public class ReservationRestController {
 
     private final ReservationService reservationService;
 
     @PostMapping
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 결제 후 예약 추가")
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid final CreateBookedReservationWithPaymentRequest request,
             final MemberAuthInfo memberAuthInfo
@@ -45,6 +49,7 @@ public class ReservationRestController {
 
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 예약 삭제")
     public ResponseEntity<Void> deleteReservation(
             @PathVariable final Long id,
             final MemberAuthInfo memberAuthInfo
@@ -56,6 +61,7 @@ public class ReservationRestController {
 
     @GetMapping("/mine")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
+    @Operation(summary = "회원 권한의 내 예약 목록 조회")
     public ResponseEntity<List<ReservationResponse.ForMember>> findAllMyReservations(
             final MemberAuthInfo memberAuthInfo
     ) {
@@ -64,6 +70,7 @@ public class ReservationRestController {
     }
 
     @GetMapping("/available-times")
+    @Operation(summary = "특정 날짜, 테마에 대해 예약 가능한 시간 목록 조회")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAllAvailableReservationTimes(
             @ModelAttribute @Valid final AvailableReservationTimeRequest request
     ) {
