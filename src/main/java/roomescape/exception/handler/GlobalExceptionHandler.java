@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.common.RuntimeExceptionWithLog;
+import roomescape.exception.common.UnexpectedException;
 import roomescape.exception.dto.ErrorResponse;
 
 @RestControllerAdvice
@@ -27,10 +28,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleDefault(Exception ex) {
-        log.error("[예외 발생] " + ex.getMessage());
+    public ErrorResponse handleDefault(Exception rootException) {
+        UnexpectedException exception = new UnexpectedException(rootException);
+        log.error(exception.getLogMessage());
         return new ErrorResponse(
-                ex.getMessage(),
+                exception.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
