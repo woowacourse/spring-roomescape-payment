@@ -86,15 +86,9 @@ class ReservationRepositoryTest {
         tm.persistAndFlush(info1);
         tm.persistAndFlush(info2);
 
-        Reservation reservation1 = Reservation.builder()
-                .roomEscapeInformation(info1)
-                .member(member1)
-                .build();
+        Reservation reservation1 = Reservation.booked(info1, member1);
 
-        Reservation reservation2 = Reservation.builder()
-                .roomEscapeInformation(info2)
-                .member(member2)
-                .build();
+        Reservation reservation2 = Reservation.booked(info2, member2);
 
         tm.persistAndFlush(reservation1);
         tm.persistAndFlush(reservation2);
@@ -141,9 +135,9 @@ class ReservationRepositoryTest {
         tm.persistAndFlush(info2);
         tm.persistAndFlush(info3);
 
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info1).member(member1).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info2).member(member1).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info3).member(member1).build());
+        tm.persistAndFlush(Reservation.booked(info1, member1));
+        tm.persistAndFlush(Reservation.booked(info2, member1));
+        tm.persistAndFlush(Reservation.booked(info3, member1));
 
         tm.clear();
 
@@ -208,11 +202,11 @@ class ReservationRepositoryTest {
         tm.persistAndFlush(info4);
         tm.persistAndFlush(info5);
 
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info5).member(member1).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info4).member(member1).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info3).member(member1).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info2).member(member2).build());
-        tm.persistAndFlush(Reservation.builder().roomEscapeInformation(info1).member(member2).build());
+        tm.persistAndFlush(Reservation.booked(info1, member1));
+        tm.persistAndFlush(Reservation.booked(info2, member1));
+        tm.persistAndFlush(Reservation.booked(info3, member1));
+        tm.persistAndFlush(Reservation.booked(info4, member2));
+        tm.persistAndFlush(Reservation.booked(info5, member2));
 
         tm.clear();
 
@@ -248,10 +242,7 @@ class ReservationRepositoryTest {
 
         tm.persistAndFlush(info);
 
-        final Reservation booked = Reservation.builder()
-                .roomEscapeInformation(info)
-                .member(member1)
-                .build();
+        final Reservation booked = Reservation.booked(info, member1);
 
         tm.clear();
 

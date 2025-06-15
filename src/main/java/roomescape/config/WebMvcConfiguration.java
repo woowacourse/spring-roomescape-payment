@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.auth.infrastructure.AdminInterceptor;
 import roomescape.auth.infrastructure.AuthenticationPrincipalArgumentResolver;
+import roomescape.infrastructure.TraceIdInterceptor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final AuthenticationPrincipalArgumentResolver authResolver;
     private final AdminInterceptor adminInterceptor;
+    private final TraceIdInterceptor traceIdInterceptor;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
@@ -23,7 +25,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(traceIdInterceptor);
         registry.addInterceptor(adminInterceptor)
-                .addPathPatterns("/admin/**");
+                .addPathPatterns("/admin/**", "/swagger-ui/**", "/swagger");
     }
 }

@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import roomescape.member.domain.Member;
+import roomescape.reservation.util.BaseTimeEntity;
 
 @Getter
 @Entity
@@ -40,5 +41,12 @@ public class WaitingReservation extends BaseTimeEntity {
         this.id = id;
         this.roomEscapeInformation = roomEscapeInformation;
         this.member = member;
+    }
+
+    public static WaitingReservation of(final RoomEscapeInformation roomEscapeInformation, final Member member) {
+        return WaitingReservation.builder()
+                .roomEscapeInformation(roomEscapeInformation)
+                .member(member)
+                .build();
     }
 }

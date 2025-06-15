@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
+import roomescape.lock.service.LockService;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.domain.Password;
@@ -31,7 +32,7 @@ import roomescape.theme.domain.Theme;
 
 @DataJpaTest
 @Sql("/data.sql")
-@Import({ReservationService.class, WaitingReservationService.class})
+@Import({ReservationCommandService.class, ReservationQueryService.class, WaitingReservationService.class, LockService.class})
 class ReservationServiceTest {
 
     @Autowired
@@ -41,7 +42,10 @@ class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationService service;
+    private ReservationCommandService reservationCommandService;
+
+    @Autowired
+    private ReservationQueryService reservationQueryService;
 
     private ReservationTime time;
     private Theme theme;
@@ -66,16 +70,13 @@ class ReservationServiceTest {
                 .theme(theme)
                 .build();
 
-        reservation = Reservation.builder()
-                .roomEscapeInformation(roomEscapeInformation)
-                .member(member)
-                .build();
+        reservation = Reservation.booked(roomEscapeInformation, member);
     }
 
     @Test
     void 모든_예약을_조회한다() {
         // when
-        List<ReservationResponse> responses = service.findReservationsByCriteria(
+        List<ReservationResponse> responses = reservationQueryService.findReservationsByCriteria(
                 new ReservationSearchRequest(null, null, null, null));
 
         // then
@@ -97,7 +98,7 @@ class ReservationServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> service.resisterReservation(request, loginMember))
+        assertThatThrownBy(() -> reservationCommandService.resisterReservation(request, loginMember))
                 .isInstanceOf(ReservationException.class)
                 .hasMessage("예약은 현재 시간 이후로 가능합니다.");
     }
@@ -114,7 +115,7 @@ class ReservationServiceTest {
         ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), time.getId(), theme.getId());
 
         // when
-        ReservationResponse result = service.resisterReservation(req, loginMember);
+        ReservationResponse result = reservationCommandService.resisterReservation(req, loginMember);
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -138,7 +139,7 @@ class ReservationServiceTest {
         tm.persistAndFlush(reservation);
 
         // when
-        service.deleteById(reservation.getId());
+        reservationCommandService.cancel(reservation.getId());
 
         // then
         assertThat(reservationRepository.findByCriteria(null, null, null, null))
