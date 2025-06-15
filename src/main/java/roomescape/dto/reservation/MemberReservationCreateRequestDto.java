@@ -3,16 +3,18 @@ package roomescape.dto.reservation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
-public record MemberReservationCreateRequestDto
-        (@JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+public record MemberReservationCreateRequestDto(
+        @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
          Long themeId,
          Long timeId,
          String paymentKey,
-         String orderId,
-         Long amount
+         String orderId
 ) {
-    public TossPaymentConfirmRequestDto extractTossPaymentDto() {
-        return new TossPaymentConfirmRequestDto(paymentKey, orderId, amount);
+    public TossPaymentRequestDto toTossPaymentDto() {
+        return new TossPaymentRequestDto(paymentKey, orderId);
     }
 
+    public ReservationCreateCommonRequestDto toCommonCreateRequestDtoWith(Long memberId) {
+        return new ReservationCreateCommonRequestDto(date, themeId, timeId, memberId);
+    }
 }

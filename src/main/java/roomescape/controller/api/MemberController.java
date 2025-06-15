@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.annotation.AdminOnly;
-import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.auth.SignUpRequestDto;
 import roomescape.dto.member.MemberResponseDto;
 import roomescape.dto.member.MemberSignupResponseDto;

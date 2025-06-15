@@ -9,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.controller.annotation.AdminOnly;
 import roomescape.controller.util.CookieHandler;
 import roomescape.domain.member.Role;
+import roomescape.exception.AccessDeniedException;
 import roomescape.util.JwtTokenProvider;
 
 @Component
@@ -42,6 +43,8 @@ public class AuthAdminInterceptor implements HandlerInterceptor {
         Cookie[] cookies = request.getCookies();
         String token = cookieHandler.extractCookie(cookies, TOKEN_COOKIE_NAME);
         Role role = jwtTokenProvider.extractRole(token);
-        role.checkAdminAccess();
+        if (!role.isAdmin()) {
+            throw new AccessDeniedException(role, Role.ADMIN, jwtTokenProvider.extractId(token));
+        }
     }
 }

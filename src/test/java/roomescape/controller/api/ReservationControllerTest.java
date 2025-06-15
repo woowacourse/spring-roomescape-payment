@@ -13,14 +13,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.client.PaymentClient;
+import roomescape.client.dto.TossPaymentConfirmResponse;
 import roomescape.config.RestClientConfiguration;
 import roomescape.controller.util.CookieHandler;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.OrderItem;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
+import roomescape.dto.reservation.TossPaymentRequestDto;
+import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.query.MemberQueryService;
 import roomescape.service.query.ReservationQueryService;
@@ -57,6 +63,9 @@ public class ReservationControllerTest {
 
     @MockitoBean
     private ReservationCommandService reservationCommandService;
+
+    @MockitoBean
+    private PaymentCommandService paymentCommandService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -99,7 +108,7 @@ public class ReservationControllerTest {
     void myReservationTest() throws Exception {
         when(reservationQueryService.findMyReservations(any(LoginInfo.class))).thenReturn(
                 List.of(new MyReservationResponseDto(
-                        1L, null, null, null, null
+                        1L, null, null, null, null, null, null
                 ))
         );
         mockMvc.perform(get("/reservations/me")
@@ -114,13 +123,14 @@ public class ReservationControllerTest {
     void addReservationTest() throws Exception {
         MemberReservationCreateRequestDto requestDto = new MemberReservationCreateRequestDto(
                 LocalDate.of(2025, 8, 5),
-                1L, 1L, "paymentKey", "orderId", 1000L);
+                1L, 1L, "paymentKey", "orderId");
+        when(reservationCommandService.bookReservation(any(ReservationCreateCommonRequestDto.class)))
+                .thenReturn(new ReservationResponseDto(1L, null, null, null, null, null));
         mockMvc.perform(post("/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .cookie(cookie))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        verify(paymentClient, atLeastOnce()).confirmPayment(requestDto.extractTossPaymentDto());
     }
 }

@@ -8,13 +8,12 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.controller.annotation.AdminOnly;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.controller.util.CookieHandler;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.exception.UnauthorizationException;
+import roomescape.exception.common.UnauthorizedException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.service.query.MemberQueryService;
 import roomescape.util.JwtTokenProvider;
 
@@ -34,7 +33,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return (parameter.hasParameterAnnotation(CurrentMember.class) || parameter.hasParameterAnnotation(AdminOnly.class))
+        return parameter.hasParameterAnnotation(CurrentMember.class)
                 && parameter.getParameterType().equals(LoginInfo.class);
     }
 
@@ -45,13 +44,15 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         Cookie[] cookies = nativeRequest.getCookies();
         String token = cookieHandler.extractCookie(cookies, "token");
         Long id = jwtTokenProvider.extractId(token);
-        Member loginMember = memberQueryService.findMemberById(id);
-
-        if (parameter.hasParameterAnnotation(AdminOnly.class)) {
-            if (loginMember.getRole() != Role.ADMIN) {
-                throw new UnauthorizationException("관리자 권한이 없는 사용자입니다.");
-            }
-        }
+        Member loginMember = findExistingMemberById(id);
         return new LoginInfo(loginMember);
+    }
+
+    private Member findExistingMemberById(Long id) {
+        try {
+            return memberQueryService.findMemberById(id);
+        } catch (NotFoundException e) {
+            throw new UnauthorizedException("유저를 찾을 수 없습니다.", id);
+        }
     }
 }

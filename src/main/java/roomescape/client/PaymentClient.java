@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.client.dto.TossPaymentConfirmResponse;
 import roomescape.client.dto.TossServerErrorResponse;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 
@@ -31,23 +32,26 @@ public class PaymentClient {
                     TossServerErrorResponse tossServerErrorResponse = this.objectMapper.readValue(
                             res.getBody(), TossServerErrorResponse.class);
                     if (tossServerErrorResponse.isInvisibleError()) {
-                        throw new PaymentConfirmServerException();
+                        throw new PaymentConfirmServerException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                     }
-                    throw new PaymentConfirmClientException(tossServerErrorResponse.getMessage());
+                    throw new PaymentConfirmClientException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentConfirmServerException();
+                    TossServerErrorResponse tossServerErrorResponse = this.objectMapper.readValue(
+                            res.getBody(), TossServerErrorResponse.class);
+                    throw new PaymentConfirmServerException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                 })
                 .build();
     }
 
-    public void confirmPayment(TossPaymentConfirmRequestDto requestDto) {
-        restClient.post()
+    public TossPaymentConfirmResponse confirmPayment(TossPaymentConfirmRequestDto requestDto) {
+        return restClient.post()
                 .uri(TOSS_API_URL + "/payments/confirm")
                 .header("Authorization", PAYMENT_AUTHORIZATION_HEADER)
                 .body(requestDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .toBodilessEntity();
+                .toEntity(TossPaymentConfirmResponse.class)
+                .getBody();
     }
 }

@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginRequestDto;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.util.JwtTokenProvider;
 

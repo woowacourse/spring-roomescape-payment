@@ -16,7 +16,7 @@ import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
-import roomescape.exception.InvalidRequestException;
+import roomescape.exception.PastReservationException;
 
 @Entity
 public class Reservation {
@@ -75,7 +75,7 @@ public class Reservation {
     public void validateReservableTime(final LocalDateTime now){
        LocalDateTime dateTime = LocalDateTime.of(date, time.getStartAt());
         if (dateTime.isBefore(now)) {
-            throw new InvalidRequestException("현 시점 이후의 날짜와 시간을 선택해주세요.");
+            throw new PastReservationException(dateTime, now);
         }
     }
 

@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.dto.reservation.AdminReservationCreateRequestDto;
+import roomescape.controller.annotation.CurrentMember;
+import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.ReservationCommandService;
-import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
 
 @RestController
@@ -40,11 +41,10 @@ public class AdminReservationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponseDto addReservationByAdmin(
-            @RequestBody AdminReservationCreateRequestDto requestDto
+            @RequestBody ReservationCreateCommonRequestDto requestDto,
+            @CurrentMember LoginInfo loginInfo
     ) {
-        ReservationCreateDto createDto = new ReservationCreateDto(requestDto.date(), requestDto.timeId(),
-                requestDto.themeId(), requestDto.memberId());
-        return reservationCommandService.bookReservation(createDto);
+        return reservationCommandService.bookReservation(requestDto);
     }
 
     @GetMapping("/search")

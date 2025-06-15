@@ -23,7 +23,7 @@ import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
-import roomescape.dto.reservation.AdminReservationCreateRequestDto;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.util.JwtTokenProvider;
@@ -41,10 +41,12 @@ class AdminReservationControllerTest {
 
     String loginToken;
 
+    Member adminMember;
+
     @BeforeEach
     void setUp() {
-        Member admin = new Member(null, "moda", "moda@woowa.com", Role.ADMIN, "password");
-        memberRepository.save(admin);
+        adminMember = new Member(null, "moda", "moda@woowa.com", Role.ADMIN, "password");
+        memberRepository.save(adminMember);
 
         loginToken = jwtTokenProvider.createToken(new Member(2L, "moda", "moda@woowa.com", Role.ADMIN, "password"));
     }
@@ -55,7 +57,7 @@ class AdminReservationControllerTest {
         @DisplayName("어드민 예약 추가 테스트")
         @Test
         void addReservationTest() {
-            AdminReservationCreateRequestDto dto = new AdminReservationCreateRequestDto(
+            ReservationCreateCommonRequestDto dto = new ReservationCreateCommonRequestDto(
                     LocalDate.now().plusDays(1), 1L, 1L, 1L);
             RestAssured.given().cookie("token", loginToken).log().all()
                     .contentType(ContentType.JSON)
@@ -74,7 +76,7 @@ class AdminReservationControllerTest {
         @BeforeEach
         void setUp() {
             Reservation reservationInPast = new Reservation(null,
-                    new Member(1L, "moda", "moda@woowa.com", Role.ADMIN, "password"),
+                    adminMember,
                     LocalDate.of(2024, 12, 31),
                     new ReservationTime(1L, LocalTime.of(10, 0)),
                     new Theme(1L, "테마 A", "테마 A입니다.",

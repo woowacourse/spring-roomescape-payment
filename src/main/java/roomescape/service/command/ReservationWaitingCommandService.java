@@ -1,10 +1,9 @@
 package roomescape.service.command;
 
-import jakarta.persistence.EntityManager;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.slot.ReservationTime;
@@ -14,15 +13,16 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizationException;
+import roomescape.exception.AccessDeniedException;
+import roomescape.exception.ReservationWaitingForbiddenException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 @Service
 @Transactional
@@ -34,9 +34,6 @@ public class ReservationWaitingCommandService {
     private final JpaThemeRepository themeRepository;
     private final JpaMemberRepository memberRepository;
     private final Clock clock;
-
-    @Autowired
-    private EntityManager entityManager;
 
     public ReservationWaitingCommandService(JpaReservationWaitingTicketRepository reservationWaitingTicketRepository,
                                             JpaReservationRepository reservationRepository,
@@ -51,13 +48,13 @@ public class ReservationWaitingCommandService {
         this.clock = clock;
     }
 
-    public ReservationResponseDto createReservationWaiting(ReservationCreateDto request) {
+    public ReservationResponseDto createReservationWaiting(ReservationCreateCommonRequestDto request) {
         ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new NotFoundException("예약 시간을 찾을 수 없습니다. id : " + request.timeId()));
+                .orElseThrow(() -> new NotFoundException("예약 시간", request.timeId()));
         Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new NotFoundException("테마를 찾을 수 없습니다. id : " + request.themeId()));
+                .orElseThrow(() -> new NotFoundException("테마", request.themeId()));
         Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다. id : " + request.memberId()));
+                .orElseThrow(() -> new NotFoundException("유저", request.memberId()));
 
         List<Reservation> alreadyBookedReservations = reservationRepository.findReservationsByDateAndTimeIdAndThemeId(
                 request.date(),
@@ -75,10 +72,10 @@ public class ReservationWaitingCommandService {
 
     public void deleteReservationWaiting(Long id, LoginInfo loginInfo) {
         Reservation reservationWaiting = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("등록된 예약번호만 삭제할 수 있습니다. 입력된 번호는 " + id + "입니다."));
+                .orElseThrow(() -> new NotFoundException("예약", id));
 
         if (!reservationWaiting.getMember().isSameIdWith(loginInfo.id())) {
-            throw new UnauthorizationException("예약자만 예약 대기 취소가 가능합니다.");
+            throw new AccessDeniedException(loginInfo.id());
         }
 
         reservationRepository.delete(reservationWaiting);
@@ -86,11 +83,16 @@ public class ReservationWaitingCommandService {
 
     private static void validateReservationWaitingAvailable(List<Reservation> alreadyBookedReservations, Member member) {
         if (alreadyBookedReservations.isEmpty()) {
-            throw new IllegalArgumentException("현재 예약이 존재하지 않습니다. 예약하기 기능을 이용해주세요.");
+            throw new ReservationWaitingForbiddenException("현재 예약이 존재하지 않습니다. 예약하기 기능을 이용해주세요.");
         }
-        if (alreadyBookedReservations.stream()
-                .anyMatch(reservation -> reservation.getMember().equals(member))) {
-            throw new IllegalArgumentException("이미 예약한 이력이 있습니다.");
+        Optional<Reservation> duplicatedReservation = alreadyBookedReservations.stream()
+                .filter(reservation -> reservation.getMember().equals(member))
+                .findAny();
+        if (duplicatedReservation.isPresent()) {
+            throw new ReservationWaitingForbiddenException("이미 예약한 이력이 있습니다.",
+                    member.getId(),
+                    duplicatedReservation.get().getId()
+            );
         }
     }
 }

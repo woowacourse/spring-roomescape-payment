@@ -6,7 +6,7 @@ import roomescape.domain.reservation.slot.Theme;
 import roomescape.dto.theme.ThemeCreateRequestDto;
 import roomescape.dto.theme.ThemeResponseDto;
 import roomescape.exception.DuplicateContentException;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaThemeRepository;
 
@@ -24,7 +24,7 @@ public class ThemeCommandService {
 
     public ThemeResponseDto createTheme(final ThemeCreateRequestDto requestDto) {
         if (themeRepository.existsByName(requestDto.name())) {
-            throw new DuplicateContentException("해당 이름의 테마가 이미 존재합니다.");
+            throw new DuplicateContentException("해당 이름의 테마가 이미 존재합니다.", requestDto.name());
         }
         Theme requestTheme = requestDto.createWithoutId();
         Theme savedTheme = themeRepository.save(requestTheme);
@@ -36,7 +36,7 @@ public class ThemeCommandService {
             throw new IllegalStateException("이 테마는 이미 예약이 존재합니다. id : " + id);
         }
         if (!themeRepository.existsById(id)) {
-            throw new NotFoundException("등록된 테마만 삭제할 수 있습니다. 입력된 번호는 " + id + "입니다.");
+            throw new NotFoundException("테마", id);
         }
 
         themeRepository.deleteById(id);

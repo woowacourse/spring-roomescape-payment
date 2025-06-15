@@ -16,7 +16,8 @@ import org.mockito.MockitoAnnotations;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.member.MemberResponseDto;
-import roomescape.exception.UnauthorizationException;
+import roomescape.exception.common.NotFoundException;
+import roomescape.exception.common.UnauthorizedException;
 import roomescape.repository.JpaMemberRepository;
 
 class MemberQueryServiceTest {
@@ -60,7 +61,7 @@ class MemberQueryServiceTest {
         when(memberRepository.findById(nonExistentMemberId)).thenReturn(Optional.empty());
         
         // when & then
-        assertThrows(UnauthorizationException.class, () -> memberQueryService.findMemberById(nonExistentMemberId));
+        assertThrows(NotFoundException.class, () -> memberQueryService.findMemberById(nonExistentMemberId));
     }
     
     @DisplayName("모든 회원 조회 테스트")

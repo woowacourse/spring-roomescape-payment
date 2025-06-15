@@ -25,14 +25,15 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizationException;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
+import roomescape.exception.AccessDeniedException;
+import roomescape.exception.ReservationWaitingForbiddenException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 public class ReservationWaitingCommandServiceTest {
 
@@ -71,7 +72,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 999L;
         Long themeId = 1L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.empty());
         
@@ -87,7 +88,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 999L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
@@ -112,7 +113,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 999L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
@@ -139,7 +140,7 @@ public class ReservationWaitingCommandServiceTest {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 1L;
-        ReservationCreateDto requestDto = new ReservationCreateDto(date, timeId, themeId, memberId);
+        ReservationCreateCommonRequestDto requestDto = new ReservationCreateCommonRequestDto(date, timeId, themeId, memberId);
         
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTime reservationTime = new ReservationTime(timeId, startAt);
@@ -157,7 +158,7 @@ public class ReservationWaitingCommandServiceTest {
         when(clock.getZone()).thenReturn(fixedClock.getZone());
         
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> reservationWaitingCommandService.createReservationWaiting(requestDto));
+        assertThrows(ReservationWaitingForbiddenException.class, () -> reservationWaitingCommandService.createReservationWaiting(requestDto));
     }
     
     @DisplayName("예약 대기 삭제 성공 테스트")
@@ -220,6 +221,6 @@ public class ReservationWaitingCommandServiceTest {
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         
         // when & then
-        assertThrows(UnauthorizationException.class, () -> reservationWaitingCommandService.deleteReservationWaiting(reservationId, loginInfo));
+        assertThrows(AccessDeniedException.class, () -> reservationWaitingCommandService.deleteReservationWaiting(reservationId, loginInfo));
     }
 }

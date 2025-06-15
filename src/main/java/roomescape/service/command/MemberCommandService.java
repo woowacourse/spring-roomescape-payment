@@ -21,7 +21,7 @@ public class MemberCommandService {
 
     public MemberSignupResponseDto registerMember(SignUpRequestDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.email())) {
-            throw new DuplicateContentException("해당 이메일로 가입된 이력이 있습니다.");
+            throw new DuplicateContentException("해당 이메일로 가입된 이력이 있습니다.", requestDto.email());
         }
 
         Member member = new Member(requestDto.name(), requestDto.email(), Role.USER, requestDto.password());

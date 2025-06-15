@@ -18,12 +18,12 @@ import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
+import roomescape.dto.reservation.ReservationCreateCommonRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
 import roomescape.repository.JpaThemeRepository;
-import roomescape.service.dto.ReservationCreateDto;
 
 class ReservationCommandServiceTest {
 
@@ -50,7 +50,7 @@ class ReservationCommandServiceTest {
     @Test
     void createReservation() {
         //given
-        ReservationCreateDto dto = new ReservationCreateDto(LocalDate.of(2025, 11, 11), 1, 1, 1);
+        ReservationCreateCommonRequestDto dto = new ReservationCreateCommonRequestDto(LocalDate.of(2025, 11, 11), 1L, 1L, 1L);
 
         ReservationTime reservationTime = new ReservationTime(1L, LocalTime.of(10, 0));
         Theme theme = new Theme(1L, "theme", "theme", "theme");

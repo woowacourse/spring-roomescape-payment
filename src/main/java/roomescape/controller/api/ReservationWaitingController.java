@@ -16,7 +16,6 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.ReservationWaitingCommandService;
-import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
 
 @RestController
@@ -42,12 +41,10 @@ public class ReservationWaitingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponseDto addReservationWaiting(
-            @CurrentMember LoginInfo loginInfo,
-            @RequestBody MemberReservationCreateRequestDto request
+            @RequestBody MemberReservationCreateRequestDto request,
+            @CurrentMember LoginInfo loginInfo
     ) {
-        ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
-                request.date(), request.timeId(), request.themeId(), loginInfo.id());
-        return reservationWaitingCommandService.createReservationWaiting(reservationCreateDto);
+        return reservationWaitingCommandService.createReservationWaiting(request.toCommonCreateRequestDtoWith(loginInfo.id()));
     }
 
     @DeleteMapping("/{id}")
