@@ -6,8 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.dto.CreatePaymentServiceRequest;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
@@ -24,6 +27,8 @@ import roomescape.reservation.service.converter.ReservationWaitConverter;
 import roomescape.reservation.service.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 import roomescape.reservation.service.usecase.ReservationCommandUseCase;
+import roomescape.reservation.service.usecase.ReservationPaymentCommandUseCase;
+import roomescape.reservation.service.usecase.ReservationPaymentQueryUseCase;
 import roomescape.reservation.service.usecase.ReservationQueryUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitCommandUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitQueryUseCase;
@@ -34,8 +39,12 @@ public class ReservationService {
 
     private final ReservationQueryUseCase reservationQueryUseCase;
     private final ReservationCommandUseCase reservationCommandUseCase;
+
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
+
+    private final ReservationPaymentCommandUseCase reservationPaymentCommandUseCase;
+    private final ReservationPaymentQueryUseCase reservationPaymentQueryUseCase;
 
     private final PaymentService paymentService;
 
@@ -53,26 +62,18 @@ public class ReservationService {
 
     public List<ReservationWithStatusResponse> getWithReservationWaitByMemberId(final Long memberId) {
         final List<ReservationWithStatusResponse> allReservations = new ArrayList<>();
-        allReservations.addAll(getByMemberId(memberId));
-        allReservations.addAll(getReservationWaitByMemberId(memberId));
+
+        allReservations.addAll(
+                ReservationWithStatusResponse.fromReservationPayments(
+                        reservationPaymentQueryUseCase.getByMemberId(memberId)));
+
+        allReservations.addAll(
+                ReservationWithStatusResponse.fromReservationWaits(
+                        reservationWaitQueryUseCase.getByMemberId(memberId)));
 
         return allReservations.stream()
                 .sorted(Comparator.comparing(ReservationWithStatusResponse::getDate)
                         .thenComparing(ReservationWithStatusResponse::getTime))
-                .toList();
-    }
-
-    public List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
-        return reservationQueryUseCase.getByMemberId(memberId).stream()
-                .map(ReservationWithStatusResponse::from)
-                .toList();
-    }
-
-    public List<ReservationWithStatusResponse> getReservationWaitByMemberId(final Long memberId) {
-        return reservationWaitQueryUseCase.getByMemberId(memberId).stream()
-                .map(reservationWaitWithRank -> ReservationWithStatusResponse.of(
-                        reservationWaitWithRank.reservationWait(),
-                        reservationWaitWithRank.rank()))
                 .toList();
     }
 
@@ -107,20 +108,12 @@ public class ReservationService {
             final CreateReservationWithPaymentWebRequest request,
             final MemberInfo memberInfo
     ) {
-        // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
-        paymentService.confirm(request.paymentConfirmWebRequest().toPaymentConfirmRequest());
-
-        final CreateReservationWebRequest createReservationWebRequest = request.createReservationWebRequest();
-        final Reservation reservation = reservationCommandUseCase.create(
-                new CreateReservationServiceRequest(
-                        memberInfo.id(),
-                        createReservationWebRequest.date(),
-                        createReservationWebRequest.timeId(),
-                        createReservationWebRequest.themeId()
-                )
+        paymentService.confirm(
+                request.paymentConfirmWebRequest().toPaymentConfirmRequest(),
+                memberInfo.id()
         );
 
-        return ReservationConverter.toDto(reservation);
+        return reservationPaymentCommandUseCase.createReservationWithPayment(request, memberInfo);
     }
 
     public ReservationWaitWebResponse createReservationWait(
@@ -160,5 +153,4 @@ public class ReservationService {
                 .map(ReservationConverter::toDto)
                 .toList();
     }
-
 }

@@ -164,6 +164,13 @@ public class MissionStepTest {
                 "INSERT INTO reservation (member_id, reservation_date, time_id, theme_id) VALUES (?, ?, ?, ?)",
                 1, "2023-08-05", 1, 1);
 
+        jdbcTemplate.update(
+                "INSERT INTO payment (payment_key, order_id, amount) VALUES ('payment_key_1', 'order_1', 10000)");
+
+        jdbcTemplate.update(
+                "INSERT INTO reservation_payment (payment_id, reservation_id) VALUES (1, 1)"
+        );
+
         final List<ReservationWithStatusResponse> reservations = RestAssured.given().log().all()
                 .cookie("token", memberToken)
                 .when().get("/reservations/mine")

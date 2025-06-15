@@ -3,6 +3,7 @@ package roomescape.member.auth.vo;
 import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.utils.Validator;
+import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
@@ -15,6 +16,15 @@ public record MemberInfo(
 
     public MemberInfo {
         validate(id, name, email, role);
+    }
+
+    public static MemberInfo from(final Member member) {
+        return new MemberInfo(
+                member.getId(),
+                member.getName().getValue(),
+                member.getEmail().getValue(),
+                member.getRole()
+        );
     }
 
     private void validate(final Long id,

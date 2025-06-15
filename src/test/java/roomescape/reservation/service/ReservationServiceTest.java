@@ -23,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Role;
+import roomescape.payment.controller.dto.PaymentConfirmWebRequest;
 import roomescape.payment.service.dto.PaymentConfirmResponse;
-import roomescape.payment.PaymentConfirmWebRequest;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.usecase.PaymentRestClient;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.domain.Reservation;
@@ -45,7 +45,7 @@ public class ReservationServiceTest {
     private ReservationService reservationService;
 
     @MockitoBean
-    private PaymentService paymentService;
+    private PaymentRestClient paymentRestClient;
 
     @BeforeEach
     void setUp() {
@@ -87,7 +87,7 @@ public class ReservationServiceTest {
         @Test
         void paymentConfirmSuccess() {
             // given
-            when(paymentService.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest()))
+            when(paymentRestClient.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest(), 1L))
                     .thenReturn(PAYMENT_CONFIRM_RESPONSE);
 
             // when
@@ -105,7 +105,7 @@ public class ReservationServiceTest {
         @Test
         void paymentConfirmFailed() {
             // given
-            when(paymentService.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest()))
+            when(paymentRestClient.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest(), 1L))
                     .thenThrow(new PaymentException(HttpStatus.FORBIDDEN, "결제 승인 실패", "FAILED"));
 
             // when & then

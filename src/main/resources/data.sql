@@ -2,9 +2,9 @@
 INSERT INTO member (name, email, role)
 VALUES ('관리자', 'admin@email.com', 'ADMIN');
 INSERT INTO member (name, email, role)
-VALUES ('사용자1', 'user1@email.com', 'USER');
+VALUES ('사용자1', 'user1@email.com', 'MEMBER');
 INSERT INTO member (name, email, role)
-VALUES ('사용자2', 'user2@email.com', 'USER');
+VALUES ('사용자2', 'user2@email.com', 'MEMBER');
 
 -- Account 데이터 (비밀번호: qwe123)
 INSERT INTO account (member_id, password)
@@ -47,3 +47,15 @@ INSERT INTO reservation_wait (member_id, reservation_date, time_id, theme_id)
 VALUES (3, CURRENT_DATE + 1, 1, 1);
 INSERT INTO reservation_wait (member_id, reservation_date, time_id, theme_id)
 VALUES (2, CURRENT_DATE + 1, 2, 2);
+
+-- Payment 데이터
+INSERT INTO payment (payment_key, order_id, amount)
+VALUES ('payment_key_1', 'order_1', 10000);
+INSERT INTO payment (payment_key, order_id, amount)
+VALUES ('payment_key_2', 'order_2', 10000);
+
+-- ReservationPayment 데이터
+INSERT INTO reservation_payment (payment_id, reservation_id)
+VALUES (1, 1);
+INSERT INTO reservation_payment (payment_id, reservation_id)
+VALUES (2, 2);
