@@ -8,6 +8,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ class PaymentClientTest {
             """;
     private static final String PAYMENT_KEY = "tgen_20250528175227f6y46";
     private static final String ORDER_ID = "MC44NjE2MTQzMjcyMzM2";
+    private static final String IDEMPOTENCY_KEY = UUID.randomUUID().toString();
 
     @Autowired
     private PaymentGateway paymentGateway;
@@ -70,7 +72,7 @@ class PaymentClientTest {
         mockServer.expect(requestTo(url))
                 .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
         PaymentGatewayRequest request = new PaymentGatewayRequest(PAYMENT_KEY, ORDER_ID,
-                50_000L, null, PaymentType.NORMAL);
+                50_000L, null, PaymentType.NORMAL, IDEMPOTENCY_KEY);
 
         // When
         PaymentGatewayResponse response = paymentGateway.approvePayment(request);
@@ -89,7 +91,7 @@ class PaymentClientTest {
             throws JsonProcessingException {
         // Given
         PaymentGatewayRequest request = new PaymentGatewayRequest(PAYMENT_KEY, ORDER_ID,
-                50_000L, null, PaymentType.NORMAL);
+                50_000L, null, PaymentType.NORMAL, IDEMPOTENCY_KEY);
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(new TossErrorResponse("REJECT_CARD_PAYMENT", "한도초과"));
         mockServer.expect(times(3), requestTo(url))
@@ -107,7 +109,7 @@ class PaymentClientTest {
     void approvePayment_whenInvalidClientRequest_throwsException() throws JsonProcessingException {
         // Given
         PaymentGatewayRequest request = new PaymentGatewayRequest(PAYMENT_KEY, ORDER_ID,
-                50_000L, null, PaymentType.NORMAL);
+                50_000L, null, PaymentType.NORMAL, IDEMPOTENCY_KEY);
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(
                         new TossErrorResponse("", "신용카드는 결제금액이 100원 이상, 계좌는 200원이상부터 결제가 가능합니다."));
@@ -125,7 +127,7 @@ class PaymentClientTest {
     void approvePayment_whenInvalidServerRequest_throwsException() throws JsonProcessingException {
         // Given
         PaymentGatewayRequest request = new PaymentGatewayRequest(PAYMENT_KEY, ORDER_ID,
-                50_000L, null, PaymentType.NORMAL);
+                50_000L, null, PaymentType.NORMAL, IDEMPOTENCY_KEY);
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(
                         new TossErrorResponse("UNKNOWN_PAYMENT_ERROR", "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."));
@@ -143,7 +145,7 @@ class PaymentClientTest {
     void approvePayment_whenUnrecoverableRequest_throwsException() throws JsonProcessingException {
         // Given
         PaymentGatewayRequest request = new PaymentGatewayRequest(PAYMENT_KEY, ORDER_ID, 50_000L, null,
-                PaymentType.NORMAL);
+                PaymentType.NORMAL, IDEMPOTENCY_KEY);
         TossUnrecoverableErrorCode errorCode = TossUnrecoverableErrorCode.INCORRECT_BASIC_AUTH_FORMAT;
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(new TossErrorResponse(errorCode.name(), errorCode.getDescription()));

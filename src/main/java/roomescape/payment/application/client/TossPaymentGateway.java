@@ -3,7 +3,6 @@ package roomescape.payment.application.client;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpHeaders;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
@@ -11,8 +10,6 @@ import roomescape.payment.application.dto.PaymentGatewayRequest;
 import roomescape.payment.application.dto.PaymentGatewayResponse;
 import roomescape.payment.application.dto.TossPaymentMapper;
 import roomescape.payment.domain.PaymentGateway;
-import roomescape.payment.exception.PaymentClientException;
-import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.exception.handler.PaymentExceptionHandler;
 import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
@@ -23,6 +20,7 @@ public class TossPaymentGateway implements PaymentGateway {
 
     private static final String BASIC = "Basic ";
     private static final String COLON = ":";
+    private static final String IDEMPOTENCY_KEY = "Idempotency-Key";
 
     private final RestClient restClient;
     private final PaymentExceptionHandler paymentExceptionHandler;
@@ -42,13 +40,13 @@ public class TossPaymentGateway implements PaymentGateway {
     }
 
     @Override
-    @Retryable(retryFor = {PaymentClientException.class, PaymentForbiddenException.class})
     public PaymentGatewayResponse approvePayment(final PaymentGatewayRequest paymentGatewayRequest) {
         TossPaymentApproveRequest tossRequest = tossPaymentMapper.toTossRequest(paymentGatewayRequest);
 
         TossPaymentApproveResponse tossResponse = restClient.post()
                 .uri(tossPaymentClientProperties.getConfirmApi())
                 .header(HttpHeaders.AUTHORIZATION, BASIC + encodingSecretKey)
+                .header(IDEMPOTENCY_KEY, paymentGatewayRequest.idempotencyKey())
                 .body(tossRequest)
                 .retrieve()
                 .onStatus(paymentExceptionHandler)

@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,7 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentGateway;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.exception.PaymentForbiddenException;
-import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
+import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
@@ -51,6 +52,7 @@ class PaymentServiceTest {
     private static final LocalDateTime afterOneHour = TestFixture.makeTimeAfterOneHour();
     private static final String ORDER_ID = "ORDER_ID";
     private static final String PAYMENT_KEY = "PAYMENT_KEY";
+    private static final String IDEMPOTENCY_KEY = UUID.randomUUID().toString();
 
     @Autowired
     private ReservationSlotRepository reservationSlotRepository;
@@ -109,15 +111,15 @@ class PaymentServiceTest {
     void approvePayment_whenValidRequest_returnDto() {
         // given
         long amount = 5000L;
-        TossPaymentApproveRequest tossPaymentApproveRequest = new TossPaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
-                reservationId);
+        PaymentRequest paymentRequest = new PaymentRequest(PAYMENT_KEY, ORDER_ID,
+                amount, PaymentType.NORMAL, reservationId);
         PaymentGatewayResponse paymentApproveResponse = new PaymentGatewayResponse(PAYMENT_KEY, ORDER_ID,
                 amount);
         when(paymentGateway.approvePayment(any(PaymentGatewayRequest.class))).thenReturn(paymentApproveResponse);
         PaymentApproveResponse expected = new PaymentApproveResponse(ORDER_ID, amount);
 
         // when
-        PaymentApproveResponse actual = paymentService.approvePayment(tossPaymentApproveRequest);
+        PaymentApproveResponse actual = paymentService.approvePayment(paymentRequest);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -131,13 +133,13 @@ class PaymentServiceTest {
     void approvePayment_whenPaymentFailed_throwException() {
         // given
         long amount = 5000L;
-        TossPaymentApproveRequest tossPaymentApproveRequest = new TossPaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
-                reservationId);
+        PaymentRequest paymentRequest = new PaymentRequest(PAYMENT_KEY, ORDER_ID,
+                amount, PaymentType.NORMAL, reservationId);
         when(paymentGateway.approvePayment(any(PaymentGatewayRequest.class))).thenThrow(
                 PaymentForbiddenException.class);
 
         // when
-        Assertions.assertThatThrownBy(() -> paymentService.approvePayment(tossPaymentApproveRequest))
+        Assertions.assertThatThrownBy(() -> paymentService.approvePayment(paymentRequest))
                 .isInstanceOf(PaymentForbiddenException.class);
     }
 

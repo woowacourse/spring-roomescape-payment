@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.security.annotation.RequireRole;
 import roomescape.member.domain.MemberRole;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
 import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 
@@ -26,8 +25,7 @@ public class PaymentController {
     @RequireRole(MemberRole.REGULAR)
     @PostMapping("/approve")
     public ResponseEntity<PaymentApproveResponse> approvePayment(@RequestBody PaymentRequest paymentRequest) {
-        PaymentApproveResponse paymentApproveResponse = paymentService.approvePayment(
-                TossPaymentApproveRequest.from(paymentRequest));
+        PaymentApproveResponse paymentApproveResponse = paymentService.approvePayment(paymentRequest);
         return ResponseEntity.ok().body(paymentApproveResponse);
     }
 }

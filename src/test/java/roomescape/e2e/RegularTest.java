@@ -46,7 +46,8 @@ import roomescape.common.security.dto.request.LoginRequest;
 import roomescape.payment.application.dto.PaymentGatewayRequest;
 import roomescape.payment.application.dto.PaymentGatewayResponse;
 import roomescape.payment.domain.PaymentGateway;
-import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
+import roomescape.payment.domain.PaymentType;
+import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.application.event.TestEventPublisher;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
@@ -304,10 +305,11 @@ public class RegularTest {
         long amount = 5000L;
 
         // when & then
-        TossPaymentApproveRequest paymentRequest = new TossPaymentApproveRequest(paymentKey, orderId, amount, reservationId);
-        PaymentGatewayRequest paymentGatewayRequest = PaymentGatewayRequest.from(paymentRequest);
+        PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL,
+                reservationId);
         PaymentGatewayResponse paymentGatewayResponse = new PaymentGatewayResponse(paymentKey, orderId, amount);
-        Mockito.when(paymentGateway.approvePayment(paymentGatewayRequest)).thenReturn(paymentGatewayResponse);
+        Mockito.when(paymentGateway.approvePayment(Mockito.any(PaymentGatewayRequest.class)))
+                .thenReturn(paymentGatewayResponse);
 
         RestAssured.given(spec).log().all()
                 .filter(document(
@@ -316,7 +318,8 @@ public class RegularTest {
                                 fieldWithPath("paymentKey").description("결제 키"),
                                 fieldWithPath("orderId").description("주문 ID"),
                                 fieldWithPath("amount").description("결제 금액"),
-                                fieldWithPath("reservationId").description("예약 ID")
+                                fieldWithPath("reservationId").description("예약 ID"),
+                                fieldWithPath("paymentType").description("결제 타입")
                         ),
                         responseFields(
                                 fieldWithPath("orderId").description("주문 ID"),
