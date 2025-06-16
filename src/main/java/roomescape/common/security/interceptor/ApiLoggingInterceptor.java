@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,10 +28,9 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
         MDC.put("clientIp", request.getRemoteAddr());
         MDC.put("userAgent", shortenUserAgent(request.getHeader("User-Agent")));
 
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod hm = (HandlerMethod) handler;
-            MDC.put("controller", hm.getBeanType().getSimpleName());
-            MDC.put("action", hm.getMethod().getName());
+        if (handler instanceof final HandlerMethod handlerMethod) {
+            MDC.put("controller", handlerMethod.getBeanType().getSimpleName());
+            MDC.put("action", handlerMethod.getMethod().getName());
         }
         log.info("요청 시작");
 
@@ -46,20 +46,23 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
 
         try {
             Long startTime = (Long) request.getAttribute("startTime");
-            if (startTime != null) {
-                long duration = System.currentTimeMillis() - startTime;
-                MDC.put("duration", duration + "ms");
-                MDC.put("status", String.valueOf(response.getStatus()));
-
-                if (ex != null) {
-                    MDC.put("exception", ex.getClass().getSimpleName());
-                    log.error("요청 실패", ex);
-                } else if (response.getStatus() >= 400) {
-                    log.warn("요청 에러");
-                } else {
-                    log.info("요청 완료");
-                }
+            if (startTime == null) {
+                return;
             }
+            long duration = System.currentTimeMillis() - startTime;
+            MDC.put("duration", duration + "ms");
+            MDC.put("status", String.valueOf(response.getStatus()));
+
+            if (ex != null) {
+                MDC.put("exception", ex.getClass().getSimpleName());
+                log.error("요청 실패", ex);
+                return;
+            }
+            if (response.getStatus() >= HttpStatus.BAD_REQUEST.value()) {
+                log.warn("요청 에러");
+                return;
+            }
+            log.info("요청 완료");
         } finally {
             MDC.clear();
         }
