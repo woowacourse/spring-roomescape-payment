@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.common.exception.BusinessException;
+import roomescape.common.exception.RoomescapeException;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.InUseException;
 import roomescape.common.exception.NotFoundException;
@@ -91,14 +91,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("서비스 연결에 문제가 발생하였습니다.");
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(BusinessException e) {
+    @ExceptionHandler(RoomescapeException.class)
+    public ResponseEntity<String> handleBusinessException(RoomescapeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<String> handleException(Exception e) {
-//        log.error("예상하지 못한 에러가 발생하였습니다.");
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일시적인 문제로 요청이 처리되지 않았습니다. 잠시 후 다시 시도해 주세요.");
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        log.error("예상하지 못한 에러가 발생하였습니다.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일시적인 문제로 요청이 처리되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+    }
 }

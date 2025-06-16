@@ -1,8 +1,8 @@
 package roomescape.common.security.exception;
 
-import roomescape.common.exception.BusinessException;
+import roomescape.common.exception.RoomescapeException;
 
-public class ForbiddenException extends BusinessException {
+public class ForbiddenException extends RoomescapeException {
 
     public ForbiddenException(final String message) {
         super(message);
