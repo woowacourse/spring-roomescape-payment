@@ -70,6 +70,6 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
     private String getErrorMessage(final String code, final String errorMessage) {
         return TossUserFriendlyErrorCode.fromCode(code)
                 .map(TossUserFriendlyErrorCode::getMessage)
-                .orElseGet(() -> errorMessage);
+                .orElse(errorMessage);
     }
 }
