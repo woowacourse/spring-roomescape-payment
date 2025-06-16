@@ -11,6 +11,7 @@ public record Email(
 ) {
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$";
     private static final int MAX_EMAIL_LENGTH = 100;
+    private static final String AT = "@";
 
     public static Email from(String email) {
         validate(email);
@@ -27,6 +28,13 @@ public record Email(
         if (email.length() > MAX_EMAIL_LENGTH) {
             throw new InvalidMemberException("이메일은 100글자 이하이어야합니다.");
         }
+    }
+
+    public String extractDomain() {
+        if (value == null || !value.contains(AT)) {
+            return "unknown";
+        }
+        return value.split(AT)[1].toLowerCase();
     }
 }
 

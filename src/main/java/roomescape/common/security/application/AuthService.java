@@ -27,10 +27,11 @@ public class AuthService {
     }
 
     public LoginResponse login(final LoginRequest loginRequest) {
-        log.info("로그인 시도: email={}", loginRequest.email());
-        Member member = findValidMember(loginRequest.email(), loginRequest.password());
+        Email email = new Email(loginRequest.email());
+        log.info("로그인 시도: domain={}", email.extractDomain());
+        Member member = findValidMember(email, loginRequest.password());
         String accessToken = jwtProvider.createToken(MemberInfo.from(member));
-        log.info("로그인 성공: memberId={}", member.getId());
+        log.info("로그인 성공: memberId={}, domain={}", member.getId(), email.extractDomain());
         return new LoginResponse(accessToken);
     }
 
@@ -40,24 +41,23 @@ public class AuthService {
         return new MemberInfo(memberId, jwtProvider.getRole(token));
     }
 
-    private Member findValidMember(final String email, final String password) {
+    private Member findValidMember(final Email email, final String password) {
         Member member = findMemberByEmail(email);
         checkPassword(password, member);
         return member;
     }
 
-    private Member findMemberByEmail(final String emailString) {
-        Email email = new Email(emailString);
+    private Member findMemberByEmail(final Email email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("로그인 실패 - 존재하지 않는 사용자: email={}", emailString);
+                    log.warn("로그인 실패 - 존재하지 않는 사용자: domain={}", email.extractDomain());
                     return new UnAuthorizedException("존재하지 않은 사용자입니다.");
                 });
     }
 
     private void checkPassword(final String password, final Member member) {
         if (!myPasswordEncoder.matches(password, member.getPassword())) {
-            log.warn("로그인 실패 - 비밀번호 불일치: email={}", member.getEmail());
+            log.warn("로그인 실패 - 비밀번호 불일치: domain={}", member.getEmail().extractDomain());
             throw new UnAuthorizedException("로그인에 실패하였습니다.");
         }
     }

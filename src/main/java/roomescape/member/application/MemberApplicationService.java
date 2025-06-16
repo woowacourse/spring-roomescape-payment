@@ -1,5 +1,7 @@
 package roomescape.member.application;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,9 @@ public class MemberApplicationService {
     }
 
     public SignUpWebResponse signup(final SignupWebRequest signupWebRequest) {
-        log.info("회원가입 시도: email={}, name={}", signupWebRequest.email(), signupWebRequest.name());
+        Email email = new Email(signupWebRequest.email());
+        log.info("회원가입 시도: domain={}, timestamp={}",
+                email.extractDomain(), LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
 
         String encodedPassword = myPasswordEncoder.encode(signupWebRequest.password());
         Member member = new Member(signupWebRequest.name(), signupWebRequest.email(), encodedPassword,
@@ -36,7 +40,7 @@ public class MemberApplicationService {
         validateMemberExists(signupWebRequest);
         Member savedMember = memberDataService.create(member);
 
-        log.info("회원가입 완료: memberId={}, email={}", savedMember.getId(), savedMember.getEmail());
+        log.info("회원가입 완료: memberId={}, domain={}", savedMember.getId(), savedMember.getEmail().extractDomain());
         return SignUpWebResponse.from(savedMember);
     }
 
@@ -53,7 +57,7 @@ public class MemberApplicationService {
     private void validateMemberExists(final SignupWebRequest signupWebRequest) {
         Email email = new Email(signupWebRequest.email());
         if (memberDataService.existsByEmail(email)) {
-            log.warn("회원가입 실패 - 이미 존재하는 이메일: email={}", signupWebRequest.email());
+            log.warn("회원가입 실패 - 중복 이메일: domain={}", email.extractDomain());
             throw new MemberDuplicatedException("이미 존재하는 회원입니다.");
         }
     }

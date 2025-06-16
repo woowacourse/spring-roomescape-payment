@@ -31,7 +31,7 @@ class MemberRepositoryTest {
 
     @Test
     void existsByEmail_memberExist_true() {
-        boolean doesExist = memberRepository.existsByEmail(new Email(member.getEmail()));
+        boolean doesExist = memberRepository.existsByEmail(member.getEmail());
         assertThat(doesExist).isTrue();
     }
 

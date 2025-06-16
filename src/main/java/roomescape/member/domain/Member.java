@@ -1,7 +1,5 @@
 package roomescape.member.domain;
 
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "members")
@@ -66,8 +65,8 @@ public class Member {
         return name.value();
     }
 
-    public String getEmail() {
-        return email.value();
+    public Email getEmail() {
+        return email;
     }
 
     public String getPassword() {
