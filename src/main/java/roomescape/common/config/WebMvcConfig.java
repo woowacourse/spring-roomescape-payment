@@ -5,11 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import roomescape.common.security.application.AuthService;
 import roomescape.common.security.infrastructure.AuthorizationExtractor;
 import roomescape.common.security.infrastructure.JwtProvider;
+import roomescape.common.security.interceptor.ApiLoggingInterceptor;
 import roomescape.common.security.interceptor.RoleInterceptor;
 import roomescape.common.security.resolver.MemberInfoArgumentResolver;
-import roomescape.common.security.application.AuthService;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -36,5 +37,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new RoleInterceptor(authorizationExtractor, jwtProvider));
+        registry.addInterceptor(new ApiLoggingInterceptor())
+                .excludePathPatterns(
+                        "/actuator/health",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/img/**",
+                        "/favicon.ico",
+                        "/error",
+                        "/**/*.html"
+                );
     }
 }

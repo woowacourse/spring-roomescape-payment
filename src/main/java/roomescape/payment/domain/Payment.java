@@ -1,6 +1,7 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,14 +20,14 @@ public class Payment {
     @Column(name = "payment_id")
     private Long id;
 
-    @Column(name = "payment_key", nullable = false)
-    private String paymentKey;
+    @Embedded
+    private PaymentKey paymentKey;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
+    @Embedded
+    private OrderId orderId;
 
-    @Column(name = "amount", nullable = false)
-    private Long amount;
+    @Embedded
+    private Amount amount;
 
     @Column(name = "payment_type", nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -36,25 +37,25 @@ public class Payment {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(final String paymentKey, final String orderId, final Long amount, final PaymentType paymentType) {
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
-        this.amount = amount;
+        this.paymentKey = PaymentKey.from(paymentKey);
+        this.orderId = OrderId.from(orderId);
+        this.amount = Amount.from(amount);
         this.paymentType = paymentType;
     }
 
     public void approve() {
-        if (paymentStatus != PaymentStatus.PENDING) {
+        if (paymentStatus.isFinished()) {
             throw new PaymentStatusException("결제 승인은 PENDING 상태에서만 가능합니다.");
         }
         this.paymentStatus = PaymentStatus.APPROVED;
     }
 
     public void fail() {
-        if (paymentStatus != PaymentStatus.PENDING) {
+        if (paymentStatus.isFinished()) {
             throw new PaymentStatusException("결제 실패는 PENDING 상태에서만 가능합니다");
         }
         this.paymentStatus = PaymentStatus.FAILED;
@@ -65,22 +66,18 @@ public class Payment {
     }
 
     public String getPaymentKey() {
-        return paymentKey;
+        return paymentKey.value();
     }
 
     public String getOrderId() {
-        return orderId;
+        return orderId.value();
     }
 
     public Long getAmount() {
-        return amount;
+        return amount.value();
     }
 
     public PaymentType getPaymentType() {
         return paymentType;
-    }
-
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
     }
 }

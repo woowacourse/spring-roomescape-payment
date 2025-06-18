@@ -1,6 +1,8 @@
 package roomescape.common.security.exception;
 
-public class ForbiddenException extends RuntimeException {
+import roomescape.common.exception.RoomescapeException;
+
+public class ForbiddenException extends RoomescapeException {
 
     public ForbiddenException(final String message) {
         super(message);

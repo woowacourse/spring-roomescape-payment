@@ -38,7 +38,7 @@ class ReservationSlotTest {
     @Test
     void addReservation_whenValidRequest_returnReservations() {
         // given
-        reservationSlot.addReservation(member, NOW_DATETIME, null);
+        reservationSlot.addReservation(member, NOW_DATETIME);
 
         // when & then
         assertThat(reservationSlot.getReservations()).hasSize(1);
@@ -47,7 +47,7 @@ class ReservationSlotTest {
     @Test
     void addReservation_whenPastDate_throwsException() {
         assertThatThrownBy(() -> reservationSlot.addReservation(member,
-                LocalDateTime.of(FUTURE_DATE.plusDays(1), LocalTime.of(11, 0)), null))
+                LocalDateTime.of(FUTURE_DATE.plusDays(1), LocalTime.of(11, 0))))
                 .isInstanceOf(InvalidReservationSlotException.class)
                 .hasMessageContaining("예약 시간이 현재 시간보다 이전일 수 없습니다.");
     }
@@ -55,10 +55,10 @@ class ReservationSlotTest {
     @Test
     void addReservation_whenAlreadyReserved_throwsException() {
         reservationSlot.addReservation(member,
-                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)), null);
+                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)));
 
         assertThatThrownBy(() -> reservationSlot.addReservation(member,
-                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)), null))
+                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0))))
                 .isInstanceOf(ReservationDuplicatedException.class)
                 .hasMessageContaining("해당 멤버는 이미 예약 중입니다.");
     }
@@ -69,7 +69,7 @@ class ReservationSlotTest {
         LocalDateTime reservationTime = LocalDateTime.of(NOW_DATE, LocalTime.of(10, 0));
         Member member2 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member2, "id", 4L);
-        reservationSlot.addReservation(member2, reservationTime, null);
+        reservationSlot.addReservation(member2, reservationTime);
 
         // when & then
         assertThat(reservationSlot.findHighestPriorityMember().get()).isEqualTo(member);
@@ -81,11 +81,11 @@ class ReservationSlotTest {
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
         LocalDateTime reservationTime = LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0));
-        Reservation reservation1 = reservationSlot.addReservation(member1, reservationTime, null);
+        Reservation reservation1 = reservationSlot.addReservation(member1, reservationTime);
         ReflectionTestUtils.setField(reservation1, "id", 1L);
         Member member2 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 5L);
-        Reservation reservation2 = reservationSlot.addReservation(member2, reservationTime, null);
+        Reservation reservation2 = reservationSlot.addReservation(member2, reservationTime);
         ReflectionTestUtils.setField(reservation2, "id", 2L);
 
         // when & then
@@ -100,7 +100,7 @@ class ReservationSlotTest {
         // given
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
-        Reservation reservation = new Reservation(member1, reservationSlot, null);
+        Reservation reservation = new Reservation(member1, reservationSlot);
 
         // when & then
         assertThatThrownBy(() -> reservationSlot.findRank(reservation))
@@ -111,7 +111,7 @@ class ReservationSlotTest {
     @Test
     void findHighestPriorityReservation_whenValidParameters_returnReservation() {
         // given
-        Reservation reservation = reservationSlot.addReservation(member, NOW_DATETIME, null);
+        Reservation reservation = reservationSlot.addReservation(member, NOW_DATETIME);
 
         // when & then
         assertThat(reservationSlot.findHighestPriorityReservation()).isEqualTo(reservation);

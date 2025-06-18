@@ -7,11 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
+import roomescape.payment.application.dto.TossPaymentMapper;
 import roomescape.payment.exception.handler.PaymentExceptionHandler;
 
 @Configuration
+@EnableRetry
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClientConfig {
 
@@ -46,5 +49,10 @@ public class PaymentClientConfig {
     @Bean
     public PaymentExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
         return new PaymentExceptionHandler(objectMapper);
+    }
+
+    @Bean
+    public TossPaymentMapper tossPaymentMapper() {
+        return new TossPaymentMapper();
     }
 }

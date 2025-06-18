@@ -34,13 +34,6 @@ public class IntegrationFixture {
                 .cookie(TOKEN);
     }
 
-    public static void createReservationWithTimeAndTheme() {
-        createReservationTime();
-        createTheme("추리");
-        createRegularReservation(1L);
-        IntegrationFixture.findReservation();
-    }
-
     public static void createRegularReservation(final Long themeId) {
         String authToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
 
@@ -109,7 +102,7 @@ public class IntegrationFixture {
         reservation.put("timeId", 1L);
         reservation.put("themeId", 1L);
 
-        ReservationResponse reservationResponse = RestAssured.given().log().all()
+        return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie(TOKEN, user2Token)
                 .body(reservation)
@@ -118,7 +111,6 @@ public class IntegrationFixture {
                 .statusCode(201)
                 .extract()
                 .as(ReservationResponse.class);
-        return reservationResponse;
     }
 
     public static long findReservation() {

@@ -11,6 +11,8 @@ import roomescape.common.properties.CookieProperties;
 @EnableConfigurationProperties(CookieProperties.class)
 public class CookieManager {
 
+    private static final String LAX = "Lax";
+
     private final CookieProperties cookieProperties;
 
     public CookieManager(final CookieProperties cookieProperties) {
@@ -20,9 +22,8 @@ public class CookieManager {
     public ResponseCookie makeCookie(final String name, final String value) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .sameSite("Strict")
+                .sameSite(LAX)
                 .path("/")
-                .domain(cookieProperties.getDomain())
                 .maxAge(cookieProperties.getMaxAge())
                 .build();
     }
@@ -30,9 +31,8 @@ public class CookieManager {
     public void deleteCookie(final HttpServletResponse response, final String name) {
         ResponseCookie cookie = ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .sameSite("Strict")
+                .sameSite(LAX)
                 .path("/")
-                .domain(cookieProperties.getDomain())
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

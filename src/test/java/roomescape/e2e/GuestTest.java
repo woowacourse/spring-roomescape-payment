@@ -2,6 +2,11 @@ package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.REGULAR_EMAIL;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
@@ -11,13 +16,20 @@ import static roomescape.fixture.IntegrationFixture.findThemesBySize;
 import static roomescape.fixture.IntegrationFixture.loginAndGetAuthToken;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.common.mapper.TypeRef;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.common.security.dto.request.LoginRequest;
@@ -29,31 +41,54 @@ import roomescape.member.presentation.dto.request.SignupWebRequest;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
+@ExtendWith(RestDocumentationExtension.class)
 public class GuestTest {
 
     @LocalServerPort
     private int port;
 
+    private RequestSpecification spec;
+
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider provider) {
         RestAssured.port = port;
+        this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(provider))
+                .build();
     }
 
     @Test
     void findAvailableReservations() {
+        // given
         createReservationTime();
         createTheme("추리");
 
+        // when
         LocalDate now = LocalDate.now();
-        RestAssured.given().log().all()
-                .when().queryParams("date", now.toString(), "themeId", 1L).get("/times/available")
+        RestAssured.given(spec).log().all()
+                .filter(document("time/게스트-예약가능시간-조회"))
+                .when().queryParams("date", now.toString(), "themeId", 1L)
+                .get("/times/available")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(1));
     }
 
     @Test
+    @DisplayName("findAllThemes")
+    void findAllThemes() {
+        RestAssured.given(spec).log().all()
+                .filter(document("theme/게스트-모든테마-조회"))
+                .when().get("/themes")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(new TypeRef<>() {
+                });
+    }
+
+    @Test
     void findPopularTheme() {
+        // given
         createReservationTime();
         createTheme("추리1");
         createTheme("추리2");
@@ -69,7 +104,9 @@ public class GuestTest {
         createTheme("추리12");
         findThemesBySize(12);
 
-        RestAssured.given().log().all()
+        // when
+        RestAssured.given(spec).log().all()
+                .filter(document("theme/게스트-인기테마-조회"))
                 .when().get("/themes/popular")
                 .then().log().all()
                 .statusCode(200)
@@ -78,20 +115,42 @@ public class GuestTest {
 
     @Test
     void signup() {
-        RestAssured.given().log().all()
+        // when
+        RestAssured.given(spec).log().all()
+                .filter(document(
+                        "member/게스트-회원가입",
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호"),
+                                fieldWithPath("name").description("회원 이름")
+                        )
+                ))
                 .body(new SignupWebRequest("testMember@gmail.com", PASSWORD, "testMember"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/members")
                 .then().log().all()
                 .statusCode(201);
 
+        // then
         loginAndGetAuthToken("testMember@gmail.com", PASSWORD);
     }
 
     @Test
     void loginCheck() {
+        // given
         String regularToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
-        CheckLoginResponse checkLoginResponse = RestAssured.given().log().all()
+        // when
+        CheckLoginResponse checkLoginResponse = RestAssured.given(spec).log().all()
+                .filter(document(
+                        "member/게스트-로그인확인",
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("name").description("회원 이름")
+                        )
+                ))
                 .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .cookie(TOKEN, regularToken)
@@ -101,6 +160,7 @@ public class GuestTest {
                 .extract()
                 .as(CheckLoginResponse.class);
 
+        // then
         assertThat(checkLoginResponse.name()).isEqualTo("Regular");
     }
 }

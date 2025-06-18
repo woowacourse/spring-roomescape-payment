@@ -750,8 +750,7 @@ Content-Type: application/json
 [
 {
 "reservationId": 1,
-"waitingId": "2024-03-01",
-"waitingStatus": "WAITING"
+"waitingId": "2024-03-01"
 }
 ]
 ```

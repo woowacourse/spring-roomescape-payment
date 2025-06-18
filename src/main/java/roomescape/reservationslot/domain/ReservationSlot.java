@@ -64,10 +64,10 @@ public class ReservationSlot {
     protected ReservationSlot() {
     }
 
-    public Reservation addReservation(final Member member, final LocalDateTime now, final String orderId) {
+    public Reservation addReservation(final Member member, final LocalDateTime now) {
         validateDateTime(date, time.getStartAt(), now);
         validateMemberNotConfirmed(member);
-        Reservation reservation = new Reservation(member, this, orderId);
+        Reservation reservation = new Reservation(member, this);
         reservations.add(reservation);
         return reservation;
     }
@@ -75,7 +75,7 @@ public class ReservationSlot {
     public Optional<Member> findHighestPriorityMember() {
         return reservations.stream()
                 .filter(reservation -> !reservation.isFailed())
-                .sorted(Comparator.comparing(Reservation::getCreatedAt))
+                .sorted(Comparator.comparing(reservation -> reservation.getCreatedAt().value()))
                 .map(Reservation::getMember)
                 .findFirst();
     }

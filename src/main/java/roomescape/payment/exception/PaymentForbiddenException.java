@@ -1,8 +1,8 @@
 package roomescape.payment.exception;
 
-public class PaymentForbiddenException extends PaymentException {
+public class PaymentForbiddenException extends PaymentClientException {
 
-    public PaymentForbiddenException(final String code, final String message) {
-        super(code, message);
+    public PaymentForbiddenException(final String message) {
+        super(message);
     }
 }

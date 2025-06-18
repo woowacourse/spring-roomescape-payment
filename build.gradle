@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
+    id 'com.epages.restdocs-api-spec' version '0.18.2'
 }
 
 group = 'nextstep'
@@ -16,21 +18,74 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    snippetsDir = file("build/generated-snippets")
+    docsDir = file('build/docs/asciidoc')
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.security:spring-security-crypto:6.4.5'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
     implementation 'com.auth0:java-jwt:4.4.0'
+    implementation 'org.springframework.retry:spring-retry:2.0.12'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
+    testImplementation 'com.epages:restdocs-api-spec-restassured:0.18.2'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.0'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-core:3.0.0'
 }
 
-test {
+tasks.register("prepareSnippetsDir") {
+    doLast {
+        if (!snippetsDir.exists()) {
+            snippetsDir.mkdirs()
+        }
+    }
+}
+
+tasks.test {
+    dependsOn "prepareSnippetsDir"
+    outputs.dir snippetsDir
     useJUnitPlatform()
+}
+
+tasks.asciidoctor {
+    dependsOn test
+    inputs.dir snippetsDir
+    outputDir = file("$buildDir/docs/asciidoc")
+    attributes 'snippets': snippetsDir, 'docs': file('src/docs/asciidoc')
+    sources {
+        include("**/*.adoc")
+    }
+    baseDirFollowsSourceDir()
+    doLast {
+        println "📄 HTML 생성 완료: file://${docsDir}/index.html"
+    }
+}
+
+openapi3 {
+    server = 'https://localhost:8080'
+    title = '간단한 API'
+    description = 'API 목록입니다.'
+    version = '0.1.0'
+    format = 'yaml'
 }

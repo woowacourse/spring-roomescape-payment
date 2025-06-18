@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,14 +22,15 @@ import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.application.dto.PaymentGatewayRequest;
+import roomescape.payment.application.dto.PaymentGatewayResponse;
 import roomescape.payment.application.infrastructure.PaymentRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentGateway;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.exception.PaymentForbiddenException;
-import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
-import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -50,6 +52,7 @@ class PaymentServiceTest {
     private static final LocalDateTime afterOneHour = TestFixture.makeTimeAfterOneHour();
     private static final String ORDER_ID = "ORDER_ID";
     private static final String PAYMENT_KEY = "PAYMENT_KEY";
+    private static final String IDEMPOTENCY_KEY = UUID.randomUUID().toString();
 
     @Autowired
     private ReservationSlotRepository reservationSlotRepository;
@@ -76,35 +79,28 @@ class PaymentServiceTest {
     private EntityManager entityManager;
 
     @MockitoBean
-    private PaymentClient paymentClient;
+    private PaymentGateway paymentGateway;
 
     private PaymentService paymentService;
-
-    private ReservationDataService reservationDataService;
-
-    private Long timeId;
-    private Long themeId;
-    private Long memberId;
     private Long reservationId;
-
-    private ConfirmedReservationApplicationService confirmedReservationApplicationService;
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(paymentClient, paymentRepository, eventPublisher);
+        paymentService = new PaymentService(paymentGateway, paymentRepository, eventPublisher);
         ReservationSlotDataService reservationSlotDataService = new ReservationSlotDataService(
                 reservationSlotRepository);
         ReservationTimeDataService reservationTimeDataService = new ReservationTimeDataService(
                 reservationTimeRepository, reservationSlotDataService);
         ThemeDataService themeDataService = new ThemeDataService(themeRepository);
         MemberDataService memberDataService = new MemberDataService(memberRepository);
-        reservationDataService = new ReservationDataService(reservationRepository);
-        confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
+        ReservationDataService reservationDataService = new ReservationDataService(reservationRepository);
+        ConfirmedReservationApplicationService confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
+                reservationSlotDataService,
                 reservationTimeDataService, themeDataService, memberDataService, reservationDataService,
                 eventPublisher);
-        timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
-        themeId = themeRepository.save(TestFixture.makeTheme()).getId();
-        memberId = memberRepository.save(TestFixture.makeMember()).getId();
+        Long timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
+        Long themeId = themeRepository.save(TestFixture.makeTheme()).getId();
+        Long memberId = memberRepository.save(TestFixture.makeMember()).getId();
         reservationId = confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId, memberId,
                         afterOneHour, null)).id();
@@ -115,15 +111,15 @@ class PaymentServiceTest {
     void approvePayment_whenValidRequest_returnDto() {
         // given
         long amount = 5000L;
-        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
-                reservationId);
-        TossPaymentApproveResponse paymentApproveResponse = new TossPaymentApproveResponse(PAYMENT_KEY, ORDER_ID,
+        PaymentRequest paymentRequest = new PaymentRequest(PAYMENT_KEY, ORDER_ID,
+                amount, PaymentType.NORMAL, reservationId);
+        PaymentGatewayResponse paymentApproveResponse = new PaymentGatewayResponse(PAYMENT_KEY, ORDER_ID,
                 amount);
-        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenReturn(paymentApproveResponse);
+        when(paymentGateway.approvePayment(any(PaymentGatewayRequest.class))).thenReturn(paymentApproveResponse);
         PaymentApproveResponse expected = new PaymentApproveResponse(ORDER_ID, amount);
 
         // when
-        PaymentApproveResponse actual = paymentService.approvePayment(paymentApproveRequest);
+        PaymentApproveResponse actual = paymentService.approvePayment(paymentRequest);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -137,12 +133,13 @@ class PaymentServiceTest {
     void approvePayment_whenPaymentFailed_throwException() {
         // given
         long amount = 5000L;
-        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
-                reservationId);
-        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenThrow(PaymentForbiddenException.class);
+        PaymentRequest paymentRequest = new PaymentRequest(PAYMENT_KEY, ORDER_ID,
+                amount, PaymentType.NORMAL, reservationId);
+        when(paymentGateway.approvePayment(any(PaymentGatewayRequest.class))).thenThrow(
+                PaymentForbiddenException.class);
 
         // when
-        Assertions.assertThatThrownBy(() -> paymentService.approvePayment(paymentApproveRequest))
+        Assertions.assertThatThrownBy(() -> paymentService.approvePayment(paymentRequest))
                 .isInstanceOf(PaymentForbiddenException.class);
     }
 

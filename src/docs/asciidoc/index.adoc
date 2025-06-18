@@ -1,0 +1,35 @@
+= Roomescape API 문서
+:doctype: book
+:toc:
+:toclevels: 2
+:sectnums:
+
+== REST API 그룹
+
+=== 🧑‍💼 회원 관련 API
+
+include::member.adoc[]
+
+=== 🏠 예약 API
+
+include::reservation.adoc[]
+
+=== 🚪 대기 예약 API
+
+include::waiting-reservation.adoc[]
+
+=== 🎯 테마 API
+
+include::theme.adoc[]
+
+=== ⏰ 예약 시간 API
+
+include::time.adoc[]
+
+=== 💰 결제 API
+
+include::payment.adoc[]
+
+== 🖥️ View 페이지 접근 API
+
+include::view-pages.adoc[]
